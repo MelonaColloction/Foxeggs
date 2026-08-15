@@ -13,25 +13,16 @@ jobs:
 
     steps:
 
-      # -------------------------
-      # دریافت کد
-      # -------------------------
       - name: Checkout
         uses: actions/checkout@v4
 
 
-      # -------------------------
-      # نصب Node.js
-      # -------------------------
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
 
-      # -------------------------
-      # نصب Java
-      # -------------------------
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
@@ -39,9 +30,18 @@ jobs:
           java-version: 17
 
 
-      # -------------------------
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+
+      # ساخت پوشه مخصوص فایل‌های وب
+      - name: Prepare web files
+        run: |
+          mkdir -p www
+          cp index.html www/index.html
+
+
       # ساخت package.json
-      # -------------------------
       - name: Create package.json
         run: |
           cat > package.json <<'EOF'
@@ -49,9 +49,6 @@ jobs:
             "name": "fox-eggs",
             "version": "1.0.0",
             "private": true,
-            "scripts": {
-              "sync": "npx cap sync android"
-            },
             "dependencies": {
               "@capacitor/core": "^7.4.0",
               "@capacitor/android": "^7.4.0"
@@ -63,52 +60,34 @@ jobs:
           EOF
 
 
-      # -------------------------
       # نصب Capacitor
-      # -------------------------
       - name: Install Capacitor
         run: npm install
 
 
-      # -------------------------
-      # ساخت تنظیمات Capacitor
-      # -------------------------
+      # تنظیم Capacitor
       - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
           {
             "appId": "com.foxeggs.game",
             "appName": "Fox Eggs",
-            "webDir": ".",
-            "bundledWebRuntime": false
+            "webDir": "www"
           }
           EOF
 
 
-      # -------------------------
-      # ساخت پروژه Android
-      # -------------------------
+      # ساخت Android
       - name: Add Android
         run: npx cap add android
 
 
-      # -------------------------
-      # انتقال index.html
-      # -------------------------
-      - name: Sync web files
+      # انتقال فایل‌های وب به Android
+      - name: Sync Android
         run: npx cap sync android
 
 
-      # -------------------------
-      # نصب Android SDK
-      # -------------------------
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-
-      # -------------------------
-      # ساخت APK
-      # -------------------------
+      # Build APK
       - name: Build APK
         working-directory: android
         run: |
@@ -116,18 +95,14 @@ jobs:
           ./gradlew assembleDebug
 
 
-      # -------------------------
-      # تغییر نام APK
-      # -------------------------
-      - name: Rename APK
+      # آماده کردن فایل خروجی
+      - name: Prepare APK
         run: |
           mkdir -p release
           cp android/app/build/outputs/apk/debug/app-debug.apk release/FoxEggs.apk
 
 
-      # -------------------------
-      # قرار دادن APK در GitHub
-      # -------------------------
+      # آپلود APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
