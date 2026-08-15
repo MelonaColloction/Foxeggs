@@ -8,13 +8,13 @@ on:
 
 jobs:
   build:
-    name: Build Android APK
+    name: Build Fox Eggs
     runs-on: ubuntu-latest
 
     steps:
 
       # =========================
-      # دریافت پروژه
+      # Checkout
       # =========================
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,7 +47,16 @@ jobs:
 
 
       # =========================
-      # آماده کردن فایل بازی
+      # بررسی index.html
+      # =========================
+      - name: Check game
+        run: |
+          test -f index.html
+          echo "index.html OK"
+
+
+      # =========================
+      # ساخت Web Folder
       # =========================
       - name: Prepare web files
         run: |
@@ -99,30 +108,271 @@ jobs:
 
 
       # =========================
-      # ساخت پروژه Android
+      # ساخت Android
       # =========================
       - name: Add Android
         run: npx cap add android
 
 
       # =========================
-      # انتقال فایل بازی
+      # Sync
       # =========================
       - name: Sync Android
         run: npx cap sync android
 
 
       # =========================
-      # بررسی Java
+      # نصب ImageMagick
       # =========================
-      - name: Check Java
+      - name: Install ImageMagick
         run: |
-          java -version
-          echo "JAVA_HOME=$JAVA_HOME"
+          sudo apt-get update
+          sudo apt-get install -y imagemagick
 
 
       # =========================
-      # ساخت APK
+      # ساخت آیکن با SVG
+      # =========================
+      - name: Create Fox Eggs Icon
+        run: |
+
+          cat > icon.svg <<'EOF'
+          <svg xmlns="http://www.w3.org/2000/svg"
+               width="1024"
+               height="1024"
+               viewBox="0 0 1024 1024">
+
+            <!-- Background -->
+            <rect
+              width="1024"
+              height="1024"
+              rx="220"
+              fill="#87CEEB"/>
+
+            <!-- Ground -->
+            <path
+              d="M0 720
+                 Q250 650 500 720
+                 Q760 790 1024 700
+                 L1024 1024
+                 L0 1024 Z"
+              fill="#70B84A"/>
+
+            <!-- Egg -->
+            <path
+              d="M730 650
+                 C820 650 875 570 865 475
+                 C855 370 790 260 730 260
+                 C670 260 605 370 595 475
+                 C585 570 640 650 730 650 Z"
+              fill="#FFF7ED"/>
+
+            <!-- Egg color -->
+            <path
+              d="M610 470
+                 Q730 410 850 470
+                 L850 540
+                 Q730 600 610 540 Z"
+              fill="#FACC15"/>
+
+            <!-- Egg shine -->
+            <ellipse
+              cx="680"
+              cy="380"
+              rx="28"
+              ry="55"
+              fill="#FFFFFF"
+              opacity=".8"/>
+
+            <!-- Fox tail -->
+            <path
+              d="M170 680
+                 C40 600 90 430 230 470
+                 C300 490 325 565 280 620
+                 C250 655 210 675 170 680 Z"
+              fill="#F97316"/>
+
+            <!-- Tail tip -->
+            <path
+              d="M105 470
+                 C70 510 70 570 115 605
+                 C145 625 175 610 190 580
+                 C150 565 130 520 105 470 Z"
+              fill="#FFF7ED"/>
+
+            <!-- Fox body -->
+            <ellipse
+              cx="390"
+              cy="620"
+              rx="190"
+              ry="125"
+              fill="#F97316"/>
+
+            <!-- Fox belly -->
+            <ellipse
+              cx="425"
+              cy="640"
+              rx="95"
+              ry="70"
+              fill="#FFF7ED"/>
+
+            <!-- Head -->
+            <ellipse
+              cx="480"
+              cy="430"
+              rx="150"
+              ry="135"
+              fill="#FB923C"/>
+
+            <!-- Left ear -->
+            <path
+              d="M365 350
+                 L355 175
+                 L470 285 Z"
+              fill="#F97316"/>
+
+            <!-- Right ear -->
+            <path
+              d="M500 285
+                 L620 175
+                 L600 370 Z"
+              fill="#F97316"/>
+
+            <!-- Inner ears -->
+            <path
+              d="M380 310 L375 225 L435 290 Z"
+              fill="#FDB4B4"/>
+
+            <path
+              d="M535 290 L600 225 L580 325 Z"
+              fill="#FDB4B4"/>
+
+            <!-- Face -->
+            <ellipse
+              cx="530"
+              cy="470"
+              rx="105"
+              ry="75"
+              fill="#FFF7ED"/>
+
+            <!-- Eyes -->
+            <circle
+              cx="440"
+              cy="415"
+              r="18"
+              fill="#111827"/>
+
+            <circle
+              cx="540"
+              cy="415"
+              r="18"
+              fill="#111827"/>
+
+            <!-- Eye shine -->
+            <circle
+              cx="446"
+              cy="408"
+              r="6"
+              fill="#FFFFFF"/>
+
+            <circle
+              cx="546"
+              cy="408"
+              r="6"
+              fill="#FFFFFF"/>
+
+            <!-- Nose -->
+            <path
+              d="M525 460
+                 Q545 450 565 460
+                 Q545 485 525 460 Z"
+              fill="#111827"/>
+
+            <!-- Smile -->
+            <path
+              d="M545 480
+                 Q530 510 505 490"
+              fill="none"
+              stroke="#111827"
+              stroke-width="9"
+              stroke-linecap="round"/>
+
+            <!-- Legs -->
+            <rect
+              x="280"
+              y="680"
+              width="55"
+              height="95"
+              rx="25"
+              fill="#EA580C"/>
+
+            <rect
+              x="460"
+              y="680"
+              width="55"
+              height="95"
+              rx="25"
+              fill="#EA580C"/>
+
+          </svg>
+          EOF
+
+
+      # =========================
+      # تبدیل SVG به PNG
+      # =========================
+      - name: Convert icon
+        run: |
+          convert -background none icon.svg icon.png
+
+
+      # =========================
+      # ساخت Android icon ها
+      # =========================
+      - name: Install Android Icons
+        run: |
+
+          mkdir -p android/app/src/main/res/mipmap-mdpi
+          mkdir -p android/app/src/main/res/mipmap-hdpi
+          mkdir -p android/app/src/main/res/mipmap-xhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxhdpi
+          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+
+
+          convert icon.png -resize 48x48 \
+            android/app/src/main/res/mipmap-mdpi/ic_launcher.png
+
+          convert icon.png -resize 72x72 \
+            android/app/src/main/res/mipmap-hdpi/ic_launcher.png
+
+          convert icon.png -resize 96x96 \
+            android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
+
+          convert icon.png -resize 144x144 \
+            android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
+
+          convert icon.png -resize 192x192 \
+            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
+
+
+          cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png \
+             android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png \
+             android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png \
+             android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png \
+             android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
+
+          cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png \
+             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
+
+
+      # =========================
+      # Build APK
       # =========================
       - name: Build APK
         working-directory: android
@@ -132,12 +382,14 @@ jobs:
 
 
       # =========================
-      # آماده کردن APK
+      # آماده سازی APK
       # =========================
       - name: Prepare APK
         run: |
           mkdir -p release
-          cp android/app/build/outputs/apk/debug/app-debug.apk release/FoxEggs.apk
+
+          cp android/app/build/outputs/apk/debug/app-debug.apk \
+             release/FoxEggs.apk
 
 
       # =========================
