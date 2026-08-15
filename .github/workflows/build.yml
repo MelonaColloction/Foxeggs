@@ -1,39 +1,24 @@
 name: Build Fox Eggs Android
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   build:
-    name: Build Fox Eggs Release
     runs-on: ubuntu-latest
 
     steps:
 
-      # ==============================
-      # SOURCE
-      # ==============================
-
       - name: Checkout
         uses: actions/checkout@v4
 
-
-      # ==============================
-      # NODE
-      # ==============================
-
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-
-      # ==============================
-      # JAVA
-      # ==============================
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -41,34 +26,20 @@ jobs:
           distribution: temurin
           java-version: 21
 
-
-      # ==============================
-      # ANDROID
-      # ==============================
-
-      - name: Setup Android SDK
+      - name: Setup Android
         uses: android-actions/setup-android@v3
 
-
-      # ==============================
-      # WEB GAME
-      # ==============================
+      # -------------------------------
+      # Prepare game
+      # -------------------------------
 
       - name: Prepare game
         run: |
           test -f index.html
-
-          rm -rf www
           mkdir -p www
-
           cp index.html www/index.html
 
-
-      # ==============================
-      # PACKAGE
-      # ==============================
-
-      - name: Create package.json
+      - name: Create package
         run: |
           cat > package.json <<'EOF'
           {
@@ -85,15 +56,7 @@ jobs:
           }
           EOF
 
-
-      - name: Install dependencies
-        run: |
           npm install
-
-
-      # ==============================
-      # CAPACITOR
-      # ==============================
 
       - name: Create Capacitor config
         run: |
@@ -105,20 +68,15 @@ jobs:
           }
           EOF
 
-
       - name: Add Android
-        run: |
-          npx cap add android
-
+        run: npx cap add android
 
       - name: Sync Android
-        run: |
-          npx cap sync android
+        run: npx cap sync android
 
-
-      # ==============================
-      # VERSION
-      # ==============================
+      # -------------------------------
+      # Version
+      # -------------------------------
 
       - name: Set version
         env:
@@ -128,50 +86,17 @@ jobs:
           VERSION_CODE=$((RUN_NUMBER + 100))
           VERSION_NAME="1.0.${RUN_NUMBER}"
 
-          python3 - <<PY
-
-          import re
-
-          path = "android/app/build.gradle"
-
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
-
-          text = re.sub(
-              r'versionCode\s+\d+',
-              'versionCode ${VERSION_CODE}',
-              text,
-              count=1
-          )
-
-          text = re.sub(
-              r'versionName\s+"[^"]+"',
-              'versionName "${VERSION_NAME}"',
-              text,
-              count=1
-          )
-
-          text = re.sub(
-              r'applicationId\s+"[^"]+"',
-              'applicationId "com.foxeggs.game"',
-              text,
-              count=1
-          )
-
-          with open(path, "w", encoding="utf-8") as f:
-              f.write(text)
-
-          PY
+          echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
+          echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
 
           echo "Version Code: $VERSION_CODE"
           echo "Version Name: $VERSION_NAME"
 
+      # -------------------------------
+      # Keystore
+      # -------------------------------
 
-      # ==============================
-      # KEYSTORE
-      # ==============================
-
-      - name: Load release keystore
+      - name: Load existing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
@@ -184,121 +109,120 @@ jobs:
 
           echo "Keystore loaded."
 
-
-      # ==============================
-      # SIGNING PROPERTIES
-      # ==============================
-
       - name: Configure signing properties
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
 
           cat >> android/gradle.properties <<EOF
+
           FOXEGGS_KEYSTORE_FILE=FoxEggs.keystore
           FOXEGGS_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
           FOXEGGS_KEY_ALIAS=foxeggs
           FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
+
           EOF
 
+      # -------------------------------
+      # Create clean build.gradle
+      # -------------------------------
 
-      # ==============================
-      # GRADLE CONFIGURATION
-      # ==============================
-
-      - name: Configure Android Gradle
+      - name: Create clean Android build.gradle
         run: |
 
-          python3 - <<'PY'
+          cat > android/app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+              id 'org.jetbrains.kotlin.android'
+              id 'com.getcapacitor.android'
+          }
 
-          import re
+          android {
+              namespace "com.foxeggs.game"
+              compileSdk 35
 
-          path = "android/app/build.gradle"
+              defaultConfig {
+                  applicationId "com.foxeggs.game"
+                  minSdk 23
+                  targetSdk 35
 
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
+                  versionCode 101
+                  versionName "1.0.1"
 
-          # Remove previously generated signing blocks
-          text = re.sub(
-              r'\s*signingConfigs\s*\{.*?\n\s*\}',
-              '',
-              text,
-              flags=re.S
-          )
+                  testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-          # Remove broken signingConfig(...) calls
-          text = re.sub(
-              r'\s*signingConfig\s*\([^)]+\)',
-              '',
-              text
-          )
+                  aaptOptions {
+                      ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+                  }
+              }
 
-          # Make sure compileSdk exists
-          if re.search(r'compileSdk\s+\d+', text):
-              text = re.sub(
-                  r'compileSdk\s+\d+',
-                  'compileSdk 35',
-                  text,
-                  count=1
-              )
-          else:
-              text = text.replace(
-                  'android {',
-                  'android {\n    compileSdk 35',
-                  1
-              )
-
-          # Application ID
-          text = re.sub(
-              r'applicationId\s+"[^"]+"',
-              'applicationId "com.foxeggs.game"',
-              text,
-              count=1
-          )
-
-          # Add signing config BEFORE buildTypes
-          signing_config = '''
               signingConfigs {
                   release {
                       storeFile file(FOXEGGS_KEYSTORE_FILE)
                       storePassword FOXEGGS_KEYSTORE_PASSWORD
                       keyAlias FOXEGGS_KEY_ALIAS
                       keyPassword FOXEGGS_KEY_PASSWORD
-                      v1SigningEnabled true
-                      v2SigningEnabled true
                   }
               }
 
-          '''
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.release
+                      minifyEnabled false
+                      shrinkResources false
+                  }
+              }
+          }
 
-          if 'signingConfigs {' not in text:
-              text = text.replace(
-                  '    buildTypes {',
-                  signing_config + '    buildTypes {',
-                  1
-              )
+          repositories {
+              flatDir {
+                  dirs '../capacitor-cordova-android-plugins/src/main/libs'
+              }
+          }
 
-          # Add signingConfig INSIDE release
+          dependencies {
+              implementation project(':capacitor-android')
+              implementation project(':capacitor-cordova-android-plugins')
+
+              implementation 'androidx.appcompat:appcompat:1.7.0'
+              implementation 'androidx.core:core-ktx:1.15.0'
+          }
+
+          apply from: 'capacitor.build.gradle'
+          EOF
+
+          # Replace version values with current build number
+          python3 - <<'PY'
+
+          import os
+
+          path = "android/app/build.gradle"
+
+          with open(path, "r", encoding="utf-8") as f:
+              text = f.read()
+
           text = text.replace(
-              '        release {',
-              '''        release {
-            signingConfig signingConfigs.release''',
-              1
+              "versionCode 101",
+              "versionCode " + os.environ["VERSION_CODE"]
+          )
+
+          text = text.replace(
+              'versionName "1.0.1"',
+              'versionName "' + os.environ["VERSION_NAME"] + '"'
           )
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
-          print("Android Gradle configured.")
-
           PY
 
+          echo "Clean build.gradle created."
 
-      # ==============================
-      # PERMISSIONS
-      # ==============================
+      # -------------------------------
+      # Remove unnecessary permissions
+      # -------------------------------
 
-      - name: Remove unnecessary permissions
+      - name: Clean permissions
         run: |
 
           python3 - <<'PY'
@@ -310,7 +234,7 @@ jobs:
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          permissions = [
+          bad_permissions = [
               "READ_CONTACTS",
               "WRITE_CONTACTS",
               "READ_SMS",
@@ -330,12 +254,11 @@ jobs:
               "BIND_ACCESSIBILITY_SERVICE"
           ]
 
-          for p in permissions:
+          for permission in bad_permissions:
 
               text = re.sub(
-                  r'\s*<uses-permission\s+'
-                  r'android:name="android\.permission\.'
-                  + p +
+                  r'\s*<uses-permission\s+android:name="android\.permission\.'
+                  + permission +
                   r'"\s*/>',
                   '',
                   text
@@ -344,19 +267,15 @@ jobs:
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
-          print("Unnecessary permissions removed.")
-
           PY
 
-
-      # ==============================
-      # ICON GENERATION
-      # ==============================
+      # -------------------------------
+      # Icon
+      # -------------------------------
 
       - name: Install Pillow
         run: |
           python3 -m pip install pillow
-
 
       - name: Create Fox Eggs icon
         run: |
@@ -365,136 +284,135 @@ jobs:
 
           from PIL import Image, ImageDraw
 
-          SIZE = 1024
+          S = 1024
 
-          image = Image.new(
+          img = Image.new(
               "RGBA",
-              (SIZE, SIZE),
+              (S, S),
               (255, 190, 70, 255)
           )
 
-          d = ImageDraw.Draw(image)
+          d = ImageDraw.Draw(img)
 
           # Background
           d.rounded_rectangle(
               (30, 30, 994, 994),
               radius=190,
-              fill=(255, 181, 65, 255)
+              fill=(255, 184, 70, 255)
           )
 
-          # Fox head
+          # Fox
           d.polygon(
               [
-                  (150, 350),
-                  (190, 135),
-                  (365, 245),
-                  (512, 205),
-                  (659, 245),
-                  (834, 135),
-                  (874, 350),
-                  (825, 610),
-                  (700, 770),
-                  (512, 830),
-                  (324, 770),
-                  (199, 610)
+                  (150,350),
+                  (190,135),
+                  (365,245),
+                  (512,205),
+                  (659,245),
+                  (834,135),
+                  (874,350),
+                  (825,610),
+                  (700,770),
+                  (512,830),
+                  (324,770),
+                  (199,610)
               ],
-              fill=(215, 91, 42, 255)
+              fill=(215,91,42,255)
           )
 
-          # Ears
+          # Inner ears
           d.polygon(
-              [(205, 300), (215, 185), (345, 275)],
-              fill=(255, 145, 115, 255)
+              [(205,300),(215,185),(345,275)],
+              fill=(255,145,115,255)
           )
 
           d.polygon(
-              [(679, 275), (809, 185), (819, 300)],
-              fill=(255, 145, 115, 255)
+              [(679,275),(809,185),(819,300)],
+              fill=(255,145,115,255)
           )
 
           # Face
           d.polygon(
               [
-                  (512, 400),
-                  (430, 455),
-                  (390, 590),
-                  (425, 700),
-                  (512, 755),
-                  (599, 700),
-                  (634, 590),
-                  (594, 455)
+                  (512,400),
+                  (430,455),
+                  (390,590),
+                  (425,700),
+                  (512,755),
+                  (599,700),
+                  (634,590),
+                  (594,455)
               ],
-              fill=(255, 239, 211, 255)
+              fill=(255,239,211,255)
           )
 
           # Eyes
           d.ellipse(
-              (330, 430, 410, 520),
-              fill=(35, 25, 20, 255)
+              (330,430,410,520),
+              fill=(35,25,20,255)
           )
 
           d.ellipse(
-              (614, 430, 694, 520),
-              fill=(35, 25, 20, 255)
-          )
-
-          # Eye highlights
-          d.ellipse(
-              (350, 447, 375, 472),
-              fill=(255, 255, 255, 255)
+              (614,430,694,520),
+              fill=(35,25,20,255)
           )
 
           d.ellipse(
-              (634, 447, 659, 472),
-              fill=(255, 255, 255, 255)
+              (350,447,375,472),
+              fill=(255,255,255,255)
+          )
+
+          d.ellipse(
+              (634,447,659,472),
+              fill=(255,255,255,255)
           )
 
           # Nose
           d.ellipse(
-              (468, 555, 556, 625),
-              fill=(40, 25, 22, 255)
+              (468,555,556,625),
+              fill=(40,25,22,255)
           )
 
           # Egg
           egg = [
-              (760, 455),
-              (735, 480),
-              (720, 530),
-              (725, 600),
-              (745, 680),
-              (780, 755),
-              (825, 805),
-              (870, 775),
-              (900, 710),
-              (920, 625),
-              (918, 550),
-              (900, 490),
-              (870, 455),
-              (815, 435)
+              (760,455),
+              (735,480),
+              (720,530),
+              (725,600),
+              (745,680),
+              (780,755),
+              (825,805),
+              (870,775),
+              (900,710),
+              (920,625),
+              (918,550),
+              (900,490),
+              (870,455),
+              (815,435)
           ]
 
           d.polygon(
               egg,
-              fill=(255, 250, 232, 255)
+              fill=(255,250,232,255)
           )
 
           # Egg spots
           d.ellipse(
-              (760, 535, 805, 580),
-              fill=(235, 115, 55, 255)
+              (760,535,805,580),
+              fill=(235,115,55,255)
           )
 
           d.ellipse(
-              (830, 620, 875, 665),
-              fill=(235, 115, 55, 255)
+              (830,620,875,665),
+              fill=(235,115,55,255)
           )
 
           d.ellipse(
-              (785, 700, 825, 740),
-              fill=(235, 115, 55, 255)
+              (785,700,825,740),
+              fill=(235,115,55,255)
           )
 
-          image.save(
+          img.save(
               "fox-eggs-icon.png",
               "PNG"
           )
@@ -502,11 +420,6 @@ jobs:
           PY
 
           python3 create_icon.py
-
-
-      # ==============================
-      # ANDROID ICONS
-      # ==============================
 
       - name: Generate Android icons
         run: |
@@ -528,13 +441,11 @@ jobs:
               "xxxhdpi": 192
           }
 
-          base = "android/app/src/main/res"
-
           for density, size in sizes.items():
 
-              folder = os.path.join(
-                  base,
-                  "mipmap-" + density
+              folder = (
+                  "android/app/src/main/res/mipmap-"
+                  + density
               )
 
               os.makedirs(
@@ -548,62 +459,25 @@ jobs:
               )
 
               icon.save(
-                  os.path.join(
-                      folder,
-                      "ic_launcher.png"
-                  )
+                  folder + "/ic_launcher.png"
               )
 
               icon.save(
-                  os.path.join(
-                      folder,
-                      "ic_launcher_round.png"
-                  )
+                  folder + "/ic_launcher_round.png"
               )
 
           PY
 
-
-      # ==============================
-      # REMOVE DEFAULT ADAPTIVE ICON
-      # ==============================
-
-      - name: Remove default adaptive icons
+      - name: Remove adaptive defaults
         run: |
-
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
+      # -------------------------------
+      # Build
+      # -------------------------------
 
-      # ==============================
-      # VERIFY
-      # ==============================
-
-      - name: Verify Android configuration
-        run: |
-
-          echo "================================"
-          echo "FOX EGGS CONFIG"
-          echo "================================"
-
-          grep "applicationId" android/app/build.gradle || true
-
-          grep "versionCode" android/app/build.gradle || true
-
-          grep "versionName" android/app/build.gradle || true
-
-          grep "compileSdk" android/app/build.gradle || true
-
-          echo ""
-          echo "Package:"
-          echo "com.foxeggs.game"
-
-
-      # ==============================
-      # BUILD APK
-      # ==============================
-
-      - name: Build Release APK
+      - name: Build APK
         working-directory: android
         run: |
 
@@ -612,11 +486,6 @@ jobs:
           ./gradlew clean
 
           ./gradlew assembleRelease --no-daemon
-
-
-      # ==============================
-      # CHECK APK
-      # ==============================
 
       - name: Inspect APK
         run: |
@@ -628,9 +497,9 @@ jobs:
           AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
           APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
 
-          echo "================================"
+          echo "=============================="
           echo "FOX EGGS APK"
-          echo "================================"
+          echo "=============================="
 
           echo ""
           echo "FILE:"
@@ -655,20 +524,18 @@ jobs:
             --print-certs \
             "$APK"
 
+      # -------------------------------
+      # AAB
+      # -------------------------------
 
-      # ==============================
-      # BUILD AAB
-      # ==============================
-
-      - name: Build Release AAB
+      - name: Build AAB
         working-directory: android
         run: |
           ./gradlew bundleRelease --no-daemon
 
-
-      # ==============================
-      # RELEASE FILES
-      # ==============================
+      # -------------------------------
+      # Release
+      # -------------------------------
 
       - name: Prepare release
         run: |
@@ -687,26 +554,18 @@ jobs:
             fox-eggs-icon.png \
             release/FoxEggs-Icon.png
 
-
-      # ==============================
-      # UPLOAD
-      # ==============================
-
-      - name: Upload Fox Eggs
+      - name: Upload release
         uses: actions/upload-artifact@v4
         with:
           name: FoxEggs-Release
           path: release/
-          if-no-files-found: error
 
-
-      # ==============================
-      # CLEANUP
-      # ==============================
+      # -------------------------------
+      # Cleanup
+      # -------------------------------
 
       - name: Cleanup
         if: always()
         run: |
-
           rm -f FoxEggs.keystore
           rm -f android/app/FoxEggs.keystore
