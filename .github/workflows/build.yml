@@ -13,35 +13,52 @@ jobs:
 
     steps:
 
+      # =========================
+      # دریافت پروژه
+      # =========================
       - name: Checkout
         uses: actions/checkout@v4
 
 
+      # =========================
+      # Node.js
+      # =========================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
 
+      # =========================
+      # Java 21
+      # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
+          java-version: 21
 
 
+      # =========================
+      # Android SDK
+      # =========================
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
 
-      # ساخت پوشه مخصوص فایل‌های وب
+      # =========================
+      # آماده کردن فایل بازی
+      # =========================
       - name: Prepare web files
         run: |
+          rm -rf www
           mkdir -p www
           cp index.html www/index.html
 
 
+      # =========================
       # ساخت package.json
+      # =========================
       - name: Create package.json
         run: |
           cat > package.json <<'EOF'
@@ -60,12 +77,16 @@ jobs:
           EOF
 
 
+      # =========================
       # نصب Capacitor
+      # =========================
       - name: Install Capacitor
         run: npm install
 
 
+      # =========================
       # تنظیم Capacitor
+      # =========================
       - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
@@ -77,34 +98,54 @@ jobs:
           EOF
 
 
-      # ساخت Android
+      # =========================
+      # ساخت پروژه Android
+      # =========================
       - name: Add Android
         run: npx cap add android
 
 
-      # انتقال فایل‌های وب به Android
+      # =========================
+      # انتقال فایل بازی
+      # =========================
       - name: Sync Android
         run: npx cap sync android
 
 
-      # Build APK
+      # =========================
+      # بررسی Java
+      # =========================
+      - name: Check Java
+        run: |
+          java -version
+          echo "JAVA_HOME=$JAVA_HOME"
+
+
+      # =========================
+      # ساخت APK
+      # =========================
       - name: Build APK
         working-directory: android
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --no-daemon
 
 
-      # آماده کردن فایل خروجی
+      # =========================
+      # آماده کردن APK
+      # =========================
       - name: Prepare APK
         run: |
           mkdir -p release
           cp android/app/build/outputs/apk/debug/app-debug.apk release/FoxEggs.apk
 
 
+      # =========================
       # آپلود APK
+      # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: FoxEggs-APK
           path: release/FoxEggs.apk
+          if-no-files-found: error
