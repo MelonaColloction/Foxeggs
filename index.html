@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Fox Eggs</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#87ceeb;
+    touch-action:none;
+    user-select:none;
+    font-family:Arial,sans-serif;
+}
+
+#game{
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+}
+
+canvas{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+}
+
+#ui{
+    position:absolute;
+    top:15px;
+    left:15px;
+    right:15px;
+    display:flex;
+    justify-content:space-between;
+    color:white;
+    font-weight:bold;
+    text-shadow:0 2px 3px #555;
+    pointer-events:none;
+    z-index:5;
+}
+
+#score{
+    font-size:22px;
+}
+
+#best{
+    font-size:14px;
+    margin-top:4px;
+}
+
+#combo{
+    opacity:0;
+    font-size:20px;
+    transition:opacity .1s;
+}
+
+#combo.show{
+    opacity:1;
+}
+
+.screen{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    background:rgba(0,0,0,.2);
+    z-index:10;
+    text-align:center;
+}
+
+#gameOver{
+    display:none;
+}
+
+.logo{
+    font-size:70px;
+    margin-bottom:10px;
+}
+
+h1{
+    font-size:42px;
+    margin-bottom:10px;
+}
+
+p{
+    margin-bottom:25px;
+}
+
+button{
+    border:none;
+    background:#f97316;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    padding:14px 35px;
+    border-radius:12px;
+    box-shadow:0 5px #c2410c;
+}
+
+button:active{
+    transform:translateY(4px);
+    box-shadow:0 1px #c2410c;
+}
+
+.final{
+    font-size:28px;
+    margin-bottom:15px;
+}
+
+#record{
+    display:none;
+    color:#ffe45e;
+    font-weight:bold;
+    margin-bottom:15px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="game">
+
+<canvas id="canvas"></canvas>
+
+<div id="ui">
+
+    <div>
+        <div id="score">امتیاز: 0</div>
+        <div id="best">رکورد: 0</div>
+    </div>
+
+    <div id="combo">
+        COMBO ×<span id="comboValue">2</span>
+    </div>
+
+</div>
+
+
+<div id="startScreen" class="screen">
+
+    <div class="logo">🦊</div>
+
+    <h1>Fox Eggs</h1>
+
+    <p>تخم‌ها را جمع کن و رکورد بزن!</p>
+
+    <button id="start">
+        شروع بازی
+    </button>
+
+    <p style="margin-top:18px;font-size:13px">
+        لمس صفحه یا Space برای پرش
+    </p>
+
+</div>
+
+
+<div id="gameOver" class="screen">
+
+    <div class="logo">🦊</div>
+
+    <h1>باختی!</h1>
+
+    <div class="final">
+        امتیاز: <span id="finalScore">0</span>
+    </div>
+
+    <div id="record">
+        🏆 رکورد جدید!
+    </div>
+
+    <button id="restart">
+        دوباره بازی کن
+    </button>
+
+</div>
+
+</div>
+
+<script>
+
+/* =====================================================
+   CANVAS
+===================================================== */
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d", {
+    alpha:false,
+    desynchronized:true
+});
+
+let W = 0;
+let H = 0;
+let scale = 1;
+
+function resize(){
+
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    /*
+      رزولوشن Canvas را محدود می‌کنیم.
+      روی گوشی‌های با صفحه خیلی باکیفیت
+      باعث کاهش شدید فشار GPU می‌شود.
+    */
+
+    scale = Math.min(window.devicePixelRatio || 1,1.5);
+
+    canvas.width = Math.floor(W * scale);
+    canvas.height = Math.floor(H * scale);
+
+    ctx.setTransform(
+        scale,
+        0,
+        0,
+        scale,
+        0,
+        0
+    );
+}
+
+resize();
+
+window.addEventListener("resize",resize);
+
+
+/* =====================================================
+   UI
+===================================================== */
+
+const scoreText =
+    document.getElementById("score");
+
+const bestText =
+    document.getElementById("best");
+
+const comboBox =
+    document.getElementById("combo");
+
+const comboValue =
+    document.getElementById("comboValue");
+
+const startScreen =
+    document.getElementById("startScreen");
+
+const gameOver =
+    document.getElementById("gameOver");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const recordText =
+    document.getElementById("record");
+
+const startButton =
+    document.getElementById("start");
+
+const restartButton =
+    document.getElementById("restart");
+
+
+/* =====================================================
+   GAME STATE
+===================================================== */
+
+let playing = false;
+
+let score = 0;
+
+let best =
+    Number(localStorage.getItem("foxBest") || 0);
+
+bestText.textContent =
+    "رکورد: " + best;
+
+let speed = 330;
+
+let lastTime = 0;
+
+let eggTimer = 0;
+
+let obstacleTimer = 1;
+
+let combo = 0;
+
+let comboTimer = 0;
+
+let eggs = [];
+
+let obstacles = [];
+
+
+/* =====================================================
+   GROUND
+===================================================== */
+
+function ground(){
+
+    return H * .72;
+}
+
+
+/* =====================================================
+   FOX
+===================================================== */
+
+const fox = {
+
+    x:100,
+
+    y:0,
+
+    w:62,
+
+    h:48,
+
+    vy:0,
+
+    gravity:2100,
+
+    jump:-780,
+
+    grounded:true,
+
+    animation:0
+
+};
+
+
+function resetFox(){
+
+    fox.x =
+        Math.max(70,W*.14);
+
+    fox.y =
+        ground()-fox.h;
+
+    fox.vy=0;
+
+    fox.grounded=true;
+
+    fox.animation=0;
+}
+
+
+/* =====================================================
+   EGG TYPES
+===================================================== */
+
+const eggTypes = [
+
+    ["#ffffff",1],
+
+    ["#45d46b",2],
+
+    ["#3498db",5],
+
+    ["#a855f7",10],
+
+    ["#ffd43b",25]
+
+];
+
+
+/* =====================================================
+   CREATE EGG
+===================================================== */
+
+function createEgg(){
+
+    let r=Math.random();
+
+    let type=0;
+
+    if(r>.55) type=1;
+
+    if(r>.78) type=2;
+
+    if(r>.91) type=3;
+
+    if(r>.98) type=4;
+
+    const data=eggTypes[type];
+
+    eggs.push({
+
+        x:W+30,
+
+        y:
+            ground()-50-
+            Math.random()*130,
+
+        w:25,
+
+        h:34,
+
+        color:data[0],
+
+        value:data[1]
+
+    });
+}
+
+
+/* =====================================================
+   CREATE OBSTACLE
+===================================================== */
+
+function createObstacle(){
+
+    const r=Math.random();
+
+    let type;
+
+    if(r<.45)
+        type="tree";
+
+    else if(r<.75)
+        type="rock";
+
+    else
+        type="cactus";
+
+
+    let w=45;
+    let h=65;
+
+    if(type==="rock"){
+
+        w=55;
+        h=40;
+
+    }
+
+    if(type==="cactus"){
+
+        w=32;
+        h=62;
+
+    }
+
+
+    obstacles.push({
+
+        x:W+40,
+
+        y:ground()-h,
+
+        w:w,
+
+        h:h,
+
+        type:type
+
+    });
+}
+
+
+/* =====================================================
+   COLLISION
+===================================================== */
+
+function collision(a,b){
+
+    return (
+
+        a.x+8 <
+        b.x+b.w &&
+
+        a.x+a.w-8 >
+        b.x &&
+
+        a.y+7 <
+        b.y+b.h &&
+
+        a.y+a.h-5 >
+        b.y
+
+    );
+}
+
+
+/* =====================================================
+   JUMP
+===================================================== */
+
+function jump(){
+
+    if(!playing)
+        return;
+
+    if(fox.grounded){
+
+        fox.vy=
+            fox.jump;
+
+        fox.grounded=false;
+    }
+}
+
+
+/* =====================================================
+   DRAW BACKGROUND
+===================================================== */
+
+function drawBackground(){
+
+    /*
+      به جای gradient متحرک یا افکت‌های سنگین،
+      فقط یک رنگ آسمان داریم.
+    */
+
+    ctx.fillStyle="#87ceeb";
+
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
+
+
+    /* خورشید */
+
+    ctx.fillStyle="#ffe082";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        W-90,
+        90,
+        35,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* چند ابر ساده */
+
+    ctx.fillStyle="rgba(255,255,255,.65)";
+
+    drawCloud(120,100,1);
+
+    drawCloud(W*.55,145,.7);
+
+    drawCloud(W*.85,80,.8);
+
+
+    /* زمین */
+
+    const gy=ground();
+
+    ctx.fillStyle="#7dbb4b";
+
+    ctx.fillRect(
+        0,
+        gy,
+        W,
+        H-gy
+    );
+
+    ctx.fillStyle="#55963b";
+
+    ctx.fillRect(
+        0,
+        gy,
+        W,
+        5
+    );
+}
+
+
+function drawCloud(x,y,s){
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        20*s,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+25*s,
+        y-8*s,
+        27*s,
+        0,
+        Math.PI*2
+    );
+
+    ctx.arc(
+        x+52*s,
+        y,
+        20*s,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+}
+
+
+/* =====================================================
+   DRAW FOX
+===================================================== */
+
+function drawFox(){
+
+    const x=fox.x;
+    const y=fox.y;
+
+    const running =
+        fox.grounded
+        ? Math.sin(fox.animation)*4
+        : 0;
+
+
+    /* shadow */
+
+    ctx.fillStyle="rgba(0,0,0,.15)";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x+30,
+        ground()+3,
+        28,
+        6,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* tail */
+
+    ctx.fillStyle="#f97316";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x+15,
+        y+28
+    );
+
+    ctx.quadraticCurveTo(
+        x-22,
+        y+5+running,
+        x-10,
+        y-10+running
+    );
+
+    ctx.quadraticCurveTo(
+        x+5,
+        y+5,
+        x+20,
+        y+23
+    );
+
+    ctx.fill();
+
+
+    /* white tail */
+
+    ctx.fillStyle="#fff7ed";
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        x-10,
+        y-10+running
+    );
+
+    ctx.quadraticCurveTo(
+        x-25,
+        y,
+        x-14,
+        y+12
+    );
+
+    ctx.quadraticCurveTo(
+        x-5,
+        y+5,
+        x+1,
+        y+7
+    );
+
+    ctx.fill();
+
+
+    /* body */
+
+    ctx.fillStyle="#f97316";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x+29,
+        y+29,
+        27,
+        18,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* belly */
+
+    ctx.fillStyle="#fff7ed";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x+34,
+        y+31,
+        14,
+        10,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* legs */
+
+    ctx.fillStyle="#ea580c";
+
+    ctx.fillRect(
+        x+14,
+        y+39+running,
+        10,
+        11
+    );
+
+    ctx.fillRect(
+        x+39,
+        y+39-running,
+        10,
+        11
+    );
+
+
+    /* neck */
+
+    ctx.fillStyle="#f97316";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x+43,
+        y+18,
+        16,
+        17,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* head */
+
+    ctx.fillStyle="#fb923c";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x+52,
+        y+8,
+        21,
+        17,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* ears */
+
+    ctx.fillStyle="#f97316";
+
+    ctx.beginPath();
+
+    ctx.moveTo(x+38,y-3);
+    ctx.lineTo(x+39,y-20);
+    ctx.lineTo(x+50,y-6);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    ctx.beginPath();
+
+    ctx.moveTo(x+53,y-4);
+    ctx.lineTo(x+62,y-19);
+    ctx.lineTo(x+68,y);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /* inner ears */
+
+    ctx.fillStyle="#fecaca";
+
+    ctx.beginPath();
+
+    ctx.moveTo(x+41,y-6);
+    ctx.lineTo(x+41,y-14);
+    ctx.lineTo(x+47,y-7);
+
+    ctx.closePath();
+
+    ctx.fill();
+
+
+    /* muzzle */
+
+    ctx.fillStyle="#fff7ed";
+
+    ctx.beginPath();
+
+    ctx.ellipse(
+        x+67,
+        y+13,
+        12,
+        8,
+        0,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* nose */
+
+    ctx.fillStyle="#111";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x+75,
+        y+10,
+        3.5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* eye */
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x+58,
+        y+5,
+        3.5,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+
+
+    /* eye shine */
+
+    ctx.fillStyle="#fff";
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x+59,
+        y+4,
+        1.2,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fill();
+}
+
+
+/* =====================================================
+   DRAW EGG
+===================================================== */
+
+function drawEgg(e){
+
+    const cx=
+        e.x+e.w/2;
+
+    if(e.value>=10){
+
+        ctx.shadowBlur=10;
+
+        ctx.shadowColor=e.color;
+    }
+
+
+    ctx.fillStyle=e.color;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        cx,
+        e.y
+    );
+
+    ctx.bezierCurveTo(
+        e.x+e.w,
+        e.y+5,
+        e.x+e.w,
+        e.y+23,
+        cx,
+        e.y+e.h
+    );
+
+    ctx.bezierCurveTo(
+        e.x,
+        e.y+23,
+        e.x,
+        e.y+5,
+        cx,
+        e.y
+    );
+
+    ctx.fill();
+
+    ctx.shadowBlur=0;
+
+
+    /* خط روی تخم */
+
+    ctx.strokeStyle="rgba(0,0,0,.12)";
+
+    ctx.lineWidth=2;
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        e.x+6,
+        e.y+18
+    );
+
+    ctx.quadraticCurveTo(
+        cx,
+        e.y+12,
+        e.x+e.w-6,
+        e.y+18
+    );
+
+    ctx.stroke();
+}
+
+
+/* =====================================================
+   DRAW OBSTACLE
+===================================================== */
+
+function drawObstacle(o){
+
+    if(o.type==="tree"){
+
+        /* trunk */
+
+        ctx.fillStyle="#8b5a2b";
+
+        ctx.fillRect(
+            o.x+16,
+            o.y+27,
+            14,
+            o.h-27
+        );
+
+
+        /* leaves */
+
+        ctx.fillStyle="#23823c";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            o.x+23,
+            o.y+20,
+            25,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.fillStyle="#2f9e44";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            o.x+7,
+            o.y+32,
+            16,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+
+        ctx.beginPath();
+
+        ctx.arc(
+            o.x+40,
+            o.y+32,
+            16,
+            0,
+            Math.PI*2
+        );
+
+        ctx.fill();
+    }
+
+
+    else if(o.type==="rock"){
+
+        ctx.fillStyle="#667085";
+
+        ctx.beginPath();
+
+        ctx.moveTo(o.x,o.y+o.h);
+
+        ctx.lineTo(o.x+10,o.y+10);
+
+        ctx.lineTo(o.x+28,o.y);
+
+        ctx.lineTo(o.x+o.w,o.y+15);
+
+        ctx.lineTo(
+            o.x+o.w-8,
+            o.y+o.h
+        );
+
+        ctx.closePath();
+
+        ctx.fill();
+    }
+
+
+    else{
+
+        ctx.fillStyle="#25834a";
+
+        ctx.fillRect(
+            o.x+9,
+            o.y,
+            14,
+            o.h
+        );
+
+        ctx.fillRect(
+            o.x,
+            o.y+20,
+            13,
+            11
+        );
+
+        ctx.fillRect(
+            o.x+20,
+            o.y+38,
+            13,
+            11
+        );
+    }
+}
+
+
+/* =====================================================
+   UPDATE
+===================================================== */
+
+function update(dt){
+
+    /* سرعت */
+
+    speed += 12*dt;
+
+    if(speed>700)
+        speed=700;
+
+
+    /* fox */
+
+    fox.vy +=
+        fox.gravity*dt;
+
+    fox.y +=
+        fox.vy*dt;
+
+    if(
+        fox.y+fox.h>=ground()
+    ){
+
+        fox.y=
+            ground()-fox.h;
+
+        fox.vy=0;
+
+        fox.grounded=true;
+    }
+
+    fox.animation +=
+        dt*15;
+
+
+    /* eggs */
+
+    eggTimer-=dt;
+
+    if(eggTimer<=0){
+
+        createEgg();
+
+        eggTimer=
+            .7+
+            Math.random()*.5;
+    }
+
+
+    for(
+        let i=eggs.length-1;
+        i>=0;
+        i--
+    ){
+
+        const e=eggs[i];
+
+        e.x -=
+            speed*dt;
+
+
+        if(collision(fox,e)){
+
+            collectEgg(e);
+
+            eggs.splice(i,1);
+
+            continue;
+        }
+
+
+        if(e.x<-60){
+
+            eggs.splice(i,1);
+        }
+    }
+
+
+    /* obstacles */
+
+    obstacleTimer-=dt;
+
+    if(obstacleTimer<=0){
+
+        createObstacle();
+
+        obstacleTimer=
+            1.1+
+            Math.random()*.7;
+
+    }
+
+
+    for(
+        let i=obstacles.length-1;
+        i>=0;
+        i--
+    ){
+
+        const o=obstacles[i];
+
+        o.x -=
+            speed*dt;
+
+
+        if(collision(fox,o)){
+
+            endGame();
+
+            return;
+        }
+
+
+        if(o.x<-80){
+
+            obstacles.splice(i,1);
+        }
+    }
+
+
+    /* combo */
+
+    if(combo>0){
+
+        comboTimer-=dt;
+
+        if(comboTimer<=0){
+
+            combo=0;
+
+            comboBox.classList.remove("show");
+        }
+    }
+}
+
+
+/* =====================================================
+   COLLECT
+===================================================== */
+
+function collectEgg(e){
+
+    combo++;
+
+    comboTimer=2;
+
+    let multiplier=1;
+
+    if(combo>=10)
+        multiplier=3;
+
+    else if(combo>=5)
+        multiplier=2;
+
+
+    score +=
+        e.value*multiplier;
+
+
+    scoreText.textContent=
+        "امتیاز: "+score;
+
+
+    if(combo>=2){
+
+        comboBox.classList.add("show");
+
+        comboValue.textContent=
+            combo;
+    }
+}
+
+
+/* =====================================================
+   GAME LOOP
+===================================================== */
+
+function loop(time){
+
+    if(!playing)
+        return;
+
+
+    /*
+      حداکثر زمان هر فریم.
+      اگر مرورگر لحظه‌ای گیر کرد،
+      بازی یکباره جلو نمی‌پرد.
+    */
+
+    let dt=
+        (time-lastTime)/1000;
+
+    lastTime=time;
+
+    if(dt>.033)
+        dt=.033;
+
+
+    update(dt);
+
+    draw();
+
+
+    requestAnimationFrame(loop);
+}
+
+
+/* =====================================================
+   DRAW
+===================================================== */
+
+function draw(){
+
+    drawBackground();
+
+    for(const e of eggs)
+        drawEgg(e);
+
+    for(const o of obstacles)
+        drawObstacle(o);
+
+    drawFox();
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+function startGame(){
+
+    score=0;
+
+    speed=330;
+
+    eggTimer=.3;
+
+    obstacleTimer=1;
+
+    combo=0;
+
+    comboTimer=0;
+
+    eggs.length=0;
+
+    obstacles.length=0;
+
+    scoreText.textContent=
+        "امتیاز: 0";
+
+    comboBox.classList.remove("show");
+
+    resetFox();
+
+    playing=true;
+
+    startScreen.style.display="none";
+
+    gameOver.style.display="none";
+
+    lastTime=
+        performance.now();
+
+    requestAnimationFrame(loop);
+}
+
+
+/* =====================================================
+   GAME OVER
+===================================================== */
+
+function endGame(){
+
+    playing=false;
+
+    finalScore.textContent=
+        score;
+
+    if(score>best){
+
+        best=score;
+
+        localStorage.setItem(
+            "foxBest",
+            best
+        );
+
+        bestText.textContent=
+            "رکورد: "+best;
+
+        recordText.style.display=
+            "block";
+
+    }else{
+
+        recordText.style.display=
+            "none";
+    }
+
+    gameOver.style.display=
+        "flex";
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+function handleInput(){
+
+    if(!playing){
+
+        startGame();
+
+    }else{
+
+        jump();
+    }
+}
+
+
+window.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.code==="Space" ||
+            e.code==="ArrowUp"
+        ){
+
+            e.preventDefault();
+
+            handleInput();
+        }
+    }
+);
+
+
+canvas.addEventListener(
+    "pointerdown",
+    function(e){
+
+        e.preventDefault();
+
+        handleInput();
+    },
+    {passive:false}
+);
+
+
+startButton.addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+        startGame();
+    }
+);
+
+
+restartButton.addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+        startGame();
+    }
+);
+
+
+/* =====================================================
+   INITIAL
+===================================================== */
+
+resetFox();
+
+draw();
+
+</script>
+
+</body>
+  </html>
