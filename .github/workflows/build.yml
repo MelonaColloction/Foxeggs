@@ -1,14 +1,11 @@
-name: Build Fox Eggs APK
+name: Build Fox Eggs Android
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 jobs:
   build:
-    name: Build Fox Eggs
+    name: Build Fox Eggs Release
     runs-on: ubuntu-latest
 
     steps:
@@ -47,10 +44,19 @@ jobs:
 
 
       # =========================
-      # آماده کردن بازی
+      # Check game
       # =========================
-      - name: Prepare web
+      - name: Check index.html
         run: |
+          test -f index.html
+
+
+      # =========================
+      # Prepare web files
+      # =========================
+      - name: Prepare web files
+        run: |
+          rm -rf www
           mkdir -p www
           cp index.html www/index.html
 
@@ -77,9 +83,9 @@ jobs:
 
 
       # =========================
-      # نصب Capacitor
+      # Install dependencies
       # =========================
-      - name: Install Capacitor
+      - name: Install dependencies
         run: npm install
 
 
@@ -98,307 +104,199 @@ jobs:
 
 
       # =========================
-      # Android
+      # Add Android
       # =========================
       - name: Add Android
         run: npx cap add android
 
 
       # =========================
-      # Sync
+      # Sync Android
       # =========================
-      - name: Sync
+      - name: Sync Android
         run: npx cap sync android
 
 
       # =========================
-      # ImageMagick
+      # Install Python image library
       # =========================
-      - name: Install ImageMagick
+      - name: Install Pillow
         run: |
-          sudo apt-get update
-          sudo apt-get install -y imagemagick
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pillow
 
 
       # =========================
-      # ساخت آیکن
+      # Generate Fox Eggs icon
       # =========================
-      - name: Create icon
-        run: |
-
-          cat > icon.svg <<'EOF'
-          <svg xmlns="http://www.w3.org/2000/svg"
-               width="1024"
-               height="1024"
-               viewBox="0 0 1024 1024">
-
-            <!-- Background -->
-            <rect
-              width="1024"
-              height="1024"
-              rx="220"
-              fill="#FF8A00"/>
-
-            <!-- Egg -->
-            <path
-              d="M720 760
-                 C860 760 920 610 890 460
-                 C860 310 790 190 720 190
-                 C650 190 580 310 550 460
-                 C520 610 580 760 720 760Z"
-              fill="#FFFFFF"/>
-
-            <!-- Egg stripe -->
-            <path
-              d="M555 470
-                 Q720 390 885 470
-                 L885 560
-                 Q720 640 555 560Z"
-              fill="#FFD43B"/>
-
-            <!-- Fox tail -->
-            <path
-              d="M170 690
-                 C40 600 80 430 230 460
-                 C330 480 350 590 260 650
-                 C230 670 200 685 170 690Z"
-              fill="#E85D04"/>
-
-            <!-- Tail -->
-            <path
-              d="M105 470
-                 C60 530 85 610 145 625
-                 C185 635 205 600 205 575
-                 C150 555 125 515 105 470Z"
-              fill="#FFF3E0"/>
-
-            <!-- Body -->
-            <ellipse
-              cx="390"
-              cy="630"
-              rx="200"
-              ry="130"
-              fill="#F76707"/>
-
-            <!-- Belly -->
-            <ellipse
-              cx="430"
-              cy="650"
-              rx="100"
-              ry="75"
-              fill="#FFF3E0"/>
-
-            <!-- Head -->
-            <ellipse
-              cx="470"
-              cy="410"
-              rx="155"
-              ry="140"
-              fill="#FF7A00"/>
-
-            <!-- Left ear -->
-            <path
-              d="M350 340
-                 L335 140
-                 L465 270Z"
-              fill="#E85D04"/>
-
-            <!-- Right ear -->
-            <path
-              d="M500 270
-                 L625 140
-                 L600 350Z"
-              fill="#E85D04"/>
-
-            <!-- Inner ears -->
-            <path
-              d="M370 300 L360 190 L430 270Z"
-              fill="#FFB3B3"/>
-
-            <path
-              d="M525 270 L600 190 L580 310Z"
-              fill="#FFB3B3"/>
-
-            <!-- Face -->
-            <ellipse
-              cx="525"
-              cy="455"
-              rx="110"
-              ry="80"
-              fill="#FFF3E0"/>
-
-            <!-- Eyes -->
-            <circle
-              cx="425"
-              cy="395"
-              r="20"
-              fill="#111111"/>
-
-            <circle
-              cx="535"
-              cy="395"
-              r="20"
-              fill="#111111"/>
-
-            <!-- Eye shine -->
-            <circle
-              cx="432"
-              cy="388"
-              r="7"
-              fill="white"/>
-
-            <circle
-              cx="542"
-              cy="388"
-              r="7"
-              fill="white"/>
-
-            <!-- Nose -->
-            <circle
-              cx="555"
-              cy="455"
-              r="13"
-              fill="#111111"/>
-
-            <!-- Smile -->
-            <path
-              d="M555 470 Q540 505 510 485"
-              fill="none"
-              stroke="#111111"
-              stroke-width="10"
-              stroke-linecap="round"/>
-
-          </svg>
-          EOF
-
-
-      # =========================
-      # تبدیل SVG به PNG
-      # =========================
-      - name: Convert icon
-        run: |
-          convert -background none icon.svg icon.png
-
-
-      # =========================
-      # حذف آیکن‌های قبلی
-      # =========================
-      - name: Remove default icons
-        run: |
-          rm -rf android/app/src/main/res/mipmap-*
-          rm -rf android/app/src/main/res/drawable/ic_launcher*
-          rm -rf android/app/src/main/res/drawable/ic_launcher_foreground*
-
-
-      # =========================
-      # ساخت پوشه‌ها
-      # =========================
-      - name: Create icon folders
+      - name: Generate Fox Eggs icon
         run: |
 
-          mkdir -p android/app/src/main/res/mipmap-mdpi
-          mkdir -p android/app/src/main/res/mipmap-hdpi
-          mkdir -p android/app/src/main/res/mipmap-xhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxhdpi
-          mkdir -p android/app/src/main/res/mipmap-xxxhdpi
+          cat > generate_icon.py <<'PY'
+          from PIL import Image, ImageDraw
 
-          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+          SIZE = 1024
+
+          img = Image.new("RGBA", (SIZE, SIZE), (255, 190, 70, 255))
+          draw = ImageDraw.Draw(img)
+
+          # Background circle
+          draw.ellipse(
+              (70, 70, 954, 954),
+              fill=(255, 205, 90, 255)
+          )
+
+          # Fox ears
+          draw.polygon(
+              [(245, 330), (330, 145), (455, 320)],
+              fill=(190, 85, 45, 255)
+          )
+
+          draw.polygon(
+              [(569, 320), (694, 145), (779, 330)],
+              fill=(190, 85, 45, 255)
+          )
+
+          # Inner ears
+          draw.polygon(
+              [(285, 285), (330, 195), (395, 295)],
+              fill=(255, 160, 125, 255)
+          )
+
+          draw.polygon(
+              [(629, 295), (694, 195), (739, 285)],
+              fill=(255, 160, 125, 255)
+          )
+
+          # Egg
+          egg = [
+              (512, 230),
+              (420, 245),
+              (350, 300),
+              (315, 400),
+              (320, 540),
+              (370, 680),
+              (450, 785),
+              (512, 825),
+              (574, 785),
+              (654, 680),
+              (704, 540),
+              (709, 400),
+              (674, 300),
+              (604, 245)
+          ]
+
+          draw.polygon(
+              egg,
+              fill=(255, 248, 220, 255)
+          )
+
+          # Egg colored spots
+          draw.ellipse(
+              (390, 350, 470, 430),
+              fill=(245, 135, 65, 255)
+          )
+
+          draw.ellipse(
+              (570, 430, 650, 510),
+              fill=(245, 135, 65, 255)
+          )
+
+          draw.ellipse(
+              (430, 570, 505, 645),
+              fill=(245, 135, 65, 255)
+          )
+
+          # Fox eyes
+          draw.ellipse(
+              (400, 470, 455, 535),
+              fill=(40, 30, 25, 255)
+          )
+
+          draw.ellipse(
+              (569, 470, 624, 535),
+              fill=(40, 30, 25, 255)
+          )
+
+          # Nose
+          draw.ellipse(
+              (478, 535, 546, 590),
+              fill=(40, 30, 25, 255)
+          )
+
+          # Smile
+          draw.arc(
+              (445, 545, 579, 650),
+              15,
+              165,
+              fill=(40, 30, 25, 255),
+              width=10
+          )
+
+          # Save
+          img.save("fox-eggs-icon.png")
+
+          print("Fox Eggs icon generated.")
+          PY
+
+          python3 generate_icon.py
 
 
       # =========================
-      # PNG های آیکن
+      # Generate Android icon sizes
       # =========================
-      - name: Generate PNG icons
-        run: |
-
-          convert icon.png -resize 48x48 \
-            android/app/src/main/res/mipmap-mdpi/ic_launcher.png
-
-          convert icon.png -resize 72x72 \
-            android/app/src/main/res/mipmap-hdpi/ic_launcher.png
-
-          convert icon.png -resize 96x96 \
-            android/app/src/main/res/mipmap-xhdpi/ic_launcher.png
-
-          convert icon.png -resize 144x144 \
-            android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png
-
-          convert icon.png -resize 192x192 \
-            android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png
-
-
-          cp android/app/src/main/res/mipmap-mdpi/ic_launcher.png \
-             android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-hdpi/ic_launcher.png \
-             android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-xhdpi/ic_launcher.png \
-             android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png \
-             android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png
-
-          cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png \
-             android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png
-
-
-      # =========================
-      # Adaptive Icon
-      # =========================
-      - name: Create adaptive icon
-        run: |
-
-          cat > android/app/src/main/res/values.xml <<'EOF'
-          EOF
-
-          mkdir -p android/app/src/main/res/values
-
-          cat > android/app/src/main/res/values/colors.xml <<'EOF'
-          <resources>
-              <color name="fox_orange">#FF8A00</color>
-          </resources>
-          EOF
-
-
-          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-              <background android:drawable="@color/fox_orange"/>
-              <foreground android:drawable="@drawable/fox_icon_foreground"/>
-          </adaptive-icon>
-          EOF
-
-
-          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
-              <background android:drawable="@color/fox_orange"/>
-              <foreground android:drawable="@drawable/fox_icon_foreground"/>
-          </adaptive-icon>
-          EOF
-
-
-      # =========================
-      # foreground
-      # =========================
-      - name: Create foreground
-        run: |
-
-          mkdir -p android/app/src/main/res/drawable
-
-          convert icon.png \
-            -resize 432x432 \
-            android/app/src/main/res/drawable/fox_icon_foreground.png
-
-
-      # =========================
-      # تنظیم Manifest
-      # =========================
-      - name: Set launcher icon
+      - name: Generate Android icon sizes
         run: |
 
           python3 - <<'PY'
+
+          from PIL import Image
+          import os
+
+          source = Image.open("fox-eggs-icon.png").convert("RGBA")
+
+          sizes = {
+              "mdpi": 48,
+              "hdpi": 72,
+              "xhdpi": 96,
+              "xxhdpi": 144,
+              "xxxhdpi": 192
+          }
+
+          base = "android/app/src/main/res"
+
+          for density, size in sizes.items():
+
+              folder = os.path.join(base, f"mipmap-{density}")
+
+              os.makedirs(folder, exist_ok=True)
+
+              icon = source.resize(
+                  (size, size),
+                  Image.Resampling.LANCZOS
+              )
+
+              icon.save(
+                  os.path.join(folder, "ic_launcher.png"),
+                  "PNG"
+              )
+
+              icon.save(
+                  os.path.join(folder, "ic_launcher_round.png"),
+                  "PNG"
+              )
+
+          PY
+
+
+      # =========================
+      # Set Android icon
+      # =========================
+      - name: Configure Android icon
+        run: |
+
+          python3 - <<'PY'
+
           path = "android/app/src/main/AndroidManifest.xml"
 
           with open(path, "r") as f:
@@ -416,38 +314,188 @@ jobs:
 
           with open(path, "w") as f:
               f.write(text)
+
           PY
 
 
       # =========================
-      # Build
+      # Version
       # =========================
-      - name: Build APK
+      - name: Set Android version
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+        run: |
+
+          VERSION_CODE=$((RUN_NUMBER + 100))
+
+          python3 - <<PY
+
+          path = "android/app/build.gradle"
+
+          with open(path, "r") as f:
+              text = f.read()
+
+          text = text.replace(
+              "versionCode 1",
+              "versionCode ${VERSION_CODE}"
+          )
+
+          text = text.replace(
+              'versionName "1.0.0"',
+              'versionName "1.0.${RUN_NUMBER}"'
+          )
+
+          with open(path, "w") as f:
+              f.write(text)
+
+          PY
+
+
+      # =========================
+      # Decode Keystore
+      # =========================
+      - name: Decode Keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+
+          echo "$KEYSTORE_BASE64" | base64 --decode > FoxEggs.keystore
+
+          test -s FoxEggs.keystore
+
+
+      # =========================
+      # Copy Keystore
+      # =========================
+      - name: Copy Keystore
+        run: |
+
+          cp FoxEggs.keystore \
+             android/app/FoxEggs.keystore
+
+
+      # =========================
+      # Configure signing
+      # =========================
+      - name: Configure signing
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+
+          cat >> android/gradle.properties <<EOF
+
+          FOXEGGS_KEYSTORE_FILE=FoxEggs.keystore
+          FOXEGGS_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
+          FOXEGGS_KEY_ALIAS=foxeggs
+          FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
+          EOF
+
+
+      # =========================
+      # Configure Release
+      # =========================
+      - name: Configure Release signing
+        run: |
+
+          python3 - <<'PY'
+
+          path = "android/app/build.gradle"
+
+          with open(path, "r") as f:
+              text = f.read()
+
+          signing = """
+              signingConfigs {
+                  release {
+                      storeFile file(FOXEGGS_KEYSTORE_FILE)
+                      storePassword FOXEGGS_KEYSTORE_PASSWORD
+                      keyAlias FOXEGGS_KEY_ALIAS
+                      keyPassword FOXEGGS_KEY_PASSWORD
+                  }
+              }
+          """
+
+          if "signingConfigs {" not in text:
+
+              text = text.replace(
+                  "android {",
+                  "android {" + signing,
+                  1
+              )
+
+          text = text.replace(
+              "buildTypes {",
+              """buildTypes {
+                  release {
+                      minifyEnabled false
+                      signingConfig signingConfigs.release
+                  }
+              """,
+              1
+          )
+
+          with open(path, "w") as f:
+              f.write(text)
+
+          PY
+
+
+      # =========================
+      # Build APK
+      # =========================
+      - name: Build Release APK
         working-directory: android
         run: |
+
           chmod +x gradlew
+
           ./gradlew clean
-          ./gradlew assembleDebug --no-daemon
+
+          ./gradlew assembleRelease --no-daemon
 
 
       # =========================
-      # خروجی
+      # Build AAB
       # =========================
-      - name: Prepare APK
+      - name: Build Release AAB
+        working-directory: android
+        run: |
+
+          ./gradlew bundleRelease --no-daemon
+
+
+      # =========================
+      # Prepare files
+      # =========================
+      - name: Prepare release
         run: |
 
           mkdir -p release
 
-          cp android/app/build/outputs/apk/debug/app-debug.apk \
+          cp android/app/build/outputs/apk/release/app-release.apk \
              release/FoxEggs.apk
+
+          cp android/app/build/outputs/bundle/release/app-release.aab \
+             release/FoxEggs.aab
 
 
       # =========================
       # Upload
       # =========================
-      - name: Upload APK
+      - name: Upload Fox Eggs Release
         uses: actions/upload-artifact@v4
         with:
-          name: FoxEggs-APK
-          path: release/FoxEggs.apk
+          name: FoxEggs-Release
+          path: release/
           if-no-files-found: error
+
+
+      # =========================
+      # Cleanup
+      # =========================
+      - name: Cleanup
+        if: always()
+        run: |
+
+          rm -f FoxEggs.keystore
+          rm -f android/app/FoxEggs.keystore
