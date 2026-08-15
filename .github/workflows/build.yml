@@ -47,26 +47,16 @@ jobs:
 
 
       # =========================
-      # بررسی index.html
+      # آماده کردن بازی
       # =========================
-      - name: Check game
+      - name: Prepare web
         run: |
-          test -f index.html
-          echo "index.html OK"
-
-
-      # =========================
-      # ساخت Web Folder
-      # =========================
-      - name: Prepare web files
-        run: |
-          rm -rf www
           mkdir -p www
           cp index.html www/index.html
 
 
       # =========================
-      # ساخت package.json
+      # package.json
       # =========================
       - name: Create package.json
         run: |
@@ -94,7 +84,7 @@ jobs:
 
 
       # =========================
-      # تنظیم Capacitor
+      # Capacitor config
       # =========================
       - name: Create Capacitor config
         run: |
@@ -108,7 +98,7 @@ jobs:
 
 
       # =========================
-      # ساخت Android
+      # Android
       # =========================
       - name: Add Android
         run: npx cap add android
@@ -117,12 +107,12 @@ jobs:
       # =========================
       # Sync
       # =========================
-      - name: Sync Android
+      - name: Sync
         run: npx cap sync android
 
 
       # =========================
-      # نصب ImageMagick
+      # ImageMagick
       # =========================
       - name: Install ImageMagick
         run: |
@@ -131,9 +121,9 @@ jobs:
 
 
       # =========================
-      # ساخت آیکن با SVG
+      # ساخت آیکن
       # =========================
-      - name: Create Fox Eggs Icon
+      - name: Create icon
         run: |
 
           cat > icon.svg <<'EOF'
@@ -147,172 +137,136 @@ jobs:
               width="1024"
               height="1024"
               rx="220"
-              fill="#87CEEB"/>
-
-            <!-- Ground -->
-            <path
-              d="M0 720
-                 Q250 650 500 720
-                 Q760 790 1024 700
-                 L1024 1024
-                 L0 1024 Z"
-              fill="#70B84A"/>
+              fill="#FF8A00"/>
 
             <!-- Egg -->
             <path
-              d="M730 650
-                 C820 650 875 570 865 475
-                 C855 370 790 260 730 260
-                 C670 260 605 370 595 475
-                 C585 570 640 650 730 650 Z"
-              fill="#FFF7ED"/>
+              d="M720 760
+                 C860 760 920 610 890 460
+                 C860 310 790 190 720 190
+                 C650 190 580 310 550 460
+                 C520 610 580 760 720 760Z"
+              fill="#FFFFFF"/>
 
-            <!-- Egg color -->
+            <!-- Egg stripe -->
             <path
-              d="M610 470
-                 Q730 410 850 470
-                 L850 540
-                 Q730 600 610 540 Z"
-              fill="#FACC15"/>
-
-            <!-- Egg shine -->
-            <ellipse
-              cx="680"
-              cy="380"
-              rx="28"
-              ry="55"
-              fill="#FFFFFF"
-              opacity=".8"/>
+              d="M555 470
+                 Q720 390 885 470
+                 L885 560
+                 Q720 640 555 560Z"
+              fill="#FFD43B"/>
 
             <!-- Fox tail -->
             <path
-              d="M170 680
-                 C40 600 90 430 230 470
-                 C300 490 325 565 280 620
-                 C250 655 210 675 170 680 Z"
-              fill="#F97316"/>
+              d="M170 690
+                 C40 600 80 430 230 460
+                 C330 480 350 590 260 650
+                 C230 670 200 685 170 690Z"
+              fill="#E85D04"/>
 
-            <!-- Tail tip -->
+            <!-- Tail -->
             <path
               d="M105 470
-                 C70 510 70 570 115 605
-                 C145 625 175 610 190 580
-                 C150 565 130 520 105 470 Z"
-              fill="#FFF7ED"/>
+                 C60 530 85 610 145 625
+                 C185 635 205 600 205 575
+                 C150 555 125 515 105 470Z"
+              fill="#FFF3E0"/>
 
-            <!-- Fox body -->
+            <!-- Body -->
             <ellipse
               cx="390"
-              cy="620"
-              rx="190"
-              ry="125"
-              fill="#F97316"/>
+              cy="630"
+              rx="200"
+              ry="130"
+              fill="#F76707"/>
 
-            <!-- Fox belly -->
+            <!-- Belly -->
             <ellipse
-              cx="425"
-              cy="640"
-              rx="95"
-              ry="70"
-              fill="#FFF7ED"/>
+              cx="430"
+              cy="650"
+              rx="100"
+              ry="75"
+              fill="#FFF3E0"/>
 
             <!-- Head -->
             <ellipse
-              cx="480"
-              cy="430"
-              rx="150"
-              ry="135"
-              fill="#FB923C"/>
+              cx="470"
+              cy="410"
+              rx="155"
+              ry="140"
+              fill="#FF7A00"/>
 
             <!-- Left ear -->
             <path
-              d="M365 350
-                 L355 175
-                 L470 285 Z"
-              fill="#F97316"/>
+              d="M350 340
+                 L335 140
+                 L465 270Z"
+              fill="#E85D04"/>
 
             <!-- Right ear -->
             <path
-              d="M500 285
-                 L620 175
-                 L600 370 Z"
-              fill="#F97316"/>
+              d="M500 270
+                 L625 140
+                 L600 350Z"
+              fill="#E85D04"/>
 
             <!-- Inner ears -->
             <path
-              d="M380 310 L375 225 L435 290 Z"
-              fill="#FDB4B4"/>
+              d="M370 300 L360 190 L430 270Z"
+              fill="#FFB3B3"/>
 
             <path
-              d="M535 290 L600 225 L580 325 Z"
-              fill="#FDB4B4"/>
+              d="M525 270 L600 190 L580 310Z"
+              fill="#FFB3B3"/>
 
             <!-- Face -->
             <ellipse
-              cx="530"
-              cy="470"
-              rx="105"
-              ry="75"
-              fill="#FFF7ED"/>
+              cx="525"
+              cy="455"
+              rx="110"
+              ry="80"
+              fill="#FFF3E0"/>
 
             <!-- Eyes -->
             <circle
-              cx="440"
-              cy="415"
-              r="18"
-              fill="#111827"/>
+              cx="425"
+              cy="395"
+              r="20"
+              fill="#111111"/>
 
             <circle
-              cx="540"
-              cy="415"
-              r="18"
-              fill="#111827"/>
+              cx="535"
+              cy="395"
+              r="20"
+              fill="#111111"/>
 
             <!-- Eye shine -->
             <circle
-              cx="446"
-              cy="408"
-              r="6"
-              fill="#FFFFFF"/>
+              cx="432"
+              cy="388"
+              r="7"
+              fill="white"/>
 
             <circle
-              cx="546"
-              cy="408"
-              r="6"
-              fill="#FFFFFF"/>
+              cx="542"
+              cy="388"
+              r="7"
+              fill="white"/>
 
             <!-- Nose -->
-            <path
-              d="M525 460
-                 Q545 450 565 460
-                 Q545 485 525 460 Z"
-              fill="#111827"/>
+            <circle
+              cx="555"
+              cy="455"
+              r="13"
+              fill="#111111"/>
 
             <!-- Smile -->
             <path
-              d="M545 480
-                 Q530 510 505 490"
+              d="M555 470 Q540 505 510 485"
               fill="none"
-              stroke="#111827"
-              stroke-width="9"
+              stroke="#111111"
+              stroke-width="10"
               stroke-linecap="round"/>
-
-            <!-- Legs -->
-            <rect
-              x="280"
-              y="680"
-              width="55"
-              height="95"
-              rx="25"
-              fill="#EA580C"/>
-
-            <rect
-              x="460"
-              y="680"
-              width="55"
-              height="95"
-              rx="25"
-              fill="#EA580C"/>
 
           </svg>
           EOF
@@ -327,9 +281,19 @@ jobs:
 
 
       # =========================
-      # ساخت Android icon ها
+      # حذف آیکن‌های قبلی
       # =========================
-      - name: Install Android Icons
+      - name: Remove default icons
+        run: |
+          rm -rf android/app/src/main/res/mipmap-*
+          rm -rf android/app/src/main/res/drawable/ic_launcher*
+          rm -rf android/app/src/main/res/drawable/ic_launcher_foreground*
+
+
+      # =========================
+      # ساخت پوشه‌ها
+      # =========================
+      - name: Create icon folders
         run: |
 
           mkdir -p android/app/src/main/res/mipmap-mdpi
@@ -338,6 +302,14 @@ jobs:
           mkdir -p android/app/src/main/res/mipmap-xxhdpi
           mkdir -p android/app/src/main/res/mipmap-xxxhdpi
 
+          mkdir -p android/app/src/main/res/mipmap-anydpi-v26
+
+
+      # =========================
+      # PNG های آیکن
+      # =========================
+      - name: Generate PNG icons
+        run: |
 
           convert icon.png -resize 48x48 \
             android/app/src/main/res/mipmap-mdpi/ic_launcher.png
@@ -372,20 +344,98 @@ jobs:
 
 
       # =========================
-      # Build APK
+      # Adaptive Icon
+      # =========================
+      - name: Create adaptive icon
+        run: |
+
+          cat > android/app/src/main/res/values.xml <<'EOF'
+          EOF
+
+          mkdir -p android/app/src/main/res/values
+
+          cat > android/app/src/main/res/values/colors.xml <<'EOF'
+          <resources>
+              <color name="fox_orange">#FF8A00</color>
+          </resources>
+          EOF
+
+
+          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/fox_orange"/>
+              <foreground android:drawable="@drawable/fox_icon_foreground"/>
+          </adaptive-icon>
+          EOF
+
+
+          cat > android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/fox_orange"/>
+              <foreground android:drawable="@drawable/fox_icon_foreground"/>
+          </adaptive-icon>
+          EOF
+
+
+      # =========================
+      # foreground
+      # =========================
+      - name: Create foreground
+        run: |
+
+          mkdir -p android/app/src/main/res/drawable
+
+          convert icon.png \
+            -resize 432x432 \
+            android/app/src/main/res/drawable/fox_icon_foreground.png
+
+
+      # =========================
+      # تنظیم Manifest
+      # =========================
+      - name: Set launcher icon
+        run: |
+
+          python3 - <<'PY'
+          path = "android/app/src/main/AndroidManifest.xml"
+
+          with open(path, "r") as f:
+              text = f.read()
+
+          text = text.replace(
+              'android:icon="@mipmap/ic_launcher"',
+              'android:icon="@mipmap/ic_launcher"'
+          )
+
+          text = text.replace(
+              'android:roundIcon="@mipmap/ic_launcher_round"',
+              'android:roundIcon="@mipmap/ic_launcher_round"'
+          )
+
+          with open(path, "w") as f:
+              f.write(text)
+          PY
+
+
+      # =========================
+      # Build
       # =========================
       - name: Build APK
         working-directory: android
         run: |
           chmod +x gradlew
+          ./gradlew clean
           ./gradlew assembleDebug --no-daemon
 
 
       # =========================
-      # آماده سازی APK
+      # خروجی
       # =========================
       - name: Prepare APK
         run: |
+
           mkdir -p release
 
           cp android/app/build/outputs/apk/debug/app-debug.apk \
@@ -393,7 +443,7 @@ jobs:
 
 
       # =========================
-      # آپلود APK
+      # Upload
       # =========================
       - name: Upload APK
         uses: actions/upload-artifact@v4
