@@ -1,6 +1,9 @@
 name: Build Fox Eggs Android
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -10,60 +13,33 @@ jobs:
 
     steps:
 
-      # =========================
-      # Checkout
-      # =========================
       - name: Checkout
         uses: actions/checkout@v4
 
-
-      # =========================
-      # Node.js
-      # =========================
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-
-      # =========================
-      # Java 21
-      # =========================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-
-      # =========================
-      # Android SDK
-      # =========================
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-
-      # =========================
-      # Check game
-      # =========================
       - name: Check index.html
         run: |
           test -f index.html
 
-
-      # =========================
-      # Prepare web files
-      # =========================
       - name: Prepare web files
         run: |
           rm -rf www
           mkdir -p www
           cp index.html www/index.html
 
-
-      # =========================
-      # package.json
-      # =========================
       - name: Create package.json
         run: |
           cat > package.json <<'EOF'
@@ -81,17 +57,9 @@ jobs:
           }
           EOF
 
-
-      # =========================
-      # Install dependencies
-      # =========================
       - name: Install dependencies
         run: npm install
 
-
-      # =========================
-      # Capacitor config
-      # =========================
       - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
@@ -102,33 +70,20 @@ jobs:
           }
           EOF
 
-
-      # =========================
-      # Add Android
-      # =========================
       - name: Add Android
         run: npx cap add android
 
-
-      # =========================
-      # Sync Android
-      # =========================
       - name: Sync Android
         run: npx cap sync android
 
-
       # =========================
-      # Install Python image library
+      # Generate icon
       # =========================
       - name: Install Pillow
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install pillow
 
-
-      # =========================
-      # Generate Fox Eggs icon
-      # =========================
       - name: Generate Fox Eggs icon
         run: |
 
@@ -140,13 +95,11 @@ jobs:
           img = Image.new("RGBA", (SIZE, SIZE), (255, 190, 70, 255))
           draw = ImageDraw.Draw(img)
 
-          # Background circle
           draw.ellipse(
               (70, 70, 954, 954),
               fill=(255, 205, 90, 255)
           )
 
-          # Fox ears
           draw.polygon(
               [(245, 330), (330, 145), (455, 320)],
               fill=(190, 85, 45, 255)
@@ -157,7 +110,6 @@ jobs:
               fill=(190, 85, 45, 255)
           )
 
-          # Inner ears
           draw.polygon(
               [(285, 285), (330, 195), (395, 295)],
               fill=(255, 160, 125, 255)
@@ -168,7 +120,6 @@ jobs:
               fill=(255, 160, 125, 255)
           )
 
-          # Egg
           egg = [
               (512, 230),
               (420, 245),
@@ -191,7 +142,6 @@ jobs:
               fill=(255, 248, 220, 255)
           )
 
-          # Egg colored spots
           draw.ellipse(
               (390, 350, 470, 430),
               fill=(245, 135, 65, 255)
@@ -207,7 +157,6 @@ jobs:
               fill=(245, 135, 65, 255)
           )
 
-          # Fox eyes
           draw.ellipse(
               (400, 470, 455, 535),
               fill=(40, 30, 25, 255)
@@ -218,13 +167,11 @@ jobs:
               fill=(40, 30, 25, 255)
           )
 
-          # Nose
           draw.ellipse(
               (478, 535, 546, 590),
               fill=(40, 30, 25, 255)
           )
 
-          # Smile
           draw.arc(
               (445, 545, 579, 650),
               15,
@@ -233,23 +180,15 @@ jobs:
               width=10
           )
 
-          # Save
           img.save("fox-eggs-icon.png")
-
-          print("Fox Eggs icon generated.")
           PY
 
           python3 generate_icon.py
 
-
-      # =========================
-      # Generate Android icon sizes
-      # =========================
-      - name: Generate Android icon sizes
+      - name: Generate Android icons
         run: |
 
           python3 - <<'PY'
-
           from PIL import Image
           import os
 
@@ -267,7 +206,10 @@ jobs:
 
           for density, size in sizes.items():
 
-              folder = os.path.join(base, f"mipmap-{density}")
+              folder = os.path.join(
+                  base,
+                  f"mipmap-{density}"
+              )
 
               os.makedirs(folder, exist_ok=True)
 
@@ -277,51 +219,18 @@ jobs:
               )
 
               icon.save(
-                  os.path.join(folder, "ic_launcher.png"),
-                  "PNG"
+                  os.path.join(folder, "ic_launcher.png")
               )
 
               icon.save(
-                  os.path.join(folder, "ic_launcher_round.png"),
-                  "PNG"
+                  os.path.join(folder, "ic_launcher_round.png")
               )
-
           PY
-
-
-      # =========================
-      # Set Android icon
-      # =========================
-      - name: Configure Android icon
-        run: |
-
-          python3 - <<'PY'
-
-          path = "android/app/src/main/AndroidManifest.xml"
-
-          with open(path, "r") as f:
-              text = f.read()
-
-          text = text.replace(
-              'android:icon="@mipmap/ic_launcher"',
-              'android:icon="@mipmap/ic_launcher"'
-          )
-
-          text = text.replace(
-              'android:roundIcon="@mipmap/ic_launcher_round"',
-              'android:roundIcon="@mipmap/ic_launcher_round"'
-          )
-
-          with open(path, "w") as f:
-              f.write(text)
-
-          PY
-
 
       # =========================
       # Version
       # =========================
-      - name: Set Android version
+      - name: Set version
         env:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
@@ -336,8 +245,8 @@ jobs:
               text = f.read()
 
           text = text.replace(
-              "versionCode 1",
-              "versionCode ${VERSION_CODE}"
+              'versionCode 1',
+              'versionCode ${VERSION_CODE}'
           )
 
           text = text.replace(
@@ -350,9 +259,8 @@ jobs:
 
           PY
 
-
       # =========================
-      # Decode Keystore
+      # Keystore
       # =========================
       - name: Decode Keystore
         env:
@@ -363,20 +271,10 @@ jobs:
 
           test -s FoxEggs.keystore
 
-
-      # =========================
-      # Copy Keystore
-      # =========================
       - name: Copy Keystore
         run: |
+          cp FoxEggs.keystore android/app/FoxEggs.keystore
 
-          cp FoxEggs.keystore \
-             android/app/FoxEggs.keystore
-
-
-      # =========================
-      # Configure signing
-      # =========================
       - name: Configure signing
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -390,11 +288,10 @@ jobs:
           FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
           EOF
 
-
       # =========================
-      # Configure Release
+      # Release signing
       # =========================
-      - name: Configure Release signing
+      - name: Configure Release
         run: |
 
           python3 - <<'PY'
@@ -416,7 +313,6 @@ jobs:
           """
 
           if "signingConfigs {" not in text:
-
               text = text.replace(
                   "android {",
                   "android {" + signing,
@@ -439,11 +335,10 @@ jobs:
 
           PY
 
-
       # =========================
-      # Build APK
+      # APK
       # =========================
-      - name: Build Release APK
+      - name: Build APK
         working-directory: android
         run: |
 
@@ -453,19 +348,16 @@ jobs:
 
           ./gradlew assembleRelease --no-daemon
 
-
       # =========================
-      # Build AAB
+      # AAB
       # =========================
-      - name: Build Release AAB
+      - name: Build AAB
         working-directory: android
         run: |
-
           ./gradlew bundleRelease --no-daemon
 
-
       # =========================
-      # Prepare files
+      # Prepare output
       # =========================
       - name: Prepare release
         run: |
@@ -478,17 +370,14 @@ jobs:
           cp android/app/build/outputs/bundle/release/app-release.aab \
              release/FoxEggs.aab
 
-
       # =========================
       # Upload
       # =========================
-      - name: Upload Fox Eggs Release
+      - name: Upload release
         uses: actions/upload-artifact@v4
         with:
           name: FoxEggs-Release
           path: release/
-          if-no-files-found: error
-
 
       # =========================
       # Cleanup
