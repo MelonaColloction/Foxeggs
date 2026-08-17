@@ -35,7 +35,7 @@ jobs:
       # =========================================
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 21
@@ -180,7 +180,7 @@ jobs:
 
 
       # =========================================
-      # Configure Capacitor generated Gradle
+      # Configure Android Gradle
       # =========================================
 
       - name: Configure Android Gradle
@@ -198,7 +198,7 @@ jobs:
 
 
           # -----------------------------------------
-          # Application ID
+          # Application ID - MUST STAY THE SAME
           # -----------------------------------------
 
           text = re.sub(
@@ -246,7 +246,7 @@ jobs:
 
 
           # -----------------------------------------
-          # Remove old signingConfigs if present
+          # Remove existing signingConfigs
           # -----------------------------------------
 
           text = re.sub(
@@ -258,7 +258,7 @@ jobs:
 
 
           # -----------------------------------------
-          # Add signingConfigs BEFORE buildTypes
+          # Add release signing configuration
           # -----------------------------------------
 
           signing_block = '''
@@ -276,18 +276,15 @@ jobs:
           '''
 
 
-          if "signingConfigs {" not in text:
-
-              text = text.replace(
-                  "    buildTypes {",
-                  signing_block + "    buildTypes {",
-                  1
-              )
+          text = text.replace(
+              "    buildTypes {",
+              signing_block + "    buildTypes {",
+              1
+          )
 
 
           # -----------------------------------------
-          # Add signingConfig ONLY inside
-          # buildTypes -> release
+          # Release signing
           # -----------------------------------------
 
           pattern = (
@@ -300,15 +297,13 @@ jobs:
               r'            signingConfig signingConfigs.release'
           )
 
-          if "signingConfig signingConfigs.release" not in text:
-
-              text = re.sub(
-                  pattern,
-                  replacement,
-                  text,
-                  count=1,
-                  flags=re.S
-              )
+          text = re.sub(
+              pattern,
+              replacement,
+              text,
+              count=1,
+              flags=re.S
+          )
 
 
           # -----------------------------------------
@@ -343,17 +338,36 @@ jobs:
 
 
       # =========================================
-      # Show final Gradle file
+      # Verify update compatibility
       # =========================================
 
-      - name: Show Gradle configuration
+      - name: Verify update configuration
         run: |
 
           echo "=========================================="
-          echo "FINAL ANDROID BUILD.GRADLE"
+          echo "FOX EGGS UPDATE CONFIGURATION"
           echo "=========================================="
 
-          cat android/app/build.gradle
+          echo ""
+          echo "Application ID:"
+          grep "applicationId" android/app/build.gradle
+
+          echo ""
+          echo "Version Code:"
+          grep "versionCode" android/app/build.gradle
+
+          echo ""
+          echo "Version Name:"
+          grep "versionName" android/app/build.gradle
+
+          echo ""
+          echo "Signing:"
+          grep -A9 "signingConfigs" android/app/build.gradle
+
+          echo ""
+          echo "Keystore:"
+          test -s android/app/FoxEggs.keystore
+          echo "OK - existing keystore loaded"
 
 
       # =========================================
@@ -449,16 +463,12 @@ jobs:
 
           d = ImageDraw.Draw(img)
 
-
-          # Background
           d.rounded_rectangle(
               (30, 30, 994, 994),
               radius=190,
               fill=(255, 184, 70, 255)
           )
 
-
-          # Fox head
           d.polygon(
               [
                   (150,350),
@@ -477,8 +487,6 @@ jobs:
               fill=(215,91,42,255)
           )
 
-
-          # Inner ears
           d.polygon(
               [
                   (205,300),
@@ -497,8 +505,6 @@ jobs:
               fill=(255,145,115,255)
           )
 
-
-          # Face
           d.polygon(
               [
                   (512,400),
@@ -513,8 +519,6 @@ jobs:
               fill=(255,239,211,255)
           )
 
-
-          # Eyes
           d.ellipse(
               (330,430,410,520),
               fill=(35,25,20,255)
@@ -525,8 +529,6 @@ jobs:
               fill=(35,25,20,255)
           )
 
-
-          # Eye highlights
           d.ellipse(
               (350,447,375,472),
               fill=(255,255,255,255)
@@ -537,15 +539,11 @@ jobs:
               fill=(255,255,255,255)
           )
 
-
-          # Nose
           d.ellipse(
               (468,555,556,625),
               fill=(40,25,22,255)
           )
 
-
-          # Egg
           egg = [
               (760,455),
               (735,480),
@@ -568,8 +566,6 @@ jobs:
               fill=(255,250,232,255)
           )
 
-
-          # Egg spots
           d.ellipse(
               (760,535,805,580),
               fill=(235,115,55,255)
@@ -585,12 +581,10 @@ jobs:
               fill=(235,115,55,255)
           )
 
-
           img.save(
               "fox-eggs-icon.png",
               "PNG"
           )
-
 
           print("Fox Eggs icon created.")
 
@@ -600,7 +594,7 @@ jobs:
 
 
       # =========================================
-      # Generate Android icon sizes
+      # Generate Android icons
       # =========================================
 
       - name: Generate Android icons
@@ -611,11 +605,9 @@ jobs:
           from PIL import Image
           import os
 
-
           source = Image.open(
               "fox-eggs-icon.png"
           ).convert("RGBA")
-
 
           sizes = {
               "mdpi": 48,
@@ -624,7 +616,6 @@ jobs:
               "xxhdpi": 144,
               "xxxhdpi": 192
           }
-
 
           for density, size in sizes.items():
 
@@ -638,12 +629,10 @@ jobs:
                   exist_ok=True
               )
 
-
               icon = source.resize(
                   (size, size),
                   Image.Resampling.LANCZOS
               )
-
 
               icon.save(
                   folder + "/ic_launcher.png"
@@ -653,51 +642,20 @@ jobs:
                   folder + "/ic_launcher_round.png"
               )
 
-
           print("Android icons generated.")
 
           PY
 
 
       # =========================================
-      # Remove adaptive icon XML
+      # Remove adaptive icon defaults
       # =========================================
 
       - name: Remove adaptive icon defaults
         run: |
 
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
-
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
-
-
-      # =========================================
-      # Verify package and signing
-      # =========================================
-
-      - name: Verify configuration
-        run: |
-
-          echo "=========================================="
-          echo "FOX EGGS CONFIGURATION"
-          echo "=========================================="
-
-          echo ""
-          echo "APPLICATION ID:"
-          grep "applicationId" android/app/build.gradle
-
-          echo ""
-          echo "VERSION:"
-          grep "versionCode" android/app/build.gradle
-          grep "versionName" android/app/build.gradle
-
-          echo ""
-          echo "COMPILE SDK:"
-          grep "compileSdk" android/app/build.gradle
-
-          echo ""
-          echo "SIGNING:"
-          grep -A10 "signingConfigs" android/app/build.gradle
 
 
       # =========================================
@@ -730,31 +688,21 @@ jobs:
 
           APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
 
-
           echo "=========================================="
           echo "FOX EGGS APK"
           echo "=========================================="
-
 
           echo ""
           echo "APK FILE:"
           ls -lh "$APK"
 
-
           echo ""
           echo "SHA256:"
           sha256sum "$APK"
 
-
           echo ""
           echo "PACKAGE / VERSION:"
           "$AAPT" dump badging "$APK" | head -n 20
-
-
-          echo ""
-          echo "PERMISSIONS:"
-          "$AAPT" dump permissions "$APK"
-
 
           echo ""
           echo "SIGNATURE:"
@@ -784,16 +732,13 @@ jobs:
 
           mkdir -p release
 
-
           cp \
             android/app/build/outputs/apk/release/app-release.apk \
             release/FoxEggs.apk
 
-
           cp \
             android/app/build/outputs/bundle/release/app-release.aab \
             release/FoxEggs.aab
-
 
           cp \
             fox-eggs-icon.png \
@@ -821,5 +766,4 @@ jobs:
         run: |
 
           rm -f FoxEggs.keystore
-
           rm -f android/app/FoxEggs.keystore
