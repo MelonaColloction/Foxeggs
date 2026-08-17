@@ -210,8 +210,6 @@ button:active{
 
 </div>
 
-
-<!-- منو فقط خارج از بازی نمایش داده می‌شود -->
 <button id="menuButton">☰</button>
 
 <div id="menuPanel">
@@ -270,9 +268,6 @@ button:active{
 
 </div>
 
-
-<!-- START -->
-
 <div id="startScreen" class="screen">
 
     <div class="logo">
@@ -299,9 +294,6 @@ button:active{
     </p>
 
 </div>
-
-
-<!-- GAME OVER -->
 
 <div id="gameOver" class="screen">
 
@@ -360,7 +352,6 @@ button:active{
 </div>
 
 </div>
-
 
 <script>
 
@@ -479,7 +470,6 @@ const finalEggs =
 
 /* =====================================================
    SAFE LOCAL STORAGE
-   اطلاعات بعد از Refresh باقی می‌مانند.
 ===================================================== */
 
 function loadNumber(key, defaultValue = 0){
@@ -785,8 +775,6 @@ let obstacles = [];
 
 /* =====================================================
    DAY / NIGHT
-   هر 100 امتیاز تغییر می‌کند.
-   هیچ نوشته‌ای وسط صفحه نشان داده نمی‌شود.
 ===================================================== */
 
 let isNight = false;
@@ -1059,8 +1047,6 @@ function drawBackground(){
 
     if(isNight){
 
-        /* ماه */
-
         ctx.fillStyle =
             "#f5f3ce";
 
@@ -1076,8 +1062,6 @@ function drawBackground(){
 
         ctx.fill();
 
-
-        /* ستاره‌ها */
 
         ctx.fillStyle =
             "rgba(255,255,255,.8)";
@@ -1103,8 +1087,6 @@ function drawBackground(){
 
     }else{
 
-        /* خورشید */
-
         ctx.fillStyle =
             "#ffe082";
 
@@ -1120,8 +1102,6 @@ function drawBackground(){
 
         ctx.fill();
 
-
-        /* ابرها */
 
         ctx.fillStyle =
             "rgba(255,255,255,.65)";
@@ -1145,8 +1125,6 @@ function drawBackground(){
         );
     }
 
-
-    /* زمین */
 
     const gy =
         ground();
@@ -1229,8 +1207,6 @@ function drawFox(){
         : 0;
 
 
-    /* سایه */
-
     ctx.fillStyle =
         "rgba(0,0,0,.15)";
 
@@ -1248,8 +1224,6 @@ function drawFox(){
 
     ctx.fill();
 
-
-    /* دم */
 
     ctx.fillStyle =
         "#f97316";
@@ -1278,8 +1252,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* نوک سفید دم */
-
     ctx.fillStyle =
         "#fff7ed";
 
@@ -1307,8 +1279,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* بدن */
-
     ctx.fillStyle =
         "#f97316";
 
@@ -1326,8 +1296,6 @@ function drawFox(){
 
     ctx.fill();
 
-
-    /* شکم */
 
     ctx.fillStyle =
         "#fff7ed";
@@ -1347,8 +1315,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* پاها */
-
     ctx.fillStyle =
         "#ea580c";
 
@@ -1366,8 +1332,6 @@ function drawFox(){
         11
     );
 
-
-    /* گردن */
 
     ctx.fillStyle =
         "#f97316";
@@ -1387,8 +1351,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* سر */
-
     ctx.fillStyle =
         "#fb923c";
 
@@ -1406,8 +1368,6 @@ function drawFox(){
 
     ctx.fill();
 
-
-    /* گوش‌ها */
 
     ctx.fillStyle =
         "#f97316";
@@ -1456,8 +1416,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* داخل گوش */
-
     ctx.fillStyle =
         "#fecaca";
 
@@ -1483,8 +1441,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* پوزه */
-
     ctx.fillStyle =
         "#fff7ed";
 
@@ -1503,8 +1459,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* بینی */
-
     ctx.fillStyle =
         "#111";
 
@@ -1521,8 +1475,6 @@ function drawFox(){
     ctx.fill();
 
 
-    /* چشم */
-
     ctx.beginPath();
 
     ctx.arc(
@@ -1535,8 +1487,6 @@ function drawFox(){
 
     ctx.fill();
 
-
-    /* برق چشم */
 
     ctx.fillStyle =
         "#fff";
@@ -1772,12 +1722,35 @@ function drawObstacle(o){
 
 function update(dt){
 
-    /*
-      بدون سقف سرعت.
-      هر ثانیه 10 واحد به سرعت اضافه می‌شود.
-    */
+    /* =====================================================
+       SPEED
+       
+       تا 600 امتیاز:
+       سرعت از 330 به 1200 می‌رسد.
 
-    speed += 10 * dt;
+       بعد از 600:
+       سرعت همچنان زیاد می‌شود،
+       ولی بسیار آرام‌تر.
+
+       هر 100 امتیاز بعد از 600،
+       فقط 20 واحد سرعت اضافه می‌شود.
+    ===================================================== */
+
+    if(score <= 600){
+
+        const progress =
+            score / 600;
+
+        speed =
+            330 +
+            (1200 - 330) * progress;
+
+    }else{
+
+        speed =
+            1200 +
+            (score - 600) * 0.20;
+    }
 
 
     /* FOX */
@@ -1955,15 +1928,8 @@ function collectEgg(e){
         e.value * multiplier;
 
 
-    /* امتیاز بازی فعلی */
-
     score += earned;
 
-
-    /*
-      آمار دائمی:
-      با Refresh صفر نمی‌شوند.
-    */
 
     totalEggs += 1;
 
@@ -2005,11 +1971,6 @@ function loop(time){
 
     lastTime = time;
 
-
-    /*
-      اگر گوشی لحظه‌ای هنگ کند،
-      بازی یکباره جلو نمی‌پرد.
-    */
 
     if(dt > .033)
         dt = .033;
@@ -2060,11 +2021,6 @@ function draw(){
 
 function startGame(){
 
-    /*
-      فقط اطلاعات مربوط به بازی فعلی صفر می‌شود.
-      اطلاعات والت هرگز صفر نمی‌شود.
-    */
-
     score = 0;
 
     speed = 330;
@@ -2086,10 +2042,6 @@ function startGame(){
     isNight = false;
 
 
-    /*
-      یک بازی جدید به تعداد بازی‌ها اضافه می‌شود.
-    */
-
     gamesPlayed++;
 
 
@@ -2108,10 +2060,6 @@ function startGame(){
 
     playing = true;
 
-
-    /*
-      منوی سه‌خط هنگام بازی مخفی است.
-    */
 
     menuButton.style.display =
         "none";
@@ -2169,10 +2117,6 @@ function endGame(){
 
     updateUI();
 
-
-    /*
-      منو فقط بیرون بازی نمایش داده می‌شود.
-    */
 
     menuButton.style.display =
         "block";
