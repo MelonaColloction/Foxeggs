@@ -49,8 +49,14 @@ canvas{
     z-index:5;
 }
 
-#score{font-size:22px;}
-#best{font-size:14px;margin-top:4px;}
+#score{
+    font-size:22px;
+}
+
+#best{
+    font-size:14px;
+    margin-top:4px;
+}
 
 #combo{
     opacity:0;
@@ -58,78 +64,62 @@ canvas{
     transition:opacity .1s;
 }
 
-#combo.show{opacity:1;}
+#combo.show{
+    opacity:1;
+}
 
 #menuButton{
     position:absolute;
-    top:15px;
-    left:15px;
+    top:12px;
+    left:12px;
+    z-index:30;
     width:48px;
     height:48px;
-    border-radius:12px;
-    border:none;
-    background:rgba(0,0,0,.45);
-    color:white;
-    font-size:27px;
     padding:0;
-    box-shadow:0 3px 8px rgba(0,0,0,.25);
-    z-index:20;
-}
-
-#menuButton:active{
-    transform:scale(.94);
+    font-size:27px;
+    line-height:48px;
+    background:rgba(0,0,0,.35);
+    box-shadow:none;
+    border-radius:12px;
+    display:none;
 }
 
 #menuPanel{
     position:absolute;
-    top:70px;
-    left:15px;
-    width:230px;
-    padding:18px;
-    border-radius:16px;
+    top:68px;
+    left:12px;
+    width:260px;
+    max-width:calc(100vw - 24px);
     background:rgba(20,20,20,.94);
     color:white;
-    z-index:19;
+    border-radius:16px;
+    padding:18px;
+    z-index:29;
     display:none;
-    text-align:right;
-    box-shadow:0 8px 25px rgba(0,0,0,.3);
+    box-shadow:0 8px 30px rgba(0,0,0,.35);
 }
 
-#menuPanel.show{
-    display:block;
-}
-
-.menuTitle{
-    font-size:21px;
-    font-weight:bold;
+#menuPanel h2{
+    font-size:22px;
     margin-bottom:15px;
 }
 
-.menuButton{
-    width:100%;
-    margin-top:9px;
-    padding:11px;
-    font-size:16px;
-    background:#f97316;
-    box-shadow:0 3px #c2410c;
-}
-
-.wallet{
-    background:rgba(255,255,255,.1);
+.menuItem{
+    margin:10px 0;
     padding:12px;
+    background:rgba(255,255,255,.08);
     border-radius:10px;
-    line-height:1.9;
-    margin-bottom:12px;
 }
 
-.language{
+.langButtons{
     display:flex;
-    gap:7px;
+    gap:8px;
+    margin-top:8px;
 }
 
-.language button{
+.langButtons button{
     flex:1;
-    padding:9px 5px;
+    padding:9px;
     font-size:14px;
 }
 
@@ -191,6 +181,13 @@ button:active{
     font-weight:bold;
     margin-bottom:15px;
 }
+
+#stats{
+    margin-top:15px;
+    margin-bottom:20px;
+    font-size:15px;
+    line-height:2;
+}
 </style>
 </head>
 
@@ -199,33 +196,6 @@ button:active{
 <div id="game">
 
 <canvas id="canvas"></canvas>
-
-<button id="menuButton" aria-label="Menu">☰</button>
-
-<div id="menuPanel">
-
-    <div class="menuTitle" id="menuTitle">
-        منو
-    </div>
-
-    <div class="wallet">
-        <b id="walletTitle">والت</b><br>
-        <span id="gamesLabel">تعداد بازی‌ها:</span>
-        <span id="gamesCount">0</span><br>
-
-        <span id="bestLabel">رکورد:</span>
-        <span id="walletBest">0</span><br>
-
-        <span id="eggsLabel">کل تخم‌ها:</span>
-        <span id="totalEggs">0</span>
-    </div>
-
-    <div class="language">
-        <button id="faButton">فارسی</button>
-        <button id="enButton">English</button>
-    </div>
-
-</div>
 
 <div id="ui">
 
@@ -241,13 +211,79 @@ button:active{
 </div>
 
 
+<!-- منو فقط خارج از بازی نمایش داده می‌شود -->
+<button id="menuButton">☰</button>
+
+<div id="menuPanel">
+
+    <h2 id="menuTitle">منو</h2>
+
+    <div class="menuItem">
+
+        <div id="languageTitle">زبان</div>
+
+        <div class="langButtons">
+
+            <button id="faButton">
+                فارسی
+            </button>
+
+            <button id="enButton">
+                English
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="menuItem">
+        <div id="gamesLabel">
+            تعداد بازی‌ها
+        </div>
+
+        <strong id="gamesValue">0</strong>
+    </div>
+
+    <div class="menuItem">
+        <div id="bestLabel">
+            رکورد
+        </div>
+
+        <strong id="walletBest">0</strong>
+    </div>
+
+    <div class="menuItem">
+        <div id="eggsLabel">
+            کل تخم‌های جمع‌شده
+        </div>
+
+        <strong id="walletEggs">0</strong>
+    </div>
+
+    <div class="menuItem">
+        <div id="walletScoreLabel">
+            امتیاز کل
+        </div>
+
+        <strong id="walletScore">0</strong>
+    </div>
+
+</div>
+
+
+<!-- START -->
+
 <div id="startScreen" class="screen">
 
-    <div class="logo">🦊</div>
+    <div class="logo">
+        🦊
+    </div>
 
-    <h1>Fox Eggs</h1>
+    <h1>
+        Fox Eggs
+    </h1>
 
-    <p id="startDescription">
+    <p id="startText">
         تخم‌ها را جمع کن و رکورد بزن!
     </p>
 
@@ -255,26 +291,66 @@ button:active{
         شروع بازی
     </button>
 
-    <p id="controlText" style="margin-top:18px;font-size:13px">
+    <p id="controlText"
+       style="margin-top:18px;font-size:13px">
+
         لمس صفحه یا Space برای پرش
+
     </p>
 
 </div>
 
 
+<!-- GAME OVER -->
+
 <div id="gameOver" class="screen">
 
-    <div class="logo">🦊</div>
+    <div class="logo">
+        🦊
+    </div>
 
-    <h1 id="gameOverTitle">باختی!</h1>
+    <h1 id="gameOverTitle">
+        باختی!
+    </h1>
 
     <div class="final">
-        <span id="finalScoreLabel">امتیاز:</span>
-        <span id="finalScore">0</span>
+
+        <span id="finalScoreLabel">
+            امتیاز:
+        </span>
+
+        <span id="finalScore">
+            0
+        </span>
+
     </div>
 
     <div id="record">
         🏆 رکورد جدید!
+    </div>
+
+    <div id="stats">
+
+        <div>
+            <span id="gameCountLabel">
+                تعداد بازی‌ها:
+            </span>
+
+            <span id="finalGames">
+                0
+            </span>
+        </div>
+
+        <div>
+            <span id="totalEggLabel">
+                کل تخم‌ها:
+            </span>
+
+            <span id="finalEggs">
+                0
+            </span>
+        </div>
+
     </div>
 
     <button id="restart">
@@ -285,371 +361,816 @@ button:active{
 
 </div>
 
+
 <script>
 
-const canvas = document.getElementById("canvas");
+/* =====================================================
+   CANVAS
+===================================================== */
 
-const ctx = canvas.getContext("2d",{
-    alpha:false,
-    desynchronized:true
-});
+const canvas =
+    document.getElementById("canvas");
 
-let W=0;
-let H=0;
-let scale=1;
+const ctx =
+    canvas.getContext("2d", {
+        alpha:false,
+        desynchronized:true
+    });
+
+let W = 0;
+let H = 0;
+let scale = 1;
+
 
 function resize(){
 
-    W=window.innerWidth;
-    H=window.innerHeight;
+    W = window.innerWidth;
+    H = window.innerHeight;
 
-    scale=Math.min(
-        window.devicePixelRatio||1,
-        1.5
-    );
+    scale =
+        Math.min(
+            window.devicePixelRatio || 1,
+            1.5
+        );
 
-    canvas.width=Math.floor(W*scale);
-    canvas.height=Math.floor(H*scale);
+    canvas.width =
+        Math.floor(W * scale);
+
+    canvas.height =
+        Math.floor(H * scale);
 
     ctx.setTransform(
-        scale,0,0,scale,0,0
+        scale,
+        0,
+        0,
+        scale,
+        0,
+        0
     );
 }
+
 
 resize();
 
-window.addEventListener("resize",resize);
+window.addEventListener(
+    "resize",
+    resize
+);
 
 
-/* =========================
+/* =====================================================
    UI
-========================= */
+===================================================== */
 
-const scoreText=document.getElementById("score");
-const bestText=document.getElementById("best");
-const comboBox=document.getElementById("combo");
-const comboValue=document.getElementById("comboValue");
+const scoreText =
+    document.getElementById("score");
 
-const startScreen=document.getElementById("startScreen");
-const gameOver=document.getElementById("gameOver");
+const bestText =
+    document.getElementById("best");
 
-const finalScore=document.getElementById("finalScore");
-const recordText=document.getElementById("record");
+const comboBox =
+    document.getElementById("combo");
 
-const startButton=document.getElementById("start");
-const restartButton=document.getElementById("restart");
+const comboValue =
+    document.getElementById("comboValue");
 
-const menuButton=document.getElementById("menuButton");
-const menuPanel=document.getElementById("menuPanel");
+const startScreen =
+    document.getElementById("startScreen");
 
-const gamesCountText=document.getElementById("gamesCount");
-const walletBest=document.getElementById("walletBest");
-const totalEggsText=document.getElementById("totalEggs");
+const gameOver =
+    document.getElementById("gameOver");
 
+const finalScore =
+    document.getElementById("finalScore");
 
-/* =========================
-   STORAGE
-========================= */
+const recordText =
+    document.getElementById("record");
 
-let best=Number(
-    localStorage.getItem("foxBest")||0
-);
+const startButton =
+    document.getElementById("start");
 
-let totalEggs=Number(
-    localStorage.getItem("foxTotalEggs")||0
-);
+const restartButton =
+    document.getElementById("restart");
 
-let gamesPlayed=Number(
-    localStorage.getItem("foxGamesPlayed")||0
-);
+const menuButton =
+    document.getElementById("menuButton");
 
+const menuPanel =
+    document.getElementById("menuPanel");
 
-/* =========================
-   STATE
-========================= */
+const gamesValue =
+    document.getElementById("gamesValue");
 
-let playing=false;
+const walletBest =
+    document.getElementById("walletBest");
 
-let score=0;
+const walletEggs =
+    document.getElementById("walletEggs");
 
-let speed=330;
+const walletScore =
+    document.getElementById("walletScore");
 
-let lastTime=0;
+const finalGames =
+    document.getElementById("finalGames");
 
-let eggTimer=0;
-
-let obstacleTimer=1;
-
-let combo=0;
-
-let comboTimer=0;
-
-let eggs=[];
-
-let obstacles=[];
-
-let isEnglish=false;
+const finalEggs =
+    document.getElementById("finalEggs");
 
 
-/* =========================
-   WALLET
-========================= */
+/* =====================================================
+   SAFE LOCAL STORAGE
+   اطلاعات بعد از Refresh باقی می‌مانند.
+===================================================== */
 
-function updateWallet(){
+function loadNumber(key, defaultValue = 0){
 
-    gamesCountText.textContent=gamesPlayed;
-    walletBest.textContent=best;
-    totalEggsText.textContent=totalEggs;
+    try{
 
-    bestText.textContent=isEnglish
-        ?"Best: "+best
-        :"رکورد: "+best;
+        const value =
+            localStorage.getItem(key);
+
+        if(value === null){
+
+            localStorage.setItem(
+                key,
+                String(defaultValue)
+            );
+
+            return defaultValue;
+        }
+
+        const number =
+            Number(value);
+
+        if(Number.isFinite(number)){
+
+            return number;
+        }
+
+        localStorage.setItem(
+            key,
+            String(defaultValue)
+        );
+
+        return defaultValue;
+
+    }catch(error){
+
+        return defaultValue;
+    }
 }
 
-updateWallet();
+
+function saveWallet(){
+
+    try{
+
+        localStorage.setItem(
+            "foxBest",
+            String(best)
+        );
+
+        localStorage.setItem(
+            "foxGames",
+            String(gamesPlayed)
+        );
+
+        localStorage.setItem(
+            "foxEggs",
+            String(totalEggs)
+        );
+
+        localStorage.setItem(
+            "foxTotalScore",
+            String(totalScore)
+        );
+
+    }catch(error){
+
+        console.warn(
+            "Could not save wallet data",
+            error
+        );
+    }
+}
 
 
-/* =========================
+/* =====================================================
+   PERMANENT DATA
+===================================================== */
+
+let best =
+    loadNumber("foxBest");
+
+let gamesPlayed =
+    loadNumber("foxGames");
+
+let totalEggs =
+    loadNumber("foxEggs");
+
+let totalScore =
+    loadNumber("foxTotalScore");
+
+
+/* =====================================================
+   LANGUAGE
+===================================================== */
+
+let language =
+    localStorage.getItem("foxLanguage") || "fa";
+
+
+function applyLanguage(){
+
+    const fa =
+        language === "fa";
+
+    document.documentElement.lang =
+        fa ? "fa" : "en";
+
+    document.documentElement.dir =
+        fa ? "rtl" : "ltr";
+
+
+    document.getElementById(
+        "menuTitle"
+    ).textContent =
+        fa ? "منو" : "Menu";
+
+
+    document.getElementById(
+        "languageTitle"
+    ).textContent =
+        fa ? "زبان" : "Language";
+
+
+    document.getElementById(
+        "gamesLabel"
+    ).textContent =
+        fa ? "تعداد بازی‌ها" : "Games played";
+
+
+    document.getElementById(
+        "bestLabel"
+    ).textContent =
+        fa ? "رکورد" : "Best score";
+
+
+    document.getElementById(
+        "eggsLabel"
+    ).textContent =
+        fa
+        ? "کل تخم‌های جمع‌شده"
+        : "Total eggs collected";
+
+
+    document.getElementById(
+        "walletScoreLabel"
+    ).textContent =
+        fa
+        ? "امتیاز کل"
+        : "Total score";
+
+
+    document.getElementById(
+        "startText"
+    ).textContent =
+        fa
+        ? "تخم‌ها را جمع کن و رکورد بزن!"
+        : "Collect eggs and beat your record!";
+
+
+    startButton.textContent =
+        fa
+        ? "شروع بازی"
+        : "Start Game";
+
+
+    document.getElementById(
+        "controlText"
+    ).textContent =
+        fa
+        ? "لمس صفحه یا Space برای پرش"
+        : "Tap the screen or press Space to jump";
+
+
+    document.getElementById(
+        "gameOverTitle"
+    ).textContent =
+        fa
+        ? "باختی!"
+        : "Game Over";
+
+
+    document.getElementById(
+        "finalScoreLabel"
+    ).textContent =
+        fa ? "امتیاز:" : "Score:";
+
+
+    document.getElementById(
+        "gameCountLabel"
+    ).textContent =
+        fa
+        ? "تعداد بازی‌ها:"
+        : "Games:";
+
+
+    document.getElementById(
+        "totalEggLabel"
+    ).textContent =
+        fa
+        ? "کل تخم‌ها:"
+        : "Total eggs:";
+
+
+    restartButton.textContent =
+        fa
+        ? "دوباره بازی کن"
+        : "Play Again";
+
+
+    recordText.textContent =
+        fa
+        ? "🏆 رکورد جدید!"
+        : "🏆 New Record!";
+
+
+    updateUI();
+}
+
+
+function setLanguage(lang){
+
+    language = lang;
+
+    localStorage.setItem(
+        "foxLanguage",
+        lang
+    );
+
+    applyLanguage();
+
+    menuPanel.style.display =
+        "none";
+}
+
+
+/* =====================================================
+   UPDATE UI
+===================================================== */
+
+function updateUI(){
+
+    const fa =
+        language === "fa";
+
+
+    scoreText.textContent =
+        fa
+        ? "امتیاز: " + score
+        : "Score: " + score;
+
+
+    bestText.textContent =
+        fa
+        ? "رکورد: " + best
+        : "Best: " + best;
+
+
+    gamesValue.textContent =
+        gamesPlayed;
+
+    walletBest.textContent =
+        best;
+
+    walletEggs.textContent =
+        totalEggs;
+
+    walletScore.textContent =
+        totalScore;
+
+    finalGames.textContent =
+        gamesPlayed;
+
+    finalEggs.textContent =
+        totalEggs;
+}
+
+
+/* =====================================================
+   GAME STATE
+===================================================== */
+
+let playing = false;
+
+let score = 0;
+
+let speed = 330;
+
+let lastTime = 0;
+
+let eggTimer = 0;
+
+let obstacleTimer = 1;
+
+let combo = 0;
+
+let comboTimer = 0;
+
+let eggs = [];
+
+let obstacles = [];
+
+
+/* =====================================================
+   DAY / NIGHT
+   هر 100 امتیاز تغییر می‌کند.
+   هیچ نوشته‌ای وسط صفحه نشان داده نمی‌شود.
+===================================================== */
+
+let isNight = false;
+
+let lastDayCycle = -1;
+
+
+function updateDayNight(){
+
+    const cycle =
+        Math.floor(score / 100);
+
+    isNight =
+        cycle % 2 === 1;
+
+    if(cycle !== lastDayCycle){
+
+        lastDayCycle = cycle;
+    }
+}
+
+
+/* =====================================================
    GROUND
-========================= */
+===================================================== */
 
 function ground(){
-    return H*.72;
+
+    return H * .72;
 }
 
 
-/* =========================
+/* =====================================================
    FOX
-========================= */
+===================================================== */
 
-const fox={
+const fox = {
+
     x:100,
+
     y:0,
+
     w:62,
+
     h:48,
+
     vy:0,
+
     gravity:2100,
+
     jump:-780,
+
     grounded:true,
+
     animation:0
+
 };
+
 
 function resetFox(){
 
-    fox.x=Math.max(70,W*.14);
+    fox.x =
+        Math.max(
+            70,
+            W * .14
+        );
 
-    fox.y=ground()-fox.h;
+    fox.y =
+        ground() - fox.h;
 
-    fox.vy=0;
+    fox.vy = 0;
 
-    fox.grounded=true;
+    fox.grounded = true;
 
-    fox.animation=0;
+    fox.animation = 0;
 }
 
 
-/* =========================
-   EGGS
-========================= */
+/* =====================================================
+   EGG TYPES
+===================================================== */
 
-const eggTypes=[
+const eggTypes = [
+
     ["#ffffff",1],
+
     ["#45d46b",2],
+
     ["#3498db",5],
+
     ["#a855f7",10],
+
     ["#ffd43b",25]
+
 ];
+
+
+/* =====================================================
+   CREATE EGG
+===================================================== */
 
 function createEgg(){
 
-    let r=Math.random();
+    let r =
+        Math.random();
 
-    let type=0;
+    let type = 0;
 
-    if(r>.55) type=1;
-    if(r>.78) type=2;
-    if(r>.91) type=3;
-    if(r>.98) type=4;
+    if(r > .55)
+        type = 1;
 
-    const data=eggTypes[type];
+    if(r > .78)
+        type = 2;
+
+    if(r > .91)
+        type = 3;
+
+    if(r > .98)
+        type = 4;
+
+    const data =
+        eggTypes[type];
+
 
     eggs.push({
-        x:W+30,
-        y:ground()-50-Math.random()*130,
+
+        x:W + 30,
+
+        y:
+            ground()
+            - 50
+            - Math.random() * 130,
+
         w:25,
+
         h:34,
+
         color:data[0],
+
         value:data[1]
+
     });
 }
 
 
-/* =========================
-   OBSTACLES
-========================= */
+/* =====================================================
+   CREATE OBSTACLE
+===================================================== */
 
 function createObstacle(){
 
-    const r=Math.random();
+    const r =
+        Math.random();
 
     let type;
 
-    if(r<.45) type="tree";
-    else if(r<.75) type="rock";
-    else type="cactus";
+    if(r < .45)
+        type = "tree";
 
-    let w=45;
-    let h=65;
+    else if(r < .75)
+        type = "rock";
 
-    if(type==="rock"){
-        w=55;
-        h=40;
+    else
+        type = "cactus";
+
+
+    let w = 45;
+    let h = 65;
+
+
+    if(type === "rock"){
+
+        w = 55;
+        h = 40;
     }
 
-    if(type==="cactus"){
-        w=32;
-        h=62;
+
+    if(type === "cactus"){
+
+        w = 32;
+        h = 62;
     }
+
 
     obstacles.push({
-        x:W+40,
-        y:ground()-h,
+
+        x:W + 40,
+
+        y:ground() - h,
+
         w:w,
+
         h:h,
+
         type:type
+
     });
 }
 
 
-/* =========================
+/* =====================================================
    COLLISION
-========================= */
+===================================================== */
 
 function collision(a,b){
 
     return(
-        a.x+8<b.x+b.w &&
-        a.x+a.w-8>b.x &&
-        a.y+7<b.y+b.h &&
-        a.y+a.h-5>b.y
+
+        a.x + 8 <
+        b.x + b.w &&
+
+        a.x + a.w - 8 >
+        b.x &&
+
+        a.y + 7 <
+        b.y + b.h &&
+
+        a.y + a.h - 5 >
+        b.y
+
     );
 }
 
 
-/* =========================
+/* =====================================================
    JUMP
-========================= */
+===================================================== */
 
 function jump(){
 
-    if(!playing)return;
+    if(!playing)
+        return;
 
     if(fox.grounded){
 
-        fox.vy=fox.jump;
+        fox.vy =
+            fox.jump;
 
-        fox.grounded=false;
+        fox.grounded =
+            false;
     }
 }
 
 
-/* =========================
+/* =====================================================
    BACKGROUND
-========================= */
+===================================================== */
 
 function drawBackground(){
 
-    const cycle=
-        Math.floor(score/100)%2;
+    if(isNight){
 
-    if(cycle===0){
-
-        ctx.fillStyle="#87ceeb";
-        ctx.fillRect(0,0,W,H);
-
-        ctx.fillStyle="#ffe082";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            W-90,
-            90,
-            35,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle="rgba(255,255,255,.65)";
-
-        drawCloud(120,100,1);
-        drawCloud(W*.55,145,.7);
-        drawCloud(W*.85,80,.8);
+        ctx.fillStyle =
+            "#101b3d";
 
     }else{
 
-        ctx.fillStyle="#101b3d";
-        ctx.fillRect(0,0,W,H);
-
-        ctx.fillStyle="#f5f3ce";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            W-90,
-            90,
-            30,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle="#101b3d";
-
-        ctx.beginPath();
-
-        ctx.arc(
-            W-78,
-            82,
-            28,
-            0,
-            Math.PI*2
-        );
-
-        ctx.fill();
-
-        ctx.fillStyle="rgba(255,255,255,.8)";
-
-        for(let i=0;i<15;i++){
-
-            const x=(i*83)%W;
-            const y=40+(i*47)%(ground()-60);
-
-            ctx.fillRect(x,y,2,2);
-        }
+        ctx.fillStyle =
+            "#87ceeb";
     }
 
 
-    const gy=ground();
+    ctx.fillRect(
+        0,
+        0,
+        W,
+        H
+    );
 
-    ctx.fillStyle=
-        cycle===0
-        ?"#7dbb4b"
-        :"#315b35";
+
+    if(isNight){
+
+        /* ماه */
+
+        ctx.fillStyle =
+            "#f5f3ce";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            W - 90,
+            90,
+            28,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        /* ستاره‌ها */
+
+        ctx.fillStyle =
+            "rgba(255,255,255,.8)";
+
+        for(let i=0;i<22;i++){
+
+            const x =
+                (i * 83 + 37) %
+                Math.max(W,1);
+
+            const y =
+                35 +
+                (i * 47) %
+                Math.max(H * .45,1);
+
+            ctx.fillRect(
+                x,
+                y,
+                2,
+                2
+            );
+        }
+
+    }else{
+
+        /* خورشید */
+
+        ctx.fillStyle =
+            "#ffe082";
+
+        ctx.beginPath();
+
+        ctx.arc(
+            W - 90,
+            90,
+            35,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        /* ابرها */
+
+        ctx.fillStyle =
+            "rgba(255,255,255,.65)";
+
+        drawCloud(
+            120,
+            100,
+            1
+        );
+
+        drawCloud(
+            W * .55,
+            145,
+            .7
+        );
+
+        drawCloud(
+            W * .85,
+            80,
+            .8
+        );
+    }
+
+
+    /* زمین */
+
+    const gy =
+        ground();
+
+
+    ctx.fillStyle =
+        isNight
+        ? "#31542c"
+        : "#7dbb4b";
+
 
     ctx.fillRect(
         0,
         gy,
         W,
-        H-gy
+        H - gy
     );
 
-    ctx.fillStyle=
-        cycle===0
-        ?"#55963b"
-        :"#244a2a";
+
+    ctx.fillStyle =
+        isNight
+        ? "#253f23"
+        : "#55963b";
+
 
     ctx.fillRect(
         0,
@@ -664,193 +1185,249 @@ function drawCloud(x,y,s){
 
     ctx.beginPath();
 
-    ctx.arc(x,y,20*s,0,Math.PI*2);
-
     ctx.arc(
-        x+25*s,
-        y-8*s,
-        27*s,
+        x,
+        y,
+        20 * s,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.arc(
-        x+52*s,
-        y,
-        20*s,
+        x + 25 * s,
+        y - 8 * s,
+        27 * s,
         0,
-        Math.PI*2
+        Math.PI * 2
+    );
+
+    ctx.arc(
+        x + 52 * s,
+        y,
+        20 * s,
+        0,
+        Math.PI * 2
     );
 
     ctx.fill();
 }
 
 
-/* =========================
-   FOX DRAW
-========================= */
+/* =====================================================
+   DRAW FOX
+===================================================== */
 
 function drawFox(){
 
-    const x=fox.x;
-    const y=fox.y;
+    const x = fox.x;
+    const y = fox.y;
 
-    const running=
+
+    const running =
         fox.grounded
-        ?Math.sin(fox.animation)*4
-        :0;
+        ? Math.sin(fox.animation) * 4
+        : 0;
 
-    ctx.fillStyle="rgba(0,0,0,.15)";
+
+    /* سایه */
+
+    ctx.fillStyle =
+        "rgba(0,0,0,.15)";
 
     ctx.beginPath();
 
     ctx.ellipse(
-        x+30,
-        ground()+3,
+        x + 30,
+        ground() + 3,
         28,
         6,
         0,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#f97316";
+    /* دم */
+
+    ctx.fillStyle =
+        "#f97316";
 
     ctx.beginPath();
 
-    ctx.moveTo(x+15,y+28);
-
-    ctx.quadraticCurveTo(
-        x-22,
-        y+5+running,
-        x-10,
-        y-10+running
+    ctx.moveTo(
+        x + 15,
+        y + 28
     );
 
     ctx.quadraticCurveTo(
-        x+5,
-        y+5,
-        x+20,
-        y+23
+        x - 22,
+        y + 5 + running,
+        x - 10,
+        y - 10 + running
+    );
+
+    ctx.quadraticCurveTo(
+        x + 5,
+        y + 5,
+        x + 20,
+        y + 23
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#fff7ed";
+    /* نوک سفید دم */
+
+    ctx.fillStyle =
+        "#fff7ed";
 
     ctx.beginPath();
 
-    ctx.moveTo(x-10,y-10+running);
-
-    ctx.quadraticCurveTo(
-        x-25,y,
-        x-14,y+12
+    ctx.moveTo(
+        x - 10,
+        y - 10 + running
     );
 
     ctx.quadraticCurveTo(
-        x-5,y+5,
-        x+1,y+7
+        x - 25,
+        y,
+        x - 14,
+        y + 12
+    );
+
+    ctx.quadraticCurveTo(
+        x - 5,
+        y + 5,
+        x + 1,
+        y + 7
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#f97316";
+    /* بدن */
+
+    ctx.fillStyle =
+        "#f97316";
 
     ctx.beginPath();
 
     ctx.ellipse(
-        x+29,
-        y+29,
+        x + 29,
+        y + 29,
         27,
         18,
         0,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#fff7ed";
+    /* شکم */
+
+    ctx.fillStyle =
+        "#fff7ed";
 
     ctx.beginPath();
 
     ctx.ellipse(
-        x+34,
-        y+31,
+        x + 34,
+        y + 31,
         14,
         10,
         0,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#ea580c";
+    /* پاها */
+
+    ctx.fillStyle =
+        "#ea580c";
 
     ctx.fillRect(
-        x+14,
-        y+39+running,
+        x + 14,
+        y + 39 + running,
         10,
         11
     );
 
     ctx.fillRect(
-        x+39,
-        y+39-running,
+        x + 39,
+        y + 39 - running,
         10,
         11
     );
 
 
-    ctx.fillStyle="#f97316";
+    /* گردن */
+
+    ctx.fillStyle =
+        "#f97316";
 
     ctx.beginPath();
 
     ctx.ellipse(
-        x+43,
-        y+18,
+        x + 43,
+        y + 18,
         16,
         17,
         0,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#fb923c";
+    /* سر */
+
+    ctx.fillStyle =
+        "#fb923c";
 
     ctx.beginPath();
 
     ctx.ellipse(
-        x+52,
-        y+8,
+        x + 52,
+        y + 8,
         21,
         17,
         0,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#f97316";
+    /* گوش‌ها */
+
+    ctx.fillStyle =
+        "#f97316";
 
     ctx.beginPath();
 
-    ctx.moveTo(x+38,y-3);
-    ctx.lineTo(x+39,y-20);
-    ctx.lineTo(x+50,y-6);
+    ctx.moveTo(
+        x + 38,
+        y - 3
+    );
+
+    ctx.lineTo(
+        x + 39,
+        y - 20
+    );
+
+    ctx.lineTo(
+        x + 50,
+        y - 6
+    );
 
     ctx.closePath();
 
@@ -859,227 +1436,314 @@ function drawFox(){
 
     ctx.beginPath();
 
-    ctx.moveTo(x+53,y-4);
-    ctx.lineTo(x+62,y-19);
-    ctx.lineTo(x+68,y);
+    ctx.moveTo(
+        x + 53,
+        y - 4
+    );
+
+    ctx.lineTo(
+        x + 62,
+        y - 19
+    );
+
+    ctx.lineTo(
+        x + 68,
+        y
+    );
 
     ctx.closePath();
 
     ctx.fill();
 
 
-    ctx.fillStyle="#fecaca";
+    /* داخل گوش */
+
+    ctx.fillStyle =
+        "#fecaca";
 
     ctx.beginPath();
 
-    ctx.moveTo(x+41,y-6);
-    ctx.lineTo(x+41,y-14);
-    ctx.lineTo(x+47,y-7);
+    ctx.moveTo(
+        x + 41,
+        y - 6
+    );
+
+    ctx.lineTo(
+        x + 41,
+        y - 14
+    );
+
+    ctx.lineTo(
+        x + 47,
+        y - 7
+    );
 
     ctx.closePath();
 
     ctx.fill();
 
 
-    ctx.fillStyle="#fff7ed";
+    /* پوزه */
+
+    ctx.fillStyle =
+        "#fff7ed";
 
     ctx.beginPath();
 
     ctx.ellipse(
-        x+67,
-        y+13,
+        x + 67,
+        y + 13,
         12,
         8,
         0,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
-    ctx.fillStyle="#111";
+    /* بینی */
+
+    ctx.fillStyle =
+        "#111";
 
     ctx.beginPath();
 
     ctx.arc(
-        x+75,
-        y+10,
+        x + 75,
+        y + 10,
         3.5,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
 
+    /* چشم */
+
     ctx.beginPath();
 
     ctx.arc(
-        x+58,
-        y+5,
+        x + 58,
+        y + 5,
         3.5,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 
-    ctx.fillStyle="#fff";
+
+    /* برق چشم */
+
+    ctx.fillStyle =
+        "#fff";
 
     ctx.beginPath();
 
     ctx.arc(
-        x+59,
-        y+4,
+        x + 59,
+        y + 4,
         1.2,
         0,
-        Math.PI*2
+        Math.PI * 2
     );
 
     ctx.fill();
 }
 
 
-/* =========================
-   EGG
-========================= */
+/* =====================================================
+   DRAW EGG
+===================================================== */
 
 function drawEgg(e){
 
-    const cx=e.x+e.w/2;
+    const cx =
+        e.x + e.w / 2;
 
-    if(e.value>=10){
 
-        ctx.shadowBlur=10;
-        ctx.shadowColor=e.color;
+    if(e.value >= 10){
+
+        ctx.shadowBlur = 10;
+
+        ctx.shadowColor =
+            e.color;
     }
 
-    ctx.fillStyle=e.color;
+
+    ctx.fillStyle =
+        e.color;
+
 
     ctx.beginPath();
 
-    ctx.moveTo(cx,e.y);
-
-    ctx.bezierCurveTo(
-        e.x+e.w,
-        e.y+5,
-        e.x+e.w,
-        e.y+23,
-        cx,
-        e.y+e.h
-    );
-
-    ctx.bezierCurveTo(
-        e.x,
-        e.y+23,
-        e.x,
-        e.y+5,
+    ctx.moveTo(
         cx,
         e.y
     );
 
+
+    ctx.bezierCurveTo(
+        e.x + e.w,
+        e.y + 5,
+        e.x + e.w,
+        e.y + 23,
+        cx,
+        e.y + e.h
+    );
+
+
+    ctx.bezierCurveTo(
+        e.x,
+        e.y + 23,
+        e.x,
+        e.y + 5,
+        cx,
+        e.y
+    );
+
+
     ctx.fill();
 
-    ctx.shadowBlur=0;
+    ctx.shadowBlur = 0;
 
-    ctx.strokeStyle="rgba(0,0,0,.12)";
-    ctx.lineWidth=2;
+
+    ctx.strokeStyle =
+        "rgba(0,0,0,.12)";
+
+    ctx.lineWidth = 2;
+
 
     ctx.beginPath();
 
-    ctx.moveTo(e.x+6,e.y+18);
+    ctx.moveTo(
+        e.x + 6,
+        e.y + 18
+    );
+
 
     ctx.quadraticCurveTo(
         cx,
-        e.y+12,
-        e.x+e.w-6,
-        e.y+18
+        e.y + 12,
+        e.x + e.w - 6,
+        e.y + 18
     );
 
     ctx.stroke();
 }
 
 
-/* =========================
-   OBSTACLE DRAW
-========================= */
+/* =====================================================
+   DRAW OBSTACLE
+===================================================== */
 
 function drawObstacle(o){
 
-    if(o.type==="tree"){
+    if(o.type === "tree"){
 
-        ctx.fillStyle="#8b5a2b";
+        ctx.fillStyle =
+            "#8b5a2b";
 
         ctx.fillRect(
-            o.x+16,
-            o.y+27,
+            o.x + 16,
+            o.y + 27,
             14,
-            o.h-27
+            o.h - 27
         );
 
-        ctx.fillStyle="#23823c";
+
+        ctx.fillStyle =
+            "#23823c";
 
         ctx.beginPath();
 
         ctx.arc(
-            o.x+23,
-            o.y+20,
+            o.x + 23,
+            o.y + 20,
             25,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
 
         ctx.fill();
 
-        ctx.fillStyle="#2f9e44";
+
+        ctx.fillStyle =
+            "#2f9e44";
 
         ctx.beginPath();
 
         ctx.arc(
-            o.x+7,
-            o.y+32,
+            o.x + 7,
+            o.y + 32,
             16,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
 
         ctx.fill();
+
 
         ctx.beginPath();
 
         ctx.arc(
-            o.x+40,
-            o.y+32,
+            o.x + 40,
+            o.y + 32,
             16,
             0,
-            Math.PI*2
+            Math.PI * 2
         );
 
         ctx.fill();
 
-    }else if(o.type==="rock"){
 
-        ctx.fillStyle="#667085";
+    }else if(o.type === "rock"){
+
+        ctx.fillStyle =
+            "#667085";
 
         ctx.beginPath();
 
-        ctx.moveTo(o.x,o.y+o.h);
-        ctx.lineTo(o.x+10,o.y+10);
-        ctx.lineTo(o.x+28,o.y);
-        ctx.lineTo(o.x+o.w,o.y+15);
-        ctx.lineTo(o.x+o.w-8,o.y+o.h);
+        ctx.moveTo(
+            o.x,
+            o.y + o.h
+        );
+
+        ctx.lineTo(
+            o.x + 10,
+            o.y + 10
+        );
+
+        ctx.lineTo(
+            o.x + 28,
+            o.y
+        );
+
+        ctx.lineTo(
+            o.x + o.w,
+            o.y + 15
+        );
+
+        ctx.lineTo(
+            o.x + o.w - 8,
+            o.y + o.h
+        );
 
         ctx.closePath();
 
         ctx.fill();
 
+
     }else{
 
-        ctx.fillStyle="#25834a";
+        ctx.fillStyle =
+            "#25834a";
 
         ctx.fillRect(
-            o.x+9,
+            o.x + 9,
             o.y,
             14,
             o.h
@@ -1087,14 +1751,14 @@ function drawObstacle(o){
 
         ctx.fillRect(
             o.x,
-            o.y+20,
+            o.y + 20,
             13,
             11
         );
 
         ctx.fillRect(
-            o.x+20,
-            o.y+38,
+            o.x + 20,
+            o.y + 38,
             13,
             11
         );
@@ -1102,79 +1766,129 @@ function drawObstacle(o){
 }
 
 
-/* =========================
+/* =====================================================
    UPDATE
-========================= */
+===================================================== */
 
 function update(dt){
 
-    speed+=12*dt;
+    /*
+      بدون سقف سرعت.
+      هر ثانیه 10 واحد به سرعت اضافه می‌شود.
+    */
 
-    if(speed>700)
-        speed=700;
+    speed += 10 * dt;
 
 
-    fox.vy+=fox.gravity*dt;
+    /* FOX */
 
-    fox.y+=fox.vy*dt;
+    fox.vy +=
+        fox.gravity * dt;
 
-    if(fox.y+fox.h>=ground()){
+    fox.y +=
+        fox.vy * dt;
 
-        fox.y=ground()-fox.h;
 
-        fox.vy=0;
+    if(
+        fox.y + fox.h >= ground()
+    ){
 
-        fox.grounded=true;
+        fox.y =
+            ground() - fox.h;
+
+        fox.vy = 0;
+
+        fox.grounded = true;
     }
 
-    fox.animation+=dt*15;
+
+    fox.animation +=
+        dt * 15;
 
 
-    eggTimer-=dt;
+    /* DAY / NIGHT */
 
-    if(eggTimer<=0){
+    updateDayNight();
+
+
+    /* EGGS */
+
+    eggTimer -= dt;
+
+
+    if(eggTimer <= 0){
 
         createEgg();
 
-        eggTimer=.7+Math.random()*.5;
+        eggTimer =
+            .55 +
+            Math.random() * .4;
     }
 
 
-    for(let i=eggs.length-1;i>=0;i--){
+    for(
+        let i = eggs.length - 1;
+        i >= 0;
+        i--
+    ){
 
-        const e=eggs[i];
+        const e =
+            eggs[i];
 
-        e.x-=speed*dt;
+        e.x -=
+            speed * dt;
+
 
         if(collision(fox,e)){
 
             collectEgg(e);
 
-            eggs.splice(i,1);
+            eggs.splice(
+                i,
+                1
+            );
 
             continue;
         }
 
-        if(e.x<-60)
-            eggs.splice(i,1);
+
+        if(e.x < -60){
+
+            eggs.splice(
+                i,
+                1
+            );
+        }
     }
 
 
-    obstacleTimer-=dt;
+    /* OBSTACLES */
 
-    if(obstacleTimer<=0){
+    obstacleTimer -= dt;
+
+
+    if(obstacleTimer <= 0){
 
         createObstacle();
 
-        obstacleTimer=1.1+Math.random()*.7;
+        obstacleTimer =
+            1.05 +
+            Math.random() * .55;
     }
 
 
-    for(let i=obstacles.length-1;i>=0;i--){
+    for(
+        let i = obstacles.length - 1;
+        i >= 0;
+        i--
+    ){
 
-        const o=obstacles[i];
+        const o =
+            obstacles[i];
 
-        o.x-=speed*dt;
+        o.x -=
+            speed * dt;
+
 
         if(collision(fox,o)){
 
@@ -1183,342 +1897,295 @@ function update(dt){
             return;
         }
 
-        if(o.x<-80)
-            obstacles.splice(i,1);
+
+        if(o.x < -80){
+
+            obstacles.splice(
+                i,
+                1
+            );
+        }
     }
 
 
-    if(combo>0){
+    /* COMBO */
 
-        comboTimer-=dt;
+    if(combo > 0){
 
-        if(comboTimer<=0){
+        comboTimer -= dt;
 
-            combo=0;
 
-            comboBox.classList.remove("show");
+        if(comboTimer <= 0){
+
+            combo = 0;
+
+            comboBox.classList.remove(
+                "show"
+            );
         }
     }
 }
 
 
-/* =========================
-   COLLECT
-========================= */
+/* =====================================================
+   COLLECT EGG
+===================================================== */
 
 function collectEgg(e){
 
     combo++;
 
-    comboTimer=2;
+    comboTimer = 2;
 
-    let multiplier=1;
 
-    if(combo>=10)
-        multiplier=3;
-    else if(combo>=5)
-        multiplier=2;
+    let multiplier = 1;
 
-    score+=e.value*multiplier;
 
-    totalEggs+=e.value;
+    if(combo >= 10){
 
-    localStorage.setItem(
-        "foxTotalEggs",
-        totalEggs
-    );
+        multiplier = 3;
 
-    scoreText.textContent=isEnglish
-        ?"Score: "+score
-        :"امتیاز: "+score;
+    }else if(combo >= 5){
 
-    totalEggsText.textContent=totalEggs;
+        multiplier = 2;
+    }
 
-    if(combo>=2){
 
-        comboBox.classList.add("show");
+    const earned =
+        e.value * multiplier;
 
-        comboValue.textContent=combo;
+
+    /* امتیاز بازی فعلی */
+
+    score += earned;
+
+
+    /*
+      آمار دائمی:
+      با Refresh صفر نمی‌شوند.
+    */
+
+    totalEggs += 1;
+
+    totalScore += earned;
+
+
+    saveWallet();
+
+    updateDayNight();
+
+    updateUI();
+
+
+    if(combo >= 2){
+
+        comboBox.classList.add(
+            "show"
+        );
+
+        comboValue.textContent =
+            combo;
     }
 }
 
 
-/* =========================
-   DRAW
-========================= */
-
-function draw(){
-
-    drawBackground();
-
-    for(const e of eggs)
-        drawEgg(e);
-
-    for(const o of obstacles)
-        drawObstacle(o);
-
-    drawFox();
-}
-
-
-/* =========================
-   LOOP
-========================= */
+/* =====================================================
+   GAME LOOP
+===================================================== */
 
 function loop(time){
 
     if(!playing)
         return;
 
-    let dt=(time-lastTime)/1000;
 
-    lastTime=time;
+    let dt =
+        (time - lastTime) / 1000;
 
-    if(dt>.033)
-        dt=.033;
+
+    lastTime = time;
+
+
+    /*
+      اگر گوشی لحظه‌ای هنگ کند،
+      بازی یکباره جلو نمی‌پرد.
+    */
+
+    if(dt > .033)
+        dt = .033;
+
 
     update(dt);
 
     draw();
 
-    if(playing)
-        requestAnimationFrame(loop);
+
+    if(playing){
+
+        requestAnimationFrame(
+            loop
+        );
+    }
 }
 
 
-/* =========================
+/* =====================================================
+   DRAW
+===================================================== */
+
+function draw(){
+
+    drawBackground();
+
+
+    for(const e of eggs){
+
+        drawEgg(e);
+    }
+
+
+    for(const o of obstacles){
+
+        drawObstacle(o);
+    }
+
+
+    drawFox();
+}
+
+
+/* =====================================================
    START GAME
-========================= */
+===================================================== */
 
 function startGame(){
 
-    score=0;
+    /*
+      فقط اطلاعات مربوط به بازی فعلی صفر می‌شود.
+      اطلاعات والت هرگز صفر نمی‌شود.
+    */
 
-    speed=330;
+    score = 0;
 
-    eggTimer=.3;
+    speed = 330;
 
-    obstacleTimer=1;
+    eggTimer = .3;
 
-    combo=0;
+    obstacleTimer = 1;
 
-    comboTimer=0;
+    combo = 0;
 
-    eggs.length=0;
+    comboTimer = 0;
 
-    obstacles.length=0;
+    eggs.length = 0;
+
+    obstacles.length = 0;
+
+    lastDayCycle = -1;
+
+    isNight = false;
+
+
+    /*
+      یک بازی جدید به تعداد بازی‌ها اضافه می‌شود.
+    */
 
     gamesPlayed++;
 
-    localStorage.setItem(
-        "foxGamesPlayed",
-        gamesPlayed
+
+    saveWallet();
+
+    updateUI();
+
+
+    comboBox.classList.remove(
+        "show"
     );
 
-    updateWallet();
-
-    scoreText.textContent=isEnglish
-        ?"Score: 0"
-        :"امتیاز: 0";
-
-    comboBox.classList.remove("show");
 
     resetFox();
 
-    playing=true;
 
-    startScreen.style.display="none";
-    gameOver.style.display="none";
+    playing = true;
 
-    /* مهم: منوی سه‌خط هنگام بازی کاملاً مخفی */
 
-    menuButton.style.display="none";
-    menuPanel.classList.remove("show");
+    /*
+      منوی سه‌خط هنگام بازی مخفی است.
+    */
 
-    lastTime=performance.now();
+    menuButton.style.display =
+        "none";
 
-    requestAnimationFrame(loop);
+    menuPanel.style.display =
+        "none";
+
+
+    startScreen.style.display =
+        "none";
+
+    gameOver.style.display =
+        "none";
+
+
+    lastTime =
+        performance.now();
+
+
+    requestAnimationFrame(
+        loop
+    );
 }
 
 
-/* =========================
+/* =====================================================
    GAME OVER
-========================= */
+===================================================== */
 
 function endGame(){
 
-    playing=false;
-
-    finalScore.textContent=score;
-
-    if(score>best){
-
-        best=score;
-
-        localStorage.setItem(
-            "foxBest",
-            best
-        );
-
-        recordText.style.display="block";
-
-    }else{
-
-        recordText.style.display="none";
-    }
-
-    updateWallet();
-
-    gameOver.style.display="flex";
-
-    /* بعد از پایان بازی دوباره منو ظاهر شود */
-
-    menuButton.style.display="block";
-}
+    playing = false;
 
 
-/* =========================
-   MENU
-========================= */
-
-menuButton.addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-        if(playing)
-            return;
-
-        menuPanel.classList.toggle("show");
-    }
-);
+    finalScore.textContent =
+        score;
 
 
-/* =========================
-   LANGUAGE
-========================= */
+    if(score > best){
 
-function setLanguage(en){
+        best = score;
 
-    isEnglish=en;
+        recordText.style.display =
+            "block";
 
-    document.documentElement.lang=
-        en?"en":"fa";
 
-    document.documentElement.dir=
-        en?"ltr":"rtl";
-
-    if(en){
-
-        document.getElementById("score").textContent=
-            "Score: "+score;
-
-        document.getElementById("best").textContent=
-            "Best: "+best;
-
-        document.getElementById("menuTitle").textContent=
-            "Menu";
-
-        document.getElementById("walletTitle").textContent=
-            "Wallet";
-
-        document.getElementById("gamesLabel").textContent=
-            "Games played: ";
-
-        document.getElementById("bestLabel").textContent=
-            "Best: ";
-
-        document.getElementById("eggsLabel").textContent=
-            "Total eggs: ";
-
-        document.getElementById("startDescription").textContent=
-            "Collect eggs and beat your record!";
-
-        document.getElementById("start").textContent=
-            "Start Game";
-
-        document.getElementById("controlText").textContent=
-            "Tap the screen or Space to jump";
-
-        document.getElementById("gameOverTitle").textContent=
-            "Game Over!";
-
-        document.getElementById("finalScoreLabel").textContent=
-            "Score: ";
-
-        document.getElementById("restart").textContent=
-            "Play Again";
+        saveWallet();
 
     }else{
 
-        document.getElementById("score").textContent=
-            "امتیاز: "+score;
-
-        document.getElementById("best").textContent=
-            "رکورد: "+best;
-
-        document.getElementById("menuTitle").textContent=
-            "منو";
-
-        document.getElementById("walletTitle").textContent=
-            "والت";
-
-        document.getElementById("gamesLabel").textContent=
-            "تعداد بازی‌ها: ";
-
-        document.getElementById("bestLabel").textContent=
-            "رکورد: ";
-
-        document.getElementById("eggsLabel").textContent=
-            "کل تخم‌ها: ";
-
-        document.getElementById("startDescription").textContent=
-            "تخم‌ها را جمع کن و رکورد بزن!";
-
-        document.getElementById("start").textContent=
-            "شروع بازی";
-
-        document.getElementById("controlText").textContent=
-            "لمس صفحه یا Space برای پرش";
-
-        document.getElementById("gameOverTitle").textContent=
-            "باختی!";
-
-        document.getElementById("finalScoreLabel").textContent=
-            "امتیاز: ";
-
-        document.getElementById("restart").textContent=
-            "دوباره بازی کن";
+        recordText.style.display =
+            "none";
     }
 
-    updateWallet();
+
+    updateUI();
+
+
+    /*
+      منو فقط بیرون بازی نمایش داده می‌شود.
+    */
+
+    menuButton.style.display =
+        "block";
+
+
+    gameOver.style.display =
+        "flex";
 }
 
-document.getElementById("faButton").addEventListener(
-    "click",
-    function(){
 
-        setLanguage(false);
-
-        menuPanel.classList.remove("show");
-    }
-);
-
-document.getElementById("enButton").addEventListener(
-    "click",
-    function(){
-
-        setLanguage(true);
-
-        menuPanel.classList.remove("show");
-    }
-);
-
-
-/* =========================
+/* =====================================================
    INPUT
-========================= */
+===================================================== */
 
 function handleInput(){
 
@@ -1538,8 +2205,8 @@ window.addEventListener(
     function(e){
 
         if(
-            e.code==="Space" ||
-            e.code==="ArrowUp"
+            e.code === "Space" ||
+            e.code === "ArrowUp"
         ){
 
             e.preventDefault();
@@ -1557,8 +2224,11 @@ canvas.addEventListener(
         e.preventDefault();
 
         handleInput();
+
     },
-    {passive:false}
+    {
+        passive:false
+    }
 );
 
 
@@ -1584,13 +2254,79 @@ restartButton.addEventListener(
 );
 
 
-/* =========================
+/* =====================================================
+   MENU
+===================================================== */
+
+menuButton.addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+
+        if(playing)
+            return;
+
+
+        menuPanel.style.display =
+            menuPanel.style.display === "block"
+            ? "none"
+            : "block";
+
+
+        updateUI();
+    }
+);
+
+
+menuPanel.addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+    }
+);
+
+
+document.getElementById(
+    "faButton"
+).addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+        setLanguage("fa");
+    }
+);
+
+
+document.getElementById(
+    "enButton"
+).addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+        setLanguage("en");
+    }
+);
+
+
+/* =====================================================
    INITIAL
-========================= */
+===================================================== */
+
+applyLanguage();
+
+updateUI();
 
 resetFox();
 
-updateWallet();
+menuButton.style.display =
+    "block";
 
 draw();
 
