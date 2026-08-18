@@ -111,13 +111,15 @@ canvas{
     border-radius:10px;
 }
 
-.langButtons{
+.langButtons,
+.soundButtons{
     display:flex;
     gap:8px;
     margin-top:8px;
 }
 
-.langButtons button{
+.langButtons button,
+.soundButtons button{
     flex:1;
     padding:9px;
     font-size:14px;
@@ -198,7 +200,6 @@ button:active{
 <canvas id="canvas"></canvas>
 
 <div id="ui">
-
     <div>
         <div id="score">امتیاز: 0</div>
         <div id="best">رکورد: 0</div>
@@ -207,7 +208,6 @@ button:active{
     <div id="combo">
         COMBO ×<span id="comboValue">2</span>
     </div>
-
 </div>
 
 <button id="menuButton">☰</button>
@@ -217,52 +217,49 @@ button:active{
     <h2 id="menuTitle">منو</h2>
 
     <div class="menuItem">
-
         <div id="languageTitle">زبان</div>
 
         <div class="langButtons">
+            <button id="faButton">فارسی</button>
+            <button id="enButton">English</button>
+        </div>
+    </div>
 
-            <button id="faButton">
-                فارسی
+    <div class="menuItem">
+
+        <div id="soundTitle">
+            صدا
+        </div>
+
+        <div class="soundButtons">
+            <button id="soundOnButton">
+                🔊 روشن
             </button>
 
-            <button id="enButton">
-                English
+            <button id="soundOffButton">
+                🔇 خاموش
             </button>
-
         </div>
 
     </div>
 
     <div class="menuItem">
-        <div id="gamesLabel">
-            تعداد بازی‌ها
-        </div>
-
+        <div id="gamesLabel">تعداد بازی‌ها</div>
         <strong id="gamesValue">0</strong>
     </div>
 
     <div class="menuItem">
-        <div id="bestLabel">
-            رکورد
-        </div>
-
+        <div id="bestLabel">رکورد</div>
         <strong id="walletBest">0</strong>
     </div>
 
     <div class="menuItem">
-        <div id="eggsLabel">
-            کل تخم‌های جمع‌شده
-        </div>
-
+        <div id="eggsLabel">کل تخم‌های جمع‌شده</div>
         <strong id="walletEggs">0</strong>
     </div>
 
     <div class="menuItem">
-        <div id="walletScoreLabel">
-            امتیاز کل
-        </div>
-
+        <div id="walletScoreLabel">امتیاز کل</div>
         <strong id="walletScore">0</strong>
     </div>
 
@@ -270,13 +267,9 @@ button:active{
 
 <div id="startScreen" class="screen">
 
-    <div class="logo">
-        🦊
-    </div>
+    <div class="logo">🦊</div>
 
-    <h1>
-        Fox Eggs
-    </h1>
+    <h1>Fox Eggs</h1>
 
     <p id="startText">
         تخم‌ها را جمع کن و رکورد بزن!
@@ -297,9 +290,7 @@ button:active{
 
 <div id="gameOver" class="screen">
 
-    <div class="logo">
-        🦊
-    </div>
+    <div class="logo">🦊</div>
 
     <h1 id="gameOverTitle">
         باختی!
@@ -372,7 +363,6 @@ let W = 0;
 let H = 0;
 let scale = 1;
 
-
 function resize(){
 
     W = window.innerWidth;
@@ -399,7 +389,6 @@ function resize(){
         0
     );
 }
-
 
 resize();
 
@@ -469,6 +458,432 @@ const finalEggs =
 
 
 /* =====================================================
+   INTERNAL MUSIC
+===================================================== */
+
+let audioContext = null;
+let musicMaster = null;
+let musicTimer = null;
+let musicStep = 0;
+
+let soundEnabled =
+    localStorage.getItem("foxSound") !== "off";
+
+
+function initAudio(){
+
+    if(audioContext)
+        return;
+
+    const AudioCtx =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if(!AudioCtx)
+        return;
+
+    audioContext =
+        new AudioCtx();
+
+    musicMaster =
+        audioContext.createGain();
+
+    musicMaster.gain.value =
+        soundEnabled ? 0.075 : 0;
+
+    musicMaster.connect(
+        audioContext.destination
+    );
+}
+
+
+function playTone(
+    frequency,
+    duration,
+    type="square",
+    volume=.08,
+    delay=0
+){
+
+    if(!audioContext || !soundEnabled)
+        return;
+
+    const now =
+        audioContext.currentTime + delay;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type =
+        type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+    );
+
+    gain.gain.setValueAtTime(
+        0,
+        now
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        volume,
+        now + .008
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        now + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(musicMaster);
+
+    oscillator.start(now);
+    oscillator.stop(now + duration + .03);
+}
+
+
+function playKick(){
+
+    if(!audioContext || !soundEnabled)
+        return;
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type =
+        "sine";
+
+    oscillator.frequency.setValueAtTime(
+        120,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        45,
+        now + .12
+    );
+
+    gain.gain.setValueAtTime(
+        .12,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        now + .14
+    );
+
+    oscillator.connect(gain);
+    gain.connect(musicMaster);
+
+    oscillator.start(now);
+    oscillator.stop(now + .15);
+}
+
+
+function playHat(){
+
+    if(!audioContext || !soundEnabled)
+        return;
+
+    const buffer =
+        audioContext.createBuffer(
+            1,
+            audioContext.sampleRate * .035,
+            audioContext.sampleRate
+        );
+
+    const data =
+        buffer.getChannelData(0);
+
+    for(let i=0;i<data.length;i++){
+
+        data[i] =
+            Math.random() * 2 - 1;
+    }
+
+    const source =
+        audioContext.createBufferSource();
+
+    const gain =
+        audioContext.createGain();
+
+    gain.gain.value =
+        .025;
+
+    source.buffer =
+        buffer;
+
+    source.connect(gain);
+    gain.connect(musicMaster);
+
+    source.start();
+}
+
+
+const melody = [
+    523.25,
+    659.25,
+    783.99,
+    659.25,
+    587.33,
+    698.46,
+    880.00,
+    698.46,
+
+    523.25,
+    659.25,
+    783.99,
+    987.77,
+    880.00,
+    783.99,
+    659.25,
+    587.33
+];
+
+
+function musicTick(){
+
+    if(!playing)
+        return;
+
+    if(!soundEnabled)
+        return;
+
+    const note =
+        melody[musicStep % melody.length];
+
+    playTone(
+        note,
+        .17,
+        "square",
+        .055
+    );
+
+    if(musicStep % 2 === 0)
+        playHat();
+
+    if(musicStep % 4 === 0)
+        playKick();
+
+    if(musicStep % 8 === 7){
+
+        playTone(
+            note / 2,
+            .28,
+            "triangle",
+            .035,
+            .02
+        );
+    }
+
+    musicStep++;
+}
+
+
+/*
+=====================================================
+FIXED START MUSIC
+
+مهم‌ترین اصلاح همین بخش است.
+
+بعد از Game Over، ولوم موسیقی صفر می‌شود.
+در شروع بازی بعدی دوباره آن را به 0.075 برمی‌گردانیم.
+=====================================================
+*/
+
+function startMusic(){
+
+    initAudio();
+
+    if(!audioContext || !musicMaster)
+        return;
+
+    if(audioContext.state === "suspended"){
+
+        audioContext.resume();
+    }
+
+    /*
+      برگرداندن صدای موسیقی بعد از Game Over
+    */
+
+    musicMaster.gain.cancelScheduledValues(
+        audioContext.currentTime
+    );
+
+    musicMaster.gain.setTargetAtTime(
+        soundEnabled ? 0.075 : 0,
+        audioContext.currentTime,
+        0.03
+    );
+
+    /*
+      جلوگیری از اجرای چند تایمر موسیقی
+      همزمان با هم
+    */
+
+    stopMusicTimer();
+
+    /*
+      آهنگ هر بار از اول شروع می‌شود
+    */
+
+    musicStep = 0;
+
+    /*
+      اولین نت بلافاصله پخش شود
+    */
+
+    if(soundEnabled){
+
+        musicTick();
+    }
+
+    /*
+      ادامه آهنگ
+    */
+
+    musicTimer =
+        setInterval(
+            musicTick,
+            190
+        );
+}
+
+
+function stopMusicTimer(){
+
+    if(musicTimer){
+
+        clearInterval(
+            musicTimer
+        );
+
+        musicTimer = null;
+    }
+}
+
+
+function stopMusic(){
+
+    stopMusicTimer();
+
+    if(musicMaster && audioContext){
+
+        musicMaster.gain.cancelScheduledValues(
+            audioContext.currentTime
+        );
+
+        musicMaster.gain.setTargetAtTime(
+            0,
+            audioContext.currentTime,
+            0.03
+        );
+    }
+}
+
+
+function enableSound(){
+
+    soundEnabled = true;
+
+    localStorage.setItem(
+        "foxSound",
+        "on"
+    );
+
+    initAudio();
+
+    if(musicMaster && audioContext){
+
+        musicMaster.gain.cancelScheduledValues(
+            audioContext.currentTime
+        );
+
+        musicMaster.gain.setTargetAtTime(
+            .075,
+            audioContext.currentTime,
+            .04
+        );
+    }
+
+    if(playing){
+
+        startMusic();
+    }
+
+    updateSoundButtons();
+}
+
+
+function disableSound(){
+
+    soundEnabled = false;
+
+    localStorage.setItem(
+        "foxSound",
+        "off"
+    );
+
+    stopMusic();
+
+    updateSoundButtons();
+}
+
+
+function updateSoundButtons(){
+
+    const onButton =
+        document.getElementById(
+            "soundOnButton"
+        );
+
+    const offButton =
+        document.getElementById(
+            "soundOffButton"
+        );
+
+    if(language === "fa"){
+
+        onButton.textContent =
+            soundEnabled
+            ? "🔊 روشن ✓"
+            : "🔊 روشن";
+
+        offButton.textContent =
+            !soundEnabled
+            ? "🔇 خاموش ✓"
+            : "🔇 خاموش";
+
+    }else{
+
+        onButton.textContent =
+            soundEnabled
+            ? "🔊 On ✓"
+            : "🔊 On";
+
+        offButton.textContent =
+            !soundEnabled
+            ? "🔇 Off ✓"
+            : "🔇 Off";
+    }
+}
+
+
+/* =====================================================
    SAFE LOCAL STORAGE
 ===================================================== */
 
@@ -492,10 +907,8 @@ function loadNumber(key, defaultValue = 0){
         const number =
             Number(value);
 
-        if(Number.isFinite(number)){
-
+        if(Number.isFinite(number))
             return number;
-        }
 
         localStorage.setItem(
             key,
@@ -595,6 +1008,12 @@ function applyLanguage(){
 
 
     document.getElementById(
+        "soundTitle"
+    ).textContent =
+        fa ? "صدا" : "Sound";
+
+
+    document.getElementById(
         "gamesLabel"
     ).textContent =
         fa ? "تعداد بازی‌ها" : "Games played";
@@ -686,6 +1105,8 @@ function applyLanguage(){
         : "🏆 New Record!";
 
 
+    updateSoundButtons();
+
     updateUI();
 }
 
@@ -771,6 +1192,41 @@ let comboTimer = 0;
 let eggs = [];
 
 let obstacles = [];
+
+
+/* =====================================================
+   SPEED SYSTEM
+===================================================== */
+
+function updateSpeed(){
+
+    if(score <= 600){
+
+        const progress =
+            Math.max(
+                0,
+                Math.min(
+                    score / 600,
+                    1
+                )
+            );
+
+        const smooth =
+            progress *
+            progress *
+            (3 - 2 * progress);
+
+        speed =
+            330 +
+            870 * smooth;
+
+    }else{
+
+        speed =
+            1200 +
+            (score - 600) * .12;
+    }
+}
 
 
 /* =====================================================
@@ -1199,7 +1655,6 @@ function drawFox(){
 
     const x = fox.x;
     const y = fox.y;
-
 
     const running =
         fox.grounded
@@ -1722,35 +2177,7 @@ function drawObstacle(o){
 
 function update(dt){
 
-    /* =====================================================
-       SPEED
-       
-       تا 600 امتیاز:
-       سرعت از 330 به 1200 می‌رسد.
-
-       بعد از 600:
-       سرعت همچنان زیاد می‌شود،
-       ولی بسیار آرام‌تر.
-
-       هر 100 امتیاز بعد از 600،
-       فقط 20 واحد سرعت اضافه می‌شود.
-    ===================================================== */
-
-    if(score <= 600){
-
-        const progress =
-            score / 600;
-
-        speed =
-            330 +
-            (1200 - 330) * progress;
-
-    }else{
-
-        speed =
-            1200 +
-            (score - 600) * 0.20;
-    }
+    updateSpeed();
 
 
     /* FOX */
@@ -1930,13 +2357,14 @@ function collectEgg(e){
 
     score += earned;
 
-
     totalEggs += 1;
 
     totalScore += earned;
 
 
     saveWallet();
+
+    updateSpeed();
 
     updateDayNight();
 
@@ -2021,6 +2449,13 @@ function draw(){
 
 function startGame(){
 
+    /*
+      اگر یک اجرای قبلی موسیقی هنوز باقی مانده،
+      اول کاملاً متوقفش می‌کنیم.
+    */
+
+    stopMusicTimer();
+
     score = 0;
 
     speed = 330;
@@ -2043,7 +2478,6 @@ function startGame(){
 
 
     gamesPlayed++;
-
 
     saveWallet();
 
@@ -2075,6 +2509,14 @@ function startGame(){
         "none";
 
 
+    /*
+      موسیقی هر بار که بازی شروع می‌شود
+      از ابتدای آهنگ پخش خواهد شد.
+    */
+
+    startMusic();
+
+
     lastTime =
         performance.now();
 
@@ -2093,6 +2535,12 @@ function endGame(){
 
     playing = false;
 
+    /*
+      موسیقی متوقف می‌شود.
+    */
+
+    stopMusic();
+
 
     finalScore.textContent =
         score;
@@ -2104,7 +2552,6 @@ function endGame(){
 
         recordText.style.display =
             "block";
-
 
         saveWallet();
 
@@ -2194,6 +2641,36 @@ restartButton.addEventListener(
         e.stopPropagation();
 
         startGame();
+    }
+);
+
+
+/* =====================================================
+   SOUND BUTTONS
+===================================================== */
+
+document.getElementById(
+    "soundOnButton"
+).addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+        enableSound();
+    }
+);
+
+
+document.getElementById(
+    "soundOffButton"
+).addEventListener(
+    "click",
+    function(e){
+
+        e.stopPropagation();
+
+        disableSound();
     }
 );
 
