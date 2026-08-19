@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
@@ -82,30 +82,53 @@ canvas{
     box-shadow:none;
     border-radius:12px;
     display:none;
+    cursor:pointer;
 }
 
 #menuPanel{
     position:absolute;
     top:68px;
     left:12px;
-    width:260px;
-    max-width:calc(100vw - 24px);
+    right:12px;
+    max-width:320px;
+    height:auto;
+    max-height:calc(100vh - 140px);
     background:rgba(20,20,20,.94);
     color:white;
     border-radius:16px;
     padding:18px;
     z-index:29;
     display:none;
-    box-shadow:0 8px 30px rgba(0,0,0,.35);
+    box-shadow:0 8px 30px rgba(0,0,0,.45);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+}
+
+#menuPanel::-webkit-scrollbar{
+    width:4px;
+}
+
+#menuPanel::-webkit-scrollbar-track{
+    background:transparent;
+}
+
+#menuPanel::-webkit-scrollbar-thumb{
+    background:rgba(255,255,255,.2);
+    border-radius:10px;
 }
 
 #menuPanel h2{
     font-size:22px;
     margin-bottom:15px;
+    position:sticky;
+    top:0;
+    background:rgba(20,20,20,.94);
+    padding-bottom:8px;
+    z-index:1;
 }
 
 .menuItem{
-    margin:10px 0;
+    margin:8px 0;
     padding:12px;
     background:rgba(255,255,255,.08);
     border-radius:10px;
@@ -116,11 +139,13 @@ canvas{
     display:flex;
     gap:8px;
     margin-top:8px;
+    flex-wrap:wrap;
 }
 
 .langButtons button,
 .soundButtons button{
     flex:1;
+    min-width:60px;
     padding:9px;
     font-size:14px;
 }
@@ -165,6 +190,8 @@ button{
     padding:14px 35px;
     border-radius:12px;
     box-shadow:0 5px #c2410c;
+    cursor:pointer;
+    transition:transform .1s;
 }
 
 button:active{
@@ -190,6 +217,180 @@ button:active{
     font-size:15px;
     line-height:2;
 }
+
+/* ===== NO INTERNET OVERLAY ===== */
+#noInternetOverlay{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    color:white;
+    padding:20px;
+}
+
+#noInternetOverlay .box{
+    background:#1a1a2e;
+    padding:40px 30px;
+    border-radius:24px;
+    max-width:380px;
+    width:100%;
+    text-align:center;
+    border:1px solid rgba(255,255,255,.05);
+}
+
+#noInternetOverlay .box .icon{
+    font-size:64px;
+    margin-bottom:12px;
+}
+
+#noInternetOverlay .box h2{
+    font-size:22px;
+    margin-bottom:8px;
+    color:#fff;
+}
+
+#noInternetOverlay .box p{
+    color:#c4b5d4;
+    font-size:14px;
+    margin-bottom:20px;
+    opacity:0.7;
+    line-height:1.6;
+}
+
+#noInternetOverlay .box .retry-btn{
+    background:linear-gradient(135deg,#a78bfa,#7c3aed);
+    border:none;
+    color:white;
+    padding:12px 35px;
+    border-radius:40px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    transition:0.3s;
+    box-shadow:0 4px 20px rgba(124,58,237,0.3);
+}
+
+#noInternetOverlay .box .retry-btn:hover{
+    transform:scale(1.02);
+    box-shadow:0 6px 28px rgba(124,58,237,0.45);
+}
+
+#noInternetOverlay .box .retry-btn:active{
+    transform:scale(0.97);
+}
+
+/* ===== REFERRAL PROMPT ===== */
+#referralPrompt{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.75);
+    color:white;
+    padding:20px;
+}
+
+#referralPrompt .box{
+    background:#1a1a2e;
+    padding:30px;
+    border-radius:20px;
+    max-width:350px;
+    width:100%;
+    text-align:center;
+}
+
+#referralPrompt .box input{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:2px solid #f97316;
+    background:#2a2a3e;
+    color:white;
+    font-size:18px;
+    text-align:center;
+    margin-bottom:12px;
+    outline:none;
+}
+
+#referralPrompt .box input:focus{
+    border-color:#ffb347;
+}
+
+#referralPrompt .box .btn-submit{
+    width:100%;
+    background:#f97316;
+    box-shadow:0 4px #c2410c;
+    padding:12px;
+    margin-bottom:8px;
+}
+
+#referralPrompt .box .btn-skip{
+    width:100%;
+    background:transparent;
+    border:1px solid #555;
+    box-shadow:none;
+    padding:10px;
+    font-size:14px;
+    color:#888;
+}
+
+#referralPrompt .box .btn-skip:hover{
+    background:rgba(255,255,255,.05);
+}
+
+#referralPrompt .box .hint{
+    color:#666;
+    font-size:12px;
+    margin-top:15px;
+}
+
+.ref-code-display{
+    display:flex;
+    gap:8px;
+    margin-top:8px;
+    align-items:center;
+}
+
+.ref-code-display code{
+    flex:1;
+    padding:8px;
+    background:rgba(255,255,255,.1);
+    border-radius:6px;
+    font-size:14px;
+    direction:ltr;
+    text-align:center;
+    user-select:all;
+    font-family:monospace;
+    letter-spacing:1px;
+}
+
+.ref-code-display button{
+    padding:8px 12px;
+    font-size:14px;
+    background:#2d7a3d;
+    box-shadow:0 3px #1a4a25;
+}
+
+.ref-count{
+    font-size:18px;
+    color:#ffe45e;
+}
+
+.global-badge{
+    font-size:10px;
+    color:rgba(255,255,255,0.2);
+    text-align:center;
+    margin-top:12px;
+    letter-spacing:0.5px;
+}
 </style>
 </head>
 
@@ -201,8 +402,8 @@ button:active{
 
 <div id="ui">
     <div>
-        <div id="score">امتیاز: 0</div>
-        <div id="best">رکورد: 0</div>
+        <div id="score">Score: 0</div>
+        <div id="best">Best: 0</div>
     </div>
 
     <div id="combo">
@@ -214,11 +415,10 @@ button:active{
 
 <div id="menuPanel">
 
-    <h2 id="menuTitle">منو</h2>
+    <h2 id="menuTitle">Menu</h2>
 
     <div class="menuItem">
-        <div id="languageTitle">زبان</div>
-
+        <div id="languageTitle">Language</div>
         <div class="langButtons">
             <button id="faButton">فارسی</button>
             <button id="enButton">English</button>
@@ -226,236 +426,483 @@ button:active{
     </div>
 
     <div class="menuItem">
-
-        <div id="soundTitle">
-            صدا
-        </div>
-
+        <div id="soundTitle">Sound</div>
         <div class="soundButtons">
-            <button id="soundOnButton">
-                🔊 روشن
-            </button>
-
-            <button id="soundOffButton">
-                🔇 خاموش
-            </button>
+            <button id="soundOnButton">🔊 On</button>
+            <button id="soundOffButton">🔇 Off</button>
         </div>
-
     </div>
 
     <div class="menuItem">
-        <div id="gamesLabel">تعداد بازی‌ها</div>
+        <div id="referralCodeLabel">My Invite Code</div>
+        <div class="ref-code-display">
+            <code id="myReferralCode">---</code>
+            <button id="copyReferralCode">📋 Copy</button>
+        </div>
+    </div>
+
+    <div class="menuItem">
+        <div id="referralCountLabel">Referrals</div>
+        <strong class="ref-count" id="referralCount">0</strong>
+    </div>
+
+    <div class="menuItem">
+        <div id="gamesLabel">Games Played</div>
         <strong id="gamesValue">0</strong>
     </div>
 
     <div class="menuItem">
-        <div id="bestLabel">رکورد</div>
+        <div id="bestLabel">Best Score</div>
         <strong id="walletBest">0</strong>
     </div>
 
     <div class="menuItem">
-        <div id="eggsLabel">کل تخم‌های جمع‌شده</div>
+        <div id="eggsLabel">Total Eggs</div>
         <strong id="walletEggs">0</strong>
     </div>
 
     <div class="menuItem">
-        <div id="walletScoreLabel">امتیاز کل</div>
+        <div id="walletScoreLabel">Total Score</div>
         <strong id="walletScore">0</strong>
     </div>
+
+    <div class="global-badge">🌍 Available worldwide</div>
 
 </div>
 
 <div id="startScreen" class="screen">
-
     <div class="logo">🦊</div>
-
     <h1>Fox Eggs</h1>
-
-    <p id="startText">
-        تخم‌ها را جمع کن و رکورد بزن!
-    </p>
-
-    <button id="start">
-        شروع بازی
-    </button>
-
-    <p id="controlText"
-       style="margin-top:18px;font-size:13px">
-
-        لمس صفحه یا Space برای پرش
-
-    </p>
-
+    <p id="startText">Collect eggs and beat your record!</p>
+    <button id="start">Start Game</button>
+    <p id="controlText" style="margin-top:18px;font-size:13px">Tap screen or Space to jump</p>
+    <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🌍 Available worldwide</p>
 </div>
 
 <div id="gameOver" class="screen">
-
     <div class="logo">🦊</div>
-
-    <h1 id="gameOverTitle">
-        باختی!
-    </h1>
-
+    <h1 id="gameOverTitle">Game Over!</h1>
     <div class="final">
-
-        <span id="finalScoreLabel">
-            امتیاز:
-        </span>
-
-        <span id="finalScore">
-            0
-        </span>
-
+        <span id="finalScoreLabel">Score:</span>
+        <span id="finalScore">0</span>
     </div>
-
-    <div id="record">
-        🏆 رکورد جدید!
-    </div>
-
+    <div id="record">🏆 New Record!</div>
     <div id="stats">
-
         <div>
-            <span id="gameCountLabel">
-                تعداد بازی‌ها:
-            </span>
-
-            <span id="finalGames">
-                0
-            </span>
+            <span id="gameCountLabel">Games:</span>
+            <span id="finalGames">0</span>
         </div>
-
         <div>
-            <span id="totalEggLabel">
-                کل تخم‌ها:
-            </span>
-
-            <span id="finalEggs">
-                0
-            </span>
+            <span id="totalEggLabel">Total Eggs:</span>
+            <span id="finalEggs">0</span>
         </div>
-
     </div>
-
-    <button id="restart">
-        دوباره بازی کن
-    </button>
+    <button id="restart">Play Again</button>
+</div>
 
 </div>
 
+<!-- ===== NO INTERNET OVERLAY ===== -->
+<div id="noInternetOverlay">
+    <div class="box">
+        <div class="icon">📡</div>
+        <h2 id="noInternetTitle">No Internet Connection</h2>
+        <p id="noInternetMessage">Please check your internet connection and try again.</p>
+        <button class="retry-btn" id="retryBtn">🔄 Retry</button>
+    </div>
 </div>
 
 <script>
 
 /* =====================================================
+   INTERNET CHECK
+===================================================== */
+
+const noInternetOverlay = document.getElementById('noInternetOverlay');
+const retryBtn = document.getElementById('retryBtn');
+let isOnline = true;
+
+// ===== چک کردن اینترنت =====
+function checkInternet() {
+    if (navigator.onLine) {
+        // آنلاین هستیم
+        if (noInternetOverlay.style.display === 'flex') {
+            noInternetOverlay.style.display = 'none';
+            isOnline = true;
+            // رفرش کردن اطلاعات
+            showReferralDataFromCache();
+            setTimeout(() => {
+                syncReferralsWithServer().then(() => {
+                    showReferralDataFromCache();
+                });
+            }, 500);
+        }
+        return true;
+    } else {
+        // آفلاین هستیم
+        showNoInternet();
+        return false;
+    }
+}
+
+// ===== نمایش پیام خطا =====
+function showNoInternet() {
+    isOnline = false;
+    const fa = language === 'fa';
+    document.getElementById('noInternetTitle').textContent = fa ? '❌ اتصال اینترنت برقرار نیست' : '❌ No Internet Connection';
+    document.getElementById('noInternetMessage').textContent = fa ? 
+        'لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.' : 
+        'Please check your internet connection and try again.';
+    noInternetOverlay.style.display = 'flex';
+}
+
+// ===== گوش دادن به تغییرات اتصال =====
+window.addEventListener('online', function() {
+    console.log('✅ Internet connected!');
+    checkInternet();
+});
+
+window.addEventListener('offline', function() {
+    console.log('❌ Internet disconnected!');
+    showNoInternet();
+});
+
+// ===== دکمه Retry =====
+retryBtn.addEventListener('click', function() {
+    checkInternet();
+    // همچنین یک بار دیگه چک کن با fetch
+    fetch('https://benula-webhook-production.up.railway.app/')
+        .then(() => {
+            if (navigator.onLine) {
+                noInternetOverlay.style.display = 'none';
+                isOnline = true;
+                showReferralDataFromCache();
+                syncReferralsWithServer().then(() => {
+                    showReferralDataFromCache();
+                });
+            }
+        })
+        .catch(() => {
+            // اگر fetch هم fail شد، باز هم آفلاین
+            showNoInternet();
+        });
+});
+
+// ===== چک اولیه اینترنت =====
+setTimeout(() => {
+    checkInternet();
+}, 300);
+
+// ===== هر 10 ثانیه چک کن =====
+setInterval(() => {
+    if (navigator.onLine && noInternetOverlay.style.display === 'flex') {
+        checkInternet();
+    } else if (!navigator.onLine) {
+        showNoInternet();
+    }
+}, 10000);
+
+/* =====================================================
    CANVAS
 ===================================================== */
 
-const canvas =
-    document.getElementById("canvas");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d", { alpha:false, desynchronized:true });
 
-const ctx =
-    canvas.getContext("2d", {
-        alpha:false,
-        desynchronized:true
-    });
-
-let W = 0;
-let H = 0;
-let scale = 1;
+let W = 0, H = 0, scale = 1;
 
 function resize(){
-
     W = window.innerWidth;
     H = window.innerHeight;
-
-    scale =
-        Math.min(
-            window.devicePixelRatio || 1,
-            1.5
-        );
-
-    canvas.width =
-        Math.floor(W * scale);
-
-    canvas.height =
-        Math.floor(H * scale);
-
-    ctx.setTransform(
-        scale,
-        0,
-        0,
-        scale,
-        0,
-        0
-    );
+    scale = Math.min(window.devicePixelRatio || 1, 1.5);
+    canvas.width = Math.floor(W * scale);
+    canvas.height = Math.floor(H * scale);
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
 }
-
 resize();
-
-window.addEventListener(
-    "resize",
-    resize
-);
-
+window.addEventListener("resize", resize);
 
 /* =====================================================
    UI
 ===================================================== */
 
-const scoreText =
-    document.getElementById("score");
+const scoreText = document.getElementById("score");
+const bestText = document.getElementById("best");
+const comboBox = document.getElementById("combo");
+const comboValue = document.getElementById("comboValue");
+const startScreen = document.getElementById("startScreen");
+const gameOver = document.getElementById("gameOver");
+const finalScore = document.getElementById("finalScore");
+const recordText = document.getElementById("record");
+const startButton = document.getElementById("start");
+const restartButton = document.getElementById("restart");
+const menuButton = document.getElementById("menuButton");
+const menuPanel = document.getElementById("menuPanel");
+const gamesValue = document.getElementById("gamesValue");
+const walletBest = document.getElementById("walletBest");
+const walletEggs = document.getElementById("walletEggs");
+const walletScore = document.getElementById("walletScore");
+const finalGames = document.getElementById("finalGames");
+const finalEggs = document.getElementById("finalEggs");
 
-const bestText =
-    document.getElementById("best");
+const myReferralCode = document.getElementById("myReferralCode");
+const referralCount = document.getElementById("referralCount");
+const copyBtn = document.getElementById("copyReferralCode");
 
-const comboBox =
-    document.getElementById("combo");
+/* =====================================================
+   WEBHOOK CONFIG
+===================================================== */
 
-const comboValue =
-    document.getElementById("comboValue");
+const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
-const startScreen =
-    document.getElementById("startScreen");
+/* =====================================================
+   REFERRAL SYSTEM
+===================================================== */
 
-const gameOver =
-    document.getElementById("gameOver");
+function saveReferralToLocalStorage(refCode, userId) {
+    try {
+        let stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
+        if (!stored[refCode]) stored[refCode] = [];
+        if (!stored[refCode].includes(userId)) {
+            stored[refCode].push(userId);
+            localStorage.setItem('fox_referrals', JSON.stringify(stored));
+            return true;
+        }
+        return false;
+    } catch(e) { return false; }
+}
 
-const finalScore =
-    document.getElementById("finalScore");
+function getReferralsFromLocalStorage(refCode) {
+    try {
+        const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
+        return stored[refCode] || [];
+    } catch(e) { return []; }
+}
 
-const recordText =
-    document.getElementById("record");
+async function syncReferralsWithServer() {
+    // اول چک کن اینترنت داریم
+    if (!navigator.onLine) {
+        console.log('⚠️ No internet, using cache');
+        return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
+    }
+    
+    const userId = getUserId();
+    const code = generateReferralCode(userId);
+    
+    const local = getReferralsFromLocalStorage(code);
+    
+    try {
+        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`);
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.referrals) {
+                const all = [...new Set([...local, ...data.referrals])];
+                const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
+                stored[code] = all;
+                localStorage.setItem('fox_referrals', JSON.stringify(stored));
+                return all;
+            }
+        }
+    } catch(e) {
+        console.log('⚠️ Server sync error, using cache');
+    }
+    
+    return local;
+}
 
-const startButton =
-    document.getElementById("start");
+function getUserId() {
+    try {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return String(tg.initDataUnsafe.user.id);
+            }
+        }
+        let userId = localStorage.getItem("foxUserId");
+        if (!userId) {
+            userId = "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+            localStorage.setItem("foxUserId", userId);
+        }
+        return userId;
+    } catch(e) {
+        return "user_" + Date.now();
+    }
+}
 
-const restartButton =
-    document.getElementById("restart");
+function generateReferralCode(userId) {
+    let code = userId.toString().slice(-6).toUpperCase();
+    while (code.length < 6) {
+        code += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
+    }
+    return code;
+}
 
-const menuButton =
-    document.getElementById("menuButton");
+function showReferralDataFromCache() {
+    const userId = getUserId();
+    const code = generateReferralCode(userId);
+    
+    myReferralCode.textContent = code;
+    
+    const referrals = getReferralsFromLocalStorage(code);
+    referralCount.textContent = referrals.length;
+    
+    return referrals;
+}
 
-const menuPanel =
-    document.getElementById("menuPanel");
+async function registerReferral(referralCodeInput) {
+    // چک کن اینترنت داریم
+    if (!navigator.onLine) {
+        const fa = language === 'fa';
+        alert(fa ? '❌ اتصال اینترنت برقرار نیست! لطفاً نت خود را روشن کنید.' : '❌ No internet connection! Please turn on your internet.');
+        return false;
+    }
+    
+    const userId = getUserId();
+    
+    if (localStorage.getItem("foxRegistered") === "true") {
+        return true;
+    }
+    
+    if (!referralCodeInput) {
+        localStorage.setItem("foxRegistered", "true");
+        return true;
+    }
+    
+    const code = referralCodeInput.toUpperCase().trim();
+    
+    try {
+        const response = await fetch(`${WEBHOOK_URL}/api/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: userId,
+                refCode: code,
+                timestamp: Date.now()
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            const msg = language === "fa" ? '🎉 کد تایید شد!' : '🎉 Code verified!';
+            alert(msg);
+        } else {
+            const msg = language === "fa" ? '❌ کد اشتباه! ولی مهم نیست، برو تو بازی 🎮' : '❌ Wrong code! But no worries, enjoy the game 🎮';
+            alert(msg);
+        }
+        
+        localStorage.setItem("foxRegistered", "true");
+        return true;
+        
+    } catch(e) {
+        const fa = language === 'fa';
+        alert(fa ? '❌ خطا در ارتباط با سرور! لطفاً اینترنت خود را بررسی کنید.' : '❌ Server connection error! Please check your internet.');
+        localStorage.setItem("foxRegistered", "true");
+        return true;
+    }
+}
 
-const gamesValue =
-    document.getElementById("gamesValue");
+function copyReferralCode() {
+    const code = myReferralCode.textContent;
+    if (code === "---" || !code) {
+        const msg = language === "fa" ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!';
+        alert(msg);
+        return;
+    }
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = copyBtn.textContent;
+            const copiedText = language === "fa" ? '✅ کپی شد!' : '✅ Copied!';
+            copyBtn.textContent = copiedText;
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }).catch(() => {
+            fallbackCopy(code);
+        });
+    } else {
+        fallbackCopy(code);
+    }
+}
 
-const walletBest =
-    document.getElementById("walletBest");
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        const msg = language === "fa" ? 'کد کپی شد!' : 'Code copied!';
+        alert(msg);
+    } catch(e) {
+        const msg = language === "fa" ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ';
+        alert(msg + text);
+    }
+    document.body.removeChild(textarea);
+}
 
-const walletEggs =
-    document.getElementById("walletEggs");
-
-const walletScore =
-    document.getElementById("walletScore");
-
-const finalGames =
-    document.getElementById("finalGames");
-
-const finalEggs =
-    document.getElementById("finalEggs");
-
+function showReferralPrompt() {
+    if (localStorage.getItem("foxRegistered") === "true") {
+        return;
+    }
+    
+    const overlay = document.createElement('div');
+    overlay.id = 'referralPrompt';
+    
+    const title = language === "fa" ? 'خوش اومدی!' : 'Welcome!';
+    const subtitle = language === "fa" ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here';
+    const placeholder = language === "fa" ? 'مثلاً: FOX123' : 'e.g. FOX123';
+    const submitText = language === "fa" ? '✅ تایید کد' : '✅ Verify Code';
+    const skipText = language === "fa" ? '⏭ رد کردن' : '⏭ Skip';
+    const hint = language === "fa" ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later';
+    
+    overlay.innerHTML = `
+        <div class="box">
+            <div style="font-size:60px;margin-bottom:10px;">🦊</div>
+            <h2 style="margin-bottom:5px;">${title}</h2>
+            <p style="color:#aaa;margin-bottom:20px;font-size:14px;">${subtitle}</p>
+            <input type="text" id="refCodeInput" placeholder="${placeholder}" maxlength="10">
+            <button class="btn-submit" id="refSubmitBtn">${submitText}</button>
+            <button class="btn-skip" id="refSkipBtn">${skipText}</button>
+            <p class="hint">${hint}</p>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const input = document.getElementById('refCodeInput');
+    const submitBtn = document.getElementById('refSubmitBtn');
+    const skipBtn = document.getElementById('refSkipBtn');
+    
+    async function handleSubmit() {
+        const code = input.value.trim().toUpperCase();
+        if (code) {
+            await registerReferral(code);
+        } else {
+            await registerReferral(null);
+        }
+        overlay.remove();
+        showReferralDataFromCache();
+    }
+    
+    async function handleSkip() {
+        await registerReferral(null);
+        overlay.remove();
+        showReferralDataFromCache();
+    }
+    
+    submitBtn.addEventListener('click', handleSubmit);
+    skipBtn.addEventListener('click', handleSkip);
+    
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            submitBtn.click();
+        }
+    });
+    
+    setTimeout(() => input.focus(), 100);
+}
 
 /* =====================================================
    INTERNAL MUSIC
@@ -465,2291 +912,751 @@ let audioContext = null;
 let musicMaster = null;
 let musicTimer = null;
 let musicStep = 0;
-
-let soundEnabled =
-    localStorage.getItem("foxSound") !== "off";
-
+let soundEnabled = localStorage.getItem("foxSound") !== "off";
 
 function initAudio(){
-
-    if(audioContext)
-        return;
-
-    const AudioCtx =
-        window.AudioContext ||
-        window.webkitAudioContext;
-
-    if(!AudioCtx)
-        return;
-
-    audioContext =
-        new AudioCtx();
-
-    musicMaster =
-        audioContext.createGain();
-
-    musicMaster.gain.value =
-        soundEnabled ? 0.075 : 0;
-
-    musicMaster.connect(
-        audioContext.destination
-    );
+    if(audioContext) return;
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    audioContext = new AudioCtx();
+    musicMaster = audioContext.createGain();
+    musicMaster.gain.value = soundEnabled ? 0.075 : 0;
+    musicMaster.connect(audioContext.destination);
 }
 
-
-function playTone(
-    frequency,
-    duration,
-    type="square",
-    volume=.08,
-    delay=0
-){
-
-    if(!audioContext || !soundEnabled)
-        return;
-
-    const now =
-        audioContext.currentTime + delay;
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    oscillator.type =
-        type;
-
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        now
-    );
-
-    gain.gain.setValueAtTime(
-        0,
-        now
-    );
-
-    gain.gain.linearRampToValueAtTime(
-        volume,
-        now + .008
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .001,
-        now + duration
-    );
-
+function playTone(frequency, duration, type="square", volume=.08, delay=0){
+    if(!audioContext || !soundEnabled) return;
+    const now = audioContext.currentTime + delay;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(frequency, now);
+    gain.gain.setValueAtTime(0, now);
+    gain.gain.linearRampToValueAtTime(volume, now + .008);
+    gain.gain.exponentialRampToValueAtTime(.001, now + duration);
     oscillator.connect(gain);
     gain.connect(musicMaster);
-
     oscillator.start(now);
     oscillator.stop(now + duration + .03);
 }
 
-
 function playKick(){
-
-    if(!audioContext || !soundEnabled)
-        return;
-
-    const now =
-        audioContext.currentTime;
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    oscillator.type =
-        "sine";
-
-    oscillator.frequency.setValueAtTime(
-        120,
-        now
-    );
-
-    oscillator.frequency.exponentialRampToValueAtTime(
-        45,
-        now + .12
-    );
-
-    gain.gain.setValueAtTime(
-        .12,
-        now
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .001,
-        now + .14
-    );
-
+    if(!audioContext || !soundEnabled) return;
+    const now = audioContext.currentTime;
+    const oscillator = audioContext.createOscillator();
+    const gain = audioContext.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(120, now);
+    oscillator.frequency.exponentialRampToValueAtTime(45, now + .12);
+    gain.gain.setValueAtTime(.12, now);
+    gain.gain.exponentialRampToValueAtTime(.001, now + .14);
     oscillator.connect(gain);
     gain.connect(musicMaster);
-
     oscillator.start(now);
     oscillator.stop(now + .15);
 }
 
-
 function playHat(){
-
-    if(!audioContext || !soundEnabled)
-        return;
-
-    const buffer =
-        audioContext.createBuffer(
-            1,
-            audioContext.sampleRate * .035,
-            audioContext.sampleRate
-        );
-
-    const data =
-        buffer.getChannelData(0);
-
-    for(let i=0;i<data.length;i++){
-
-        data[i] =
-            Math.random() * 2 - 1;
-    }
-
-    const source =
-        audioContext.createBufferSource();
-
-    const gain =
-        audioContext.createGain();
-
-    gain.gain.value =
-        .025;
-
-    source.buffer =
-        buffer;
-
+    if(!audioContext || !soundEnabled) return;
+    const buffer = audioContext.createBuffer(1, audioContext.sampleRate * .035, audioContext.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<data.length;i++) data[i] = Math.random() * 2 - 1;
+    const source = audioContext.createBufferSource();
+    const gain = audioContext.createGain();
+    gain.gain.value = .025;
+    source.buffer = buffer;
     source.connect(gain);
     gain.connect(musicMaster);
-
     source.start();
 }
 
-
-const melody = [
-    523.25,
-    659.25,
-    783.99,
-    659.25,
-    587.33,
-    698.46,
-    880.00,
-    698.46,
-
-    523.25,
-    659.25,
-    783.99,
-    987.77,
-    880.00,
-    783.99,
-    659.25,
-    587.33
-];
-
+const melody = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880.00, 698.46, 523.25, 659.25, 783.99, 987.77, 880.00, 783.99, 659.25, 587.33];
 
 function musicTick(){
-
-    if(!playing)
-        return;
-
-    if(!soundEnabled)
-        return;
-
-    const note =
-        melody[musicStep % melody.length];
-
-    playTone(
-        note,
-        .17,
-        "square",
-        .055
-    );
-
-    if(musicStep % 2 === 0)
-        playHat();
-
-    if(musicStep % 4 === 0)
-        playKick();
-
-    if(musicStep % 8 === 7){
-
-        playTone(
-            note / 2,
-            .28,
-            "triangle",
-            .035,
-            .02
-        );
-    }
-
+    if(!playing || !soundEnabled) return;
+    const note = melody[musicStep % melody.length];
+    playTone(note, .17, "square", .055);
+    if(musicStep % 2 === 0) playHat();
+    if(musicStep % 4 === 0) playKick();
+    if(musicStep % 8 === 7) playTone(note / 2, .28, "triangle", .035, .02);
     musicStep++;
 }
 
-
-/*
-=====================================================
-FIXED START MUSIC
-
-مهم‌ترین اصلاح همین بخش است.
-
-بعد از Game Over، ولوم موسیقی صفر می‌شود.
-در شروع بازی بعدی دوباره آن را به 0.075 برمی‌گردانیم.
-=====================================================
-*/
-
 function startMusic(){
-
     initAudio();
-
-    if(!audioContext || !musicMaster)
-        return;
-
-    if(audioContext.state === "suspended"){
-
-        audioContext.resume();
-    }
-
-    /*
-      برگرداندن صدای موسیقی بعد از Game Over
-    */
-
-    musicMaster.gain.cancelScheduledValues(
-        audioContext.currentTime
-    );
-
-    musicMaster.gain.setTargetAtTime(
-        soundEnabled ? 0.075 : 0,
-        audioContext.currentTime,
-        0.03
-    );
-
-    /*
-      جلوگیری از اجرای چند تایمر موسیقی
-      همزمان با هم
-    */
-
+    if(!audioContext || !musicMaster) return;
+    if(audioContext.state === "suspended") audioContext.resume();
+    musicMaster.gain.cancelScheduledValues(audioContext.currentTime);
+    musicMaster.gain.setTargetAtTime(soundEnabled ? 0.075 : 0, audioContext.currentTime, 0.03);
     stopMusicTimer();
-
-    /*
-      آهنگ هر بار از اول شروع می‌شود
-    */
-
     musicStep = 0;
-
-    /*
-      اولین نت بلافاصله پخش شود
-    */
-
-    if(soundEnabled){
-
-        musicTick();
-    }
-
-    /*
-      ادامه آهنگ
-    */
-
-    musicTimer =
-        setInterval(
-            musicTick,
-            190
-        );
+    if(soundEnabled) musicTick();
+    musicTimer = setInterval(musicTick, 190);
 }
-
 
 function stopMusicTimer(){
-
-    if(musicTimer){
-
-        clearInterval(
-            musicTimer
-        );
-
-        musicTimer = null;
-    }
+    if(musicTimer){ clearInterval(musicTimer); musicTimer = null; }
 }
-
 
 function stopMusic(){
-
     stopMusicTimer();
-
     if(musicMaster && audioContext){
-
-        musicMaster.gain.cancelScheduledValues(
-            audioContext.currentTime
-        );
-
-        musicMaster.gain.setTargetAtTime(
-            0,
-            audioContext.currentTime,
-            0.03
-        );
+        musicMaster.gain.cancelScheduledValues(audioContext.currentTime);
+        musicMaster.gain.setTargetAtTime(0, audioContext.currentTime, 0.03);
     }
 }
-
 
 function enableSound(){
-
     soundEnabled = true;
-
-    localStorage.setItem(
-        "foxSound",
-        "on"
-    );
-
+    localStorage.setItem("foxSound", "on");
     initAudio();
-
     if(musicMaster && audioContext){
-
-        musicMaster.gain.cancelScheduledValues(
-            audioContext.currentTime
-        );
-
-        musicMaster.gain.setTargetAtTime(
-            .075,
-            audioContext.currentTime,
-            .04
-        );
+        musicMaster.gain.cancelScheduledValues(audioContext.currentTime);
+        musicMaster.gain.setTargetAtTime(.075, audioContext.currentTime, .04);
     }
-
-    if(playing){
-
-        startMusic();
-    }
-
+    if(playing) startMusic();
     updateSoundButtons();
 }
-
 
 function disableSound(){
-
     soundEnabled = false;
-
-    localStorage.setItem(
-        "foxSound",
-        "off"
-    );
-
+    localStorage.setItem("foxSound", "off");
     stopMusic();
-
     updateSoundButtons();
 }
 
-
 function updateSoundButtons(){
-
-    const onButton =
-        document.getElementById(
-            "soundOnButton"
-        );
-
-    const offButton =
-        document.getElementById(
-            "soundOffButton"
-        );
-
+    const onButton = document.getElementById("soundOnButton");
+    const offButton = document.getElementById("soundOffButton");
     if(language === "fa"){
-
-        onButton.textContent =
-            soundEnabled
-            ? "🔊 روشن ✓"
-            : "🔊 روشن";
-
-        offButton.textContent =
-            !soundEnabled
-            ? "🔇 خاموش ✓"
-            : "🔇 خاموش";
-
+        onButton.textContent = soundEnabled ? "🔊 روشن ✓" : "🔊 روشن";
+        offButton.textContent = !soundEnabled ? "🔇 خاموش ✓" : "🔇 خاموش";
     }else{
-
-        onButton.textContent =
-            soundEnabled
-            ? "🔊 On ✓"
-            : "🔊 On";
-
-        offButton.textContent =
-            !soundEnabled
-            ? "🔇 Off ✓"
-            : "🔇 Off";
+        onButton.textContent = soundEnabled ? "🔊 On ✓" : "🔊 On";
+        offButton.textContent = !soundEnabled ? "🔇 Off ✓" : "🔇 Off";
     }
 }
-
 
 /* =====================================================
    SAFE LOCAL STORAGE
 ===================================================== */
 
 function loadNumber(key, defaultValue = 0){
-
     try{
-
-        const value =
-            localStorage.getItem(key);
-
-        if(value === null){
-
-            localStorage.setItem(
-                key,
-                String(defaultValue)
-            );
-
-            return defaultValue;
-        }
-
-        const number =
-            Number(value);
-
-        if(Number.isFinite(number))
-            return number;
-
-        localStorage.setItem(
-            key,
-            String(defaultValue)
-        );
-
+        const value = localStorage.getItem(key);
+        if(value === null){ localStorage.setItem(key, String(defaultValue)); return defaultValue; }
+        const number = Number(value);
+        if(Number.isFinite(number)) return number;
+        localStorage.setItem(key, String(defaultValue));
         return defaultValue;
-
-    }catch(error){
-
-        return defaultValue;
-    }
+    }catch(error){ return defaultValue; }
 }
-
 
 function saveWallet(){
-
     try{
-
-        localStorage.setItem(
-            "foxBest",
-            String(best)
-        );
-
-        localStorage.setItem(
-            "foxGames",
-            String(gamesPlayed)
-        );
-
-        localStorage.setItem(
-            "foxEggs",
-            String(totalEggs)
-        );
-
-        localStorage.setItem(
-            "foxTotalScore",
-            String(totalScore)
-        );
-
-    }catch(error){
-
-        console.warn(
-            "Could not save wallet data",
-            error
-        );
-    }
+        localStorage.setItem("foxBest", String(best));
+        localStorage.setItem("foxGames", String(gamesPlayed));
+        localStorage.setItem("foxEggs", String(totalEggs));
+        localStorage.setItem("foxTotalScore", String(totalScore));
+    }catch(error){ console.warn("Could not save wallet data", error); }
 }
-
 
 /* =====================================================
    PERMANENT DATA
 ===================================================== */
 
-let best =
-    loadNumber("foxBest");
-
-let gamesPlayed =
-    loadNumber("foxGames");
-
-let totalEggs =
-    loadNumber("foxEggs");
-
-let totalScore =
-    loadNumber("foxTotalScore");
-
+let best = loadNumber("foxBest");
+let gamesPlayed = loadNumber("foxGames");
+let totalEggs = loadNumber("foxEggs");
+let totalScore = loadNumber("foxTotalScore");
 
 /* =====================================================
    LANGUAGE
 ===================================================== */
 
-let language =
-    localStorage.getItem("foxLanguage") || "fa";
-
+let language = localStorage.getItem("foxLanguage") || "en";
 
 function applyLanguage(){
+    const fa = language === "fa";
+    document.documentElement.lang = fa ? "fa" : "en";
+    document.documentElement.dir = fa ? "rtl" : "ltr";
 
-    const fa =
-        language === "fa";
-
-    document.documentElement.lang =
-        fa ? "fa" : "en";
-
-    document.documentElement.dir =
-        fa ? "rtl" : "ltr";
-
-
-    document.getElementById(
-        "menuTitle"
-    ).textContent =
-        fa ? "منو" : "Menu";
-
-
-    document.getElementById(
-        "languageTitle"
-    ).textContent =
-        fa ? "زبان" : "Language";
-
-
-    document.getElementById(
-        "soundTitle"
-    ).textContent =
-        fa ? "صدا" : "Sound";
-
-
-    document.getElementById(
-        "gamesLabel"
-    ).textContent =
-        fa ? "تعداد بازی‌ها" : "Games played";
-
-
-    document.getElementById(
-        "bestLabel"
-    ).textContent =
-        fa ? "رکورد" : "Best score";
-
-
-    document.getElementById(
-        "eggsLabel"
-    ).textContent =
-        fa
-        ? "کل تخم‌های جمع‌شده"
-        : "Total eggs collected";
-
-
-    document.getElementById(
-        "walletScoreLabel"
-    ).textContent =
-        fa
-        ? "امتیاز کل"
-        : "Total score";
-
-
-    document.getElementById(
-        "startText"
-    ).textContent =
-        fa
-        ? "تخم‌ها را جمع کن و رکورد بزن!"
-        : "Collect eggs and beat your record!";
-
-
-    startButton.textContent =
-        fa
-        ? "شروع بازی"
-        : "Start Game";
-
-
-    document.getElementById(
-        "controlText"
-    ).textContent =
-        fa
-        ? "لمس صفحه یا Space برای پرش"
-        : "Tap the screen or press Space to jump";
-
-
-    document.getElementById(
-        "gameOverTitle"
-    ).textContent =
-        fa
-        ? "باختی!"
-        : "Game Over";
-
-
-    document.getElementById(
-        "finalScoreLabel"
-    ).textContent =
-        fa ? "امتیاز:" : "Score:";
-
-
-    document.getElementById(
-        "gameCountLabel"
-    ).textContent =
-        fa
-        ? "تعداد بازی‌ها:"
-        : "Games:";
-
-
-    document.getElementById(
-        "totalEggLabel"
-    ).textContent =
-        fa
-        ? "کل تخم‌ها:"
-        : "Total eggs:";
-
-
-    restartButton.textContent =
-        fa
-        ? "دوباره بازی کن"
-        : "Play Again";
-
-
-    recordText.textContent =
-        fa
-        ? "🏆 رکورد جدید!"
-        : "🏆 New Record!";
-
+    document.getElementById("menuTitle").textContent = fa ? "منو" : "Menu";
+    document.getElementById("languageTitle").textContent = fa ? "زبان" : "Language";
+    document.getElementById("soundTitle").textContent = fa ? "صدا" : "Sound";
+    document.getElementById("gamesLabel").textContent = fa ? "تعداد بازی‌ها" : "Games Played";
+    document.getElementById("bestLabel").textContent = fa ? "رکورد" : "Best Score";
+    document.getElementById("eggsLabel").textContent = fa ? "کل تخم‌های جمع‌شده" : "Total Eggs";
+    document.getElementById("walletScoreLabel").textContent = fa ? "امتیاز کل" : "Total Score";
+    document.getElementById("referralCodeLabel").textContent = fa ? "کد دعوت من" : "My Invite Code";
+    document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
+    
+    document.getElementById("startText").textContent = fa ? "تخم‌ها را جمع کن و رکورد بزن!" : "Collect eggs and beat your record!";
+    startButton.textContent = fa ? "شروع بازی" : "Start Game";
+    document.getElementById("controlText").textContent = fa ? "لمس صفحه یا Space برای پرش" : "Tap screen or Space to jump";
+    document.getElementById("gameOverTitle").textContent = fa ? "باختی!" : "Game Over!";
+    document.getElementById("finalScoreLabel").textContent = fa ? "امتیاز:" : "Score:";
+    document.getElementById("gameCountLabel").textContent = fa ? "تعداد بازی‌ها:" : "Games:";
+    document.getElementById("totalEggLabel").textContent = fa ? "کل تخم‌ها:" : "Total Eggs:";
+    restartButton.textContent = fa ? "دوباره بازی کن" : "Play Again";
+    recordText.textContent = fa ? "🏆 رکورد جدید!" : "🏆 New Record!";
 
     updateSoundButtons();
-
     updateUI();
 }
 
-
 function setLanguage(lang){
-
     language = lang;
-
-    localStorage.setItem(
-        "foxLanguage",
-        lang
-    );
-
+    localStorage.setItem("foxLanguage", lang);
     applyLanguage();
-
-    menuPanel.style.display =
-        "none";
+    menuPanel.style.display = "none";
 }
-
 
 /* =====================================================
    UPDATE UI
 ===================================================== */
 
 function updateUI(){
-
-    const fa =
-        language === "fa";
-
-
-    scoreText.textContent =
-        fa
-        ? "امتیاز: " + score
-        : "Score: " + score;
-
-
-    bestText.textContent =
-        fa
-        ? "رکورد: " + best
-        : "Best: " + best;
-
-
-    gamesValue.textContent =
-        gamesPlayed;
-
-    walletBest.textContent =
-        best;
-
-    walletEggs.textContent =
-        totalEggs;
-
-    walletScore.textContent =
-        totalScore;
-
-    finalGames.textContent =
-        gamesPlayed;
-
-    finalEggs.textContent =
-        totalEggs;
+    const fa = language === "fa";
+    const scoreLabel = fa ? "امتیاز: " : "Score: ";
+    const bestLabel = fa ? "رکورد: " : "Best: ";
+    
+    scoreText.textContent = scoreLabel + score;
+    bestText.textContent = bestLabel + best;
+    
+    gamesValue.textContent = gamesPlayed;
+    walletBest.textContent = best;
+    walletEggs.textContent = totalEggs;
+    walletScore.textContent = totalScore;
+    finalGames.textContent = gamesPlayed;
+    finalEggs.textContent = totalEggs;
 }
-
 
 /* =====================================================
    GAME STATE
 ===================================================== */
 
 let playing = false;
-
 let score = 0;
-
 let speed = 330;
-
 let lastTime = 0;
-
 let eggTimer = 0;
-
 let obstacleTimer = 1;
-
 let combo = 0;
-
 let comboTimer = 0;
-
 let eggs = [];
-
 let obstacles = [];
 
-
-/* =====================================================
-   SPEED SYSTEM
-===================================================== */
-
 function updateSpeed(){
-
     if(score <= 600){
-
-        const progress =
-            Math.max(
-                0,
-                Math.min(
-                    score / 600,
-                    1
-                )
-            );
-
-        const smooth =
-            progress *
-            progress *
-            (3 - 2 * progress);
-
-        speed =
-            330 +
-            870 * smooth;
-
+        const progress = Math.max(0, Math.min(score / 600, 1));
+        const smooth = progress * progress * (3 - 2 * progress);
+        speed = 330 + 870 * smooth;
     }else{
-
-        speed =
-            1200 +
-            (score - 600) * .12;
+        speed = 1200 + (score - 600) * .12;
     }
 }
-
-
-/* =====================================================
-   DAY / NIGHT
-===================================================== */
 
 let isNight = false;
-
 let lastDayCycle = -1;
 
-
 function updateDayNight(){
-
-    const cycle =
-        Math.floor(score / 100);
-
-    isNight =
-        cycle % 2 === 1;
-
-    if(cycle !== lastDayCycle){
-
-        lastDayCycle = cycle;
-    }
+    const cycle = Math.floor(score / 100);
+    isNight = cycle % 2 === 1;
+    if(cycle !== lastDayCycle) lastDayCycle = cycle;
 }
 
-
-/* =====================================================
-   GROUND
-===================================================== */
-
-function ground(){
-
-    return H * .72;
-}
-
-
-/* =====================================================
-   FOX
-===================================================== */
+function ground(){ return H * .72; }
 
 const fox = {
-
-    x:100,
-
-    y:0,
-
-    w:62,
-
-    h:48,
-
-    vy:0,
-
-    gravity:2100,
-
-    jump:-780,
-
-    grounded:true,
-
-    animation:0
-
+    x:100, y:0, w:62, h:48, vy:0, gravity:2100, jump:-780, grounded:true, animation:0
 };
 
-
 function resetFox(){
-
-    fox.x =
-        Math.max(
-            70,
-            W * .14
-        );
-
-    fox.y =
-        ground() - fox.h;
-
+    fox.x = Math.max(70, W * .14);
+    fox.y = ground() - fox.h;
     fox.vy = 0;
-
     fox.grounded = true;
-
     fox.animation = 0;
 }
 
-
-/* =====================================================
-   EGG TYPES
-===================================================== */
-
 const eggTypes = [
-
     ["#ffffff",1],
-
     ["#45d46b",2],
-
     ["#3498db",5],
-
     ["#a855f7",10],
-
     ["#ffd43b",25]
-
 ];
 
-
-/* =====================================================
-   CREATE EGG
-===================================================== */
-
 function createEgg(){
-
-    let r =
-        Math.random();
-
+    let r = Math.random();
     let type = 0;
-
-    if(r > .55)
-        type = 1;
-
-    if(r > .78)
-        type = 2;
-
-    if(r > .91)
-        type = 3;
-
-    if(r > .98)
-        type = 4;
-
-    const data =
-        eggTypes[type];
-
-
+    if(r > .55) type = 1;
+    if(r > .78) type = 2;
+    if(r > .91) type = 3;
+    if(r > .98) type = 4;
+    const data = eggTypes[type];
     eggs.push({
-
         x:W + 30,
-
-        y:
-            ground()
-            - 50
-            - Math.random() * 130,
-
-        w:25,
-
-        h:34,
-
+        y: ground() - 50 - Math.random() * 130,
+        w:25, h:34,
         color:data[0],
-
         value:data[1]
-
     });
 }
-
-
-/* =====================================================
-   CREATE OBSTACLE
-===================================================== */
 
 function createObstacle(){
-
-    const r =
-        Math.random();
-
+    const r = Math.random();
     let type;
-
-    if(r < .45)
-        type = "tree";
-
-    else if(r < .75)
-        type = "rock";
-
-    else
-        type = "cactus";
-
-
-    let w = 45;
-    let h = 65;
-
-
-    if(type === "rock"){
-
-        w = 55;
-        h = 40;
-    }
-
-
-    if(type === "cactus"){
-
-        w = 32;
-        h = 62;
-    }
-
-
+    if(r < .45) type = "tree";
+    else if(r < .75) type = "rock";
+    else type = "cactus";
+    let w = 45, h = 65;
+    if(type === "rock"){ w = 55; h = 40; }
+    if(type === "cactus"){ w = 32; h = 62; }
     obstacles.push({
-
         x:W + 40,
-
         y:ground() - h,
-
-        w:w,
-
-        h:h,
-
+        w:w, h:h,
         type:type
-
     });
 }
 
-
-/* =====================================================
-   COLLISION
-===================================================== */
-
 function collision(a,b){
-
     return(
-
-        a.x + 8 <
-        b.x + b.w &&
-
-        a.x + a.w - 8 >
-        b.x &&
-
-        a.y + 7 <
-        b.y + b.h &&
-
-        a.y + a.h - 5 >
-        b.y
-
+        a.x + 8 < b.x + b.w &&
+        a.x + a.w - 8 > b.x &&
+        a.y + 7 < b.y + b.h &&
+        a.y + a.h - 5 > b.y
     );
 }
-
-
-/* =====================================================
-   JUMP
-===================================================== */
 
 function jump(){
-
-    if(!playing)
-        return;
-
+    if(!playing) return;
     if(fox.grounded){
-
-        fox.vy =
-            fox.jump;
-
-        fox.grounded =
-            false;
+        fox.vy = fox.jump;
+        fox.grounded = false;
     }
 }
-
-
-/* =====================================================
-   BACKGROUND
-===================================================== */
 
 function drawBackground(){
-
     if(isNight){
-
-        ctx.fillStyle =
-            "#101b3d";
-
+        ctx.fillStyle = "#101b3d";
     }else{
-
-        ctx.fillStyle =
-            "#87ceeb";
+        ctx.fillStyle = "#87ceeb";
     }
-
-
-    ctx.fillRect(
-        0,
-        0,
-        W,
-        H
-    );
-
+    ctx.fillRect(0, 0, W, H);
 
     if(isNight){
-
-        ctx.fillStyle =
-            "#f5f3ce";
-
+        ctx.fillStyle = "#f5f3ce";
         ctx.beginPath();
-
-        ctx.arc(
-            W - 90,
-            90,
-            28,
-            0,
-            Math.PI * 2
-        );
-
+        ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
         ctx.fill();
-
-
-        ctx.fillStyle =
-            "rgba(255,255,255,.8)";
-
+        ctx.fillStyle = "rgba(255,255,255,.8)";
         for(let i=0;i<22;i++){
-
-            const x =
-                (i * 83 + 37) %
-                Math.max(W,1);
-
-            const y =
-                35 +
-                (i * 47) %
-                Math.max(H * .45,1);
-
-            ctx.fillRect(
-                x,
-                y,
-                2,
-                2
-            );
+            const x = (i * 83 + 37) % Math.max(W,1);
+            const y = 35 + (i * 47) % Math.max(H * .45,1);
+            ctx.fillRect(x, y, 2, 2);
         }
-
     }else{
-
-        ctx.fillStyle =
-            "#ffe082";
-
+        ctx.fillStyle = "#ffe082";
         ctx.beginPath();
-
-        ctx.arc(
-            W - 90,
-            90,
-            35,
-            0,
-            Math.PI * 2
-        );
-
+        ctx.arc(W - 90, 90, 35, 0, Math.PI * 2);
         ctx.fill();
-
-
-        ctx.fillStyle =
-            "rgba(255,255,255,.65)";
-
-        drawCloud(
-            120,
-            100,
-            1
-        );
-
-        drawCloud(
-            W * .55,
-            145,
-            .7
-        );
-
-        drawCloud(
-            W * .85,
-            80,
-            .8
-        );
+        ctx.fillStyle = "rgba(255,255,255,.65)";
+        drawCloud(120, 100, 1);
+        drawCloud(W * .55, 145, .7);
+        drawCloud(W * .85, 80, .8);
     }
 
-
-    const gy =
-        ground();
-
-
-    ctx.fillStyle =
-        isNight
-        ? "#31542c"
-        : "#7dbb4b";
-
-
-    ctx.fillRect(
-        0,
-        gy,
-        W,
-        H - gy
-    );
-
-
-    ctx.fillStyle =
-        isNight
-        ? "#253f23"
-        : "#55963b";
-
-
-    ctx.fillRect(
-        0,
-        gy,
-        W,
-        5
-    );
+    const gy = ground();
+    ctx.fillStyle = isNight ? "#31542c" : "#7dbb4b";
+    ctx.fillRect(0, gy, W, H - gy);
+    ctx.fillStyle = isNight ? "#253f23" : "#55963b";
+    ctx.fillRect(0, gy, W, 5);
 }
-
 
 function drawCloud(x,y,s){
-
     ctx.beginPath();
-
-    ctx.arc(
-        x,
-        y,
-        20 * s,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 25 * s,
-        y - 8 * s,
-        27 * s,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.arc(
-        x + 52 * s,
-        y,
-        20 * s,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.arc(x, y, 20 * s, 0, Math.PI * 2);
+    ctx.arc(x + 25 * s, y - 8 * s, 27 * s, 0, Math.PI * 2);
+    ctx.arc(x + 52 * s, y, 20 * s, 0, Math.PI * 2);
     ctx.fill();
 }
-
-
-/* =====================================================
-   DRAW FOX
-===================================================== */
 
 function drawFox(){
-
     const x = fox.x;
     const y = fox.y;
+    const running = fox.grounded ? Math.sin(fox.animation) * 4 : 0;
 
-    const running =
-        fox.grounded
-        ? Math.sin(fox.animation) * 4
-        : 0;
-
-
-    ctx.fillStyle =
-        "rgba(0,0,0,.15)";
-
+    ctx.fillStyle = "rgba(0,0,0,.15)";
     ctx.beginPath();
-
-    ctx.ellipse(
-        x + 30,
-        ground() + 3,
-        28,
-        6,
-        0,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.ellipse(x + 30, ground() + 3, 28, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#f97316";
-
+    ctx.fillStyle = "#f97316";
     ctx.beginPath();
-
-    ctx.moveTo(
-        x + 15,
-        y + 28
-    );
-
-    ctx.quadraticCurveTo(
-        x - 22,
-        y + 5 + running,
-        x - 10,
-        y - 10 + running
-    );
-
-    ctx.quadraticCurveTo(
-        x + 5,
-        y + 5,
-        x + 20,
-        y + 23
-    );
-
+    ctx.moveTo(x + 15, y + 28);
+    ctx.quadraticCurveTo(x - 22, y + 5 + running, x - 10, y - 10 + running);
+    ctx.quadraticCurveTo(x + 5, y + 5, x + 20, y + 23);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#fff7ed";
-
+    ctx.fillStyle = "#fff7ed";
     ctx.beginPath();
-
-    ctx.moveTo(
-        x - 10,
-        y - 10 + running
-    );
-
-    ctx.quadraticCurveTo(
-        x - 25,
-        y,
-        x - 14,
-        y + 12
-    );
-
-    ctx.quadraticCurveTo(
-        x - 5,
-        y + 5,
-        x + 1,
-        y + 7
-    );
-
+    ctx.moveTo(x - 10, y - 10 + running);
+    ctx.quadraticCurveTo(x - 25, y, x - 14, y + 12);
+    ctx.quadraticCurveTo(x - 5, y + 5, x + 1, y + 7);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#f97316";
-
+    ctx.fillStyle = "#f97316";
     ctx.beginPath();
-
-    ctx.ellipse(
-        x + 29,
-        y + 29,
-        27,
-        18,
-        0,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.ellipse(x + 29, y + 29, 27, 18, 0, 0, Math.PI * 2);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#fff7ed";
-
+    ctx.fillStyle = "#fff7ed";
     ctx.beginPath();
-
-    ctx.ellipse(
-        x + 34,
-        y + 31,
-        14,
-        10,
-        0,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.ellipse(x + 34, y + 31, 14, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
+    ctx.fillStyle = "#ea580c";
+    ctx.fillRect(x + 14, y + 39 + running, 10, 11);
+    ctx.fillRect(x + 39, y + 39 - running, 10, 11);
 
-    ctx.fillStyle =
-        "#ea580c";
-
-    ctx.fillRect(
-        x + 14,
-        y + 39 + running,
-        10,
-        11
-    );
-
-    ctx.fillRect(
-        x + 39,
-        y + 39 - running,
-        10,
-        11
-    );
-
-
-    ctx.fillStyle =
-        "#f97316";
-
+    ctx.fillStyle = "#f97316";
     ctx.beginPath();
-
-    ctx.ellipse(
-        x + 43,
-        y + 18,
-        16,
-        17,
-        0,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.ellipse(x + 43, y + 18, 16, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#fb923c";
-
+    ctx.fillStyle = "#fb923c";
     ctx.beginPath();
-
-    ctx.ellipse(
-        x + 52,
-        y + 8,
-        21,
-        17,
-        0,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.ellipse(x + 52, y + 8, 21, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#f97316";
-
+    ctx.fillStyle = "#f97316";
     ctx.beginPath();
-
-    ctx.moveTo(
-        x + 38,
-        y - 3
-    );
-
-    ctx.lineTo(
-        x + 39,
-        y - 20
-    );
-
-    ctx.lineTo(
-        x + 50,
-        y - 6
-    );
-
+    ctx.moveTo(x + 38, y - 3);
+    ctx.lineTo(x + 39, y - 20);
+    ctx.lineTo(x + 50, y - 6);
     ctx.closePath();
-
     ctx.fill();
 
-
     ctx.beginPath();
-
-    ctx.moveTo(
-        x + 53,
-        y - 4
-    );
-
-    ctx.lineTo(
-        x + 62,
-        y - 19
-    );
-
-    ctx.lineTo(
-        x + 68,
-        y
-    );
-
+    ctx.moveTo(x + 53, y - 4);
+    ctx.lineTo(x + 62, y - 19);
+    ctx.lineTo(x + 68, y);
     ctx.closePath();
-
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#fecaca";
-
+    ctx.fillStyle = "#fecaca";
     ctx.beginPath();
-
-    ctx.moveTo(
-        x + 41,
-        y - 6
-    );
-
-    ctx.lineTo(
-        x + 41,
-        y - 14
-    );
-
-    ctx.lineTo(
-        x + 47,
-        y - 7
-    );
-
+    ctx.moveTo(x + 41, y - 6);
+    ctx.lineTo(x + 41, y - 14);
+    ctx.lineTo(x + 47, y - 7);
     ctx.closePath();
-
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#fff7ed";
-
+    ctx.fillStyle = "#fff7ed";
     ctx.beginPath();
-
-    ctx.ellipse(
-        x + 67,
-        y + 13,
-        12,
-        8,
-        0,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-
-    ctx.fillStyle =
-        "#111";
-
+    ctx.fillStyle = "#111";
     ctx.beginPath();
-
-    ctx.arc(
-        x + 75,
-        y + 10,
-        3.5,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(x + 58, y + 5, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-
+    ctx.fillStyle = "#fff";
     ctx.beginPath();
-
-    ctx.arc(
-        x + 58,
-        y + 5,
-        3.5,
-        0,
-        Math.PI * 2
-    );
-
-    ctx.fill();
-
-
-    ctx.fillStyle =
-        "#fff";
-
-    ctx.beginPath();
-
-    ctx.arc(
-        x + 59,
-        y + 4,
-        1.2,
-        0,
-        Math.PI * 2
-    );
-
+    ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
     ctx.fill();
 }
 
-
-/* =====================================================
-   DRAW EGG
-===================================================== */
-
 function drawEgg(e){
-
-    const cx =
-        e.x + e.w / 2;
-
-
+    const cx = e.x + e.w / 2;
     if(e.value >= 10){
-
         ctx.shadowBlur = 10;
-
-        ctx.shadowColor =
-            e.color;
+        ctx.shadowColor = e.color;
     }
-
-
-    ctx.fillStyle =
-        e.color;
-
-
+    ctx.fillStyle = e.color;
     ctx.beginPath();
-
-    ctx.moveTo(
-        cx,
-        e.y
-    );
-
-
-    ctx.bezierCurveTo(
-        e.x + e.w,
-        e.y + 5,
-        e.x + e.w,
-        e.y + 23,
-        cx,
-        e.y + e.h
-    );
-
-
-    ctx.bezierCurveTo(
-        e.x,
-        e.y + 23,
-        e.x,
-        e.y + 5,
-        cx,
-        e.y
-    );
-
-
+    ctx.moveTo(cx, e.y);
+    ctx.bezierCurveTo(e.x + e.w, e.y + 5, e.x + e.w, e.y + 23, cx, e.y + e.h);
+    ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
-
     ctx.shadowBlur = 0;
-
-
-    ctx.strokeStyle =
-        "rgba(0,0,0,.12)";
-
+    ctx.strokeStyle = "rgba(0,0,0,.12)";
     ctx.lineWidth = 2;
-
-
     ctx.beginPath();
-
-    ctx.moveTo(
-        e.x + 6,
-        e.y + 18
-    );
-
-
-    ctx.quadraticCurveTo(
-        cx,
-        e.y + 12,
-        e.x + e.w - 6,
-        e.y + 18
-    );
-
+    ctx.moveTo(e.x + 6, e.y + 18);
+    ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
 }
 
-
-/* =====================================================
-   DRAW OBSTACLE
-===================================================== */
-
 function drawObstacle(o){
-
     if(o.type === "tree"){
-
-        ctx.fillStyle =
-            "#8b5a2b";
-
-        ctx.fillRect(
-            o.x + 16,
-            o.y + 27,
-            14,
-            o.h - 27
-        );
-
-
-        ctx.fillStyle =
-            "#23823c";
-
+        ctx.fillStyle = "#8b5a2b";
+        ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
+        ctx.fillStyle = "#23823c";
         ctx.beginPath();
-
-        ctx.arc(
-            o.x + 23,
-            o.y + 20,
-            25,
-            0,
-            Math.PI * 2
-        );
-
+        ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
         ctx.fill();
-
-
-        ctx.fillStyle =
-            "#2f9e44";
-
+        ctx.fillStyle = "#2f9e44";
         ctx.beginPath();
-
-        ctx.arc(
-            o.x + 7,
-            o.y + 32,
-            16,
-            0,
-            Math.PI * 2
-        );
-
+        ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
         ctx.fill();
-
-
         ctx.beginPath();
-
-        ctx.arc(
-            o.x + 40,
-            o.y + 32,
-            16,
-            0,
-            Math.PI * 2
-        );
-
+        ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
         ctx.fill();
-
-
     }else if(o.type === "rock"){
-
-        ctx.fillStyle =
-            "#667085";
-
+        ctx.fillStyle = "#667085";
         ctx.beginPath();
-
-        ctx.moveTo(
-            o.x,
-            o.y + o.h
-        );
-
-        ctx.lineTo(
-            o.x + 10,
-            o.y + 10
-        );
-
-        ctx.lineTo(
-            o.x + 28,
-            o.y
-        );
-
-        ctx.lineTo(
-            o.x + o.w,
-            o.y + 15
-        );
-
-        ctx.lineTo(
-            o.x + o.w - 8,
-            o.y + o.h
-        );
-
+        ctx.moveTo(o.x, o.y + o.h);
+        ctx.lineTo(o.x + 10, o.y + 10);
+        ctx.lineTo(o.x + 28, o.y);
+        ctx.lineTo(o.x + o.w, o.y + 15);
+        ctx.lineTo(o.x + o.w - 8, o.y + o.h);
         ctx.closePath();
-
         ctx.fill();
-
-
     }else{
-
-        ctx.fillStyle =
-            "#25834a";
-
-        ctx.fillRect(
-            o.x + 9,
-            o.y,
-            14,
-            o.h
-        );
-
-        ctx.fillRect(
-            o.x,
-            o.y + 20,
-            13,
-            11
-        );
-
-        ctx.fillRect(
-            o.x + 20,
-            o.y + 38,
-            13,
-            11
-        );
+        ctx.fillStyle = "#25834a";
+        ctx.fillRect(o.x + 9, o.y, 14, o.h);
+        ctx.fillRect(o.x, o.y + 20, 13, 11);
+        ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
     }
 }
-
-
-/* =====================================================
-   UPDATE
-===================================================== */
 
 function update(dt){
-
     updateSpeed();
 
-
-    /* FOX */
-
-    fox.vy +=
-        fox.gravity * dt;
-
-    fox.y +=
-        fox.vy * dt;
-
-
-    if(
-        fox.y + fox.h >= ground()
-    ){
-
-        fox.y =
-            ground() - fox.h;
-
+    fox.vy += fox.gravity * dt;
+    fox.y += fox.vy * dt;
+    if(fox.y + fox.h >= ground()){
+        fox.y = ground() - fox.h;
         fox.vy = 0;
-
         fox.grounded = true;
     }
-
-
-    fox.animation +=
-        dt * 15;
-
-
-    /* DAY / NIGHT */
+    fox.animation += dt * 15;
 
     updateDayNight();
-
-
-    /* EGGS */
 
     eggTimer -= dt;
-
-
     if(eggTimer <= 0){
-
         createEgg();
-
-        eggTimer =
-            .55 +
-            Math.random() * .4;
+        eggTimer = .55 + Math.random() * .4;
     }
-
-
-    for(
-        let i = eggs.length - 1;
-        i >= 0;
-        i--
-    ){
-
-        const e =
-            eggs[i];
-
-        e.x -=
-            speed * dt;
-
-
+    for(let i = eggs.length - 1; i >= 0; i--){
+        const e = eggs[i];
+        e.x -= speed * dt;
         if(collision(fox,e)){
-
             collectEgg(e);
-
-            eggs.splice(
-                i,
-                1
-            );
-
+            eggs.splice(i, 1);
             continue;
         }
-
-
-        if(e.x < -60){
-
-            eggs.splice(
-                i,
-                1
-            );
-        }
+        if(e.x < -60) eggs.splice(i, 1);
     }
-
-
-    /* OBSTACLES */
 
     obstacleTimer -= dt;
-
-
     if(obstacleTimer <= 0){
-
         createObstacle();
-
-        obstacleTimer =
-            1.05 +
-            Math.random() * .55;
+        obstacleTimer = 1.05 + Math.random() * .55;
     }
-
-
-    for(
-        let i = obstacles.length - 1;
-        i >= 0;
-        i--
-    ){
-
-        const o =
-            obstacles[i];
-
-        o.x -=
-            speed * dt;
-
-
+    for(let i = obstacles.length - 1; i >= 0; i--){
+        const o = obstacles[i];
+        o.x -= speed * dt;
         if(collision(fox,o)){
-
             endGame();
-
             return;
         }
-
-
-        if(o.x < -80){
-
-            obstacles.splice(
-                i,
-                1
-            );
-        }
+        if(o.x < -80) obstacles.splice(i, 1);
     }
-
-
-    /* COMBO */
 
     if(combo > 0){
-
         comboTimer -= dt;
-
-
         if(comboTimer <= 0){
-
             combo = 0;
-
-            comboBox.classList.remove(
-                "show"
-            );
+            comboBox.classList.remove("show");
         }
     }
 }
 
-
-/* =====================================================
-   COLLECT EGG
-===================================================== */
-
 function collectEgg(e){
-
     combo++;
-
     comboTimer = 2;
-
-
     let multiplier = 1;
-
-
-    if(combo >= 10){
-
-        multiplier = 3;
-
-    }else if(combo >= 5){
-
-        multiplier = 2;
-    }
-
-
-    const earned =
-        e.value * multiplier;
-
-
+    if(combo >= 10) multiplier = 3;
+    else if(combo >= 5) multiplier = 2;
+    const earned = e.value * multiplier;
     score += earned;
-
     totalEggs += 1;
-
     totalScore += earned;
-
-
     saveWallet();
-
     updateSpeed();
-
     updateDayNight();
-
     updateUI();
-
-
     if(combo >= 2){
-
-        comboBox.classList.add(
-            "show"
-        );
-
-        comboValue.textContent =
-            combo;
+        comboBox.classList.add("show");
+        comboValue.textContent = combo;
     }
 }
-
-
-/* =====================================================
-   GAME LOOP
-===================================================== */
 
 function loop(time){
-
-    if(!playing)
-        return;
-
-
-    let dt =
-        (time - lastTime) / 1000;
-
-
+    if(!playing) return;
+    let dt = (time - lastTime) / 1000;
     lastTime = time;
-
-
-    if(dt > .033)
-        dt = .033;
-
-
+    if(dt > .033) dt = .033;
     update(dt);
-
     draw();
-
-
-    if(playing){
-
-        requestAnimationFrame(
-            loop
-        );
-    }
+    if(playing) requestAnimationFrame(loop);
 }
 
-
-/* =====================================================
-   DRAW
-===================================================== */
-
 function draw(){
-
     drawBackground();
-
-
-    for(const e of eggs){
-
-        drawEgg(e);
-    }
-
-
-    for(const o of obstacles){
-
-        drawObstacle(o);
-    }
-
-
+    for(const e of eggs) drawEgg(e);
+    for(const o of obstacles) drawObstacle(o);
     drawFox();
 }
 
-
-/* =====================================================
-   START GAME
-===================================================== */
-
 function startGame(){
-
-    /*
-      اگر یک اجرای قبلی موسیقی هنوز باقی مانده،
-      اول کاملاً متوقفش می‌کنیم.
-    */
-
     stopMusicTimer();
-
     score = 0;
-
     speed = 330;
-
     eggTimer = .3;
-
     obstacleTimer = 1;
-
     combo = 0;
-
     comboTimer = 0;
-
     eggs.length = 0;
-
     obstacles.length = 0;
-
     lastDayCycle = -1;
-
     isNight = false;
-
-
     gamesPlayed++;
-
     saveWallet();
-
     updateUI();
-
-
-    comboBox.classList.remove(
-        "show"
-    );
-
-
+    comboBox.classList.remove("show");
     resetFox();
-
-
     playing = true;
-
-
-    menuButton.style.display =
-        "none";
-
-    menuPanel.style.display =
-        "none";
-
-
-    startScreen.style.display =
-        "none";
-
-    gameOver.style.display =
-        "none";
-
-
-    /*
-      موسیقی هر بار که بازی شروع می‌شود
-      از ابتدای آهنگ پخش خواهد شد.
-    */
-
+    menuButton.style.display = "none";
+    menuPanel.style.display = "none";
+    startScreen.style.display = "none";
+    gameOver.style.display = "none";
     startMusic();
-
-
-    lastTime =
-        performance.now();
-
-
-    requestAnimationFrame(
-        loop
-    );
+    lastTime = performance.now();
+    requestAnimationFrame(loop);
 }
-
-
-/* =====================================================
-   GAME OVER
-===================================================== */
 
 function endGame(){
-
     playing = false;
-
-    /*
-      موسیقی متوقف می‌شود.
-    */
-
     stopMusic();
-
-
-    finalScore.textContent =
-        score;
-
-
+    finalScore.textContent = score;
     if(score > best){
-
         best = score;
-
-        recordText.style.display =
-            "block";
-
+        recordText.style.display = "block";
         saveWallet();
-
     }else{
-
-        recordText.style.display =
-            "none";
+        recordText.style.display = "none";
     }
-
-
     updateUI();
-
-
-    menuButton.style.display =
-        "block";
-
-
-    gameOver.style.display =
-        "flex";
+    menuButton.style.display = "block";
+    gameOver.style.display = "flex";
 }
-
-
-/* =====================================================
-   INPUT
-===================================================== */
 
 function handleInput(){
-
-    if(!playing){
-
-        startGame();
-
-    }else{
-
-        jump();
-    }
+    if(!playing) startGame();
+    else jump();
 }
 
-
-window.addEventListener(
-    "keydown",
-    function(e){
-
-        if(
-            e.code === "Space" ||
-            e.code === "ArrowUp"
-        ){
-
-            e.preventDefault();
-
-            handleInput();
-        }
-    }
-);
-
-
-canvas.addEventListener(
-    "pointerdown",
-    function(e){
-
+window.addEventListener("keydown", function(e){
+    if(e.code === "Space" || e.code === "ArrowUp"){
         e.preventDefault();
-
         handleInput();
-
-    },
-    {
-        passive:false
     }
-);
+});
 
+canvas.addEventListener("pointerdown", function(e){
+    e.preventDefault();
+    handleInput();
+}, { passive:false });
 
-startButton.addEventListener(
-    "click",
-    function(e){
+startButton.addEventListener("click", function(e){
+    e.stopPropagation();
+    startGame();
+});
 
-        e.stopPropagation();
+restartButton.addEventListener("click", function(e){
+    e.stopPropagation();
+    startGame();
+});
 
-        startGame();
-    }
-);
+document.getElementById("soundOnButton").addEventListener("click", function(e){
+    e.stopPropagation();
+    enableSound();
+});
 
+document.getElementById("soundOffButton").addEventListener("click", function(e){
+    e.stopPropagation();
+    disableSound();
+});
 
-restartButton.addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-        startGame();
-    }
-);
-
-
-/* =====================================================
-   SOUND BUTTONS
-===================================================== */
-
-document.getElementById(
-    "soundOnButton"
-).addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-        enableSound();
-    }
-);
-
-
-document.getElementById(
-    "soundOffButton"
-).addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-        disableSound();
-    }
-);
-
-
-/* =====================================================
-   MENU
-===================================================== */
-
-menuButton.addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-
-        if(playing)
-            return;
-
-
-        menuPanel.style.display =
-            menuPanel.style.display === "block"
-            ? "none"
-            : "block";
-
-
+menuButton.addEventListener("click", function(e){
+    e.stopPropagation();
+    if(playing) return;
+    if (menuPanel.style.display === "block") {
+        menuPanel.style.display = "none";
+    } else {
+        menuPanel.style.display = "block";
         updateUI();
+        syncReferralsWithServer().then(() => {
+            showReferralDataFromCache();
+        });
     }
-);
+});
 
+menuPanel.addEventListener("click", function(e){
+    e.stopPropagation();
+});
 
-menuPanel.addEventListener(
-    "click",
-    function(e){
+document.getElementById("faButton").addEventListener("click", function(e){
+    e.stopPropagation();
+    setLanguage("fa");
+});
 
-        e.stopPropagation();
-    }
-);
+document.getElementById("enButton").addEventListener("click", function(e){
+    e.stopPropagation();
+    setLanguage("en");
+});
 
-
-document.getElementById(
-    "faButton"
-).addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-        setLanguage("fa");
-    }
-);
-
-
-document.getElementById(
-    "enButton"
-).addEventListener(
-    "click",
-    function(e){
-
-        e.stopPropagation();
-
-        setLanguage("en");
-    }
-);
-
+copyBtn.addEventListener("click", copyReferralCode);
 
 /* =====================================================
    INITIAL
 ===================================================== */
 
 applyLanguage();
-
 updateUI();
-
 resetFox();
-
-menuButton.style.display =
-    "block";
-
+menuButton.style.display = "block";
 draw();
+
+showReferralDataFromCache();
+
+setTimeout(() => {
+    // چک کن اینترنت داریم قبل از نمایش
+    if (navigator.onLine) {
+        showReferralPrompt();
+    } else {
+        showNoInternet();
+    }
+}, 400);
+
+setTimeout(() => {
+    if (navigator.onLine) {
+        syncReferralsWithServer().then(() => {
+            showReferralDataFromCache();
+        });
+    }
+}, 1000);
 
 </script>
 
