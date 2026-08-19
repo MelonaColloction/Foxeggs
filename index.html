@@ -33,6 +33,7 @@ canvas{
     inset:0;
     width:100%;
     height:100%;
+    display:block;
 }
 
 #ui{
@@ -81,8 +82,10 @@ canvas{
     background:rgba(0,0,0,.35);
     box-shadow:none;
     border-radius:12px;
-    display:none;
+    display:block;
     cursor:pointer;
+    color:white;
+    border:none;
 }
 
 #menuPanel{
@@ -161,6 +164,7 @@ canvas{
     background:rgba(0,0,0,.2);
     z-index:10;
     text-align:center;
+    pointer-events:auto;
 }
 
 #gameOver{
@@ -218,7 +222,6 @@ button:active{
     line-height:2;
 }
 
-/* ===== NO INTERNET OVERLAY ===== */
 #noInternetOverlay{
     position:fixed;
     inset:0;
@@ -284,7 +287,6 @@ button:active{
     transform:scale(0.97);
 }
 
-/* ===== REFERRAL PROMPT ===== */
 #referralPrompt{
     position:fixed;
     inset:0;
@@ -305,6 +307,15 @@ button:active{
     max-width:350px;
     width:100%;
     text-align:center;
+    position:relative;
+}
+
+#referralPrompt .box .error-msg{
+    color:#f87171;
+    font-size:13px;
+    margin-bottom:10px;
+    min-height:20px;
+    display:block;
 }
 
 #referralPrompt .box input{
@@ -318,10 +329,24 @@ button:active{
     text-align:center;
     margin-bottom:12px;
     outline:none;
+    transition:border-color 0.3s;
 }
 
 #referralPrompt .box input:focus{
     border-color:#ffb347;
+}
+
+#referralPrompt .box input.error{
+    border-color:#f87171;
+    animation: shake 0.4s ease;
+}
+
+@keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-5px);}
+    80%{transform:translateX(5px);}
 }
 
 #referralPrompt .box .btn-submit{
@@ -330,6 +355,18 @@ button:active{
     box-shadow:0 4px #c2410c;
     padding:12px;
     margin-bottom:8px;
+}
+
+#referralPrompt .box .btn-submit:disabled{
+    opacity:0.4;
+    cursor:not-allowed;
+    transform:none;
+}
+
+#referralPrompt .box .btn-submit.loading{
+    background:linear-gradient(135deg,#6b7280,#4b5563);
+    box-shadow:none;
+    cursor:wait;
 }
 
 #referralPrompt .box .btn-skip{
@@ -502,7 +539,6 @@ button:active{
 
 </div>
 
-<!-- ===== NO INTERNET OVERLAY ===== -->
 <div id="noInternetOverlay">
     <div class="box">
         <div class="icon">📡</div>
@@ -522,14 +558,11 @@ const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
 let isOnline = true;
 
-// ===== چک کردن اینترنت =====
 function checkInternet() {
     if (navigator.onLine) {
-        // آنلاین هستیم
         if (noInternetOverlay.style.display === 'flex') {
             noInternetOverlay.style.display = 'none';
             isOnline = true;
-            // رفرش کردن اطلاعات
             showReferralDataFromCache();
             setTimeout(() => {
                 syncReferralsWithServer().then(() => {
@@ -539,13 +572,11 @@ function checkInternet() {
         }
         return true;
     } else {
-        // آفلاین هستیم
         showNoInternet();
         return false;
     }
 }
 
-// ===== نمایش پیام خطا =====
 function showNoInternet() {
     isOnline = false;
     const fa = language === 'fa';
@@ -556,7 +587,6 @@ function showNoInternet() {
     noInternetOverlay.style.display = 'flex';
 }
 
-// ===== گوش دادن به تغییرات اتصال =====
 window.addEventListener('online', function() {
     console.log('✅ Internet connected!');
     checkInternet();
@@ -567,10 +597,8 @@ window.addEventListener('offline', function() {
     showNoInternet();
 });
 
-// ===== دکمه Retry =====
 retryBtn.addEventListener('click', function() {
     checkInternet();
-    // همچنین یک بار دیگه چک کن با fetch
     fetch('https://benula-webhook-production.up.railway.app/')
         .then(() => {
             if (navigator.onLine) {
@@ -583,17 +611,14 @@ retryBtn.addEventListener('click', function() {
             }
         })
         .catch(() => {
-            // اگر fetch هم fail شد، باز هم آفلاین
             showNoInternet();
         });
 });
 
-// ===== چک اولیه اینترنت =====
 setTimeout(() => {
     checkInternet();
 }, 300);
 
-// ===== هر 10 ثانیه چک کن =====
 setInterval(() => {
     if (navigator.onLine && noInternetOverlay.style.display === 'flex') {
         checkInternet();
@@ -680,7 +705,6 @@ function getReferralsFromLocalStorage(refCode) {
 }
 
 async function syncReferralsWithServer() {
-    // اول چک کن اینترنت داریم
     if (!navigator.onLine) {
         console.log('⚠️ No internet, using cache');
         return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
@@ -688,7 +712,6 @@ async function syncReferralsWithServer() {
     
     const userId = getUserId();
     const code = generateReferralCode(userId);
-    
     const local = getReferralsFromLocalStorage(code);
     
     try {
@@ -749,26 +772,43 @@ function showReferralDataFromCache() {
     return referrals;
 }
 
-async function registerReferral(referralCodeInput) {
-    // چک کن اینترنت داریم
+async function registerReferralWithRetry(referralCodeInput, overlayElement, inputElement, errorElement, submitBtn) {
     if (!navigator.onLine) {
         const fa = language === 'fa';
-        alert(fa ? '❌ اتصال اینترنت برقرار نیست! لطفاً نت خود را روشن کنید.' : '❌ No internet connection! Please turn on your internet.');
+        errorElement.textContent = fa ? '❌ اتصال اینترنت برقرار نیست! نت خود را روشن کنید.' : '❌ No internet connection! Turn on your internet.';
+        errorElement.style.color = '#f87171';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
         return false;
     }
     
     const userId = getUserId();
     
-    if (localStorage.getItem("foxRegistered") === "true") {
-        return true;
+    if (!referralCodeInput || referralCodeInput.trim() === '') {
+        const fa = language === 'fa';
+        errorElement.textContent = fa ? '⚠️ لطفاً کد دعوت را وارد کنید.' : '⚠️ Please enter an invite code.';
+        errorElement.style.color = '#fbbf24';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        return false;
     }
     
-    if (!referralCodeInput) {
-        localStorage.setItem("foxRegistered", "true");
-        return true;
+    const code = referralCodeInput.trim().toUpperCase();
+    
+    if (!/^[A-Z0-9]{4,10}$/.test(code)) {
+        const fa = language === 'fa';
+        errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر! کد باید شامل حروف و اعداد باشد.' : '⚠️ Invalid code format! Code must contain letters and numbers.';
+        errorElement.style.color = '#fbbf24';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        return false;
     }
     
-    const code = referralCodeInput.toUpperCase().trim();
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    const fa = language === 'fa';
+    submitBtn.textContent = fa ? '⏳ در حال ارسال...' : '⏳ Sending...';
+    errorElement.textContent = '';
     
     try {
         const response = await fetch(`${WEBHOOK_URL}/api/register`, {
@@ -784,63 +824,50 @@ async function registerReferral(referralCodeInput) {
         const data = await response.json();
         
         if (data.success) {
-            const msg = language === "fa" ? '🎉 کد تایید شد!' : '🎉 Code verified!';
-            alert(msg);
+            errorElement.textContent = fa ? '✅ کد تایید شد!' : '✅ Code verified!';
+            errorElement.style.color = '#34d399';
+            inputElement.style.borderColor = '#34d399';
+            
+            localStorage.setItem("foxRegistered", "true");
+            localStorage.setItem("foxReferralCode", code);
+            
+            setTimeout(() => {
+                if (overlayElement && overlayElement.parentNode) {
+                    overlayElement.remove();
+                }
+                showReferralDataFromCache();
+                syncReferralsWithServer().then(() => {
+                    showReferralDataFromCache();
+                });
+            }, 1000);
+            
+            return true;
         } else {
-            const msg = language === "fa" ? '❌ کد اشتباه! ولی مهم نیست، برو تو بازی 🎮' : '❌ Wrong code! But no worries, enjoy the game 🎮';
-            alert(msg);
+            errorElement.textContent = fa ? '❌ کد اشتباه! دوباره امتحان کنید.' : '❌ Wrong code! Try again.';
+            errorElement.style.color = '#f87171';
+            inputElement.classList.add('error');
+            setTimeout(() => inputElement.classList.remove('error'), 500);
+            inputElement.value = '';
+            inputElement.focus();
+            
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
+            return false;
         }
-        
-        localStorage.setItem("foxRegistered", "true");
-        return true;
         
     } catch(e) {
         const fa = language === 'fa';
-        alert(fa ? '❌ خطا در ارتباط با سرور! لطفاً اینترنت خود را بررسی کنید.' : '❌ Server connection error! Please check your internet.');
-        localStorage.setItem("foxRegistered", "true");
-        return true;
+        errorElement.textContent = fa ? '❌ خطا در ارتباط با سرور! دوباره تلاش کنید.' : '❌ Server connection error! Try again.';
+        errorElement.style.color = '#f87171';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
+        return false;
     }
-}
-
-function copyReferralCode() {
-    const code = myReferralCode.textContent;
-    if (code === "---" || !code) {
-        const msg = language === "fa" ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!';
-        alert(msg);
-        return;
-    }
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(code).then(() => {
-            const originalText = copyBtn.textContent;
-            const copiedText = language === "fa" ? '✅ کپی شد!' : '✅ Copied!';
-            copyBtn.textContent = copiedText;
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-            }, 2000);
-        }).catch(() => {
-            fallbackCopy(code);
-        });
-    } else {
-        fallbackCopy(code);
-    }
-}
-
-function fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-        document.execCommand('copy');
-        const msg = language === "fa" ? 'کد کپی شد!' : 'Code copied!';
-        alert(msg);
-    } catch(e) {
-        const msg = language === "fa" ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ';
-        alert(msg + text);
-    }
-    document.body.removeChild(textarea);
 }
 
 function showReferralPrompt() {
@@ -851,19 +878,21 @@ function showReferralPrompt() {
     const overlay = document.createElement('div');
     overlay.id = 'referralPrompt';
     
-    const title = language === "fa" ? 'خوش اومدی!' : 'Welcome!';
-    const subtitle = language === "fa" ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here';
-    const placeholder = language === "fa" ? 'مثلاً: FOX123' : 'e.g. FOX123';
-    const submitText = language === "fa" ? '✅ تایید کد' : '✅ Verify Code';
-    const skipText = language === "fa" ? '⏭ رد کردن' : '⏭ Skip';
-    const hint = language === "fa" ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later';
+    const fa = language === 'fa';
+    const title = fa ? 'خوش اومدی!' : 'Welcome!';
+    const subtitle = fa ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here';
+    const placeholder = fa ? 'مثلاً: FOX123' : 'e.g. FOX123';
+    const submitText = fa ? '✅ تایید کد' : '✅ Verify Code';
+    const skipText = fa ? '⏭ رد کردن' : '⏭ Skip';
+    const hint = fa ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later';
     
     overlay.innerHTML = `
         <div class="box">
             <div style="font-size:60px;margin-bottom:10px;">🦊</div>
             <h2 style="margin-bottom:5px;">${title}</h2>
-            <p style="color:#aaa;margin-bottom:20px;font-size:14px;">${subtitle}</p>
-            <input type="text" id="refCodeInput" placeholder="${placeholder}" maxlength="10">
+            <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${subtitle}</p>
+            <span class="error-msg" id="refErrorMsg"></span>
+            <input type="text" id="refCodeInput" placeholder="${placeholder}" maxlength="10" autofocus>
             <button class="btn-submit" id="refSubmitBtn">${submitText}</button>
             <button class="btn-skip" id="refSkipBtn">${skipText}</button>
             <p class="hint">${hint}</p>
@@ -874,20 +903,15 @@ function showReferralPrompt() {
     const input = document.getElementById('refCodeInput');
     const submitBtn = document.getElementById('refSubmitBtn');
     const skipBtn = document.getElementById('refSkipBtn');
+    const errorMsg = document.getElementById('refErrorMsg');
     
     async function handleSubmit() {
-        const code = input.value.trim().toUpperCase();
-        if (code) {
-            await registerReferral(code);
-        } else {
-            await registerReferral(null);
-        }
-        overlay.remove();
-        showReferralDataFromCache();
+        const code = input.value;
+        await registerReferralWithRetry(code, overlay, input, errorMsg, submitBtn);
     }
     
-    async function handleSkip() {
-        await registerReferral(null);
+    function handleSkip() {
+        localStorage.setItem("foxRegistered", "true");
         overlay.remove();
         showReferralDataFromCache();
     }
@@ -897,11 +921,19 @@ function showReferralPrompt() {
     
     input.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
+            e.preventDefault();
             submitBtn.click();
         }
     });
     
-    setTimeout(() => input.focus(), 100);
+    input.addEventListener('input', function() {
+        errorMsg.textContent = '';
+        errorMsg.style.color = '';
+        this.classList.remove('error');
+        this.style.borderColor = '#f97316';
+    });
+    
+    setTimeout(() => input.focus(), 200);
 }
 
 /* =====================================================
@@ -1110,6 +1142,15 @@ function setLanguage(lang){
     localStorage.setItem("foxLanguage", lang);
     applyLanguage();
     menuPanel.style.display = "none";
+    const prompt = document.getElementById('referralPrompt');
+    if (prompt) {
+        const oldOverlay = prompt;
+        const parent = oldOverlay.parentNode;
+        if (parent) {
+            parent.removeChild(oldOverlay);
+            showReferralPrompt();
+        }
+    }
 }
 
 /* =====================================================
@@ -1630,6 +1671,51 @@ document.getElementById("enButton").addEventListener("click", function(e){
 copyBtn.addEventListener("click", copyReferralCode);
 
 /* =====================================================
+   COPY REFERRAL CODE
+===================================================== */
+
+function copyReferralCode() {
+    const code = myReferralCode.textContent;
+    if (code === "---" || !code) {
+        const msg = language === "fa" ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!';
+        alert(msg);
+        return;
+    }
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = copyBtn.textContent;
+            const copiedText = language === "fa" ? '✅ کپی شد!' : '✅ Copied!';
+            copyBtn.textContent = copiedText;
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        }).catch(() => {
+            fallbackCopy(code);
+        });
+    } else {
+        fallbackCopy(code);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        const msg = language === "fa" ? 'کد کپی شد!' : 'Code copied!';
+        alert(msg);
+    } catch(e) {
+        const msg = language === "fa" ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ';
+        alert(msg + text);
+    }
+    document.body.removeChild(textarea);
+}
+
+/* =====================================================
    INITIAL
 ===================================================== */
 
@@ -1637,12 +1723,14 @@ applyLanguage();
 updateUI();
 resetFox();
 menuButton.style.display = "block";
-draw();
+
+// فقط پس‌زمینه رو رسم کن (بدون fox و تخم‌ها)
+ctx.fillStyle = "#87ceeb";
+ctx.fillRect(0, 0, W, H);
 
 showReferralDataFromCache();
 
 setTimeout(() => {
-    // چک کن اینترنت داریم قبل از نمایش
     if (navigator.onLine) {
         showReferralPrompt();
     } else {
