@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Fox Eggs - Autumn</title>
+<title>Fox Eggs</title>
 
 <style>
 *{
@@ -16,7 +16,7 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#c7a17a;
+    background:#87ceeb;
     touch-action:none;
     user-select:none;
     font-family:Arial,sans-serif;
@@ -187,20 +187,20 @@ p{
 
 button{
     border:none;
-    background:#b86b3a;
+    background:#f97316;
     color:white;
     font-size:18px;
     font-weight:bold;
     padding:14px 35px;
     border-radius:12px;
-    box-shadow:0 5px #7a4a2a;
+    box-shadow:0 5px #c2410c;
     cursor:pointer;
     transition:transform .1s;
 }
 
 button:active{
     transform:translateY(4px);
-    box-shadow:0 1px #7a4a2a;
+    box-shadow:0 1px #c2410c;
 }
 
 .final{
@@ -322,7 +322,7 @@ button:active{
     width:100%;
     padding:12px;
     border-radius:10px;
-    border:2px solid #b86b3a;
+    border:2px solid #f97316;
     background:#2a2a3e;
     color:white;
     font-size:18px;
@@ -333,7 +333,7 @@ button:active{
 }
 
 #referralPrompt .box input:focus{
-    border-color:#d48c5a;
+    border-color:#ffb347;
 }
 
 #referralPrompt .box input.error{
@@ -351,8 +351,8 @@ button:active{
 
 #referralPrompt .box .btn-submit{
     width:100%;
-    background:#b86b3a;
-    box-shadow:0 4px #7a4a2a;
+    background:#f97316;
+    box-shadow:0 4px #c2410c;
     padding:12px;
     margin-bottom:8px;
 }
@@ -429,6 +429,102 @@ button:active{
     letter-spacing:0.5px;
 }
 
+/* Theme Selector - Professional */
+.theme-selector-overlay {
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+.theme-selector-panel {
+    background:rgba(20,20,30,0.95);
+    border-radius:20px;
+    padding:30px 25px;
+    max-width:420px;
+    width:90%;
+    max-height:85vh;
+    overflow-y:auto;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5);
+    border:1px solid rgba(255,255,255,0.05);
+}
+
+.theme-selector-panel h2 {
+    color:white;
+    font-size:24px;
+    text-align:center;
+    margin-bottom:8px;
+}
+
+.theme-selector-panel .subtitle {
+    color:rgba(255,255,255,0.4);
+    font-size:13px;
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.theme-grid {
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:10px;
+}
+
+.theme-option {
+    background:rgba(255,255,255,0.05);
+    border:2px solid rgba(255,255,255,0.08);
+    border-radius:14px;
+    padding:14px 10px;
+    text-align:center;
+    cursor:pointer;
+    transition:all 0.25s ease;
+    color:white;
+}
+
+.theme-option:hover {
+    background:rgba(255,255,255,0.1);
+    transform:scale(1.02);
+}
+
+.theme-option.active {
+    border-color:#f97316;
+    background:rgba(249,115,22,0.15);
+    box-shadow:0 0 20px rgba(249,115,22,0.1);
+}
+
+.theme-option .icon {
+    font-size:32px;
+    display:block;
+    margin-bottom:4px;
+}
+
+.theme-option .name {
+    font-size:13px;
+    font-weight:bold;
+}
+
+.theme-option .desc {
+    font-size:10px;
+    color:rgba(255,255,255,0.3);
+}
+
+.theme-selector-panel .btn-close-theme {
+    width:100%;
+    margin-top:15px;
+    background:rgba(255,255,255,0.08);
+    box-shadow:none;
+    font-size:15px;
+    padding:12px;
+}
+
+.theme-selector-panel .btn-close-theme:hover {
+    background:rgba(255,255,255,0.15);
+}
+
 /* ===== بخش سیستم جوایز ===== */
 .reward-info-box{
     border: 2px solid rgba(251, 191, 36, 0.3);
@@ -471,6 +567,24 @@ button:active{
     line-height: 1.5;
     margin-top: 6px;
 }
+
+/* Game Over Theme Button */
+#changeThemeBtn {
+    background:rgba(255,255,255,0.12);
+    box-shadow:none;
+    font-size:15px;
+    padding:12px 25px;
+    margin-top:8px;
+    border:1px solid rgba(255,255,255,0.1);
+}
+
+#changeThemeBtn:hover {
+    background:rgba(255,255,255,0.2);
+}
+
+#changeThemeBtn:active {
+    transform:translateY(3px);
+}
 </style>
 </head>
 
@@ -511,6 +625,13 @@ button:active{
             <button id="soundOnButton">🔊 On</button>
             <button id="soundOffButton">🔇 Off</button>
         </div>
+    </div>
+
+    <div class="menuItem">
+        <div id="themeMenuTitle">🎨 Theme</div>
+        <button id="openThemeFromMenu" style="width:100%;font-size:14px;padding:10px;background:rgba(255,255,255,0.08);box-shadow:none;margin-top:6px;">
+            🎨 <span id="currentThemeDisplay">Classic</span>
+        </button>
     </div>
 
     <!-- ===== بخش سیستم جوایز ===== -->
@@ -564,17 +685,61 @@ button:active{
 
 </div>
 
+<!-- Theme Selector Overlay -->
+<div class="theme-selector-overlay" id="themeSelectorOverlay">
+    <div class="theme-selector-panel">
+        <h2 id="themeSelectorTitle">🎨 Select Theme</h2>
+        <p class="subtitle" id="themeSelectorSub">Choose your adventure style</p>
+        <div class="theme-grid" id="themeGrid">
+            <div class="theme-option active" data-theme="classic">
+                <span class="icon">☀️</span>
+                <div class="name" id="themeNameClassic">Classic</div>
+                <div class="desc" id="themeDescClassic">Original summer</div>
+            </div>
+            <div class="theme-option" data-theme="city">
+                <span class="icon">🏙️</span>
+                <div class="name" id="themeNameCity">City</div>
+                <div class="desc" id="themeDescCity">Urban streets</div>
+            </div>
+            <div class="theme-option" data-theme="beach">
+                <span class="icon">🏖️</span>
+                <div class="name" id="themeNameBeach">Beach</div>
+                <div class="desc" id="themeDescBeach">Sun & sand</div>
+            </div>
+            <div class="theme-option" data-theme="forest">
+                <span class="icon">🌲</span>
+                <div class="name" id="themeNameForest">Forest</div>
+                <div class="desc" id="themeDescForest">Deep woods</div>
+            </div>
+            <div class="theme-option" data-theme="space">
+                <span class="icon">🚀</span>
+                <div class="name" id="themeNameSpace">Space</div>
+                <div class="desc" id="themeDescSpace">Galaxy fox</div>
+            </div>
+            <div class="theme-option" data-theme="night">
+                <span class="icon">🌙</span>
+                <div class="name" id="themeNameNight">Night</div>
+                <div class="desc" id="themeDescNight">Dark & stars</div>
+            </div>
+        </div>
+        <button class="btn-close-theme" id="closeThemeSelector">✓ <span id="applyThemeText">Apply Theme</span></button>
+    </div>
+</div>
+
 <div id="startScreen" class="screen">
-    <div class="logo">🍂</div>
-    <h1>Autumn Fox</h1>
-    <p id="startText">Collect autumn eggs & beat your record!</p>
+    <div class="logo">🦊</div>
+    <h1>Fox Eggs</h1>
+    <p id="startText">Collect eggs and beat your record!</p>
     <button id="start">Start Game</button>
+    <button id="openThemeStartBtn" style="background:rgba(255,255,255,0.12);box-shadow:none;font-size:14px;padding:10px 25px;margin-top:10px;border:1px solid rgba(255,255,255,0.1);">
+        🎨 <span id="startThemeLabel">Change Theme</span>
+    </button>
     <p id="controlText" style="margin-top:18px;font-size:13px">Tap screen or Space to jump</p>
-    <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🍁 Autumn Edition</p>
+    <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🌍 Available worldwide</p>
 </div>
 
 <div id="gameOver" class="screen">
-    <div class="logo">🍂</div>
+    <div class="logo">🦊</div>
     <h1 id="gameOverTitle">Game Over!</h1>
     <div class="final">
         <span id="finalScoreLabel">Score:</span>
@@ -592,6 +757,7 @@ button:active{
         </div>
     </div>
     <button id="restart">Play Again</button>
+    <button id="changeThemeBtn">🎨 <span id="changeThemeLabel">Change Theme</span></button>
 </div>
 
 </div>
@@ -645,12 +811,10 @@ function showNoInternet() {
 }
 
 window.addEventListener('online', function() {
-    console.log('✅ Internet connected!');
     checkInternet();
 });
 
 window.addEventListener('offline', function() {
-    console.log('❌ Internet disconnected!');
     showNoInternet();
 });
 
@@ -726,6 +890,13 @@ const walletEggs = document.getElementById("walletEggs");
 const walletScore = document.getElementById("walletScore");
 const finalGames = document.getElementById("finalGames");
 const finalEggs = document.getElementById("finalEggs");
+const changeThemeBtn = document.getElementById("changeThemeBtn");
+const openThemeStartBtn = document.getElementById("openThemeStartBtn");
+const openThemeFromMenu = document.getElementById("openThemeFromMenu");
+const themeSelectorOverlay = document.getElementById("themeSelectorOverlay");
+const closeThemeSelector = document.getElementById("closeThemeSelector");
+const currentThemeDisplay = document.getElementById("currentThemeDisplay");
+const startThemeLabel = document.getElementById("startThemeLabel");
 
 const myReferralCode = document.getElementById("myReferralCode");
 const referralCount = document.getElementById("referralCount");
@@ -763,7 +934,6 @@ function getReferralsFromLocalStorage(refCode) {
 
 async function syncReferralsWithServer() {
     if (!navigator.onLine) {
-        console.log('⚠️ No internet, using cache');
         return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
     }
     
@@ -783,9 +953,7 @@ async function syncReferralsWithServer() {
                 return all;
             }
         }
-    } catch(e) {
-        console.log('⚠️ Server sync error, using cache');
-    }
+    } catch(e) {}
     
     return local;
 }
@@ -820,19 +988,16 @@ function generateReferralCode(userId) {
 function showReferralDataFromCache() {
     const userId = getUserId();
     const code = generateReferralCode(userId);
-    
     myReferralCode.textContent = code;
-    
     const referrals = getReferralsFromLocalStorage(code);
     referralCount.textContent = referrals.length;
-    
     return referrals;
 }
 
 async function registerReferralWithRetry(referralCodeInput, overlayElement, inputElement, errorElement, submitBtn) {
     if (!navigator.onLine) {
         const fa = language === 'fa';
-        errorElement.textContent = fa ? '❌ اتصال اینترنت برقرار نیست! نت خود را روشن کنید.' : '❌ No internet connection! Turn on your internet.';
+        errorElement.textContent = fa ? '❌ اتصال اینترنت برقرار نیست!' : '❌ No internet connection!';
         errorElement.style.color = '#f87171';
         inputElement.classList.add('error');
         setTimeout(() => inputElement.classList.remove('error'), 500);
@@ -854,7 +1019,7 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
     
     if (!/^[A-Z0-9]{4,10}$/.test(code)) {
         const fa = language === 'fa';
-        errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر! کد باید شامل حروف و اعداد باشد.' : '⚠️ Invalid code format! Code must contain letters and numbers.';
+        errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر!' : '⚠️ Invalid code format!';
         errorElement.style.color = '#fbbf24';
         inputElement.classList.add('error');
         setTimeout(() => inputElement.classList.remove('error'), 500);
@@ -884,10 +1049,8 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
             errorElement.textContent = fa ? '✅ کد تایید شد!' : '✅ Code verified!';
             errorElement.style.color = '#34d399';
             inputElement.style.borderColor = '#34d399';
-            
             localStorage.setItem("foxRegistered", "true");
             localStorage.setItem("foxReferralCode", code);
-            
             setTimeout(() => {
                 if (overlayElement && overlayElement.parentNode) {
                     overlayElement.remove();
@@ -897,29 +1060,25 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
                     showReferralDataFromCache();
                 });
             }, 1000);
-            
             return true;
         } else {
-            errorElement.textContent = fa ? '❌ کد اشتباه! دوباره امتحان کنید.' : '❌ Wrong code! Try again.';
+            errorElement.textContent = fa ? '❌ کد اشتباه!' : '❌ Wrong code!';
             errorElement.style.color = '#f87171';
             inputElement.classList.add('error');
             setTimeout(() => inputElement.classList.remove('error'), 500);
             inputElement.value = '';
             inputElement.focus();
-            
             submitBtn.disabled = false;
             submitBtn.classList.remove('loading');
             submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
             return false;
         }
-        
     } catch(e) {
         const fa = language === 'fa';
-        errorElement.textContent = fa ? '❌ خطا در ارتباط با سرور! دوباره تلاش کنید.' : '❌ Server connection error! Try again.';
+        errorElement.textContent = fa ? '❌ خطا در ارتباط با سرور!' : '❌ Server connection error!';
         errorElement.style.color = '#f87171';
         inputElement.classList.add('error');
         setTimeout(() => inputElement.classList.remove('error'), 500);
-        
         submitBtn.disabled = false;
         submitBtn.classList.remove('loading');
         submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
@@ -928,9 +1087,7 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
 }
 
 function showReferralPrompt() {
-    if (localStorage.getItem("foxRegistered") === "true") {
-        return;
-    }
+    if (localStorage.getItem("foxRegistered") === "true") return;
     
     const overlay = document.createElement('div');
     overlay.id = 'referralPrompt';
@@ -945,7 +1102,7 @@ function showReferralPrompt() {
     
     overlay.innerHTML = `
         <div class="box">
-            <div style="font-size:60px;margin-bottom:10px;">🍂</div>
+            <div style="font-size:60px;margin-bottom:10px;">🦊</div>
             <h2 style="margin-bottom:5px;">${title}</h2>
             <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${subtitle}</p>
             <span class="error-msg" id="refErrorMsg"></span>
@@ -963,8 +1120,7 @@ function showReferralPrompt() {
     const errorMsg = document.getElementById('refErrorMsg');
     
     async function handleSubmit() {
-        const code = input.value;
-        await registerReferralWithRetry(code, overlay, input, errorMsg, submitBtn);
+        await registerReferralWithRetry(input.value, overlay, input, errorMsg, submitBtn);
     }
     
     function handleSkip() {
@@ -987,7 +1143,7 @@ function showReferralPrompt() {
         errorMsg.textContent = '';
         errorMsg.style.color = '';
         this.classList.remove('error');
-        this.style.borderColor = '#b86b3a';
+        this.style.borderColor = '#f97316';
     });
     
     setTimeout(() => input.focus(), 200);
@@ -1147,7 +1303,7 @@ function saveWallet(){
         localStorage.setItem("foxGames", String(gamesPlayed));
         localStorage.setItem("foxEggs", String(totalEggs));
         localStorage.setItem("foxTotalScore", String(totalScore));
-    }catch(error){ console.warn("Could not save wallet data", error); }
+    }catch(error){}
 }
 
 /* =====================================================
@@ -1158,6 +1314,178 @@ let best = loadNumber("foxBest");
 let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
+
+/* =====================================================
+   THEME SYSTEM
+===================================================== */
+
+let currentTheme = localStorage.getItem("foxTheme") || "classic";
+
+const themeConfigs = {
+    classic: {
+        id: "classic",
+        icon: "☀️",
+        nameEn: "Classic",
+        nameFa: "کلاسیک",
+        descEn: "Original summer",
+        descFa: "تابستانی اصلی",
+        skyDay: ["#87CEEB", "#a8d8f0", "#c8e8f5"],
+        skyNight: ["#0a1525", "#152535", "#1a2a40"],
+        groundDay: ["#7dbb4b", "#6aaa3a", "#55963b"],
+        groundNight: ["#2a3a2a", "#1a2a1a", "#0a1a0a"],
+        eggColors: [
+            ["#ffffff", 1], ["#45d46b", 2], ["#3498db", 5], ["#a855f7", 10], ["#ffd43b", 25]
+        ],
+        foxColor: "#f97316",
+        treeColor: "#6a4a2a",
+        rockColor: "#7a8a9a",
+        isSpace: false
+    },
+    city: {
+        id: "city",
+        icon: "🏙️",
+        nameEn: "City",
+        nameFa: "شهری",
+        descEn: "Urban streets",
+        descFa: "خیابان‌های شهری",
+        skyDay: ["#b8c8d8", "#d0dce8", "#e0e8f0"],
+        skyNight: ["#0a1520", "#15202a", "#1a2a3a"],
+        groundDay: ["#8a9aa8", "#7a8a98", "#6a7a88"],
+        groundNight: ["#3a4a5a", "#2a3a4a", "#1a2a3a"],
+        eggColors: [
+            ["#e8eef0", 1], ["#b8c8d8", 2], ["#8898a8", 5], ["#5a6a7a", 10], ["#c8d8e0", 25]
+        ],
+        foxColor: "#d47a3a",
+        treeColor: "#6a4a2a",
+        rockColor: "#7a8a9a",
+        isSpace: false
+    },
+    beach: {
+        id: "beach",
+        icon: "🏖️",
+        nameEn: "Beach",
+        nameFa: "ساحلی",
+        descEn: "Sun & sand",
+        descFa: "آفتاب و شن",
+        skyDay: ["#87CEEB", "#b0d8f0", "#d0e8f5"],
+        skyNight: ["#0a1a2a", "#152535", "#1a2a40"],
+        groundDay: ["#f0d8a0", "#e8c888", "#d4b070"],
+        groundNight: ["#5a4a2a", "#4a3a1a", "#3a2a10"],
+        eggColors: [
+            ["#f5e8c8", 1], ["#f0c878", 2], ["#e8a848", 5], ["#d48838", 10], ["#f5d898", 25]
+        ],
+        foxColor: "#d47a3a",
+        treeColor: "#6a5a3a",
+        rockColor: "#b8a888",
+        isSpace: false
+    },
+    forest: {
+        id: "forest",
+        icon: "🌲",
+        nameEn: "Forest",
+        nameFa: "جنگلی",
+        descEn: "Deep woods",
+        descFa: "جنگل انبوه",
+        skyDay: ["#6a9a6a", "#7aaa7a", "#8aba8a"],
+        skyNight: ["#0a1a0a", "#152a15", "#1a3a1a"],
+        groundDay: ["#3a5a2a", "#2a4a1a", "#1a3a0a"],
+        groundNight: ["#1a2a0a", "#0a1a0a", "#050a00"],
+        eggColors: [
+            ["#d4e8c8", 1], ["#a8c878", 2], ["#6a9a3a", 5], ["#3a6a1a", 10], ["#c8e8a8", 25]
+        ],
+        foxColor: "#d47a3a",
+        treeColor: "#3a2a1a",
+        rockColor: "#5a6a4a",
+        isSpace: false
+    },
+    space: {
+        id: "space",
+        icon: "🚀",
+        nameEn: "Space",
+        nameFa: "فضایی",
+        descEn: "Galaxy fox",
+        descFa: "روباه کهکشانی",
+        skyDay: ["#1a0a3a", "#2a1a4a", "#3a2a5a"],
+        skyNight: ["#0a0a1a", "#0a0a2a", "#1a0a2a"],
+        groundDay: ["#3a2a4a", "#4a3a5a", "#5a4a6a"],
+        groundNight: ["#1a0a2a", "#0a0a1a", "#05000a"],
+        eggColors: [
+            ["#c8a8e8", 1], ["#a878d8", 2], ["#f0d060", 5], ["#6a3a9a", 10], ["#e8e0f0", 25]
+        ],
+        foxColor: "#a878d8",
+        treeColor: "#4a2a6a",
+        rockColor: "#5a4a6a",
+        isSpace: true
+    },
+    night: {
+        id: "night",
+        icon: "🌙",
+        nameEn: "Night",
+        nameFa: "شب",
+        descEn: "Dark & stars",
+        descFa: "تاریک و ستاره‌ها",
+        skyDay: ["#1a1a2e", "#16213e", "#0f3460"],
+        skyNight: ["#0a0a1a", "#0a0a2a", "#1a0a2a"],
+        groundDay: ["#2a2a3a", "#1a1a2a", "#0a0a1a"],
+        groundNight: ["#1a0a2a", "#0a0a1a", "#05000a"],
+        eggColors: [
+            ["#e8e0f0", 1], ["#c8b8e8", 2], ["#a898d8", 5], ["#8878c8", 10], ["#d8c8f0", 25]
+        ],
+        foxColor: "#d47a3a",
+        treeColor: "#3a2a5a",
+        rockColor: "#5a4a6a",
+        isSpace: false
+    }
+};
+
+function getTheme() {
+    return themeConfigs[currentTheme] || themeConfigs.classic;
+}
+
+function getThemeName(themeId) {
+    const t = themeConfigs[themeId];
+    if (!t) return themeId;
+    return language === 'fa' ? t.nameFa : t.nameEn;
+}
+
+function getThemeDesc(themeId) {
+    const t = themeConfigs[themeId];
+    if (!t) return '';
+    return language === 'fa' ? t.descFa : t.descEn;
+}
+
+function setTheme(themeId) {
+    if (!themeConfigs[themeId]) return;
+    currentTheme = themeId;
+    localStorage.setItem("foxTheme", themeId);
+    updateThemeUI();
+    if (!playing) {
+        drawBackground();
+        drawFox();
+    }
+}
+
+function updateThemeUI() {
+    const theme = getTheme();
+    const name = language === 'fa' ? theme.nameFa : theme.nameEn;
+    currentThemeDisplay.textContent = name;
+    startThemeLabel.textContent = language === 'fa' ? 'تغییر تم' : 'Change Theme';
+    
+    document.querySelectorAll('.theme-option').forEach(opt => {
+        const tid = opt.dataset.theme;
+        const t = themeConfigs[tid];
+        if (!t) return;
+        const isActive = tid === currentTheme;
+        opt.classList.toggle('active', isActive);
+        opt.querySelector('.name').textContent = language === 'fa' ? t.nameFa : t.nameEn;
+        opt.querySelector('.desc').textContent = language === 'fa' ? t.descFa : t.descEn;
+    });
+    
+    document.getElementById('themeSelectorTitle').textContent = language === 'fa' ? '🎨 انتخاب تم' : '🎨 Select Theme';
+    document.getElementById('themeSelectorSub').textContent = language === 'fa' ? 'سبک ماجراجویی خود را انتخاب کنید' : 'Choose your adventure style';
+    document.getElementById('applyThemeText').textContent = language === 'fa' ? 'اعمال تم' : 'Apply Theme';
+    document.getElementById('changeThemeLabel').textContent = language === 'fa' ? 'تغییر تم' : 'Change Theme';
+}
 
 /* =====================================================
    LANGUAGE
@@ -1173,6 +1501,7 @@ function applyLanguage(){
     document.getElementById("menuTitle").textContent = fa ? "منو" : "Menu";
     document.getElementById("languageTitle").textContent = fa ? "زبان" : "Language";
     document.getElementById("soundTitle").textContent = fa ? "صدا" : "Sound";
+    document.getElementById("themeMenuTitle").textContent = fa ? "🎨 تم" : "🎨 Theme";
     document.getElementById("gamesLabel").textContent = fa ? "تعداد بازی‌ها" : "Games Played";
     document.getElementById("bestLabel").textContent = fa ? "رکورد" : "Best Score";
     document.getElementById("eggsLabel").textContent = fa ? "کل تخم‌های جمع‌شده" : "Total Eggs";
@@ -1180,7 +1509,6 @@ function applyLanguage(){
     document.getElementById("referralCodeLabel").textContent = fa ? "کد دعوت من" : "My Invite Code";
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
     
-    // ===== ترجمه بخش جوایز =====
     document.getElementById("rewardTitle").textContent = fa ? "💰 سیستم جوایز" : "💰 Reward System";
     document.getElementById("rewardDesc").innerHTML = fa ? 
         '✅ امتیازهای شما در <strong>اپ</strong> و <strong>تلگرام</strong> یکی خواهد شد!' : 
@@ -1189,7 +1517,7 @@ function applyLanguage(){
         '🔑 امتیازهای مینی‌اپ تلگرام و اپ بعداً یکی میشوند.' : 
         '🔑 Telegram Mini App and App scores will be merged later.';
     
-    document.getElementById("startText").textContent = fa ? "تخم‌های پاییزی را جمع کن و رکورد بزن!" : "Collect autumn eggs and beat your record!";
+    document.getElementById("startText").textContent = fa ? "تخم‌ها را جمع کن و رکورد بزن!" : "Collect eggs and beat your record!";
     startButton.textContent = fa ? "شروع بازی" : "Start Game";
     document.getElementById("controlText").textContent = fa ? "لمس صفحه یا Space برای پرش" : "Tap screen or Space to jump";
     document.getElementById("gameOverTitle").textContent = fa ? "باختی!" : "Game Over!";
@@ -1198,9 +1526,12 @@ function applyLanguage(){
     document.getElementById("totalEggLabel").textContent = fa ? "کل تخم‌ها:" : "Total Eggs:";
     restartButton.textContent = fa ? "دوباره بازی کن" : "Play Again";
     recordText.textContent = fa ? "🏆 رکورد جدید!" : "🏆 New Record!";
+    document.getElementById("startThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
+    document.getElementById("changeThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
 
     updateSoundButtons();
     updateUI();
+    updateThemeUI();
 }
 
 function setLanguage(lang){
@@ -1287,23 +1618,19 @@ function resetFox(){
     fox.animation = 0;
 }
 
-// Autumn egg colors (warm tones)
-const eggTypes = [
-    ["#f5d0a9", 1], // cream
-    ["#d4a373", 2], // warm beige
-    ["#b86b3a", 5], // autumn orange
-    ["#8b5a2b", 10], // brown
-    ["#c47a3a", 25] // golden
-];
+function getEggColors() {
+    return getTheme().eggColors;
+}
 
 function createEgg(){
+    const eggColors = getEggColors();
     let r = Math.random();
     let type = 0;
     if(r > .55) type = 1;
     if(r > .78) type = 2;
     if(r > .91) type = 3;
     if(r > .98) type = 4;
-    const data = eggTypes[type];
+    const data = eggColors[type];
     eggs.push({
         x:W + 30,
         y: ground() - 50 - Math.random() * 130,
@@ -1348,78 +1675,121 @@ function jump(){
 }
 
 function drawBackground(){
-    // Autumn sky: warm gradient
-    const gradient = ctx.createLinearGradient(0, 0, 0, ground());
-    if(isNight){
-        gradient.addColorStop(0, "#1a0e0a");
-        gradient.addColorStop(0.6, "#3d1f14");
-        gradient.addColorStop(1, "#4d2a1a");
-    } else {
-        gradient.addColorStop(0, "#f7d9b3");
-        gradient.addColorStop(0.5, "#e8c9a0");
-        gradient.addColorStop(1, "#d4b08c");
-    }
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, W, H);
-
-    // Sun or moon
-    if(isNight){
-        ctx.fillStyle = "#e8d5b0";
-        ctx.beginPath();
-        ctx.arc(W - 90, 90, 30, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "rgba(255,255,240,.2)";
-        for(let i=0;i<22;i++){
-            const x = (i * 83 + 37) % Math.max(W,1);
-            const y = 35 + (i * 47) % Math.max(H * .45,1);
-            ctx.fillRect(x, y, 2, 2);
-        }
-    }else{
-        ctx.fillStyle = "#f5c27b";
-        ctx.beginPath();
-        ctx.arc(W - 90, 90, 38, 0, Math.PI * 2);
-        ctx.fill();
-        // Clouds - autumn style
-        ctx.fillStyle = "rgba(255,240,220,0.7)";
-        drawCloud(120, 100, 1.2);
-        drawCloud(W * .55, 145, .8);
-        drawCloud(W * .85, 80, .9);
-    }
-
+    const theme = getTheme();
     const gy = ground();
-    // Ground - autumn colors
-    const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
-    if(isNight){
-        groundGrad.addColorStop(0, "#5a3a2a");
-        groundGrad.addColorStop(1, "#2d1a10");
-    } else {
-        groundGrad.addColorStop(0, "#b8864a");
-        groundGrad.addColorStop(0.3, "#a0733a");
-        groundGrad.addColorStop(1, "#7a5a2a");
+    const colors = isNight ? theme.skyNight : theme.skyDay;
+    const isSpace = theme.isSpace || false;
+    
+    // Sky
+    const gradient = ctx.createLinearGradient(0, 0, 0, gy);
+    gradient.addColorStop(0, colors[0]);
+    gradient.addColorStop(0.5, colors[1]);
+    gradient.addColorStop(1, colors[2]);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, W, gy);
+
+    // Space theme special effects
+    if(isSpace){
+        // Galaxy effect
+        for(let i=0; i<30; i++){
+            const x = (i * 137 + 53) % W;
+            const y = (i * 97 + 31) % (gy * 0.7);
+            const size = 2 + (i % 5);
+            ctx.fillStyle = `rgba(200,180,255,${0.03 + (i % 3) * 0.02})`;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // Nebula clouds
+        ctx.fillStyle = "rgba(150,100,200,0.05)";
+        ctx.beginPath();
+        ctx.ellipse(W*0.2, gy*0.3, 150, 80, 0.5, 0, Math.PI*2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(100,150,255,0.04)";
+        ctx.beginPath();
+        ctx.ellipse(W*0.7, gy*0.2, 180, 60, -0.3, 0, Math.PI*2);
+        ctx.fill();
     }
+
+    // Sun/Moon
+    if(isNight){
+        ctx.fillStyle = isSpace ? "rgba(255,240,220,0.1)" : "rgba(255,240,220,0.15)";
+        ctx.beginPath();
+        ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
+        ctx.fill();
+        // Stars
+        const starColor = isSpace ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
+        ctx.fillStyle = starColor;
+        for(let i=0; i< (isSpace ? 40 : 20); i++){
+            const x = (i * 47 + 13) % W;
+            const y = 20 + (i * 37) % (gy * 0.5);
+            const size = isSpace ? 1 + (i%4) : 1 + (i%2);
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        // Twinkling stars (space)
+        if(isSpace){
+            const t = Date.now() / 1000;
+            for(let i=0; i<8; i++){
+                const x = (i * 73 + 17 + t * 5) % W;
+                const y = 30 + (i * 53 + 11 + t * 3) % (gy * 0.4);
+                const brightness = 0.3 + Math.sin(t * 2 + i) * 0.2;
+                ctx.fillStyle = `rgba(255,255,255,${brightness})`;
+                ctx.beginPath();
+                ctx.arc(x, y, 2 + (i%2), 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+    } else {
+        ctx.fillStyle = isSpace ? "rgba(200,180,255,0.3)" : "rgba(255,230,180,0.7)";
+        ctx.beginPath();
+        ctx.arc(W - 90, 90, isSpace ? 30 : 35, 0, Math.PI * 2);
+        ctx.fill();
+        if(!isSpace){
+            ctx.fillStyle = "rgba(255,255,255,0.25)";
+            drawCloud(120, 100, 1);
+            drawCloud(W * .55, 145, .7);
+            drawCloud(W * .85, 80, .8);
+        }
+    }
+
+    // Ground
+    const groundColors = isNight ? theme.groundNight : theme.groundDay;
+    const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
+    groundGrad.addColorStop(0, groundColors[0]);
+    groundGrad.addColorStop(0.5, groundColors[1]);
+    groundGrad.addColorStop(1, groundColors[2]);
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, gy, W, H - gy);
     
-    // Grass detail - autumn brownish
-    ctx.fillStyle = isNight ? "#3d2a1a" : "#8a6a3a";
-    ctx.fillRect(0, gy, W, 5);
-    
-    // Some autumn leaves on ground
-    ctx.fillStyle = isNight ? "rgba(180,120,60,0.3)" : "rgba(200,140,60,0.4)";
-    for(let i=0; i<30; i++){
-        const x = (i * 37 + 11) % W;
-        const y = gy + 8 + (i * 13) % 20;
-        ctx.beginPath();
-        ctx.ellipse(x, y, 3 + i%4, 2 + i%3, i*0.2, 0, Math.PI*2);
-        ctx.fill();
+    // Ground line
+    ctx.fillStyle = isNight ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
+    ctx.fillRect(0, gy, W, 3);
+
+    // Space theme craters
+    if(isSpace){
+        ctx.fillStyle = "rgba(0,0,0,0.08)";
+        for(let i=0; i<5; i++){
+            const x = (i * 87 + 23) % W;
+            const y = gy + 20 + (i * 43) % (H - gy - 30);
+            ctx.beginPath();
+            ctx.ellipse(x, y, 15 + i*5, 8 + i*3, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.beginPath();
+            ctx.ellipse(x-4, y-2, 8 + i*3, 4 + i*2, 0, 0, Math.PI*2);
+            ctx.fill();
+            ctx.fillStyle = "rgba(0,0,0,0.08)";
+        }
     }
 }
 
 function drawCloud(x,y,s){
     ctx.beginPath();
-    ctx.arc(x, y, 25 * s, 0, Math.PI * 2);
-    ctx.arc(x + 30 * s, y - 10 * s, 32 * s, 0, Math.PI * 2);
-    ctx.arc(x + 60 * s, y, 25 * s, 0, Math.PI * 2);
+    ctx.arc(x, y, 20 * s, 0, Math.PI * 2);
+    ctx.arc(x + 25 * s, y - 8 * s, 27 * s, 0, Math.PI * 2);
+    ctx.arc(x + 52 * s, y, 20 * s, 0, Math.PI * 2);
     ctx.fill();
 }
 
@@ -1427,59 +1797,61 @@ function drawFox(){
     const x = fox.x;
     const y = fox.y;
     const running = fox.grounded ? Math.sin(fox.animation) * 4 : 0;
+    const theme = getTheme();
+    const isSpace = theme.isSpace || false;
 
     // Shadow
-    ctx.fillStyle = "rgba(0,0,0,.15)";
+    ctx.fillStyle = isSpace ? "rgba(100,80,150,0.15)" : "rgba(0,0,0,.12)";
     ctx.beginPath();
     ctx.ellipse(x + 30, ground() + 3, 28, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Fox body - autumn orange
-    ctx.fillStyle = "#d48c4a";
+    const foxColor = theme.foxColor;
+    
+    // Fox body
+    ctx.fillStyle = foxColor;
+    if(isSpace){
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "rgba(150,100,255,0.3)";
+    }
     ctx.beginPath();
     ctx.moveTo(x + 15, y + 28);
     ctx.quadraticCurveTo(x - 22, y + 5 + running, x - 10, y - 10 + running);
     ctx.quadraticCurveTo(x + 5, y + 5, x + 20, y + 23);
     ctx.fill();
 
-    // White chest
-    ctx.fillStyle = "#f5e6d0";
+    ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
     ctx.moveTo(x - 10, y - 10 + running);
     ctx.quadraticCurveTo(x - 25, y, x - 14, y + 12);
     ctx.quadraticCurveTo(x - 5, y + 5, x + 1, y + 7);
     ctx.fill();
 
-    // Main body
-    ctx.fillStyle = "#d48c4a";
+    ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.ellipse(x + 29, y + 29, 27, 18, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // White belly
-    ctx.fillStyle = "#f5e6d0";
+    ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
     ctx.ellipse(x + 34, y + 31, 14, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Legs
-    ctx.fillStyle = "#b86b3a";
+    ctx.fillStyle = isSpace ? "#9a7aba" : "#b86b3a";
     ctx.fillRect(x + 14, y + 39 + running, 10, 11);
     ctx.fillRect(x + 39, y + 39 - running, 10, 11);
 
-    // Head
-    ctx.fillStyle = "#d48c4a";
+    ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.ellipse(x + 43, y + 18, 16, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Ears
-    ctx.fillStyle = "#c47a3a";
+    ctx.fillStyle = isSpace ? "#9a7aba" : "#c47a3a";
     ctx.beginPath();
     ctx.ellipse(x + 52, y + 8, 21, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#d48c4a";
+    ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.moveTo(x + 38, y - 3);
     ctx.lineTo(x + 39, y - 20);
@@ -1494,8 +1866,7 @@ function drawFox(){
     ctx.closePath();
     ctx.fill();
 
-    // Inner ear
-    ctx.fillStyle = "#f5cba0";
+    ctx.fillStyle = isSpace ? "#c8b8e0" : "#f5cba0";
     ctx.beginPath();
     ctx.moveTo(x + 41, y - 6);
     ctx.lineTo(x + 41, y - 14);
@@ -1503,23 +1874,26 @@ function drawFox(){
     ctx.closePath();
     ctx.fill();
 
-    // Snout
-    ctx.fillStyle = "#f5e6d0";
+    ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
     ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyes
-    ctx.fillStyle = "#111";
+    // Eyes - neon for space
+    ctx.fillStyle = isSpace ? "#00ff88" : "#1a1a2a";
+    if(isSpace){
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(0,255,136,0.3)";
+    }
     ctx.beginPath();
     ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
     ctx.arc(x + 58, y + 5, 3.5, 0, Math.PI * 2);
     ctx.fill();
+    ctx.shadowBlur = 0;
 
-    // Eye shine
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = isSpace ? "#ccffdd" : "#fff";
     ctx.beginPath();
     ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
     ctx.fill();
@@ -1527,9 +1901,12 @@ function drawFox(){
 
 function drawEgg(e){
     const cx = e.x + e.w / 2;
-    if(e.value >= 10){
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = "rgba(200,150,60,0.5)";
+    const theme = getTheme();
+    const isSpace = theme.isSpace || false;
+    
+    if(isSpace){
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = "rgba(150,100,255,0.3)";
     }
     ctx.fillStyle = e.color;
     ctx.beginPath();
@@ -1538,61 +1915,110 @@ function drawEgg(e){
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = "rgba(120,80,40,.15)";
-    ctx.lineWidth = 2;
+    ctx.strokeStyle = isSpace ? "rgba(200,180,255,0.2)" : "rgba(0,0,0,.06)";
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(e.x + 6, e.y + 18);
     ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
+    ctx.fillStyle = isSpace ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.12)";
+    ctx.beginPath();
+    ctx.ellipse(cx - 4, e.y + 8, 4, 7, -0.2, 0, Math.PI * 2);
+    ctx.fill();
 }
 
 function drawObstacle(o){
+    const theme = getTheme();
+    const isSpace = theme.isSpace || false;
+    
     if(o.type === "tree"){
-        // Autumn tree
-        ctx.fillStyle = "#6a4a2a";
-        ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
-        ctx.fillStyle = "#b86b3a";
-        ctx.beginPath();
-        ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = "#c47a3a";
-        ctx.beginPath();
-        ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
-        ctx.fill();
-        // Some leaves falling
-        ctx.fillStyle = "rgba(200,140,60,0.3)";
-        for(let i=0; i<5; i++){
+        if(isSpace){
+            // Space crystal tree
+            ctx.fillStyle = "#4a2a6a";
+            ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
+            ctx.fillStyle = "#6a3a8a";
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "rgba(150,100,255,0.2)";
             ctx.beginPath();
-            ctx.ellipse(o.x + 10 + i*8, o.y + 40 + i*6, 4, 3, i*0.5, 0, Math.PI*2);
+            ctx.arc(o.x + 23, o.y + 20, 22, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = "#8a5aaa";
+            ctx.beginPath();
+            ctx.arc(o.x + 7, o.y + 32, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(o.x + 40, o.y + 32, 14, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        } else {
+            ctx.fillStyle = theme.treeColor || "#6a4a2a";
+            ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
+            ctx.fillStyle = isNight ? "#3a4a3a" : "#23823c";
+            ctx.beginPath();
+            ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = isNight ? "#2a3a2a" : "#2f9e44";
+            ctx.beginPath();
+            ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
             ctx.fill();
         }
     }else if(o.type === "rock"){
-        ctx.fillStyle = "#7a6a5a";
-        ctx.beginPath();
-        ctx.moveTo(o.x, o.y + o.h);
-        ctx.lineTo(o.x + 10, o.y + 10);
-        ctx.lineTo(o.x + 28, o.y);
-        ctx.lineTo(o.x + o.w, o.y + 15);
-        ctx.lineTo(o.x + o.w - 8, o.y + o.h);
-        ctx.closePath();
-        ctx.fill();
-        ctx.fillStyle = "rgba(160,140,120,0.2)";
-        ctx.beginPath();
-        ctx.ellipse(o.x + 15, o.y + 12, 8, 5, 0.3, 0, Math.PI*2);
-        ctx.fill();
+        if(isSpace){
+            // Space meteor
+            ctx.fillStyle = "#4a3a5a";
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "rgba(150,100,255,0.15)";
+            ctx.beginPath();
+            ctx.moveTo(o.x, o.y + o.h);
+            ctx.lineTo(o.x + 10, o.y + 10);
+            ctx.lineTo(o.x + 28, o.y);
+            ctx.lineTo(o.x + o.w, o.y + 15);
+            ctx.lineTo(o.x + o.w - 8, o.y + o.h);
+            ctx.closePath();
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "rgba(200,180,255,0.1)";
+            ctx.beginPath();
+            ctx.ellipse(o.x + 15, o.y + 8, 10, 5, 0, 0, Math.PI*2);
+            ctx.fill();
+        } else {
+            ctx.fillStyle = theme.rockColor || "#7a8a9a";
+            ctx.beginPath();
+            ctx.moveTo(o.x, o.y + o.h);
+            ctx.lineTo(o.x + 10, o.y + 10);
+            ctx.lineTo(o.x + 28, o.y);
+            ctx.lineTo(o.x + o.w, o.y + 15);
+            ctx.lineTo(o.x + o.w - 8, o.y + o.h);
+            ctx.closePath();
+            ctx.fill();
+        }
     }else{
-        // Cactus - autumn style with warm tone
-        ctx.fillStyle = "#5a7a3a";
-        ctx.fillRect(o.x + 9, o.y, 14, o.h);
-        ctx.fillRect(o.x, o.y + 20, 13, 11);
-        ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
-        ctx.fillStyle = "#4a6a2a";
-        ctx.fillRect(o.x + 12, o.y + 5, 8, 5);
-        ctx.fillRect(o.x + 3, o.y + 25, 7, 4);
-        ctx.fillRect(o.x + 22, o.y + 43, 7, 4);
+        if(isSpace){
+            // Space alien plant
+            ctx.fillStyle = "#3a7a5a";
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = "rgba(100,200,150,0.15)";
+            ctx.fillRect(o.x + 9, o.y, 14, o.h);
+            ctx.fillRect(o.x, o.y + 20, 13, 11);
+            ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
+            ctx.fillStyle = "#2a6a4a";
+            ctx.fillRect(o.x + 12, o.y + 5, 8, 5);
+            ctx.fillRect(o.x + 3, o.y + 25, 7, 4);
+            ctx.fillRect(o.x + 22, o.y + 43, 7, 4);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "rgba(100,255,200,0.08)";
+            ctx.beginPath();
+            ctx.ellipse(o.x + 16, o.y + 8, 6, 3, 0, 0, Math.PI*2);
+            ctx.fill();
+        } else {
+            ctx.fillStyle = "#25834a";
+            ctx.fillRect(o.x + 9, o.y, 14, o.h);
+            ctx.fillRect(o.x, o.y + 20, 13, 11);
+            ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
+        }
     }
 }
 
@@ -1709,6 +2135,7 @@ function startGame(){
     menuPanel.style.display = "none";
     startScreen.style.display = "none";
     gameOver.style.display = "none";
+    themeSelectorOverlay.style.display = "none";
     startMusic();
     lastTime = performance.now();
     requestAnimationFrame(loop);
@@ -1735,10 +2162,63 @@ function handleInput(){
     else jump();
 }
 
+/* =====================================================
+   THEME SELECTOR OVERLAY
+===================================================== */
+
+function openThemeSelector() {
+    themeSelectorOverlay.style.display = 'flex';
+    updateThemeUI();
+}
+
+function closeThemeSelectorFn() {
+    themeSelectorOverlay.style.display = 'none';
+}
+
+// Theme option click
+document.querySelectorAll('.theme-option').forEach(opt => {
+    opt.addEventListener('click', function() {
+        const themeId = this.dataset.theme;
+        setTheme(themeId);
+        drawBackground();
+        drawFox();
+    });
+});
+
+// Close theme selector
+closeThemeSelector.addEventListener('click', closeThemeSelectorFn);
+themeSelectorOverlay.addEventListener('click', function(e) {
+    if (e.target === this) closeThemeSelectorFn();
+});
+
+// Open from buttons
+changeThemeBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    openThemeSelector();
+});
+
+openThemeStartBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    openThemeSelector();
+});
+
+openThemeFromMenu.addEventListener('click', function(e) {
+    e.stopPropagation();
+    menuPanel.style.display = "none";
+    openThemeSelector();
+});
+
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+
 window.addEventListener("keydown", function(e){
     if(e.code === "Space" || e.code === "ArrowUp"){
         e.preventDefault();
         handleInput();
+    }
+    if(e.code === "Escape" && themeSelectorOverlay.style.display === 'flex') {
+        closeThemeSelectorFn();
     }
 });
 
@@ -1851,10 +2331,15 @@ updateUI();
 resetFox();
 menuButton.style.display = "block";
 
-// Draw initial autumn background
-ctx.fillStyle = "#f7d9b3";
+// Set active theme
+const savedTheme = localStorage.getItem("foxTheme") || "classic";
+setTheme(savedTheme);
+
+// Draw initial background
+ctx.fillStyle = "#87CEEB";
 ctx.fillRect(0, 0, W, H);
 drawBackground();
+drawFox();
 
 showReferralDataFromCache();
 
@@ -1877,4 +2362,4 @@ setTimeout(() => {
 </script>
 
 </body>
-    </html>
+            </html>
