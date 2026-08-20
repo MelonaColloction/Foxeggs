@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Fox Eggs</title>
+<title>Fox Eggs - Autumn</title>
 
 <style>
 *{
@@ -16,7 +16,7 @@ html,body{
     width:100%;
     height:100%;
     overflow:hidden;
-    background:#87ceeb;
+    background:#c7a17a;
     touch-action:none;
     user-select:none;
     font-family:Arial,sans-serif;
@@ -187,20 +187,20 @@ p{
 
 button{
     border:none;
-    background:#f97316;
+    background:#b86b3a;
     color:white;
     font-size:18px;
     font-weight:bold;
     padding:14px 35px;
     border-radius:12px;
-    box-shadow:0 5px #c2410c;
+    box-shadow:0 5px #7a4a2a;
     cursor:pointer;
     transition:transform .1s;
 }
 
 button:active{
     transform:translateY(4px);
-    box-shadow:0 1px #c2410c;
+    box-shadow:0 1px #7a4a2a;
 }
 
 .final{
@@ -322,7 +322,7 @@ button:active{
     width:100%;
     padding:12px;
     border-radius:10px;
-    border:2px solid #f97316;
+    border:2px solid #b86b3a;
     background:#2a2a3e;
     color:white;
     font-size:18px;
@@ -333,7 +333,7 @@ button:active{
 }
 
 #referralPrompt .box input:focus{
-    border-color:#ffb347;
+    border-color:#d48c5a;
 }
 
 #referralPrompt .box input.error{
@@ -351,8 +351,8 @@ button:active{
 
 #referralPrompt .box .btn-submit{
     width:100%;
-    background:#f97316;
-    box-shadow:0 4px #c2410c;
+    background:#b86b3a;
+    box-shadow:0 4px #7a4a2a;
     padding:12px;
     margin-bottom:8px;
 }
@@ -565,16 +565,16 @@ button:active{
 </div>
 
 <div id="startScreen" class="screen">
-    <div class="logo">🦊</div>
-    <h1>Fox Eggs</h1>
-    <p id="startText">Collect eggs and beat your record!</p>
+    <div class="logo">🍂</div>
+    <h1>Autumn Fox</h1>
+    <p id="startText">Collect autumn eggs & beat your record!</p>
     <button id="start">Start Game</button>
     <p id="controlText" style="margin-top:18px;font-size:13px">Tap screen or Space to jump</p>
-    <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🌍 Available worldwide</p>
+    <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🍁 Autumn Edition</p>
 </div>
 
 <div id="gameOver" class="screen">
-    <div class="logo">🦊</div>
+    <div class="logo">🍂</div>
     <h1 id="gameOverTitle">Game Over!</h1>
     <div class="final">
         <span id="finalScoreLabel">Score:</span>
@@ -945,7 +945,7 @@ function showReferralPrompt() {
     
     overlay.innerHTML = `
         <div class="box">
-            <div style="font-size:60px;margin-bottom:10px;">🦊</div>
+            <div style="font-size:60px;margin-bottom:10px;">🍂</div>
             <h2 style="margin-bottom:5px;">${title}</h2>
             <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${subtitle}</p>
             <span class="error-msg" id="refErrorMsg"></span>
@@ -987,7 +987,7 @@ function showReferralPrompt() {
         errorMsg.textContent = '';
         errorMsg.style.color = '';
         this.classList.remove('error');
-        this.style.borderColor = '#f97316';
+        this.style.borderColor = '#b86b3a';
     });
     
     setTimeout(() => input.focus(), 200);
@@ -1189,7 +1189,7 @@ function applyLanguage(){
         '🔑 امتیازهای مینی‌اپ تلگرام و اپ بعداً یکی میشوند.' : 
         '🔑 Telegram Mini App and App scores will be merged later.';
     
-    document.getElementById("startText").textContent = fa ? "تخم‌ها را جمع کن و رکورد بزن!" : "Collect eggs and beat your record!";
+    document.getElementById("startText").textContent = fa ? "تخم‌های پاییزی را جمع کن و رکورد بزن!" : "Collect autumn eggs and beat your record!";
     startButton.textContent = fa ? "شروع بازی" : "Start Game";
     document.getElementById("controlText").textContent = fa ? "لمس صفحه یا Space برای پرش" : "Tap screen or Space to jump";
     document.getElementById("gameOverTitle").textContent = fa ? "باختی!" : "Game Over!";
@@ -1287,12 +1287,13 @@ function resetFox(){
     fox.animation = 0;
 }
 
+// Autumn egg colors (warm tones)
 const eggTypes = [
-    ["#ffffff",1],
-    ["#45d46b",2],
-    ["#3498db",5],
-    ["#a855f7",10],
-    ["#ffd43b",25]
+    ["#f5d0a9", 1], // cream
+    ["#d4a373", 2], // warm beige
+    ["#b86b3a", 5], // autumn orange
+    ["#8b5a2b", 10], // brown
+    ["#c47a3a", 25] // golden
 ];
 
 function createEgg(){
@@ -1347,47 +1348,78 @@ function jump(){
 }
 
 function drawBackground(){
+    // Autumn sky: warm gradient
+    const gradient = ctx.createLinearGradient(0, 0, 0, ground());
     if(isNight){
-        ctx.fillStyle = "#101b3d";
-    }else{
-        ctx.fillStyle = "#87ceeb";
+        gradient.addColorStop(0, "#1a0e0a");
+        gradient.addColorStop(0.6, "#3d1f14");
+        gradient.addColorStop(1, "#4d2a1a");
+    } else {
+        gradient.addColorStop(0, "#f7d9b3");
+        gradient.addColorStop(0.5, "#e8c9a0");
+        gradient.addColorStop(1, "#d4b08c");
     }
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, W, H);
 
+    // Sun or moon
     if(isNight){
-        ctx.fillStyle = "#f5f3ce";
+        ctx.fillStyle = "#e8d5b0";
         ctx.beginPath();
-        ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
+        ctx.arc(W - 90, 90, 30, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,.8)";
+        ctx.fillStyle = "rgba(255,255,240,.2)";
         for(let i=0;i<22;i++){
             const x = (i * 83 + 37) % Math.max(W,1);
             const y = 35 + (i * 47) % Math.max(H * .45,1);
             ctx.fillRect(x, y, 2, 2);
         }
     }else{
-        ctx.fillStyle = "#ffe082";
+        ctx.fillStyle = "#f5c27b";
         ctx.beginPath();
-        ctx.arc(W - 90, 90, 35, 0, Math.PI * 2);
+        ctx.arc(W - 90, 90, 38, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "rgba(255,255,255,.65)";
-        drawCloud(120, 100, 1);
-        drawCloud(W * .55, 145, .7);
-        drawCloud(W * .85, 80, .8);
+        // Clouds - autumn style
+        ctx.fillStyle = "rgba(255,240,220,0.7)";
+        drawCloud(120, 100, 1.2);
+        drawCloud(W * .55, 145, .8);
+        drawCloud(W * .85, 80, .9);
     }
 
     const gy = ground();
-    ctx.fillStyle = isNight ? "#31542c" : "#7dbb4b";
+    // Ground - autumn colors
+    const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
+    if(isNight){
+        groundGrad.addColorStop(0, "#5a3a2a");
+        groundGrad.addColorStop(1, "#2d1a10");
+    } else {
+        groundGrad.addColorStop(0, "#b8864a");
+        groundGrad.addColorStop(0.3, "#a0733a");
+        groundGrad.addColorStop(1, "#7a5a2a");
+    }
+    ctx.fillStyle = groundGrad;
     ctx.fillRect(0, gy, W, H - gy);
-    ctx.fillStyle = isNight ? "#253f23" : "#55963b";
+    
+    // Grass detail - autumn brownish
+    ctx.fillStyle = isNight ? "#3d2a1a" : "#8a6a3a";
     ctx.fillRect(0, gy, W, 5);
+    
+    // Some autumn leaves on ground
+    ctx.fillStyle = isNight ? "rgba(180,120,60,0.3)" : "rgba(200,140,60,0.4)";
+    for(let i=0; i<30; i++){
+        const x = (i * 37 + 11) % W;
+        const y = gy + 8 + (i * 13) % 20;
+        ctx.beginPath();
+        ctx.ellipse(x, y, 3 + i%4, 2 + i%3, i*0.2, 0, Math.PI*2);
+        ctx.fill();
+    }
 }
 
 function drawCloud(x,y,s){
     ctx.beginPath();
-    ctx.arc(x, y, 20 * s, 0, Math.PI * 2);
-    ctx.arc(x + 25 * s, y - 8 * s, 27 * s, 0, Math.PI * 2);
-    ctx.arc(x + 52 * s, y, 20 * s, 0, Math.PI * 2);
+    ctx.arc(x, y, 25 * s, 0, Math.PI * 2);
+    ctx.arc(x + 30 * s, y - 10 * s, 32 * s, 0, Math.PI * 2);
+    ctx.arc(x + 60 * s, y, 25 * s, 0, Math.PI * 2);
     ctx.fill();
 }
 
@@ -1396,50 +1428,58 @@ function drawFox(){
     const y = fox.y;
     const running = fox.grounded ? Math.sin(fox.animation) * 4 : 0;
 
+    // Shadow
     ctx.fillStyle = "rgba(0,0,0,.15)";
     ctx.beginPath();
     ctx.ellipse(x + 30, ground() + 3, 28, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#f97316";
+    // Fox body - autumn orange
+    ctx.fillStyle = "#d48c4a";
     ctx.beginPath();
     ctx.moveTo(x + 15, y + 28);
     ctx.quadraticCurveTo(x - 22, y + 5 + running, x - 10, y - 10 + running);
     ctx.quadraticCurveTo(x + 5, y + 5, x + 20, y + 23);
     ctx.fill();
 
-    ctx.fillStyle = "#fff7ed";
+    // White chest
+    ctx.fillStyle = "#f5e6d0";
     ctx.beginPath();
     ctx.moveTo(x - 10, y - 10 + running);
     ctx.quadraticCurveTo(x - 25, y, x - 14, y + 12);
     ctx.quadraticCurveTo(x - 5, y + 5, x + 1, y + 7);
     ctx.fill();
 
-    ctx.fillStyle = "#f97316";
+    // Main body
+    ctx.fillStyle = "#d48c4a";
     ctx.beginPath();
     ctx.ellipse(x + 29, y + 29, 27, 18, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#fff7ed";
+    // White belly
+    ctx.fillStyle = "#f5e6d0";
     ctx.beginPath();
     ctx.ellipse(x + 34, y + 31, 14, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#ea580c";
+    // Legs
+    ctx.fillStyle = "#b86b3a";
     ctx.fillRect(x + 14, y + 39 + running, 10, 11);
     ctx.fillRect(x + 39, y + 39 - running, 10, 11);
 
-    ctx.fillStyle = "#f97316";
+    // Head
+    ctx.fillStyle = "#d48c4a";
     ctx.beginPath();
     ctx.ellipse(x + 43, y + 18, 16, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#fb923c";
+    // Ears
+    ctx.fillStyle = "#c47a3a";
     ctx.beginPath();
     ctx.ellipse(x + 52, y + 8, 21, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = "#f97316";
+    ctx.fillStyle = "#d48c4a";
     ctx.beginPath();
     ctx.moveTo(x + 38, y - 3);
     ctx.lineTo(x + 39, y - 20);
@@ -1454,7 +1494,8 @@ function drawFox(){
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = "#fecaca";
+    // Inner ear
+    ctx.fillStyle = "#f5cba0";
     ctx.beginPath();
     ctx.moveTo(x + 41, y - 6);
     ctx.lineTo(x + 41, y - 14);
@@ -1462,11 +1503,13 @@ function drawFox(){
     ctx.closePath();
     ctx.fill();
 
-    ctx.fillStyle = "#fff7ed";
+    // Snout
+    ctx.fillStyle = "#f5e6d0";
     ctx.beginPath();
     ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
+    // Eyes
     ctx.fillStyle = "#111";
     ctx.beginPath();
     ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
@@ -1475,6 +1518,7 @@ function drawFox(){
     ctx.arc(x + 58, y + 5, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
+    // Eye shine
     ctx.fillStyle = "#fff";
     ctx.beginPath();
     ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
@@ -1484,8 +1528,8 @@ function drawFox(){
 function drawEgg(e){
     const cx = e.x + e.w / 2;
     if(e.value >= 10){
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = e.color;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "rgba(200,150,60,0.5)";
     }
     ctx.fillStyle = e.color;
     ctx.beginPath();
@@ -1494,7 +1538,7 @@ function drawEgg(e){
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = "rgba(0,0,0,.12)";
+    ctx.strokeStyle = "rgba(120,80,40,.15)";
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(e.x + 6, e.y + 18);
@@ -1504,21 +1548,29 @@ function drawEgg(e){
 
 function drawObstacle(o){
     if(o.type === "tree"){
-        ctx.fillStyle = "#8b5a2b";
+        // Autumn tree
+        ctx.fillStyle = "#6a4a2a";
         ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
-        ctx.fillStyle = "#23823c";
+        ctx.fillStyle = "#b86b3a";
         ctx.beginPath();
         ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = "#2f9e44";
+        ctx.fillStyle = "#c47a3a";
         ctx.beginPath();
         ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
         ctx.fill();
         ctx.beginPath();
         ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
         ctx.fill();
+        // Some leaves falling
+        ctx.fillStyle = "rgba(200,140,60,0.3)";
+        for(let i=0; i<5; i++){
+            ctx.beginPath();
+            ctx.ellipse(o.x + 10 + i*8, o.y + 40 + i*6, 4, 3, i*0.5, 0, Math.PI*2);
+            ctx.fill();
+        }
     }else if(o.type === "rock"){
-        ctx.fillStyle = "#667085";
+        ctx.fillStyle = "#7a6a5a";
         ctx.beginPath();
         ctx.moveTo(o.x, o.y + o.h);
         ctx.lineTo(o.x + 10, o.y + 10);
@@ -1527,11 +1579,20 @@ function drawObstacle(o){
         ctx.lineTo(o.x + o.w - 8, o.y + o.h);
         ctx.closePath();
         ctx.fill();
+        ctx.fillStyle = "rgba(160,140,120,0.2)";
+        ctx.beginPath();
+        ctx.ellipse(o.x + 15, o.y + 12, 8, 5, 0.3, 0, Math.PI*2);
+        ctx.fill();
     }else{
-        ctx.fillStyle = "#25834a";
+        // Cactus - autumn style with warm tone
+        ctx.fillStyle = "#5a7a3a";
         ctx.fillRect(o.x + 9, o.y, 14, o.h);
         ctx.fillRect(o.x, o.y + 20, 13, 11);
         ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
+        ctx.fillStyle = "#4a6a2a";
+        ctx.fillRect(o.x + 12, o.y + 5, 8, 5);
+        ctx.fillRect(o.x + 3, o.y + 25, 7, 4);
+        ctx.fillRect(o.x + 22, o.y + 43, 7, 4);
     }
 }
 
@@ -1743,14 +1804,14 @@ copyBtn.addEventListener("click", copyReferralCode);
 function copyReferralCode() {
     const code = myReferralCode.textContent;
     if (code === "---" || !code) {
-        const msg = language === "fa" ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!';
+        const msg = language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!';
         alert(msg);
         return;
     }
     if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
             const originalText = copyBtn.textContent;
-            const copiedText = language === "fa" ? '✅ کپی شد!' : '✅ Copied!';
+            const copiedText = language === 'fa' ? '✅ کپی شد!' : '✅ Copied!';
             copyBtn.textContent = copiedText;
             setTimeout(() => {
                 copyBtn.textContent = originalText;
@@ -1772,10 +1833,10 @@ function fallbackCopy(text) {
     textarea.select();
     try {
         document.execCommand('copy');
-        const msg = language === "fa" ? 'کد کپی شد!' : 'Code copied!';
+        const msg = language === 'fa' ? 'کد کپی شد!' : 'Code copied!';
         alert(msg);
     } catch(e) {
-        const msg = language === "fa" ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ';
+        const msg = language === 'fa' ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ';
         alert(msg + text);
     }
     document.body.removeChild(textarea);
@@ -1790,9 +1851,10 @@ updateUI();
 resetFox();
 menuButton.style.display = "block";
 
-// فقط پس‌زمینه رو رسم کن (بدون fox و تخم‌ها)
-ctx.fillStyle = "#87ceeb";
+// Draw initial autumn background
+ctx.fillStyle = "#f7d9b3";
 ctx.fillRect(0, 0, W, H);
+drawBackground();
 
 showReferralDataFromCache();
 
