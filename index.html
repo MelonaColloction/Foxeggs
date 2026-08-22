@@ -620,9 +620,14 @@ button:active{
     border:2px solid #ffd54f;
 }
 
-#magnetIndicator {
-    background:rgba(206,147,216,0.4);
-    border:2px solid #ce93d8;
+#goldenEggIndicator {
+    background:rgba(251,191,36,0.4);
+    border:2px solid #fbbf24;
+}
+
+#doubleScoreIndicator {
+    background:rgba(244,114,182,0.4);
+    border:2px solid #f472b6;
 }
 
 /* ===== Skin Shop - New Design ===== */
@@ -721,7 +726,8 @@ button:active{
 <div id="powerupStatus">
     <div id="shieldIndicator" class="indicator">🛡️ SHIELD</div>
     <div id="speedIndicator" class="indicator">⚡ SPEED</div>
-    <div id="magnetIndicator" class="indicator">🧲 MAGNET</div>
+    <div id="goldenEggIndicator" class="indicator">💫 GOLDEN</div>
+    <div id="doubleScoreIndicator" class="indicator">⭐ 2x SCORE</div>
 </div>
 
 <button id="menuButton">☰</button>
@@ -777,6 +783,25 @@ button:active{
         </p>
         <p class="sub-desc" id="rewardSubDesc">
             🔑 امتیازهای مینی‌اپ تلگرام و اپ بعداً یکی میشوند.
+        </p>
+    </div>
+
+    <!-- ===== بخش ربات تلگرام - فقط در موبایل نمایش داده میشه ===== -->
+    <div class="menuItem" id="telegramSection" style="background:rgba(0,136,204,0.08);border:1px solid rgba(0,136,204,0.2);display:none;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+            <span style="font-size:20px;">🤖</span>
+            <span style="font-weight:bold;color:#4fc3f7;" id="telegramTitle">بازی در تلگرام</span>
+        </div>
+        <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;" id="telegramDesc">
+            نسخه مینی‌اپ تلگرام رو امتحان کن!
+        </p>
+        <a href="https://t.me/Foxeggs_bot" target="_blank" 
+           style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:linear-gradient(135deg,#0088cc,#005f8a);color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;transition:transform 0.2s;border:1px solid rgba(255,255,255,0.1);">
+            📱 <span id="telegramLinkText">باز کردن ربات</span>
+            <span style="font-size:14px;">↗️</span>
+        </a>
+        <p style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:6px;" id="telegramHint">
+            برای استفاده از مینی‌اپ حتماً تلگرام نصب باشه
         </p>
     </div>
 
@@ -1883,6 +1908,12 @@ function updateThemeUI() {
 
 let language = localStorage.getItem("foxLanguage") || "en";
 
+function isMobileDevice() {
+    if (window.Telegram && window.Telegram.WebApp) return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+           || window.innerWidth < 768;
+}
+
 function applyLanguage(){
     const fa = language === "fa";
     document.documentElement.lang = fa ? "fa" : "en";
@@ -1899,6 +1930,24 @@ function applyLanguage(){
     document.getElementById("referralCodeLabel").textContent = fa ? "کد دعوت من" : "My Invite Code";
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
     document.getElementById("skinShopTitle").textContent = fa ? "🎨 پوست روباه" : "🎨 Fox Skins";
+    
+    // بخش تلگرام
+    document.getElementById("telegramTitle").textContent = fa ? "بازی در تلگرام" : "Play on Telegram";
+    document.getElementById("telegramDesc").textContent = fa ? 
+        "نسخه مینی‌اپ تلگرام رو امتحان کن!" : 
+        "Try the Telegram mini-app version!";
+    document.getElementById("telegramLinkText").textContent = fa ? "باز کردن ربات" : "Open Bot";
+    document.getElementById("telegramHint").textContent = fa ? 
+        "برای استفاده از مینی‌اپ حتماً تلگرام نصب باشه" : 
+        "Telegram app required to open mini-app";
+    
+    // نمایش یا مخفی کردن لینک ربات
+    const telegramSection = document.getElementById('telegramSection');
+    if (isMobileDevice()) {
+        telegramSection.style.display = 'block';
+    } else {
+        telegramSection.style.display = 'none';
+    }
     
     document.getElementById("rewardTitle").textContent = fa ? "💰 سیستم جوایز" : "💰 Reward System";
     document.getElementById("rewardDesc").innerHTML = fa ? 
@@ -1983,10 +2032,13 @@ let shieldActive = false;
 let shieldHits = 0;
 let speedBoostActive = false;
 let speedBoostTimer = 0;
-let magnetActive = false;
-let magnetTimer = 0;
+let goldenEggActive = false;
+let goldenEggTimer = 0;
+let doubleScoreActive = false;
+let doubleScoreTimer = 0;
 let powerupTimer = 0;
 let gameTime = 0;
+let shieldTimeout = null;
 
 const POWERUP_CONFIG = {
     shield: { 
@@ -2005,14 +2057,20 @@ const POWERUP_CONFIG = {
         startTime: 10,
         speedMultiplier: 1.5
     },
-    magnet: { 
-        duration: 15,
-        color: '#ce93d8', 
-        icon: '🧲', 
+    goldenEgg: { 
+        duration: 10,
+        color: '#fbbf24', 
+        icon: '💫', 
+        spawnRate: 0.02,
+        startTime: 10
+    },
+    doubleScore: { 
+        duration: 12,
+        color: '#f472b6', 
+        icon: '⭐', 
         spawnRate: 0.02,
         startTime: 10,
-        range: 300,
-        force: 800
+        multiplier: 2
     }
 };
 
@@ -2101,10 +2159,17 @@ function createEgg(){
     const eggColors = getEggColors();
     let r = Math.random();
     let type = 0;
-    if(r > .55) type = 1;
-    if(r > .78) type = 2;
-    if(r > .91) type = 3;
-    if(r > .98) type = 4;
+    
+    // اگر تخم طلایی فعاله، همه تخم‌ها طلایی میشن
+    if (goldenEggActive) {
+        type = 4;
+    } else {
+        if(r > .55) type = 1;
+        if(r > .78) type = 2;
+        if(r > .91) type = 3;
+        if(r > .98) type = 4;
+    }
+    
     const data = eggColors[type];
     eggs.push({
         x:W + 30,
@@ -2147,16 +2212,16 @@ function createPowerup(type) {
     });
 }
 
+// ===== POWERUP SPAWN - 90% شانس =====
 function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
     
     const chance = Math.random() * 100;
-    const roll = 20; // دقیقاً ۲۰٪
-    // برای تنوع: const roll = 18 + Math.random() * 4; // ۱۸-۲۲٪
+    const roll = 90;
     
     if (chance < roll) {
-        const types = ['shield', 'speed', 'magnet'];
+        const types = ['shield', 'speed', 'goldenEgg', 'doubleScore'];
         const type = types[Math.floor(Math.random() * types.length)];
         createPowerup(type);
     }
@@ -2588,19 +2653,6 @@ function update(dt){
         eggTimer = .55 + Math.random() * .4;
     }
     
-    if (magnetActive) {
-        eggs.forEach(e => {
-            const dx = (fox.x + fox.w/2) - (e.x + e.w/2);
-            const dy = (fox.y + fox.h/2) - (e.y + e.h/2);
-            const dist = Math.sqrt(dx*dx + dy*dy);
-            if (dist < 300 && dist > 10) {
-                const force = 800 / (dist + 50);
-                e.x += (dx / dist) * force * dt;
-                e.y += (dy / dist) * force * dt;
-            }
-        });
-    }
-    
     for(let i = eggs.length - 1; i >= 0; i--){
         const e = eggs[i];
         e.x -= speed * dt;
@@ -2639,7 +2691,7 @@ function update(dt){
     powerupTimer -= dt;
     if (powerupTimer <= 0) {
         trySpawnPowerup();
-        powerupTimer = 3 + Math.random() * 4;
+        powerupTimer = 2 + Math.random() * 3;
     }
     
     for(let i = powerups.length - 1; i >= 0; i--){
@@ -2653,19 +2705,38 @@ function update(dt){
         if(p.x < -60) powerups.splice(i, 1);
     }
     
+    // ===== تایمرهای پاورآپ =====
     if (speedBoostActive) {
         speedBoostTimer -= dt;
-        if (speedBoostTimer <= 0) speedBoostActive = false;
+        if (speedBoostTimer <= 0) {
+            speedBoostActive = false;
+            speedBoostTimer = 0;
+            showToast(language === 'fa' ? '⚡ سرعت تمام شد!' : '⚡ Speed ended!');
+        }
     }
-    
-    if (magnetActive) {
-        magnetTimer -= dt;
-        if (magnetTimer <= 0) magnetActive = false;
+
+    if (goldenEggActive) {
+        goldenEggTimer -= dt;
+        if (goldenEggTimer <= 0) {
+            goldenEggActive = false;
+            goldenEggTimer = 0;
+            showToast(language === 'fa' ? '💫 تخم‌های طلایی تمام شد!' : '💫 Golden eggs ended!');
+        }
+    }
+
+    if (doubleScoreActive) {
+        doubleScoreTimer -= dt;
+        if (doubleScoreTimer <= 0) {
+            doubleScoreActive = false;
+            doubleScoreTimer = 0;
+            showToast(language === 'fa' ? '⭐ دوبرابر کننده تمام شد!' : '⭐ Double score ended!');
+        }
     }
 
     document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
     document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
-    document.getElementById('magnetIndicator').style.display = magnetActive ? 'block' : 'none';
+    document.getElementById('goldenEggIndicator').style.display = goldenEggActive ? 'block' : 'none';
+    document.getElementById('doubleScoreIndicator').style.display = doubleScoreActive ? 'block' : 'none';
 
     if(combo > 0){
         comboTimer -= dt;
@@ -2690,21 +2761,36 @@ function applyPowerup(type) {
             for(let i=0; i<15; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 'sparkle');
             }
+            if (shieldTimeout) clearTimeout(shieldTimeout);
+            shieldTimeout = setTimeout(() => {
+                shieldActive = false;
+                shieldHits = 0;
+                document.getElementById('shieldIndicator').style.display = 'none';
+                showToast(fa ? '🛡️ سپر تمام شد!' : '🛡️ Shield ended!');
+            }, 15000);
             break;
         case 'speed':
             speedBoostActive = true;
-            speedBoostTimer = POWERUP_CONFIG.speed.duration;
+            speedBoostTimer = 15;
             msg = fa ? '⚡ افزایش سرعت!' : '⚡ Speed boost!';
             for(let i=0; i<15; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 'sparkle');
             }
             break;
-        case 'magnet':
-            magnetActive = true;
-            magnetTimer = POWERUP_CONFIG.magnet.duration;
-            msg = fa ? '🧲 آهن‌ربا فعال شد!' : '🧲 Magnet activated!';
+        case 'goldenEgg':
+            goldenEggActive = true;
+            goldenEggTimer = 10;
+            msg = fa ? '💫 تخم‌های طلایی!' : '💫 Golden eggs!';
             for(let i=0; i<15; i++) {
-                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ce93d8', 'sparkle');
+                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#fbbf24', 'sparkle');
+            }
+            break;
+        case 'doubleScore':
+            doubleScoreActive = true;
+            doubleScoreTimer = 12;
+            msg = fa ? '⭐ امتیازها ۲ برابر!' : '⭐ Double score!';
+            for(let i=0; i<15; i++) {
+                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#f472b6', 'sparkle');
             }
             break;
     }
@@ -2717,7 +2803,14 @@ function collectEgg(e){
     let multiplier = 1;
     if(combo >= 10) multiplier = 3;
     else if(combo >= 5) multiplier = 2;
-    const earned = e.value * multiplier;
+    
+    let earned = e.value * multiplier;
+    
+    // اگر دوبرابر کننده فعاله
+    if (doubleScoreActive) {
+        earned = earned * 2;
+    }
+    
     score += earned;
     totalEggs += 1;
     totalScore += earned;
@@ -2725,9 +2818,22 @@ function collectEgg(e){
     updateSpeed();
     updateDayNight();
     updateUI();
+    
     if(combo >= 2){
         comboBox.classList.add("show");
         comboValue.textContent = combo;
+    }
+    
+    // افکت‌ها
+    if (doubleScoreActive) {
+        for (let i = 0; i < 8; i++) {
+            createParticle(e.x + e.w/2, e.y + e.h/2, '#f472b6', 'sparkle');
+        }
+    }
+    if (goldenEggActive) {
+        for (let i = 0; i < 8; i++) {
+            createParticle(e.x + e.w/2, e.y + e.h/2, '#fbbf24', 'sparkle');
+        }
     }
     
     const skin = getSkin(currentSkinId);
@@ -2787,16 +2893,23 @@ function startGame(){
     shieldHits = 0;
     speedBoostActive = false;
     speedBoostTimer = 0;
-    magnetActive = false;
-    magnetTimer = 0;
-    powerupTimer = 3;
+    goldenEggActive = false;
+    goldenEggTimer = 0;
+    doubleScoreActive = false;
+    doubleScoreTimer = 0;
+    powerupTimer = 2;
+    if (shieldTimeout) {
+        clearTimeout(shieldTimeout);
+        shieldTimeout = null;
+    }
     gamesPlayed++;
     saveWallet();
     updateUI();
     comboBox.classList.remove("show");
     document.getElementById('shieldIndicator').style.display = 'none';
     document.getElementById('speedIndicator').style.display = 'none';
-    document.getElementById('magnetIndicator').style.display = 'none';
+    document.getElementById('goldenEggIndicator').style.display = 'none';
+    document.getElementById('doubleScoreIndicator').style.display = 'none';
     resetFox();
     playing = true;
     menuButton.style.display = "none";
@@ -3027,4 +3140,4 @@ setTimeout(() => {
 </script>
 
 </body>
-    </html>
+            </html>
