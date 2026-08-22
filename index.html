@@ -585,6 +585,119 @@ button:active{
 #changeThemeBtn:active {
     transform:translateY(3px);
 }
+
+/* ===== Powerup Indicators ===== */
+#powerupStatus {
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:10px;
+    z-index:5;
+    pointer-events:none;
+}
+
+#powerupStatus .indicator {
+    display:none;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:14px;
+    color:white;
+    font-weight:bold;
+    text-shadow:0 1px 3px rgba(0,0,0,0.5);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+}
+
+#shieldIndicator {
+    background:rgba(79,195,247,0.4);
+    border:2px solid #4fc3f7;
+}
+
+#speedIndicator {
+    background:rgba(255,213,79,0.4);
+    border:2px solid #ffd54f;
+}
+
+#magnetIndicator {
+    background:rgba(206,147,216,0.4);
+    border:2px solid #ce93d8;
+}
+
+/* ===== Skin Shop - New Design ===== */
+#skinShopGrid .skin-option {
+    transition:all 0.2s ease;
+}
+
+#skinShopGrid .skin-option:hover:not(.locked) {
+    transform:scale(1.03);
+}
+
+#skinShopGrid .skin-option.active {
+    box-shadow:0 0 20px rgba(249,115,22,0.2);
+}
+
+#skinShopGrid .skin-option.locked {
+    opacity:0.5;
+    cursor:not-allowed;
+}
+
+.rarity-common { background:#6b7280; }
+.rarity-uncommon { background:#22c55e; }
+.rarity-rare { background:#3b82f6; }
+.rarity-epic { background:#8b5cf6; }
+.rarity-legendary { background:#f59e0b; }
+.rarity-mythic { background:#ef4444; }
+
+#skinCount {
+    font-size:12px;
+    color:#888;
+}
+
+#totalScoreDisplay {
+    color:#fbbf24;
+    font-weight:bold;
+    font-size:14px;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity:0; transform:translateY(20px); }
+    to { opacity:1; transform:translateY(0); }
+}
+
+@keyframes fadeOutDown {
+    from { opacity:1; transform:translateY(0); }
+    to { opacity:0; transform:translateY(20px); }
+}
+
+@keyframes pulse {
+    0%,100% { transform:scale(1); }
+    50% { transform:scale(1.05); }
+}
+
+.pulse {
+    animation:pulse 0.5s ease 2;
+}
+
+/* Toast message */
+#toast {
+    position:fixed;
+    bottom:80px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    color:white;
+    padding:12px 24px;
+    border-radius:12px;
+    font-size:14px;
+    z-index:200;
+    animation:fadeInUp 0.3s ease;
+    pointer-events:none;
+    text-align:center;
+    max-width:90%;
+}
 </style>
 </head>
 
@@ -603,6 +716,12 @@ button:active{
     <div id="combo">
         COMBO ×<span id="comboValue">2</span>
     </div>
+</div>
+
+<div id="powerupStatus">
+    <div id="shieldIndicator" class="indicator">🛡️ SHIELD</div>
+    <div id="speedIndicator" class="indicator">⚡ SPEED</div>
+    <div id="magnetIndicator" class="indicator">🧲 MAGNET</div>
 </div>
 
 <button id="menuButton">☰</button>
@@ -632,6 +751,19 @@ button:active{
         <button id="openThemeFromMenu" style="width:100%;font-size:14px;padding:10px;background:rgba(255,255,255,0.08);box-shadow:none;margin-top:6px;">
             🎨 <span id="currentThemeDisplay">Classic</span>
         </button>
+    </div>
+
+    <!-- ===== Fox Skin Shop - New Design ===== -->
+    <div class="menuItem" id="skinShop">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <span id="skinShopTitle" style="font-size:16px;font-weight:bold;">🎨 Fox Skins</span>
+            <span id="skinCount" style="font-size:12px;color:#888;">0/10</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding:8px 12px;background:rgba(251,191,36,0.1);border-radius:8px;border:1px solid rgba(251,191,36,0.2);">
+            <span style="font-size:12px;color:#aaa;">💰 Total Score</span>
+            <span id="totalScoreDisplay" style="font-size:16px;font-weight:bold;color:#fbbf24;">0</span>
+        </div>
+        <div id="skinShopGrid"></div>
     </div>
 
     <!-- ===== بخش سیستم جوایز ===== -->
@@ -770,6 +902,8 @@ button:active{
         <button class="retry-btn" id="retryBtn">🔄 Retry</button>
     </div>
 </div>
+
+<div id="toast" style="display:none;"></div>
 
 <script>
 
@@ -1316,6 +1450,262 @@ let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
 
 /* =====================================================
+   FOX SKINS SYSTEM - NEW DESIGN
+===================================================== */
+
+const FOX_SKINS = [
+    { id: 'classic', name: 'Classic Fox', nameFa: 'روباه کلاسیک', color: '#f97316', price: 0, rarity: 'common', effect: null, glowColor: null, eyeColor: '#1a1a2a' },
+    { id: 'ember', name: 'Ember Fox', nameFa: 'روباه آتشین', color: '#ef4444', price: 250000, rarity: 'uncommon', effect: 'fire_trail', glowColor: '#ff6b35', eyeColor: '#fbbf24' },
+    { id: 'frost', name: 'Frost Fox', nameFa: 'روباه یخی', color: '#3b82f6', price: 500000, rarity: 'uncommon', effect: 'snow_particles', glowColor: '#93c5fd', eyeColor: '#ffffff' },
+    { id: 'shadow', name: 'Shadow Fox', nameFa: 'روباه شب', color: '#7c3aed', price: 1000000, rarity: 'rare', effect: 'glow_eyes', glowColor: '#4ade80', eyeColor: '#4ade80' },
+    { id: 'golden', name: 'Golden Fox', nameFa: 'روباه طلایی', color: '#fbbf24', price: 1750000, rarity: 'rare', effect: 'sparkles', glowColor: '#fcd34d', eyeColor: '#b45309' },
+    { id: 'neon', name: 'Neon Fox', nameFa: 'روباه نئونی', color: '#ec4899', price: 2500000, rarity: 'epic', effect: 'neon_glow', glowColor: '#f472b6', eyeColor: '#3b82f6' },
+    { id: 'crystal', name: 'Crystal Fox', nameFa: 'روباه کریستالی', color: '#8b5cf6', price: 4000000, rarity: 'epic', effect: 'crystal_shine', glowColor: '#a78bfa', eyeColor: '#c4b5d4' },
+    { id: 'galaxy', name: 'Galaxy Fox', nameFa: 'روباه کهکشانی', color: '#1e1b4b', price: 7500000, rarity: 'legendary', effect: 'galaxy_stars', glowColor: '#818cf8', eyeColor: '#c7d2fe' },
+    { id: 'rainbow', name: 'Rainbow Fox', nameFa: 'روباه رنگین‌کمان', color: 'rainbow', price: 12500000, rarity: 'legendary', effect: 'rainbow_shift', glowColor: null, eyeColor: '#ffffff' },
+    { id: 'phoenix', name: 'Phoenix Fox', nameFa: 'روباه ققنوس', color: '#dc2626', price: 25000000, rarity: 'mythic', effect: 'phoenix_flames', glowColor: '#f97316', eyeColor: '#fcd34d' }
+];
+
+let currentSkinId = localStorage.getItem('foxSkin') || 'classic';
+let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins') || '["classic"]');
+
+function getSkin(id) {
+    return FOX_SKINS.find(s => s.id === id) || FOX_SKINS[0];
+}
+
+function isSkinOwned(id) {
+    return purchasedSkins.includes(id);
+}
+
+function isSkinActive(id) {
+    return currentSkinId === id;
+}
+
+function getRarityLabel(rarity) {
+    const labels = {
+        'common': { fa: 'معمولی', en: 'Common' },
+        'uncommon': { fa: 'نادر', en: 'Uncommon' },
+        'rare': { fa: 'کمیاب', en: 'Rare' },
+        'epic': { fa: 'حماسی', en: 'Epic' },
+        'legendary': { fa: 'افسانه‌ای', en: 'Legendary' },
+        'mythic': { fa: 'اسطوره‌ای', en: 'Mythic' }
+    };
+    return labels[rarity] ? (language === 'fa' ? labels[rarity].fa : labels[rarity].en) : rarity;
+}
+
+function getRarityClass(rarity) {
+    return 'rarity-' + rarity;
+}
+
+function getEffect(effect) {
+    const effects = {
+        'fire_trail': 'Fire Trail',
+        'snow_particles': 'Snow Particles',
+        'glow_eyes': 'Glowing Eyes',
+        'sparkles': 'Sparkles',
+        'neon_glow': 'Neon Glow',
+        'crystal_shine': 'Crystal Shine',
+        'galaxy_stars': 'Galaxy Stars',
+        'rainbow_shift': 'Rainbow Shift',
+        'phoenix_flames': 'Phoenix Flames'
+    };
+    return effects[effect] || '';
+}
+
+function getEffectFa(effect) {
+    const effects = {
+        'fire_trail': 'رد آتش',
+        'snow_particles': 'ذرات برف',
+        'glow_eyes': 'چشم‌های درخشان',
+        'sparkles': 'جرقه‌های طلایی',
+        'neon_glow': 'درخشش نئون',
+        'crystal_shine': 'خطوط کریستال',
+        'galaxy_stars': 'ستاره‌های کهکشان',
+        'rainbow_shift': 'تغییر رنگ مداوم',
+        'phoenix_flames': 'پرهای آتشین'
+    };
+    return effects[effect] || '';
+}
+
+function renderSkinShop() {
+    const grid = document.getElementById('skinShopGrid');
+    if (!grid) return;
+    
+    const fa = language === 'fa';
+    const ownedCount = purchasedSkins.length;
+    document.getElementById('skinCount').textContent = ownedCount + '/' + FOX_SKINS.length;
+    document.getElementById('totalScoreDisplay').textContent = totalScore.toLocaleString();
+    
+    const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
+    const rarityLabels = {
+        common: { fa: '⚪ معمولی', en: '⚪ Common', color: '#6b7280' },
+        uncommon: { fa: '🟢 نادر', en: '🟢 Uncommon', color: '#22c55e' },
+        rare: { fa: '🔵 کمیاب', en: '🔵 Rare', color: '#3b82f6' },
+        epic: { fa: '🟣 حماسی', en: '🟣 Epic', color: '#8b5cf6' },
+        legendary: { fa: '🟠 افسانه‌ای', en: '🟠 Legendary', color: '#f59e0b' },
+        mythic: { fa: '🔴 اسطوره‌ای', en: '🔴 Mythic', color: '#ef4444' }
+    };
+    
+    let html = '';
+    
+    rarityOrder.forEach(rarity => {
+        const skinsInRarity = FOX_SKINS.filter(s => s.rarity === rarity);
+        if (skinsInRarity.length === 0) return;
+        
+        const label = fa ? rarityLabels[rarity].fa : rarityLabels[rarity].en;
+        const color = rarityLabels[rarity].color;
+        
+        html += `<div style="margin-top:12px;margin-bottom:6px;">`;
+        html += `<div style="font-size:11px;font-weight:bold;color:${color};letter-spacing:0.5px;border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:4px;">${label}</div>`;
+        html += `<div style="display:grid;grid-template-columns:repeat(${skinsInRarity.length === 1 ? 1 : 2},1fr);gap:6px;margin-top:6px;">`;
+        
+        skinsInRarity.forEach(skin => {
+            const owned = isSkinOwned(skin.id);
+            const active = isSkinActive(skin.id);
+            const canBuy = totalScore >= skin.price && !owned;
+            const isFree = skin.price === 0;
+            
+            const colorStyle = skin.id === 'rainbow' 
+                ? 'linear-gradient(45deg,red,orange,yellow,green,blue,indigo,violet)' 
+                : skin.color;
+            
+            let statusText = '';
+            let statusColor = '';
+            let bgColor = 'rgba(255,255,255,0.03)';
+            let borderColor = 'rgba(255,255,255,0.06)';
+            
+            if (active) {
+                statusText = fa ? '✓ فعال' : '✓ Active';
+                statusColor = '#4ade80';
+                bgColor = 'rgba(74,222,128,0.1)';
+                borderColor = '#4ade80';
+            } else if (owned) {
+                statusText = fa ? '✅ خریداری شده' : '✅ Owned';
+                statusColor = '#60a5fa';
+                bgColor = 'rgba(96,165,250,0.08)';
+                borderColor = 'rgba(96,165,250,0.3)';
+            } else if (isFree) {
+                statusText = fa ? 'رایگان' : 'Free';
+                statusColor = '#fbbf24';
+            } else if (canBuy) {
+                statusText = '💰 ' + skin.price.toLocaleString();
+                statusColor = '#fbbf24';
+            } else {
+                statusText = '🔒 ' + skin.price.toLocaleString();
+                statusColor = '#ef4444';
+                bgColor = 'rgba(239,68,68,0.05)';
+            }
+            
+            const rarityLabel = fa ? getRarityLabel(skin.rarity) : getRarityLabel(skin.rarity);
+            const effectLabel = fa ? getEffectFa(skin.effect) : getEffect(skin.effect);
+            
+            html += `
+                <div class="skin-option ${active ? 'active' : ''} ${owned ? 'owned' : ''} ${!owned && !canBuy && !isFree ? 'locked' : ''}" 
+                     data-skin="${skin.id}"
+                     style="background:${bgColor};border:2px solid ${borderColor};border-radius:10px;padding:8px;text-align:center;cursor:${(owned || canBuy || isFree) ? 'pointer' : 'not-allowed'};transition:all 0.2s;position:relative;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <span style="font-size:10px;color:${statusColor};">${statusText}</span>
+                        <span style="font-size:8px;color:rgba(255,255,255,0.2);">${rarityLabel}</span>
+                    </div>
+                    <div style="width:36px;height:36px;border-radius:50%;margin:0 auto 4px;background:${colorStyle};border:2px solid rgba(255,255,255,0.1);box-shadow:${active ? '0 0 15px rgba(249,115,22,0.3)' : 'none'};"></div>
+                    <div style="font-size:11px;font-weight:bold;color:white;">${fa ? skin.nameFa : skin.name}</div>
+                    ${effectLabel ? `<div style="font-size:8px;color:rgba(255,255,255,0.3);">${effectLabel}</div>` : '<div style="font-size:8px;color:rgba(255,255,255,0.15);">—</div>'}
+                    ${active ? '<div style="position:absolute;top:-4px;right:-4px;font-size:12px;">⭐</div>' : ''}
+                </div>
+            `;
+        });
+        
+        html += `</div></div>`;
+    });
+    
+    grid.innerHTML = html;
+    
+    document.querySelectorAll('.skin-option').forEach(el => {
+        el.addEventListener('click', function() {
+            const skinId = this.dataset.skin;
+            if (!this.classList.contains('locked')) {
+                handleSkinClick(skinId);
+            } else {
+                const fa = language === 'fa';
+                showToast(fa ? '❌ امتیاز کافی نیست!' : '❌ Not enough points!');
+            }
+        });
+    });
+}
+
+function handleSkinClick(skinId) {
+    const skin = getSkin(skinId);
+    if (!skin) return;
+    
+    const owned = isSkinOwned(skinId);
+    const fa = language === 'fa';
+    
+    if (owned) {
+        currentSkinId = skinId;
+        localStorage.setItem('foxSkin', skinId);
+        renderSkinShop();
+        updateUI();
+        if (!playing) {
+            drawBackground();
+            drawFox();
+        }
+        showToast((fa ? '✅ رنگ ' : '✅ Skin ') + (fa ? skin.nameFa : skin.name) + (fa ? ' انتخاب شد!' : ' selected!'));
+        return;
+    }
+    
+    if (skin.price === 0) {
+        purchasedSkins.push(skinId);
+        localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
+        currentSkinId = skinId;
+        localStorage.setItem('foxSkin', skinId);
+        renderSkinShop();
+        updateUI();
+        if (!playing) {
+            drawBackground();
+            drawFox();
+        }
+        showToast((fa ? '✅ رنگ ' : '✅ Skin ') + (fa ? skin.nameFa : skin.name) + (fa ? ' فعال شد!' : ' activated!'));
+        return;
+    }
+    
+    if (totalScore >= skin.price) {
+        if (confirm((fa ? 'آیا مطمئنی می‌خوای رنگ "' : 'Buy skin "') + (fa ? skin.nameFa : skin.name) + '" ' + (fa ? 'را به قیمت ' : 'for ') + skin.price.toLocaleString() + (fa ? ' امتیاز بخری؟' : ' points?'))) {
+            totalScore -= skin.price;
+            purchasedSkins.push(skinId);
+            localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
+            currentSkinId = skinId;
+            localStorage.setItem('foxSkin', skinId);
+            saveWallet();
+            renderSkinShop();
+            updateUI();
+            if (!playing) {
+                drawBackground();
+                drawFox();
+            }
+            showToast((fa ? '✅ رنگ "' : '✅ Skin "') + (fa ? skin.nameFa : skin.name) + '" ' + (fa ? 'خریداری شد!' : 'purchased!'));
+        }
+    } else {
+        showToast((fa ? '❌ امتیاز کافی نیست! نیاز به ' : '❌ Not enough points! Need ') + skin.price.toLocaleString() + (fa ? ' امتیاز' : ' points'));
+    }
+}
+
+function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.style.display = 'block';
+    toast.className = '';
+    void toast.offsetWidth;
+    toast.style.animation = 'fadeInUp 0.3s ease';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => {
+        toast.style.animation = 'fadeOutDown 0.3s ease';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 300);
+    }, 2500);
+}
+
+/* =====================================================
    THEME SYSTEM
 ===================================================== */
 
@@ -1508,6 +1898,7 @@ function applyLanguage(){
     document.getElementById("walletScoreLabel").textContent = fa ? "امتیاز کل" : "Total Score";
     document.getElementById("referralCodeLabel").textContent = fa ? "کد دعوت من" : "My Invite Code";
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
+    document.getElementById("skinShopTitle").textContent = fa ? "🎨 پوست روباه" : "🎨 Fox Skins";
     
     document.getElementById("rewardTitle").textContent = fa ? "💰 سیستم جوایز" : "💰 Reward System";
     document.getElementById("rewardDesc").innerHTML = fa ? 
@@ -1532,6 +1923,7 @@ function applyLanguage(){
     updateSoundButtons();
     updateUI();
     updateThemeUI();
+    renderSkinShop();
 }
 
 function setLanguage(lang){
@@ -1585,14 +1977,97 @@ let comboTimer = 0;
 let eggs = [];
 let obstacles = [];
 
+// ===== POWERUP SYSTEM =====
+let powerups = [];
+let shieldActive = false;
+let shieldHits = 0;
+let speedBoostActive = false;
+let speedBoostTimer = 0;
+let magnetActive = false;
+let magnetTimer = 0;
+let powerupTimer = 0;
+let gameTime = 0;
+
+const POWERUP_CONFIG = {
+    shield: { 
+        duration: 15,
+        color: '#4fc3f7', 
+        icon: '🛡️', 
+        spawnRate: 0.02,
+        startTime: 10,
+        maxHits: 1
+    },
+    speed: { 
+        duration: 15,
+        color: '#ffd54f', 
+        icon: '⚡', 
+        spawnRate: 0.02,
+        startTime: 10,
+        speedMultiplier: 1.5
+    },
+    magnet: { 
+        duration: 15,
+        color: '#ce93d8', 
+        icon: '🧲', 
+        spawnRate: 0.02,
+        startTime: 10,
+        range: 300,
+        force: 800
+    }
+};
+
+// ===== TRAIL SYSTEM =====
+let trailPositions = [];
+let particles = [];
+
+function createParticle(x, y, color, type = 'sparkle') {
+    particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 200,
+        vy: (Math.random() - 0.5) * 200 - 50,
+        life: 1,
+        maxLife: 0.5 + Math.random() * 0.5,
+        size: 3 + Math.random() * 5,
+        color: color,
+        type: type
+    });
+}
+
+function updateParticles(dt) {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        p.vy += 100 * dt;
+        p.life -= dt / p.maxLife;
+        if (p.life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
+function drawParticles() {
+    particles.forEach(p => {
+        ctx.globalAlpha = p.life * 0.8;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    ctx.globalAlpha = 1;
+}
+
 function updateSpeed(){
+    let baseSpeed = 330;
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
-        speed = 330 + 870 * smooth;
+        baseSpeed = 330 + 870 * smooth;
     }else{
-        speed = 1200 + (score - 600) * .12;
+        baseSpeed = 1200 + (score - 600) * .12;
     }
+    speed = speedBoostActive ? baseSpeed * 1.5 : baseSpeed;
 }
 
 let isNight = false;
@@ -1657,6 +2132,36 @@ function createObstacle(){
     });
 }
 
+function createPowerup(type) {
+    const config = POWERUP_CONFIG[type];
+    if (!config) return;
+    powerups.push({
+        x: W + 30,
+        y: ground() - 80 - Math.random() * 100,
+        w: 30,
+        h: 30,
+        type: type,
+        color: config.color,
+        icon: config.icon,
+        pulse: Math.random() * Math.PI * 2
+    });
+}
+
+function trySpawnPowerup() {
+    gameTime += 0.1;
+    if (gameTime < 10) return;
+    
+    const chance = Math.random() * 100;
+    const roll = 20; // دقیقاً ۲۰٪
+    // برای تنوع: const roll = 18 + Math.random() * 4; // ۱۸-۲۲٪
+    
+    if (chance < roll) {
+        const types = ['shield', 'speed', 'magnet'];
+        const type = types[Math.floor(Math.random() * types.length)];
+        createPowerup(type);
+    }
+}
+
 function collision(a,b){
     return(
         a.x + 8 < b.x + b.w &&
@@ -1680,7 +2185,6 @@ function drawBackground(){
     const colors = isNight ? theme.skyNight : theme.skyDay;
     const isSpace = theme.isSpace || false;
     
-    // Sky
     const gradient = ctx.createLinearGradient(0, 0, 0, gy);
     gradient.addColorStop(0, colors[0]);
     gradient.addColorStop(0.5, colors[1]);
@@ -1688,9 +2192,7 @@ function drawBackground(){
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, W, gy);
 
-    // Space theme special effects
     if(isSpace){
-        // Galaxy effect
         for(let i=0; i<30; i++){
             const x = (i * 137 + 53) % W;
             const y = (i * 97 + 31) % (gy * 0.7);
@@ -1700,7 +2202,6 @@ function drawBackground(){
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
         }
-        // Nebula clouds
         ctx.fillStyle = "rgba(150,100,200,0.05)";
         ctx.beginPath();
         ctx.ellipse(W*0.2, gy*0.3, 150, 80, 0.5, 0, Math.PI*2);
@@ -1711,13 +2212,11 @@ function drawBackground(){
         ctx.fill();
     }
 
-    // Sun/Moon
     if(isNight){
         ctx.fillStyle = isSpace ? "rgba(255,240,220,0.1)" : "rgba(255,240,220,0.15)";
         ctx.beginPath();
         ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
         ctx.fill();
-        // Stars
         const starColor = isSpace ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
         ctx.fillStyle = starColor;
         for(let i=0; i< (isSpace ? 40 : 20); i++){
@@ -1728,7 +2227,6 @@ function drawBackground(){
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
         }
-        // Twinkling stars (space)
         if(isSpace){
             const t = Date.now() / 1000;
             for(let i=0; i<8; i++){
@@ -1754,7 +2252,6 @@ function drawBackground(){
         }
     }
 
-    // Ground
     const groundColors = isNight ? theme.groundNight : theme.groundDay;
     const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
     groundGrad.addColorStop(0, groundColors[0]);
@@ -1763,11 +2260,9 @@ function drawBackground(){
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, gy, W, H - gy);
     
-    // Ground line
     ctx.fillStyle = isNight ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
     ctx.fillRect(0, gy, W, 3);
 
-    // Space theme craters
     if(isSpace){
         ctx.fillStyle = "rgba(0,0,0,0.08)";
         for(let i=0; i<5; i++){
@@ -1793,27 +2288,74 @@ function drawCloud(x,y,s){
     ctx.fill();
 }
 
+function drawPowerup(p) {
+    const cx = p.x + p.w/2;
+    const cy = p.y + p.h/2;
+    p.pulse += 0.05;
+    const scale = 1 + Math.sin(p.pulse) * 0.08;
+    
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = p.color + '50';
+    
+    ctx.beginPath();
+    ctx.arc(cx, cy, 18 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + '30';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(cx, cy, 14 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    
+    ctx.shadowBlur = 0;
+    
+    ctx.font = '18px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'white';
+    ctx.fillText(p.icon, cx, cy + 1);
+}
+
 function drawFox(){
     const x = fox.x;
     const y = fox.y;
     const running = fox.grounded ? Math.sin(fox.animation) * 4 : 0;
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
+    const skin = getSkin(currentSkinId);
 
-    // Shadow
     ctx.fillStyle = isSpace ? "rgba(100,80,150,0.15)" : "rgba(0,0,0,.12)";
     ctx.beginPath();
     ctx.ellipse(x + 30, ground() + 3, 28, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    const foxColor = theme.foxColor;
-    
-    // Fox body
-    ctx.fillStyle = foxColor;
-    if(isSpace){
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "rgba(150,100,255,0.3)";
+    let foxColor = skin.color;
+    if (skin.id === 'rainbow') {
+        const hue = (Date.now() / 50) % 360;
+        foxColor = `hsl(${hue}, 80%, 60%)`;
     }
+    
+    if (skin.effect === 'neon_glow' || skin.effect === 'glow_eyes') {
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = skin.glowColor || foxColor;
+    }
+    
+    if (skin.effect === 'fire_trail' && playing) {
+        trailPositions.push({ x: x + 20, y: y + fox.h/2, life: 1 });
+        if (trailPositions.length > 20) trailPositions.shift();
+        
+        trailPositions.forEach((pos, i) => {
+            const alpha = pos.life * 0.3;
+            const size = 5 * pos.life;
+            ctx.fillStyle = `rgba(255, 107, 53, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+            ctx.fill();
+            pos.life -= 0.03;
+        });
+    }
+    
+    ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.moveTo(x + 15, y + 28);
     ctx.quadraticCurveTo(x - 22, y + 5 + running, x - 10, y - 10 + running);
@@ -1879,24 +2421,30 @@ function drawFox(){
     ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyes - neon for space
-    ctx.fillStyle = isSpace ? "#00ff88" : "#1a1a2a";
-    if(isSpace){
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = "rgba(0,255,136,0.3)";
-    }
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = skin.eyeColor || "#1a1a2a";
     ctx.beginPath();
     ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
     ctx.fill();
     ctx.beginPath();
     ctx.arc(x + 58, y + 5, 3.5, 0, Math.PI * 2);
     ctx.fill();
-    ctx.shadowBlur = 0;
 
     ctx.fillStyle = isSpace ? "#ccffdd" : "#fff";
     ctx.beginPath();
     ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
     ctx.fill();
+    
+    if (skin.effect === 'crystal_shine') {
+        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+            ctx.beginPath();
+            ctx.moveTo(x + 10 + i*8, y + 10);
+            ctx.lineTo(x + 20 + i*8, y + 40);
+            ctx.stroke();
+        }
+    }
 }
 
 function drawEgg(e){
@@ -1933,7 +2481,6 @@ function drawObstacle(o){
     
     if(o.type === "tree"){
         if(isSpace){
-            // Space crystal tree
             ctx.fillStyle = "#4a2a6a";
             ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
             ctx.fillStyle = "#6a3a8a";
@@ -1967,7 +2514,6 @@ function drawObstacle(o){
         }
     }else if(o.type === "rock"){
         if(isSpace){
-            // Space meteor
             ctx.fillStyle = "#4a3a5a";
             ctx.shadowBlur = 10;
             ctx.shadowColor = "rgba(150,100,255,0.15)";
@@ -1997,7 +2543,6 @@ function drawObstacle(o){
         }
     }else{
         if(isSpace){
-            // Space alien plant
             ctx.fillStyle = "#3a7a5a";
             ctx.shadowBlur = 10;
             ctx.shadowColor = "rgba(100,200,150,0.15)";
@@ -2023,6 +2568,7 @@ function drawObstacle(o){
 }
 
 function update(dt){
+    gameTime += dt;
     updateSpeed();
 
     fox.vy += fox.gravity * dt;
@@ -2041,6 +2587,20 @@ function update(dt){
         createEgg();
         eggTimer = .55 + Math.random() * .4;
     }
+    
+    if (magnetActive) {
+        eggs.forEach(e => {
+            const dx = (fox.x + fox.w/2) - (e.x + e.w/2);
+            const dy = (fox.y + fox.h/2) - (e.y + e.h/2);
+            const dist = Math.sqrt(dx*dx + dy*dy);
+            if (dist < 300 && dist > 10) {
+                const force = 800 / (dist + 50);
+                e.x += (dx / dist) * force * dt;
+                e.y += (dy / dist) * force * dt;
+            }
+        });
+    }
+    
     for(let i = eggs.length - 1; i >= 0; i--){
         const e = eggs[i];
         e.x -= speed * dt;
@@ -2061,11 +2621,51 @@ function update(dt){
         const o = obstacles[i];
         o.x -= speed * dt;
         if(collision(fox,o)){
+            if(shieldActive && shieldHits > 0) {
+                shieldHits--;
+                if(shieldHits === 0) shieldActive = false;
+                obstacles.splice(i, 1);
+                for(let j=0; j<10; j++) {
+                    createParticle(o.x + o.w/2, o.y + o.h/2, '#4fc3f7', 'sparkle');
+                }
+                continue;
+            }
             endGame();
             return;
         }
         if(o.x < -80) obstacles.splice(i, 1);
     }
+
+    powerupTimer -= dt;
+    if (powerupTimer <= 0) {
+        trySpawnPowerup();
+        powerupTimer = 3 + Math.random() * 4;
+    }
+    
+    for(let i = powerups.length - 1; i >= 0; i--){
+        const p = powerups[i];
+        p.x -= speed * dt;
+        if(collision(fox, p)){
+            applyPowerup(p.type);
+            powerups.splice(i, 1);
+            continue;
+        }
+        if(p.x < -60) powerups.splice(i, 1);
+    }
+    
+    if (speedBoostActive) {
+        speedBoostTimer -= dt;
+        if (speedBoostTimer <= 0) speedBoostActive = false;
+    }
+    
+    if (magnetActive) {
+        magnetTimer -= dt;
+        if (magnetTimer <= 0) magnetActive = false;
+    }
+
+    document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
+    document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
+    document.getElementById('magnetIndicator').style.display = magnetActive ? 'block' : 'none';
 
     if(combo > 0){
         comboTimer -= dt;
@@ -2074,6 +2674,41 @@ function update(dt){
             comboBox.classList.remove("show");
         }
     }
+    
+    updateParticles(dt);
+}
+
+function applyPowerup(type) {
+    const fa = language === 'fa';
+    let msg = '';
+    
+    switch(type) {
+        case 'shield':
+            shieldActive = true;
+            shieldHits = 1;
+            msg = fa ? '🛡️ سپر فعال شد!' : '🛡️ Shield activated!';
+            for(let i=0; i<15; i++) {
+                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 'sparkle');
+            }
+            break;
+        case 'speed':
+            speedBoostActive = true;
+            speedBoostTimer = POWERUP_CONFIG.speed.duration;
+            msg = fa ? '⚡ افزایش سرعت!' : '⚡ Speed boost!';
+            for(let i=0; i<15; i++) {
+                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 'sparkle');
+            }
+            break;
+        case 'magnet':
+            magnetActive = true;
+            magnetTimer = POWERUP_CONFIG.magnet.duration;
+            msg = fa ? '🧲 آهن‌ربا فعال شد!' : '🧲 Magnet activated!';
+            for(let i=0; i<15; i++) {
+                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ce93d8', 'sparkle');
+            }
+            break;
+    }
+    showToast(msg);
 }
 
 function collectEgg(e){
@@ -2094,6 +2729,23 @@ function collectEgg(e){
         comboBox.classList.add("show");
         comboValue.textContent = combo;
     }
+    
+    const skin = getSkin(currentSkinId);
+    if (skin.effect === 'snow_particles') {
+        for (let i = 0; i < 8; i++) {
+            createParticle(e.x + e.w/2, e.y + e.h/2, '#93c5fd', 'snow');
+        }
+    }
+    if (skin.effect === 'sparkles') {
+        for (let i = 0; i < 12; i++) {
+            createParticle(e.x + e.w/2, e.y + e.h/2, '#fcd34d', 'sparkle');
+        }
+    }
+    if (skin.effect === 'galaxy_stars') {
+        for (let i = 0; i < 10; i++) {
+            createParticle(e.x + e.w/2, e.y + e.h/2, '#818cf8', 'sparkle');
+        }
+    }
 }
 
 function loop(time){
@@ -2110,6 +2762,8 @@ function draw(){
     drawBackground();
     for(const e of eggs) drawEgg(e);
     for(const o of obstacles) drawObstacle(o);
+    for(const p of powerups) drawPowerup(p);
+    drawParticles();
     drawFox();
 }
 
@@ -2123,12 +2777,26 @@ function startGame(){
     comboTimer = 0;
     eggs.length = 0;
     obstacles.length = 0;
+    powerups.length = 0;
+    particles.length = 0;
+    trailPositions.length = 0;
     lastDayCycle = -1;
     isNight = false;
+    gameTime = 0;
+    shieldActive = false;
+    shieldHits = 0;
+    speedBoostActive = false;
+    speedBoostTimer = 0;
+    magnetActive = false;
+    magnetTimer = 0;
+    powerupTimer = 3;
     gamesPlayed++;
     saveWallet();
     updateUI();
     comboBox.classList.remove("show");
+    document.getElementById('shieldIndicator').style.display = 'none';
+    document.getElementById('speedIndicator').style.display = 'none';
+    document.getElementById('magnetIndicator').style.display = 'none';
     resetFox();
     playing = true;
     menuButton.style.display = "none";
@@ -2175,7 +2843,6 @@ function closeThemeSelectorFn() {
     themeSelectorOverlay.style.display = 'none';
 }
 
-// Theme option click
 document.querySelectorAll('.theme-option').forEach(opt => {
     opt.addEventListener('click', function() {
         const themeId = this.dataset.theme;
@@ -2185,13 +2852,11 @@ document.querySelectorAll('.theme-option').forEach(opt => {
     });
 });
 
-// Close theme selector
 closeThemeSelector.addEventListener('click', closeThemeSelectorFn);
 themeSelectorOverlay.addEventListener('click', function(e) {
     if (e.target === this) closeThemeSelectorFn();
 });
 
-// Open from buttons
 changeThemeBtn.addEventListener('click', function(e) {
     e.stopPropagation();
     openThemeSelector();
@@ -2255,6 +2920,7 @@ menuButton.addEventListener("click", function(e){
     } else {
         menuPanel.style.display = "block";
         updateUI();
+        renderSkinShop();
         syncReferralsWithServer().then(() => {
             showReferralDataFromCache();
         });
@@ -2331,17 +2997,16 @@ updateUI();
 resetFox();
 menuButton.style.display = "block";
 
-// Set active theme
 const savedTheme = localStorage.getItem("foxTheme") || "classic";
 setTheme(savedTheme);
 
-// Draw initial background
 ctx.fillStyle = "#87CEEB";
 ctx.fillRect(0, 0, W, H);
 drawBackground();
 drawFox();
 
 showReferralDataFromCache();
+renderSkinShop();
 
 setTimeout(() => {
     if (navigator.onLine) {
@@ -2362,4 +3027,4 @@ setTimeout(() => {
 </script>
 
 </body>
-            </html>
+    </html>
