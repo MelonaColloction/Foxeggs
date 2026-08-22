@@ -1908,8 +1908,18 @@ function updateThemeUI() {
 
 let language = localStorage.getItem("foxLanguage") || "en";
 
-function isMobileDevice() {
-    if (window.Telegram && window.Telegram.WebApp) return false;
+function shouldShowTelegramButton() {
+    // ۱. اگر در تلگرام مینی‌اپ هستیم، لینک رو نشون نده
+    if (window.Telegram && window.Telegram.WebApp) {
+        return false;
+    }
+    
+    // ۲. اگر در اپلیکیشن هستیم، لینک رو نشون نده
+    if (/FoxEggsApp/i.test(navigator.userAgent) || localStorage.getItem('isApp') === 'true') {
+        return false;
+    }
+    
+    // ۳. اگر موبایل واقعی هست، لینک رو نشون بده
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
            || window.innerWidth < 768;
 }
@@ -1941,9 +1951,9 @@ function applyLanguage(){
         "برای استفاده از مینی‌اپ حتماً تلگرام نصب باشه" : 
         "Telegram app required to open mini-app";
     
-    // نمایش یا مخفی کردن لینک ربات
+    // ===== نمایش یا مخفی کردن لینک ربات با تشخیص دقیق =====
     const telegramSection = document.getElementById('telegramSection');
-    if (isMobileDevice()) {
+    if (shouldShowTelegramButton()) {
         telegramSection.style.display = 'block';
     } else {
         telegramSection.style.display = 'none';
@@ -3140,4 +3150,4 @@ setTimeout(() => {
 </script>
 
 </body>
-            </html>
+                </html>
