@@ -577,48 +577,6 @@ button:active{
     background:rgba(255,255,255,0.15);
 }
 
-.reward-info-box{
-    border: 2px solid rgba(251, 191, 36, 0.3);
-    background: rgba(251, 191, 36, 0.08);
-    border-radius: 12px;
-    padding: 14px;
-    margin: 10px 0;
-}
-
-.reward-info-box .header{
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 6px;
-}
-
-.reward-info-box .header .icon{
-    font-size: 22px;
-}
-
-.reward-info-box .header .title{
-    color: #fbbf24;
-    font-weight: 700;
-    font-size: 15px;
-}
-
-.reward-info-box .desc{
-    color: rgba(255,255,255,0.6);
-    font-size: 12px;
-    line-height: 1.6;
-}
-
-.reward-info-box .desc strong{
-    color: #fbbf24;
-}
-
-.reward-info-box .sub-desc{
-    color: rgba(255,255,255,0.4);
-    font-size: 11px;
-    line-height: 1.5;
-    margin-top: 6px;
-}
-
 #changeThemeBtn {
     background:rgba(255,255,255,0.12);
     box-shadow:none;
@@ -2011,14 +1969,17 @@ let trailPositions = [];
 let particles = [];
 
 function createParticle(x, y, color, type = 'sparkle') {
+    // محدودیت تعداد پارتکل‌ها برای جلوگیری از لگ
+    if (particles.length > 30) return;
+    
     particles.push({
         x: x,
         y: y,
-        vx: (Math.random() - 0.5) * 200,
-        vy: (Math.random() - 0.5) * 200 - 50,
+        vx: (Math.random() - 0.5) * 100,
+        vy: (Math.random() - 0.5) * 100 - 30,
         life: 1,
-        maxLife: 0.5 + Math.random() * 0.5,
-        size: 3 + Math.random() * 5,
+        maxLife: 0.3 + Math.random() * 0.3,
+        size: 2 + Math.random() * 3,
         color: color,
         type: type
     });
@@ -2029,7 +1990,7 @@ function updateParticles(dt) {
         const p = particles[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        p.vy += 100 * dt;
+        p.vy += 60 * dt;
         p.life -= dt / p.maxLife;
         if (p.life <= 0) {
             particles.splice(i, 1);
@@ -2038,13 +1999,13 @@ function updateParticles(dt) {
 }
 
 function drawParticles() {
-    particles.forEach(p => {
-        ctx.globalAlpha = p.life * 0.8;
+    for (const p of particles) {
+        ctx.globalAlpha = p.life * 0.7;
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
         ctx.fill();
-    });
+    }
     ctx.globalAlpha = 1;
 }
 
@@ -2190,11 +2151,12 @@ function drawBackground(){
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, W, gy);
 
+    // ستاره‌ها با تعداد کمتر برای عملکرد بهتر
     if(isSpace){
-        for(let i=0; i<30; i++){
+        for(let i=0; i<15; i++){
             const x = (i * 137 + 53) % W;
             const y = (i * 97 + 31) % (gy * 0.7);
-            const size = 2 + (i % 5);
+            const size = 1 + (i % 3);
             ctx.fillStyle = `rgba(200,180,255,${0.03 + (i % 3) * 0.02})`;
             ctx.beginPath();
             ctx.arc(x, y, size, 0, Math.PI * 2);
@@ -2217,23 +2179,23 @@ function drawBackground(){
         ctx.fill();
         const starColor = isSpace ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
         ctx.fillStyle = starColor;
-        for(let i=0; i< (isSpace ? 40 : 20); i++){
+        for(let i=0; i< (isSpace ? 20 : 10); i++){
             const x = (i * 47 + 13) % W;
             const y = 20 + (i * 37) % (gy * 0.5);
-            const size = isSpace ? 1 + (i%4) : 1 + (i%2);
+            const size = isSpace ? 1 + (i%3) : 1 + (i%2);
             ctx.beginPath();
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
         }
         if(isSpace){
             const t = Date.now() / 1000;
-            for(let i=0; i<8; i++){
+            for(let i=0; i<5; i++){
                 const x = (i * 73 + 17 + t * 5) % W;
                 const y = 30 + (i * 53 + 11 + t * 3) % (gy * 0.4);
                 const brightness = 0.3 + Math.sin(t * 2 + i) * 0.2;
                 ctx.fillStyle = `rgba(255,255,255,${brightness})`;
                 ctx.beginPath();
-                ctx.arc(x, y, 2 + (i%2), 0, Math.PI * 2);
+                ctx.arc(x, y, 1 + (i%2), 0, Math.PI * 2);
                 ctx.fill();
             }
         }
@@ -2263,7 +2225,7 @@ function drawBackground(){
 
     if(isSpace){
         ctx.fillStyle = "rgba(0,0,0,0.08)";
-        for(let i=0; i<5; i++){
+        for(let i=0; i<3; i++){
             const x = (i * 87 + 23) % W;
             const y = gy + 20 + (i * 43) % (H - gy - 30);
             ctx.beginPath();
@@ -2292,9 +2254,6 @@ function drawPowerup(p) {
     p.pulse += 0.05;
     const scale = 1 + Math.sin(p.pulse) * 0.08;
     
-    ctx.shadowBlur = 25;
-    ctx.shadowColor = p.color + '50';
-    
     ctx.beginPath();
     ctx.arc(cx, cy, 18 * scale, 0, Math.PI * 2);
     ctx.fillStyle = p.color + '30';
@@ -2304,8 +2263,6 @@ function drawPowerup(p) {
     ctx.arc(cx, cy, 14 * scale, 0, Math.PI * 2);
     ctx.fillStyle = p.color;
     ctx.fill();
-    
-    ctx.shadowBlur = 0;
     
     ctx.font = '18px Arial';
     ctx.textAlign = 'center';
@@ -2333,24 +2290,25 @@ function drawFox(){
         foxColor = `hsl(${hue}, 80%, 60%)`;
     }
     
-    if (skin.effect === 'neon_glow' || skin.effect === 'glow_eyes') {
-        ctx.shadowBlur = 20;
+    // فقط برای اسکین‌های خاص و با تعداد کمتر
+    if ((skin.effect === 'neon_glow' || skin.effect === 'glow_eyes') && particles.length < 20) {
+        ctx.shadowBlur = 15;
         ctx.shadowColor = skin.glowColor || foxColor;
     }
     
-    if (skin.effect === 'fire_trail' && playing) {
+    if (skin.effect === 'fire_trail' && playing && particles.length < 25) {
         trailPositions.push({ x: x + 20, y: y + fox.h/2, life: 1 });
-        if (trailPositions.length > 20) trailPositions.shift();
+        if (trailPositions.length > 15) trailPositions.shift();
         
-        trailPositions.forEach((pos, i) => {
+        for (const pos of trailPositions) {
             const alpha = pos.life * 0.3;
-            const size = 5 * pos.life;
+            const size = 4 * pos.life;
             ctx.fillStyle = `rgba(255, 107, 53, ${alpha})`;
             ctx.beginPath();
             ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
             ctx.fill();
             pos.life -= 0.03;
-        });
+        }
     }
     
     ctx.fillStyle = foxColor;
@@ -2433,10 +2391,11 @@ function drawFox(){
     ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
     ctx.fill();
     
-    if (skin.effect === 'crystal_shine') {
-        ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+    // فقط برای اسکین کریستال با تعداد کمتر
+    if (skin.effect === 'crystal_shine' && particles.length < 20) {
+        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
         ctx.lineWidth = 1;
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 4; i++) {
             ctx.beginPath();
             ctx.moveTo(x + 10 + i*8, y + 10);
             ctx.lineTo(x + 20 + i*8, y + 40);
@@ -2450,12 +2409,13 @@ function drawEgg(e){
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     
-    if (gemActive) {
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = "rgba(244,114,182,0.4)";
-    } else if(isSpace){
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = "rgba(150,100,255,0.3)";
+    // فقط در صورت نیاز شیدو بزن
+    if (gemActive && particles.length < 20) {
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = "rgba(244,114,182,0.3)";
+    } else if(isSpace && particles.length < 20){
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(150,100,255,0.2)";
     }
     
     ctx.fillStyle = e.color;
@@ -2465,15 +2425,19 @@ function drawEgg(e){
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = gemActive ? "rgba(244,114,182,0.3)" : (isSpace ? "rgba(200,180,255,0.2)" : "rgba(0,0,0,.06)");
-    ctx.lineWidth = 1.5;
+    
+    // خط وسط تخم‌مرغ با رنگ ساده‌تر
+    ctx.strokeStyle = gemActive ? "rgba(244,114,182,0.2)" : (isSpace ? "rgba(200,180,255,0.15)" : "rgba(0,0,0,.04)");
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(e.x + 6, e.y + 18);
     ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
-    ctx.fillStyle = gemActive ? "rgba(244,114,182,0.15)" : (isSpace ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.12)");
+    
+    // هایلایت ساده‌تر
+    ctx.fillStyle = gemActive ? "rgba(244,114,182,0.1)" : (isSpace ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)");
     ctx.beginPath();
-    ctx.ellipse(cx - 4, e.y + 8, 4, 7, -0.2, 0, Math.PI * 2);
+    ctx.ellipse(cx - 4, e.y + 8, 3, 6, -0.2, 0, Math.PI * 2);
     ctx.fill();
 }
 
@@ -2486,8 +2450,6 @@ function drawObstacle(o){
             ctx.fillStyle = "#4a2a6a";
             ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
             ctx.fillStyle = "#6a3a8a";
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "rgba(150,100,255,0.2)";
             ctx.beginPath();
             ctx.arc(o.x + 23, o.y + 20, 22, 0, Math.PI * 2);
             ctx.fill();
@@ -2498,7 +2460,6 @@ function drawObstacle(o){
             ctx.beginPath();
             ctx.arc(o.x + 40, o.y + 32, 14, 0, Math.PI * 2);
             ctx.fill();
-            ctx.shadowBlur = 0;
         } else {
             ctx.fillStyle = theme.treeColor || "#6a4a2a";
             ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
@@ -2517,8 +2478,6 @@ function drawObstacle(o){
     }else if(o.type === "rock"){
         if(isSpace){
             ctx.fillStyle = "#4a3a5a";
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = "rgba(150,100,255,0.15)";
             ctx.beginPath();
             ctx.moveTo(o.x, o.y + o.h);
             ctx.lineTo(o.x + 10, o.y + 10);
@@ -2527,8 +2486,7 @@ function drawObstacle(o){
             ctx.lineTo(o.x + o.w - 8, o.y + o.h);
             ctx.closePath();
             ctx.fill();
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = "rgba(200,180,255,0.1)";
+            ctx.fillStyle = "rgba(200,180,255,0.08)";
             ctx.beginPath();
             ctx.ellipse(o.x + 15, o.y + 8, 10, 5, 0, 0, Math.PI*2);
             ctx.fill();
@@ -2546,8 +2504,6 @@ function drawObstacle(o){
     }else{
         if(isSpace){
             ctx.fillStyle = "#3a7a5a";
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = "rgba(100,200,150,0.15)";
             ctx.fillRect(o.x + 9, o.y, 14, o.h);
             ctx.fillRect(o.x, o.y + 20, 13, 11);
             ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
@@ -2555,8 +2511,7 @@ function drawObstacle(o){
             ctx.fillRect(o.x + 12, o.y + 5, 8, 5);
             ctx.fillRect(o.x + 3, o.y + 25, 7, 4);
             ctx.fillRect(o.x + 22, o.y + 43, 7, 4);
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = "rgba(100,255,200,0.08)";
+            ctx.fillStyle = "rgba(100,255,200,0.06)";
             ctx.beginPath();
             ctx.ellipse(o.x + 16, o.y + 8, 6, 3, 0, 0, Math.PI*2);
             ctx.fill();
@@ -2646,7 +2601,8 @@ function update(dt){
                 shieldHits--;
                 if(shieldHits === 0) shieldActive = false;
                 obstacles.splice(i, 1);
-                for(let j=0; j<10; j++) {
+                // تعداد پارتکل کمتر
+                for(let j=0; j<5; j++) {
                     createParticle(o.x + o.w/2, o.y + o.h/2, '#4fc3f7', 'sparkle');
                 }
                 continue;
@@ -2732,7 +2688,8 @@ function applyPowerup(type) {
             shieldHits = 1;
             shieldTimer = 15;
             msg = fa ? '🛡️ سپر فعال شد!' : '🛡️ Shield activated!';
-            for(let i=0; i<15; i++) {
+            // پارتکل کمتر
+            for(let i=0; i<8; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 'sparkle');
             }
             if (shieldTimeout) clearTimeout(shieldTimeout);
@@ -2741,7 +2698,7 @@ function applyPowerup(type) {
             speedBoostActive = true;
             speedBoostTimer = 15;
             msg = fa ? '⚡ افزایش سرعت!' : '⚡ Speed boost!';
-            for(let i=0; i<15; i++) {
+            for(let i=0; i<8; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 'sparkle');
             }
             break;
@@ -2749,7 +2706,7 @@ function applyPowerup(type) {
             gemActive = true;
             gemTimer = 12;
             msg = fa ? '💎 تخم‌های باارزش!' : '💎 Gem eggs!';
-            for(let i=0; i<15; i++) {
+            for(let i=0; i<8; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#f472b6', 'sparkle');
             }
             break;
@@ -2784,18 +2741,19 @@ function collectEgg(e){
     }
     
     const skin = getSkin(currentSkinId);
+    // پارتکل کمتر برای افکت‌ها
     if (skin.effect === 'snow_particles') {
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 5; i++) {
             createParticle(e.x + e.w/2, e.y + e.h/2, '#93c5fd', 'snow');
         }
     }
     if (skin.effect === 'sparkles') {
-        for (let i = 0; i < 12; i++) {
+        for (let i = 0; i < 6; i++) {
             createParticle(e.x + e.w/2, e.y + e.h/2, '#fcd34d', 'sparkle');
         }
     }
     if (skin.effect === 'galaxy_stars') {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 5; i++) {
             createParticle(e.x + e.w/2, e.y + e.h/2, '#818cf8', 'sparkle');
         }
     }
@@ -3072,4 +3030,4 @@ setTimeout(() => {
 </script>
 
 </body>
-            </html>
+    </html>
