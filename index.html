@@ -828,19 +828,6 @@ button:active{
         <div id="skinShopGrid"></div>
     </div>
 
-    <div class="reward-info-box" id="rewardInfoBox">
-        <div class="header">
-            <span class="icon">💰</span>
-            <span class="title" id="rewardTitle">سیستم جوایز</span>
-        </div>
-        <p class="desc" id="rewardDesc">
-            ✅ امتیازهای شما در <strong>اپ</strong> و <strong>تلگرام</strong> یکی خواهد شد!
-        </p>
-        <p class="sub-desc" id="rewardSubDesc">
-            🔑 امتیازهای مینی‌اپ تلگرام و اپ بعداً یکی میشوند.
-        </p>
-    </div>
-
     <div class="menuItem">
         <div id="referralCodeLabel">My Invite Code</div>
         <div class="ref-code-display">
@@ -1921,14 +1908,6 @@ function applyLanguage(){
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
     document.getElementById("skinShopTitle").textContent = fa ? "🎨 پوست روباه" : "🎨 Fox Skins";
     
-    document.getElementById("rewardTitle").textContent = fa ? "💰 سیستم جوایز" : "💰 Reward System";
-    document.getElementById("rewardDesc").innerHTML = fa ? 
-        '✅ امتیازهای شما در <strong>اپ</strong> و <strong>تلگرام</strong> یکی خواهد شد!' : 
-        '✅ Your scores in <strong>App</strong> and <strong>Telegram</strong> will be the same!';
-    document.getElementById("rewardSubDesc").textContent = fa ? 
-        '🔑 امتیازهای مینی‌اپ تلگرام و اپ بعداً یکی میشوند.' : 
-        '🔑 Telegram Mini App and App scores will be merged later.';
-    
     document.getElementById("startText").textContent = fa ? "تخم‌ها را جمع کن و رکورد بزن!" : "Collect eggs and beat your record!";
     startButton.textContent = fa ? "شروع بازی" : "Start Game";
     document.getElementById("controlText").textContent = fa ? "لمس صفحه یا Space برای پرش" : "Tap screen or Space to jump";
@@ -2017,7 +1996,7 @@ const POWERUP_CONFIG = {
         icon: '⚡', 
         spawnRate: 0.02,
         startTime: 10,
-        speedMultiplier: 1.2  // کاهش یافته از 1.5 به 1.2
+        speedMultiplier: 1.2
     },
     gem: { 
         duration: 12,
@@ -2078,7 +2057,6 @@ function updateSpeed(){
     }else{
         baseSpeed = 1200 + (score - 600) * .12;
     }
-    // سرعت با ضریب 1.2 (کمتر از قبل)
     speed = speedBoostActive ? baseSpeed * 1.2 : baseSpeed;
 }
 
@@ -2114,7 +2092,6 @@ function createEgg(){
     let r = Math.random();
     let type = 0;
     
-    // اگر جواهر فعال باشه، تخم‌های باارزش‌تر ظاهر میشن
     if (gemActive) {
         if(r > .3) type = 1;
         if(r > .6) type = 2;
@@ -2473,7 +2450,6 @@ function drawEgg(e){
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     
-    // اگر جواهر فعال باشه، تخم‌ها براق‌تر و خاص‌تر به نظر میان
     if (gemActive) {
         ctx.shadowBlur = 20;
         ctx.shadowColor = "rgba(244,114,182,0.4)";
@@ -2594,7 +2570,6 @@ function drawObstacle(o){
 }
 
 function updatePowerupTimers() {
-    // مخفی کردن همه تایمرها
     shieldTimerItem.classList.add('hidden-timer');
     speedTimerItem.classList.add('hidden-timer');
     gemTimerItem.classList.add('hidden-timer');
@@ -2790,10 +2765,9 @@ function collectEgg(e){
     if(combo >= 10) multiplier = 3;
     else if(combo >= 5) multiplier = 2;
     
-    // اگر جواهر فعال باشه، امتیاز تخم‌ها بیشتر میشه
     let earned = e.value * multiplier;
     if (gemActive) {
-        earned = earned * 1.5; // ۵۰٪ امتیاز بیشتر
+        earned = earned * 1.5;
     }
     
     score += earned;
@@ -3098,4 +3072,4 @@ setTimeout(() => {
 </script>
 
 </body>
-                </html>
+            </html>
