@@ -69,6 +69,59 @@ canvas{
     opacity:1;
 }
 
+#powerupTimer {
+    position:absolute;
+    top:70px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    pointer-events:none;
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    padding:6px 18px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,0.1);
+    transition:all 0.3s ease;
+}
+
+#powerupTimer.hidden {
+    opacity:0;
+    transform:translateX(-50%) translateY(-10px);
+    pointer-events:none;
+}
+
+.timer-item {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.timer-item .icon {
+    font-size:16px;
+}
+
+.timer-item .time {
+    min-width:28px;
+    text-align:center;
+    font-variant-numeric:tabular-nums;
+}
+
+#shieldTimer .time { color:#4fc3f7; }
+#speedTimer .time { color:#ffd54f; }
+#gemTimer .time { color:#f472b6; }
+
+.timer-item.hidden-timer {
+    display:none !important;
+}
+
 #menuButton{
     position:absolute;
     top:12px;
@@ -429,7 +482,6 @@ button:active{
     letter-spacing:0.5px;
 }
 
-/* Theme Selector - Professional */
 .theme-selector-overlay {
     position:fixed;
     inset:0;
@@ -525,7 +577,6 @@ button:active{
     background:rgba(255,255,255,0.15);
 }
 
-/* ===== بخش سیستم جوایز ===== */
 .reward-info-box{
     border: 2px solid rgba(251, 191, 36, 0.3);
     background: rgba(251, 191, 36, 0.08);
@@ -568,7 +619,6 @@ button:active{
     margin-top: 6px;
 }
 
-/* Game Over Theme Button */
 #changeThemeBtn {
     background:rgba(255,255,255,0.12);
     box-shadow:none;
@@ -586,7 +636,6 @@ button:active{
     transform:translateY(3px);
 }
 
-/* ===== Powerup Indicators ===== */
 #powerupStatus {
     position:absolute;
     bottom:20px;
@@ -620,17 +669,11 @@ button:active{
     border:2px solid #ffd54f;
 }
 
-#goldenEggIndicator {
-    background:rgba(251,191,36,0.4);
-    border:2px solid #fbbf24;
-}
-
-#doubleScoreIndicator {
+#gemIndicator {
     background:rgba(244,114,182,0.4);
     border:2px solid #f472b6;
 }
 
-/* ===== Skin Shop - New Design ===== */
 #skinShopGrid .skin-option {
     transition:all 0.2s ease;
 }
@@ -666,7 +709,6 @@ button:active{
     font-size:14px;
 }
 
-/* Animations */
 @keyframes fadeInUp {
     from { opacity:0; transform:translateY(20px); }
     to { opacity:1; transform:translateY(0); }
@@ -686,7 +728,6 @@ button:active{
     animation:pulse 0.5s ease 2;
 }
 
-/* Toast message */
 #toast {
     position:fixed;
     bottom:80px;
@@ -717,17 +758,33 @@ button:active{
         <div id="score">Score: 0</div>
         <div id="best">Best: 0</div>
     </div>
-
     <div id="combo">
         COMBO ×<span id="comboValue">2</span>
+    </div>
+</div>
+
+<div id="powerupTimer" class="hidden">
+    <div class="timer-item hidden-timer" id="shieldTimer">
+        <span class="icon">🛡️</span>
+        <span class="time" id="shieldTimeDisplay">0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
+    </div>
+    <div class="timer-item hidden-timer" id="speedTimer">
+        <span class="icon">⚡</span>
+        <span class="time" id="speedTimeDisplay">0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
+    </div>
+    <div class="timer-item hidden-timer" id="gemTimer">
+        <span class="icon">💎</span>
+        <span class="time" id="gemTimeDisplay">0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
     </div>
 </div>
 
 <div id="powerupStatus">
     <div id="shieldIndicator" class="indicator">🛡️ SHIELD</div>
     <div id="speedIndicator" class="indicator">⚡ SPEED</div>
-    <div id="goldenEggIndicator" class="indicator">💫 GOLDEN</div>
-    <div id="doubleScoreIndicator" class="indicator">⭐ 2x SCORE</div>
+    <div id="gemIndicator" class="indicator">💎 GEM</div>
 </div>
 
 <button id="menuButton">☰</button>
@@ -759,7 +816,6 @@ button:active{
         </button>
     </div>
 
-    <!-- ===== Fox Skin Shop - New Design ===== -->
     <div class="menuItem" id="skinShop">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
             <span id="skinShopTitle" style="font-size:16px;font-weight:bold;">🎨 Fox Skins</span>
@@ -772,7 +828,6 @@ button:active{
         <div id="skinShopGrid"></div>
     </div>
 
-    <!-- ===== بخش سیستم جوایز ===== -->
     <div class="reward-info-box" id="rewardInfoBox">
         <div class="header">
             <span class="icon">💰</span>
@@ -783,25 +838,6 @@ button:active{
         </p>
         <p class="sub-desc" id="rewardSubDesc">
             🔑 امتیازهای مینی‌اپ تلگرام و اپ بعداً یکی میشوند.
-        </p>
-    </div>
-
-    <!-- ===== بخش ربات تلگرام - فقط در موبایل نمایش داده میشه ===== -->
-    <div class="menuItem" id="telegramSection" style="background:rgba(0,136,204,0.08);border:1px solid rgba(0,136,204,0.2);display:none;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
-            <span style="font-size:20px;">🤖</span>
-            <span style="font-weight:bold;color:#4fc3f7;" id="telegramTitle">بازی در تلگرام</span>
-        </div>
-        <p style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:8px;" id="telegramDesc">
-            نسخه مینی‌اپ تلگرام رو امتحان کن!
-        </p>
-        <a href="https://t.me/Foxeggs_bot" target="_blank" 
-           style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px;background:linear-gradient(135deg,#0088cc,#005f8a);color:white;border-radius:8px;text-decoration:none;font-weight:bold;font-size:13px;transition:transform 0.2s;border:1px solid rgba(255,255,255,0.1);">
-            📱 <span id="telegramLinkText">باز کردن ربات</span>
-            <span style="font-size:14px;">↗️</span>
-        </a>
-        <p style="font-size:9px;color:rgba(255,255,255,0.2);margin-top:6px;" id="telegramHint">
-            برای استفاده از مینی‌اپ حتماً تلگرام نصب باشه
         </p>
     </div>
 
@@ -842,7 +878,6 @@ button:active{
 
 </div>
 
-<!-- Theme Selector Overlay -->
 <div class="theme-selector-overlay" id="themeSelectorOverlay">
     <div class="theme-selector-panel">
         <h2 id="themeSelectorTitle">🎨 Select Theme</h2>
@@ -932,10 +967,6 @@ button:active{
 
 <script>
 
-/* =====================================================
-   INTERNET CHECK
-===================================================== */
-
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
 let isOnline = true;
@@ -1007,10 +1038,6 @@ setInterval(() => {
     }
 }, 10000);
 
-/* =====================================================
-   CANVAS
-===================================================== */
-
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d", { alpha:false, desynchronized:true });
 
@@ -1026,10 +1053,6 @@ function resize(){
 }
 resize();
 window.addEventListener("resize", resize);
-
-/* =====================================================
-   UI
-===================================================== */
 
 const scoreText = document.getElementById("score");
 const bestText = document.getElementById("best");
@@ -1061,15 +1084,16 @@ const myReferralCode = document.getElementById("myReferralCode");
 const referralCount = document.getElementById("referralCount");
 const copyBtn = document.getElementById("copyReferralCode");
 
-/* =====================================================
-   WEBHOOK CONFIG
-===================================================== */
+const powerupTimer = document.getElementById('powerupTimer');
+const shieldTimeDisplay = document.getElementById('shieldTimeDisplay');
+const speedTimeDisplay = document.getElementById('speedTimeDisplay');
+const gemTimeDisplay = document.getElementById('gemTimeDisplay');
+
+const shieldTimerItem = document.getElementById('shieldTimer');
+const speedTimerItem = document.getElementById('speedTimer');
+const gemTimerItem = document.getElementById('gemTimer');
 
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
-
-/* =====================================================
-   REFERRAL SYSTEM
-===================================================== */
 
 function saveReferralToLocalStorage(refCode, userId) {
     try {
@@ -1308,10 +1332,6 @@ function showReferralPrompt() {
     setTimeout(() => input.focus(), 200);
 }
 
-/* =====================================================
-   INTERNAL MUSIC
-===================================================== */
-
 let audioContext = null;
 let musicMaster = null;
 let musicTimer = null;
@@ -1441,10 +1461,6 @@ function updateSoundButtons(){
     }
 }
 
-/* =====================================================
-   SAFE LOCAL STORAGE
-===================================================== */
-
 function loadNumber(key, defaultValue = 0){
     try{
         const value = localStorage.getItem(key);
@@ -1465,18 +1481,10 @@ function saveWallet(){
     }catch(error){}
 }
 
-/* =====================================================
-   PERMANENT DATA
-===================================================== */
-
 let best = loadNumber("foxBest");
 let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
-
-/* =====================================================
-   FOX SKINS SYSTEM - NEW DESIGN
-===================================================== */
 
 const FOX_SKINS = [
     { id: 'classic', name: 'Classic Fox', nameFa: 'روباه کلاسیک', color: '#f97316', price: 0, rarity: 'common', effect: null, glowColor: null, eyeColor: '#1a1a2a' },
@@ -1516,10 +1524,6 @@ function getRarityLabel(rarity) {
         'mythic': { fa: 'اسطوره‌ای', en: 'Mythic' }
     };
     return labels[rarity] ? (language === 'fa' ? labels[rarity].fa : labels[rarity].en) : rarity;
-}
-
-function getRarityClass(rarity) {
-    return 'rarity-' + rarity;
 }
 
 function getEffect(effect) {
@@ -1730,10 +1734,6 @@ function showToast(msg) {
     }, 2500);
 }
 
-/* =====================================================
-   THEME SYSTEM
-===================================================== */
-
 let currentTheme = localStorage.getItem("foxTheme") || "classic";
 
 const themeConfigs = {
@@ -1902,27 +1902,7 @@ function updateThemeUI() {
     document.getElementById('changeThemeLabel').textContent = language === 'fa' ? 'تغییر تم' : 'Change Theme';
 }
 
-/* =====================================================
-   LANGUAGE
-===================================================== */
-
 let language = localStorage.getItem("foxLanguage") || "en";
-
-function shouldShowTelegramButton() {
-    // ۱. اگر در تلگرام مینی‌اپ هستیم، لینک رو نشون نده
-    if (window.Telegram && window.Telegram.WebApp) {
-        return false;
-    }
-    
-    // ۲. اگر در اپلیکیشن هستیم، لینک رو نشون نده
-    if (/FoxEggsApp/i.test(navigator.userAgent) || localStorage.getItem('isApp') === 'true') {
-        return false;
-    }
-    
-    // ۳. اگر موبایل واقعی هست، لینک رو نشون بده
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
-           || window.innerWidth < 768;
-}
 
 function applyLanguage(){
     const fa = language === "fa";
@@ -1940,24 +1920,6 @@ function applyLanguage(){
     document.getElementById("referralCodeLabel").textContent = fa ? "کد دعوت من" : "My Invite Code";
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
     document.getElementById("skinShopTitle").textContent = fa ? "🎨 پوست روباه" : "🎨 Fox Skins";
-    
-    // بخش تلگرام
-    document.getElementById("telegramTitle").textContent = fa ? "بازی در تلگرام" : "Play on Telegram";
-    document.getElementById("telegramDesc").textContent = fa ? 
-        "نسخه مینی‌اپ تلگرام رو امتحان کن!" : 
-        "Try the Telegram mini-app version!";
-    document.getElementById("telegramLinkText").textContent = fa ? "باز کردن ربات" : "Open Bot";
-    document.getElementById("telegramHint").textContent = fa ? 
-        "برای استفاده از مینی‌اپ حتماً تلگرام نصب باشه" : 
-        "Telegram app required to open mini-app";
-    
-    // ===== نمایش یا مخفی کردن لینک ربات با تشخیص دقیق =====
-    const telegramSection = document.getElementById('telegramSection');
-    if (shouldShowTelegramButton()) {
-        telegramSection.style.display = 'block';
-    } else {
-        telegramSection.style.display = 'none';
-    }
     
     document.getElementById("rewardTitle").textContent = fa ? "💰 سیستم جوایز" : "💰 Reward System";
     document.getElementById("rewardDesc").innerHTML = fa ? 
@@ -2001,10 +1963,6 @@ function setLanguage(lang){
     }
 }
 
-/* =====================================================
-   UPDATE UI
-===================================================== */
-
 function updateUI(){
     const fa = language === "fa";
     const scoreLabel = fa ? "امتیاز: " : "Score: ";
@@ -2021,10 +1979,6 @@ function updateUI(){
     finalEggs.textContent = totalEggs;
 }
 
-/* =====================================================
-   GAME STATE
-===================================================== */
-
 let playing = false;
 let score = 0;
 let speed = 330;
@@ -2036,17 +1990,15 @@ let comboTimer = 0;
 let eggs = [];
 let obstacles = [];
 
-// ===== POWERUP SYSTEM =====
 let powerups = [];
 let shieldActive = false;
 let shieldHits = 0;
+let shieldTimer = 0;
 let speedBoostActive = false;
 let speedBoostTimer = 0;
-let goldenEggActive = false;
-let goldenEggTimer = 0;
-let doubleScoreActive = false;
-let doubleScoreTimer = 0;
-let powerupTimer = 0;
+let gemActive = false;
+let gemTimer = 0;
+let powerupTimerValue = 0;
 let gameTime = 0;
 let shieldTimeout = null;
 
@@ -2065,26 +2017,17 @@ const POWERUP_CONFIG = {
         icon: '⚡', 
         spawnRate: 0.02,
         startTime: 10,
-        speedMultiplier: 1.5
+        speedMultiplier: 1.2  // کاهش یافته از 1.5 به 1.2
     },
-    goldenEgg: { 
-        duration: 10,
-        color: '#fbbf24', 
-        icon: '💫', 
-        spawnRate: 0.02,
-        startTime: 10
-    },
-    doubleScore: { 
+    gem: { 
         duration: 12,
         color: '#f472b6', 
-        icon: '⭐', 
+        icon: '💎', 
         spawnRate: 0.02,
-        startTime: 10,
-        multiplier: 2
+        startTime: 10
     }
 };
 
-// ===== TRAIL SYSTEM =====
 let trailPositions = [];
 let particles = [];
 
@@ -2135,7 +2078,8 @@ function updateSpeed(){
     }else{
         baseSpeed = 1200 + (score - 600) * .12;
     }
-    speed = speedBoostActive ? baseSpeed * 1.5 : baseSpeed;
+    // سرعت با ضریب 1.2 (کمتر از قبل)
+    speed = speedBoostActive ? baseSpeed * 1.2 : baseSpeed;
 }
 
 let isNight = false;
@@ -2170,9 +2114,12 @@ function createEgg(){
     let r = Math.random();
     let type = 0;
     
-    // اگر تخم طلایی فعاله، همه تخم‌ها طلایی میشن
-    if (goldenEggActive) {
-        type = 4;
+    // اگر جواهر فعال باشه، تخم‌های باارزش‌تر ظاهر میشن
+    if (gemActive) {
+        if(r > .3) type = 1;
+        if(r > .6) type = 2;
+        if(r > .8) type = 3;
+        if(r > .92) type = 4;
     } else {
         if(r > .55) type = 1;
         if(r > .78) type = 2;
@@ -2222,7 +2169,6 @@ function createPowerup(type) {
     });
 }
 
-// ===== POWERUP SPAWN - 90% شانس =====
 function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
@@ -2231,7 +2177,7 @@ function trySpawnPowerup() {
     const roll = 90;
     
     if (chance < roll) {
-        const types = ['shield', 'speed', 'goldenEgg', 'doubleScore'];
+        const types = ['shield', 'speed', 'gem'];
         const type = types[Math.floor(Math.random() * types.length)];
         createPowerup(type);
     }
@@ -2527,10 +2473,15 @@ function drawEgg(e){
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     
-    if(isSpace){
+    // اگر جواهر فعال باشه، تخم‌ها براق‌تر و خاص‌تر به نظر میان
+    if (gemActive) {
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "rgba(244,114,182,0.4)";
+    } else if(isSpace){
         ctx.shadowBlur = 15;
         ctx.shadowColor = "rgba(150,100,255,0.3)";
     }
+    
     ctx.fillStyle = e.color;
     ctx.beginPath();
     ctx.moveTo(cx, e.y);
@@ -2538,13 +2489,13 @@ function drawEgg(e){
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = isSpace ? "rgba(200,180,255,0.2)" : "rgba(0,0,0,.06)";
+    ctx.strokeStyle = gemActive ? "rgba(244,114,182,0.3)" : (isSpace ? "rgba(200,180,255,0.2)" : "rgba(0,0,0,.06)");
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(e.x + 6, e.y + 18);
     ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
-    ctx.fillStyle = isSpace ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.12)";
+    ctx.fillStyle = gemActive ? "rgba(244,114,182,0.15)" : (isSpace ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.12)");
     ctx.beginPath();
     ctx.ellipse(cx - 4, e.y + 8, 4, 7, -0.2, 0, Math.PI * 2);
     ctx.fill();
@@ -2642,6 +2593,39 @@ function drawObstacle(o){
     }
 }
 
+function updatePowerupTimers() {
+    // مخفی کردن همه تایمرها
+    shieldTimerItem.classList.add('hidden-timer');
+    speedTimerItem.classList.add('hidden-timer');
+    gemTimerItem.classList.add('hidden-timer');
+    
+    let anyActive = false;
+    
+    if (shieldActive) {
+        shieldTimerItem.classList.remove('hidden-timer');
+        shieldTimeDisplay.textContent = Math.ceil(shieldTimer);
+        anyActive = true;
+    }
+    
+    if (speedBoostActive) {
+        speedTimerItem.classList.remove('hidden-timer');
+        speedTimeDisplay.textContent = Math.ceil(speedBoostTimer);
+        anyActive = true;
+    }
+    
+    if (gemActive) {
+        gemTimerItem.classList.remove('hidden-timer');
+        gemTimeDisplay.textContent = Math.ceil(gemTimer);
+        anyActive = true;
+    }
+    
+    if (anyActive) {
+        powerupTimer.classList.remove('hidden');
+    } else {
+        powerupTimer.classList.add('hidden');
+    }
+}
+
 function update(dt){
     gameTime += dt;
     updateSpeed();
@@ -2698,10 +2682,10 @@ function update(dt){
         if(o.x < -80) obstacles.splice(i, 1);
     }
 
-    powerupTimer -= dt;
-    if (powerupTimer <= 0) {
+    powerupTimerValue -= dt;
+    if (powerupTimerValue <= 0) {
         trySpawnPowerup();
-        powerupTimer = 2 + Math.random() * 3;
+        powerupTimerValue = 2 + Math.random() * 3;
     }
     
     for(let i = powerups.length - 1; i >= 0; i--){
@@ -2715,7 +2699,19 @@ function update(dt){
         if(p.x < -60) powerups.splice(i, 1);
     }
     
-    // ===== تایمرهای پاورآپ =====
+    if (shieldActive) {
+        shieldTimer -= dt;
+        if (shieldTimer <= 0) {
+            shieldActive = false;
+            shieldTimer = 0;
+            if (shieldTimeout) {
+                clearTimeout(shieldTimeout);
+                shieldTimeout = null;
+            }
+            showToast(language === 'fa' ? '🛡️ سپر تمام شد!' : '🛡️ Shield ended!');
+        }
+    }
+
     if (speedBoostActive) {
         speedBoostTimer -= dt;
         if (speedBoostTimer <= 0) {
@@ -2724,29 +2720,21 @@ function update(dt){
             showToast(language === 'fa' ? '⚡ سرعت تمام شد!' : '⚡ Speed ended!');
         }
     }
-
-    if (goldenEggActive) {
-        goldenEggTimer -= dt;
-        if (goldenEggTimer <= 0) {
-            goldenEggActive = false;
-            goldenEggTimer = 0;
-            showToast(language === 'fa' ? '💫 تخم‌های طلایی تمام شد!' : '💫 Golden eggs ended!');
+    
+    if (gemActive) {
+        gemTimer -= dt;
+        if (gemTimer <= 0) {
+            gemActive = false;
+            gemTimer = 0;
+            showToast(language === 'fa' ? '💎 جواهر تمام شد!' : '💎 Gem ended!');
         }
     }
 
-    if (doubleScoreActive) {
-        doubleScoreTimer -= dt;
-        if (doubleScoreTimer <= 0) {
-            doubleScoreActive = false;
-            doubleScoreTimer = 0;
-            showToast(language === 'fa' ? '⭐ دوبرابر کننده تمام شد!' : '⭐ Double score ended!');
-        }
-    }
+    updatePowerupTimers();
 
     document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
     document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
-    document.getElementById('goldenEggIndicator').style.display = goldenEggActive ? 'block' : 'none';
-    document.getElementById('doubleScoreIndicator').style.display = doubleScoreActive ? 'block' : 'none';
+    document.getElementById('gemIndicator').style.display = gemActive ? 'block' : 'none';
 
     if(combo > 0){
         comboTimer -= dt;
@@ -2767,17 +2755,12 @@ function applyPowerup(type) {
         case 'shield':
             shieldActive = true;
             shieldHits = 1;
+            shieldTimer = 15;
             msg = fa ? '🛡️ سپر فعال شد!' : '🛡️ Shield activated!';
             for(let i=0; i<15; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 'sparkle');
             }
             if (shieldTimeout) clearTimeout(shieldTimeout);
-            shieldTimeout = setTimeout(() => {
-                shieldActive = false;
-                shieldHits = 0;
-                document.getElementById('shieldIndicator').style.display = 'none';
-                showToast(fa ? '🛡️ سپر تمام شد!' : '🛡️ Shield ended!');
-            }, 15000);
             break;
         case 'speed':
             speedBoostActive = true;
@@ -2787,23 +2770,16 @@ function applyPowerup(type) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 'sparkle');
             }
             break;
-        case 'goldenEgg':
-            goldenEggActive = true;
-            goldenEggTimer = 10;
-            msg = fa ? '💫 تخم‌های طلایی!' : '💫 Golden eggs!';
-            for(let i=0; i<15; i++) {
-                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#fbbf24', 'sparkle');
-            }
-            break;
-        case 'doubleScore':
-            doubleScoreActive = true;
-            doubleScoreTimer = 12;
-            msg = fa ? '⭐ امتیازها ۲ برابر!' : '⭐ Double score!';
+        case 'gem':
+            gemActive = true;
+            gemTimer = 12;
+            msg = fa ? '💎 تخم‌های باارزش!' : '💎 Gem eggs!';
             for(let i=0; i<15; i++) {
                 createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#f472b6', 'sparkle');
             }
             break;
     }
+    updatePowerupTimers();
     showToast(msg);
 }
 
@@ -2814,11 +2790,10 @@ function collectEgg(e){
     if(combo >= 10) multiplier = 3;
     else if(combo >= 5) multiplier = 2;
     
+    // اگر جواهر فعال باشه، امتیاز تخم‌ها بیشتر میشه
     let earned = e.value * multiplier;
-    
-    // اگر دوبرابر کننده فعاله
-    if (doubleScoreActive) {
-        earned = earned * 2;
+    if (gemActive) {
+        earned = earned * 1.5; // ۵۰٪ امتیاز بیشتر
     }
     
     score += earned;
@@ -2832,18 +2807,6 @@ function collectEgg(e){
     if(combo >= 2){
         comboBox.classList.add("show");
         comboValue.textContent = combo;
-    }
-    
-    // افکت‌ها
-    if (doubleScoreActive) {
-        for (let i = 0; i < 8; i++) {
-            createParticle(e.x + e.w/2, e.y + e.h/2, '#f472b6', 'sparkle');
-        }
-    }
-    if (goldenEggActive) {
-        for (let i = 0; i < 8; i++) {
-            createParticle(e.x + e.w/2, e.y + e.h/2, '#fbbf24', 'sparkle');
-        }
     }
     
     const skin = getSkin(currentSkinId);
@@ -2901,13 +2864,12 @@ function startGame(){
     gameTime = 0;
     shieldActive = false;
     shieldHits = 0;
+    shieldTimer = 0;
     speedBoostActive = false;
     speedBoostTimer = 0;
-    goldenEggActive = false;
-    goldenEggTimer = 0;
-    doubleScoreActive = false;
-    doubleScoreTimer = 0;
-    powerupTimer = 2;
+    gemActive = false;
+    gemTimer = 0;
+    powerupTimerValue = 2;
     if (shieldTimeout) {
         clearTimeout(shieldTimeout);
         shieldTimeout = null;
@@ -2918,8 +2880,8 @@ function startGame(){
     comboBox.classList.remove("show");
     document.getElementById('shieldIndicator').style.display = 'none';
     document.getElementById('speedIndicator').style.display = 'none';
-    document.getElementById('goldenEggIndicator').style.display = 'none';
-    document.getElementById('doubleScoreIndicator').style.display = 'none';
+    document.getElementById('gemIndicator').style.display = 'none';
+    powerupTimer.classList.add('hidden');
     resetFox();
     playing = true;
     menuButton.style.display = "none";
@@ -2946,16 +2908,13 @@ function endGame(){
     updateUI();
     menuButton.style.display = "block";
     gameOver.style.display = "flex";
+    powerupTimer.classList.add('hidden');
 }
 
 function handleInput(){
     if(!playing) startGame();
     else jump();
 }
-
-/* =====================================================
-   THEME SELECTOR OVERLAY
-===================================================== */
 
 function openThemeSelector() {
     themeSelectorOverlay.style.display = 'flex';
@@ -2995,10 +2954,6 @@ openThemeFromMenu.addEventListener('click', function(e) {
     menuPanel.style.display = "none";
     openThemeSelector();
 });
-
-/* =====================================================
-   EVENT LISTENERS
-===================================================== */
 
 window.addEventListener("keydown", function(e){
     if(e.code === "Space" || e.code === "ArrowUp"){
@@ -3066,10 +3021,6 @@ document.getElementById("enButton").addEventListener("click", function(e){
 
 copyBtn.addEventListener("click", copyReferralCode);
 
-/* =====================================================
-   COPY REFERRAL CODE
-===================================================== */
-
 function copyReferralCode() {
     const code = myReferralCode.textContent;
     if (code === "---" || !code) {
@@ -3111,10 +3062,6 @@ function fallbackCopy(text) {
     document.body.removeChild(textarea);
 }
 
-/* =====================================================
-   INITIAL
-===================================================== */
-
 applyLanguage();
 updateUI();
 resetFox();
@@ -3130,6 +3077,7 @@ drawFox();
 
 showReferralDataFromCache();
 renderSkinShop();
+powerupTimer.classList.add('hidden');
 
 setTimeout(() => {
     if (navigator.onLine) {
