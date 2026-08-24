@@ -1431,19 +1431,135 @@ let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
 
+// ============================================================
+// 🔥 ۱۰ اسکین با قیمت‌های پولی (فقط Classic رایگان)
+// ============================================================
 const FOX_SKINS = [
-    { id: 'classic', name: 'Classic Fox', nameFa: 'روباه کلاسیک', color: '#f97316', price: 0, rarity: 'common', effect: null, glowColor: null, eyeColor: '#1a1a2a' },
-    { id: 'ember', name: 'Ember Fox', nameFa: 'روباه آتشین', color: '#ef4444', price: 250000, rarity: 'uncommon', effect: 'fire_trail', glowColor: '#ff6b35', eyeColor: '#fbbf24' },
-    { id: 'frost', name: 'Frost Fox', nameFa: 'روباه یخی', color: '#3b82f6', price: 500000, rarity: 'uncommon', effect: 'snow_particles', glowColor: '#93c5fd', eyeColor: '#ffffff' },
-    { id: 'shadow', name: 'Shadow Fox', nameFa: 'روباه شب', color: '#7c3aed', price: 1000000, rarity: 'rare', effect: 'glow_eyes', glowColor: '#4ade80', eyeColor: '#4ade80' },
-    { id: 'golden', name: 'Golden Fox', nameFa: 'روباه طلایی', color: '#fbbf24', price: 1750000, rarity: 'rare', effect: 'sparkles', glowColor: '#fcd34d', eyeColor: '#b45309' },
-    { id: 'neon', name: 'Neon Fox', nameFa: 'روباه نئونی', color: '#ec4899', price: 2500000, rarity: 'epic', effect: 'neon_glow', glowColor: '#f472b6', eyeColor: '#3b82f6' },
-    { id: 'crystal', name: 'Crystal Fox', nameFa: 'روباه کریستالی', color: '#8b5cf6', price: 4000000, rarity: 'epic', effect: 'crystal_shine', glowColor: '#a78bfa', eyeColor: '#c4b5d4' },
-    { id: 'galaxy', name: 'Galaxy Fox', nameFa: 'روباه کهکشانی', color: '#1e1b4b', price: 7500000, rarity: 'legendary', effect: 'galaxy_stars', glowColor: '#818cf8', eyeColor: '#c7d2fe' },
-    { id: 'rainbow', name: 'Rainbow Fox', nameFa: 'روباه رنگین‌کمان', color: 'rainbow', price: 12500000, rarity: 'legendary', effect: 'rainbow_shift', glowColor: null, eyeColor: '#ffffff' },
-    { id: 'phoenix', name: 'Phoenix Fox', nameFa: 'روباه ققنوس', color: '#dc2626', price: 25000000, rarity: 'mythic', effect: 'phoenix_flames', glowColor: '#f97316', eyeColor: '#fcd34d' }
+    { 
+        id: 'classic', 
+        name: 'Classic Fox', 
+        nameFa: 'روباه کلاسیک', 
+        color: '#f97316', 
+        price: 0, 
+        rarity: 'common', 
+        trailColor: 'rgba(249,115,22,0.3)',
+        glowColor: '#f97316',
+        eyeColor: '#1a1a2a',
+        desc: '🔥 ردپای نارنجی'
+    },
+    { 
+        id: 'ember', 
+        name: 'Ember Fox', 
+        nameFa: 'روباه آتشین', 
+        color: '#ef4444', 
+        price: 250000, 
+        rarity: 'uncommon', 
+        trailColor: 'rgba(239,68,68,0.3)',
+        glowColor: '#ff6b35',
+        eyeColor: '#fbbf24',
+        desc: '💥 جرقه‌های آتش'
+    },
+    { 
+        id: 'frost', 
+        name: 'Frost Fox', 
+        nameFa: 'روباه یخی', 
+        color: '#3b82f6', 
+        price: 500000, 
+        rarity: 'uncommon', 
+        trailColor: 'rgba(59,130,246,0.3)',
+        glowColor: '#93c5fd',
+        eyeColor: '#ffffff',
+        desc: '❄️ ردپای یخی'
+    },
+    { 
+        id: 'shadow', 
+        name: 'Shadow Fox', 
+        nameFa: 'روباه شب', 
+        color: '#7c3aed', 
+        price: 1000000, 
+        rarity: 'rare', 
+        trailColor: 'rgba(124,58,237,0.3)',
+        glowColor: '#4ade80',
+        eyeColor: '#4ade80',
+        desc: '🌑 سایه‌ی بنفش'
+    },
+    { 
+        id: 'golden', 
+        name: 'Golden Fox', 
+        nameFa: 'روباه طلایی', 
+        color: '#fbbf24', 
+        price: 1750000, 
+        rarity: 'rare', 
+        trailColor: 'rgba(251,191,36,0.3)',
+        glowColor: '#fcd34d',
+        eyeColor: '#78350f',
+        desc: '✨ ردپای طلا'
+    },
+    { 
+        id: 'neon', 
+        name: 'Neon Fox', 
+        nameFa: 'روباه نئونی', 
+        color: '#ec4899', 
+        price: 2500000, 
+        rarity: 'epic', 
+        trailColor: 'rgba(236,72,153,0.3)',
+        glowColor: '#f472b6',
+        eyeColor: '#3b82f6',
+        desc: '💜 ردپای نئون'
+    },
+    { 
+        id: 'crystal', 
+        name: 'Crystal Fox', 
+        nameFa: 'روباه کریستالی', 
+        color: '#8b5cf6', 
+        price: 4000000, 
+        rarity: 'epic', 
+        trailColor: 'rgba(139,92,246,0.3)',
+        glowColor: '#a78bfa',
+        eyeColor: '#c4b5d4',
+        desc: '💎 ردپای کریستال'
+    },
+    { 
+        id: 'galaxy', 
+        name: 'Galaxy Fox', 
+        nameFa: 'روباه کهکشانی', 
+        color: '#1e1b4b', 
+        price: 7500000, 
+        rarity: 'legendary', 
+        trailColor: 'rgba(129,140,248,0.3)',
+        glowColor: '#818cf8',
+        eyeColor: '#c7d2fe',
+        desc: '🌌 ردپای کهکشان'
+    },
+    { 
+        id: 'rainbow', 
+        name: 'Rainbow Fox', 
+        nameFa: 'روباه رنگین‌کمان', 
+        color: 'rainbow', 
+        price: 12500000, 
+        rarity: 'legendary', 
+        trailColor: 'rgba(255,255,255,0.2)',
+        glowColor: null,
+        eyeColor: '#ffffff',
+        desc: '🌈 ردپای رنگین'
+    },
+    { 
+        id: 'phoenix', 
+        name: 'Phoenix Fox', 
+        nameFa: 'روباه ققنوس', 
+        color: '#dc2626', 
+        price: 25000000, 
+        rarity: 'mythic', 
+        trailColor: 'rgba(220,38,38,0.3)',
+        glowColor: '#f97316',
+        eyeColor: '#fcd34d',
+        desc: '🔥 ردپای ققنوس'
+    }
 ];
 
+// ============================================================
+// 🔥 فقط Classic خریداری شده (بقیه نه)
+// ============================================================
 let currentSkinId = localStorage.getItem('foxSkin') || 'classic';
 let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins') || '["classic"]');
 
@@ -1469,36 +1585,6 @@ function getRarityLabel(rarity) {
         'mythic': { fa: 'اسطوره‌ای', en: 'Mythic' }
     };
     return labels[rarity] ? (language === 'fa' ? labels[rarity].fa : labels[rarity].en) : rarity;
-}
-
-function getEffect(effect) {
-    const effects = {
-        'fire_trail': 'Fire Trail',
-        'snow_particles': 'Snow Particles',
-        'glow_eyes': 'Glowing Eyes',
-        'sparkles': 'Sparkles',
-        'neon_glow': 'Neon Glow',
-        'crystal_shine': 'Crystal Shine',
-        'galaxy_stars': 'Galaxy Stars',
-        'rainbow_shift': 'Rainbow Shift',
-        'phoenix_flames': 'Phoenix Flames'
-    };
-    return effects[effect] || '';
-}
-
-function getEffectFa(effect) {
-    const effects = {
-        'fire_trail': 'رد آتش',
-        'snow_particles': 'ذرات برف',
-        'glow_eyes': 'چشم‌های درخشان',
-        'sparkles': 'جرقه‌های طلایی',
-        'neon_glow': 'درخشش نئون',
-        'crystal_shine': 'خطوط کریستال',
-        'galaxy_stars': 'ستاره‌های کهکشان',
-        'rainbow_shift': 'تغییر رنگ مداوم',
-        'phoenix_flames': 'پرهای آتشین'
-    };
-    return effects[effect] || '';
 }
 
 function renderSkinShop() {
@@ -1536,7 +1622,7 @@ function renderSkinShop() {
         skinsInRarity.forEach(skin => {
             const owned = isSkinOwned(skin.id);
             const active = isSkinActive(skin.id);
-            const canBuy = totalScore >= skin.price && !owned;
+            const canBuy = totalScore >= skin.price && !owned && skin.price > 0;
             const isFree = skin.price === 0;
             
             const colorStyle = skin.id === 'rainbow' 
@@ -1547,6 +1633,7 @@ function renderSkinShop() {
             let statusColor = '';
             let bgColor = 'rgba(255,255,255,0.03)';
             let borderColor = 'rgba(255,255,255,0.06)';
+            let cursorStyle = 'pointer';
             
             if (active) {
                 statusText = fa ? '✓ فعال' : '✓ Active';
@@ -1568,22 +1655,25 @@ function renderSkinShop() {
                 statusText = '🔒 ' + skin.price.toLocaleString();
                 statusColor = '#ef4444';
                 bgColor = 'rgba(239,68,68,0.05)';
+                cursorStyle = 'not-allowed';
             }
             
             const rarityLabel = fa ? getRarityLabel(skin.rarity) : getRarityLabel(skin.rarity);
-            const effectLabel = fa ? getEffectFa(skin.effect) : getEffect(skin.effect);
+            const descText = fa ? skin.desc : skin.desc;
+            
+            const isLocked = !owned && !canBuy && !isFree;
             
             html += `
-                <div class="skin-option ${active ? 'active' : ''} ${owned ? 'owned' : ''} ${!owned && !canBuy && !isFree ? 'locked' : ''}" 
+                <div class="skin-option ${active ? 'active' : ''} ${owned ? 'owned' : ''} ${isLocked ? 'locked' : ''}" 
                      data-skin="${skin.id}"
-                     style="background:${bgColor};border:2px solid ${borderColor};border-radius:10px;padding:8px;text-align:center;cursor:${(owned || canBuy || isFree) ? 'pointer' : 'not-allowed'};transition:all 0.2s;position:relative;">
+                     style="background:${bgColor};border:2px solid ${borderColor};border-radius:10px;padding:8px;text-align:center;cursor:${cursorStyle};transition:all 0.2s;position:relative;${isLocked ? 'opacity:0.5;' : ''}">
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                         <span style="font-size:10px;color:${statusColor};">${statusText}</span>
                         <span style="font-size:8px;color:rgba(255,255,255,0.2);">${rarityLabel}</span>
                     </div>
-                    <div style="width:36px;height:36px;border-radius:50%;margin:0 auto 4px;background:${colorStyle};border:2px solid rgba(255,255,255,0.1);box-shadow:${active ? '0 0 15px rgba(249,115,22,0.3)' : 'none'};"></div>
+                    <div style="width:36px;height:36px;border-radius:50%;margin:0 auto 4px;background:${colorStyle};border:2px solid rgba(255,255,255,0.1);box-shadow:${active ? '0 0 15px ' + (skin.glowColor || 'rgba(249,115,22,0.3)') : 'none'};"></div>
                     <div style="font-size:11px;font-weight:bold;color:white;">${fa ? skin.nameFa : skin.name}</div>
-                    ${effectLabel ? `<div style="font-size:8px;color:rgba(255,255,255,0.3);">${effectLabel}</div>` : '<div style="font-size:8px;color:rgba(255,255,255,0.15);">—</div>'}
+                    <div style="font-size:8px;color:rgba(255,255,255,0.4);">${descText}</div>
                     ${active ? '<div style="position:absolute;top:-4px;right:-4px;font-size:12px;">⭐</div>' : ''}
                 </div>
             `;
@@ -1965,24 +2055,45 @@ const POWERUP_CONFIG = {
     }
 };
 
-let trailPositions = [];
+// ============================================================
+// 🔥 سیستم ذرات فوق‌بهینه (بدون لگ)
+// ============================================================
 let particles = [];
+let MAX_PARTICLES = 12;
 
-function createParticle(x, y, color, type = 'sparkle') {
-    // محدودیت تعداد پارتکل‌ها برای جلوگیری از لگ
-    if (particles.length > 30) return;
+function createTrailParticle(x, y, color) {
+    if (particles.length >= MAX_PARTICLES) return;
+    if (Math.random() > 0.06) return;
     
     particles.push({
-        x: x,
-        y: y,
-        vx: (Math.random() - 0.5) * 100,
-        vy: (Math.random() - 0.5) * 100 - 30,
+        x: x + (Math.random() - 0.5) * 4,
+        y: y + (Math.random() - 0.5) * 4,
+        vx: (Math.random() - 0.5) * 10,
+        vy: (Math.random() - 0.5) * 10,
         life: 1,
-        maxLife: 0.3 + Math.random() * 0.3,
-        size: 2 + Math.random() * 3,
-        color: color,
-        type: type
+        maxLife: 0.2 + Math.random() * 0.2,
+        size: 2 + Math.random() * 2,
+        color: color
     });
+}
+
+function createBurstParticles(x, y, color, count = 6) {
+    const maxBurst = Math.min(count, 8);
+    for (let i = 0; i < maxBurst; i++) {
+        if (particles.length >= MAX_PARTICLES) break;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 30 + Math.random() * 50;
+        particles.push({
+            x: x + (Math.random() - 0.5) * 8,
+            y: y + (Math.random() - 0.5) * 8,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 15,
+            life: 1,
+            maxLife: 0.25 + Math.random() * 0.25,
+            size: 2 + Math.random() * 2,
+            color: color
+        });
+    }
 }
 
 function updateParticles(dt) {
@@ -1990,7 +2101,7 @@ function updateParticles(dt) {
         const p = particles[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        p.vy += 60 * dt;
+        p.vy += 20 * dt;
         p.life -= dt / p.maxLife;
         if (p.life <= 0) {
             particles.splice(i, 1);
@@ -2000,7 +2111,8 @@ function updateParticles(dt) {
 
 function drawParticles() {
     for (const p of particles) {
-        ctx.globalAlpha = p.life * 0.7;
+        const alpha = p.life * 0.7;
+        ctx.globalAlpha = alpha;
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
@@ -2151,7 +2263,6 @@ function drawBackground(){
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, W, gy);
 
-    // ستاره‌ها با تعداد کمتر برای عملکرد بهتر
     if(isSpace){
         for(let i=0; i<15; i++){
             const x = (i * 137 + 53) % W;
@@ -2271,6 +2382,9 @@ function drawPowerup(p) {
     ctx.fillText(p.icon, cx, cy + 1);
 }
 
+// ============================================================
+// 🔥 رندرینگ روباه (بدون shadowBlur برای کاهش لگ)
+// ============================================================
 function drawFox(){
     const x = fox.x;
     const y = fox.y;
@@ -2285,32 +2399,27 @@ function drawFox(){
     ctx.fill();
 
     let foxColor = skin.color;
+    let trailColor = skin.trailColor || 'rgba(249,115,22,0.25)';
+    
     if (skin.id === 'rainbow') {
         const hue = (Date.now() / 50) % 360;
         foxColor = `hsl(${hue}, 80%, 60%)`;
+        trailColor = `hsla(${hue}, 80%, 60%, 0.2)`;
     }
     
-    // فقط برای اسکین‌های خاص و با تعداد کمتر
-    if ((skin.effect === 'neon_glow' || skin.effect === 'glow_eyes') && particles.length < 20) {
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = skin.glowColor || foxColor;
+    // ============================================================
+    // 🔥 رد پشت سر (فوق‌بهینه)
+    // ============================================================
+    if (playing && fox.grounded && particles.length < MAX_PARTICLES) {
+        createTrailParticle(x - 2, y + 22, trailColor);
+        createTrailParticle(x - 6, y + 28, trailColor);
     }
     
-    if (skin.effect === 'fire_trail' && playing && particles.length < 25) {
-        trailPositions.push({ x: x + 20, y: y + fox.h/2, life: 1 });
-        if (trailPositions.length > 15) trailPositions.shift();
-        
-        for (const pos of trailPositions) {
-            const alpha = pos.life * 0.3;
-            const size = 4 * pos.life;
-            ctx.fillStyle = `rgba(255, 107, 53, ${alpha})`;
-            ctx.beginPath();
-            ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
-            ctx.fill();
-            pos.life -= 0.03;
-        }
-    }
+    // ============================================================
+    // 🔥 بدون shadowBlur برای کاهش لگ
+    // ============================================================
     
+    // Body
     ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.moveTo(x + 15, y + 28);
@@ -2377,7 +2486,7 @@ function drawFox(){
     ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.shadowBlur = 0;
+    // Eyes
     ctx.fillStyle = skin.eyeColor || "#1a1a2a";
     ctx.beginPath();
     ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
@@ -2390,18 +2499,6 @@ function drawFox(){
     ctx.beginPath();
     ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
     ctx.fill();
-    
-    // فقط برای اسکین کریستال با تعداد کمتر
-    if (skin.effect === 'crystal_shine' && particles.length < 20) {
-        ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 4; i++) {
-            ctx.beginPath();
-            ctx.moveTo(x + 10 + i*8, y + 10);
-            ctx.lineTo(x + 20 + i*8, y + 40);
-            ctx.stroke();
-        }
-    }
 }
 
 function drawEgg(e){
@@ -2409,33 +2506,21 @@ function drawEgg(e){
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     
-    // فقط در صورت نیاز شیدو بزن
-    if (gemActive && particles.length < 20) {
-        ctx.shadowBlur = 12;
-        ctx.shadowColor = "rgba(244,114,182,0.3)";
-    } else if(isSpace && particles.length < 20){
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = "rgba(150,100,255,0.2)";
-    }
-    
     ctx.fillStyle = e.color;
     ctx.beginPath();
     ctx.moveTo(cx, e.y);
     ctx.bezierCurveTo(e.x + e.w, e.y + 5, e.x + e.w, e.y + 23, cx, e.y + e.h);
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
-    ctx.shadowBlur = 0;
     
-    // خط وسط تخم‌مرغ با رنگ ساده‌تر
-    ctx.strokeStyle = gemActive ? "rgba(244,114,182,0.2)" : (isSpace ? "rgba(200,180,255,0.15)" : "rgba(0,0,0,.04)");
+    ctx.strokeStyle = isSpace ? "rgba(200,180,255,0.15)" : "rgba(0,0,0,.04)";
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(e.x + 6, e.y + 18);
     ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
     
-    // هایلایت ساده‌تر
-    ctx.fillStyle = gemActive ? "rgba(244,114,182,0.1)" : (isSpace ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)");
+    ctx.fillStyle = isSpace ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)";
     ctx.beginPath();
     ctx.ellipse(cx - 4, e.y + 8, 3, 6, -0.2, 0, Math.PI * 2);
     ctx.fill();
@@ -2601,10 +2686,7 @@ function update(dt){
                 shieldHits--;
                 if(shieldHits === 0) shieldActive = false;
                 obstacles.splice(i, 1);
-                // تعداد پارتکل کمتر
-                for(let j=0; j<5; j++) {
-                    createParticle(o.x + o.w/2, o.y + o.h/2, '#4fc3f7', 'sparkle');
-                }
+                createBurstParticles(o.x + o.w/2, o.y + o.h/2, '#4fc3f7', 5);
                 continue;
             }
             endGame();
@@ -2639,7 +2721,6 @@ function update(dt){
                 clearTimeout(shieldTimeout);
                 shieldTimeout = null;
             }
-            showToast(language === 'fa' ? '🛡️ سپر تمام شد!' : '🛡️ Shield ended!');
         }
     }
 
@@ -2648,7 +2729,6 @@ function update(dt){
         if (speedBoostTimer <= 0) {
             speedBoostActive = false;
             speedBoostTimer = 0;
-            showToast(language === 'fa' ? '⚡ سرعت تمام شد!' : '⚡ Speed ended!');
         }
     }
     
@@ -2657,7 +2737,6 @@ function update(dt){
         if (gemTimer <= 0) {
             gemActive = false;
             gemTimer = 0;
-            showToast(language === 'fa' ? '💎 جواهر تمام شد!' : '💎 Gem ended!');
         }
     }
 
@@ -2679,40 +2758,29 @@ function update(dt){
 }
 
 function applyPowerup(type) {
-    const fa = language === 'fa';
-    let msg = '';
+    const skin = getSkin(currentSkinId);
+    const color = skin.glowColor || '#fbbf24';
     
     switch(type) {
         case 'shield':
             shieldActive = true;
             shieldHits = 1;
             shieldTimer = 15;
-            msg = fa ? '🛡️ سپر فعال شد!' : '🛡️ Shield activated!';
-            // پارتکل کمتر
-            for(let i=0; i<8; i++) {
-                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 'sparkle');
-            }
+            createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 5);
             if (shieldTimeout) clearTimeout(shieldTimeout);
             break;
         case 'speed':
             speedBoostActive = true;
             speedBoostTimer = 15;
-            msg = fa ? '⚡ افزایش سرعت!' : '⚡ Speed boost!';
-            for(let i=0; i<8; i++) {
-                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 'sparkle');
-            }
+            createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 5);
             break;
         case 'gem':
             gemActive = true;
             gemTimer = 12;
-            msg = fa ? '💎 تخم‌های باارزش!' : '💎 Gem eggs!';
-            for(let i=0; i<8; i++) {
-                createParticle(fox.x + fox.w/2, fox.y + fox.h/2, '#f472b6', 'sparkle');
-            }
+            createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#f472b6', 5);
             break;
     }
     updatePowerupTimers();
-    showToast(msg);
 }
 
 function collectEgg(e){
@@ -2741,22 +2809,22 @@ function collectEgg(e){
     }
     
     const skin = getSkin(currentSkinId);
-    // پارتکل کمتر برای افکت‌ها
-    if (skin.effect === 'snow_particles') {
-        for (let i = 0; i < 5; i++) {
-            createParticle(e.x + e.w/2, e.y + e.h/2, '#93c5fd', 'snow');
-        }
+    let burstColor = skin.color;
+    
+    if (skin.id === 'rainbow') {
+        const hue = (Date.now() / 30) % 360;
+        burstColor = `hsl(${hue}, 80%, 60%)`;
     }
-    if (skin.effect === 'sparkles') {
-        for (let i = 0; i < 6; i++) {
-            createParticle(e.x + e.w/2, e.y + e.h/2, '#fcd34d', 'sparkle');
-        }
-    }
-    if (skin.effect === 'galaxy_stars') {
-        for (let i = 0; i < 5; i++) {
-            createParticle(e.x + e.w/2, e.y + e.h/2, '#818cf8', 'sparkle');
-        }
-    }
+    if (skin.id === 'galaxy') burstColor = '#818cf8';
+    if (skin.id === 'shadow') burstColor = '#4ade80';
+    if (skin.id === 'phoenix') burstColor = '#f97316';
+    if (skin.id === 'neon') burstColor = '#f472b6';
+    if (skin.id === 'crystal') burstColor = '#a78bfa';
+    if (skin.id === 'golden') burstColor = '#fcd34d';
+    if (skin.id === 'frost') burstColor = '#93c5fd';
+    if (skin.id === 'ember') burstColor = '#ff6b35';
+    
+    createBurstParticles(e.x + e.w/2, e.y + e.h/2, burstColor, 6);
 }
 
 function loop(time){
@@ -2790,7 +2858,6 @@ function startGame(){
     obstacles.length = 0;
     powerups.length = 0;
     particles.length = 0;
-    trailPositions.length = 0;
     lastDayCycle = -1;
     isNight = false;
     gameTime = 0;
