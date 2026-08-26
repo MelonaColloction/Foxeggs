@@ -1570,7 +1570,7 @@ function showToast(msg) {
 // ===== بخش ۱۲: موتور بازی =====
 let playing = false;
 let score = 0;
-let speed = 330;
+let speed = 380;  // ← تغییر: از 330 به 380
 let lastTime = 0;
 let eggTimer = 0;
 let obstacleTimer = 1;
@@ -1678,13 +1678,13 @@ function drawParticles() {
 
 // سرعت
 function updateSpeed(){
-    let baseSpeed = 330;
+    let baseSpeed = 380;  // ← تغییر: از 330 به 380
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
-        baseSpeed = 330 + 870 * smooth;
+        baseSpeed = 380 + 1000 * smooth;  // ← تغییر: از 870 به 1000
     }else{
-        baseSpeed = 1200 + (score - 600) * .12;
+        baseSpeed = 1400 + (score - 600) * .15;  // ← تغییر: از 1200 به 1400 و ضریب .12 به .15
     }
     speed = speedBoostActive ? baseSpeed * 1.2 : baseSpeed;
 }
@@ -2445,7 +2445,7 @@ function loop(time){
 function startGame(){
     stopMusicTimer();
     score = 0;
-    speed = 330;
+    speed = 380;  // ← تغییر: از 330 به 380
     eggTimer = .3;
     obstacleTimer = 1;
     combo = 0;
@@ -2706,4 +2706,4 @@ initGame();
 
 </script>
 </body>
-                    </html>
+                </html>
