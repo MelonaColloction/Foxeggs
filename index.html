@@ -345,7 +345,7 @@ button:active{transform:translateY(4px);box-shadow:0 1px #c2410c}
 
 <script>
 // ============================================================
-// 🔥 کد کامل جاوااسکریپت
+// 🔥 کد کامل جاوااسکریپت - نسخه بدون باگ برای اپ
 // ============================================================
 
 // ===== بخش ۱: متغیرها و تنظیمات اولیه =====
@@ -858,7 +858,6 @@ function saveWallet(){
         localStorage.setItem("foxGames", String(gamesPlayed));
         localStorage.setItem("foxEggs", String(totalEggs));
         localStorage.setItem("foxTotalScore", String(totalScore));
-        localStorage.setItem("foxTotalEarned", String(totalScoreEarned));
         localStorage.setItem("foxLastLevel", String(getLevel()));
     }catch(error){}
 }
@@ -867,46 +866,6 @@ let best = loadNumber("foxBest");
 let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
-
-// محاسبه totalScoreEarned برای کاربرانی که قبلاً بازی کردن
-let totalScoreEarned = loadNumber("foxTotalEarned");
-
-// اگر foxTotalEarned وجود نداره (کاربر قبلاً بازی کرده ولی این متغیر جدید هست)
-if (totalScoreEarned === 0 && totalScore > 0) {
-    // محاسبه امتیاز کل کسب شده = امتیاز فعلی + امتیازهای خرج شده برای خریدها
-    let spentScore = 0;
-    
-    // امتیاز خرج شده برای اسکین‌ها
-    const purchasedSkinsData = JSON.parse(localStorage.getItem('purchasedSkins') || '["classic"]');
-    FOX_SKINS.forEach(skin => {
-        if (purchasedSkinsData.includes(skin.id) && skin.price > 0) {
-            spentScore += skin.price;
-        }
-    });
-    
-    // امتیاز خرج شده برای اکسسوری‌ها
-    const purchasedAccessoriesData = JSON.parse(localStorage.getItem('purchasedAccessories') || '["none"]');
-    ACCESSORIES.forEach(acc => {
-        if (purchasedAccessoriesData.includes(acc.id) && acc.price > 0) {
-            spentScore += acc.price;
-        }
-    });
-    
-    totalScoreEarned = totalScore + spentScore;
-    localStorage.setItem("foxTotalEarned", String(totalScoreEarned));
-}
-
-// اگر به هر دلیلی totalScoreEarned از totalScore کمتر شد (باگ یا هر چیزی)
-if (totalScoreEarned < totalScore) {
-    totalScoreEarned = totalScore;
-    localStorage.setItem("foxTotalEarned", String(totalScoreEarned));
-}
-
-// اگر کاربر جدید هست و totalScoreEarned صفر هست، مقدارش رو صفر میذاریم
-if (totalScoreEarned === 0 && totalScore === 0) {
-    totalScoreEarned = 0;
-    localStorage.setItem("foxTotalEarned", "0");
-}
 
 // ===== بخش ۵: اسکین‌ها =====
 const FOX_SKINS = [
@@ -1268,16 +1227,51 @@ function handleAccessoryClick(accId) {
     }
 }
 
-// ===== بخش ۷: سیستم لول‌بندی =====
+// ===== بخش ۷: سیستم لول‌بندی (نسخه بدون باگ) =====
 function getLevel() {
-    return Math.floor(Math.sqrt(totalScoreEarned / 1000)) + 1;
+    // محاسبه کل امتیازهای کسب شده = امتیاز فعلی + امتیازهای خرج شده
+    let totalEarned = totalScore;
+    
+    // امتیازهای خرج شده برای اسکین‌ها
+    const purchasedSkinsData = JSON.parse(localStorage.getItem('purchasedSkins') || '["classic"]');
+    FOX_SKINS.forEach(skin => {
+        if (purchasedSkinsData.includes(skin.id) && skin.price > 0) {
+            totalEarned += skin.price;
+        }
+    });
+    
+    // امتیازهای خرج شده برای اکسسوری‌ها
+    const purchasedAccessoriesData = JSON.parse(localStorage.getItem('purchasedAccessories') || '["none"]');
+    ACCESSORIES.forEach(acc => {
+        if (purchasedAccessoriesData.includes(acc.id) && acc.price > 0) {
+            totalEarned += acc.price;
+        }
+    });
+    
+    return Math.floor(Math.sqrt(totalEarned / 1000)) + 1;
 }
 
 function getLevelProgress() {
+    let totalEarned = totalScore;
+    
+    const purchasedSkinsData = JSON.parse(localStorage.getItem('purchasedSkins') || '["classic"]');
+    FOX_SKINS.forEach(skin => {
+        if (purchasedSkinsData.includes(skin.id) && skin.price > 0) {
+            totalEarned += skin.price;
+        }
+    });
+    
+    const purchasedAccessoriesData = JSON.parse(localStorage.getItem('purchasedAccessories') || '["none"]');
+    ACCESSORIES.forEach(acc => {
+        if (purchasedAccessoriesData.includes(acc.id) && acc.price > 0) {
+            totalEarned += acc.price;
+        }
+    });
+    
     const currentLevel = getLevel();
     const expForCurrent = (currentLevel - 1) ** 2 * 1000;
     const expForNext = currentLevel ** 2 * 1000;
-    const progress = (totalScoreEarned - expForCurrent) / (expForNext - expForCurrent);
+    const progress = (totalEarned - expForCurrent) / (expForNext - expForCurrent);
     return Math.min(Math.max(progress, 0), 1);
 }
 
@@ -2319,7 +2313,6 @@ function collectEgg(e){
     score += earned;
     totalEggs += 1;
     totalScore += earned;
-    totalScoreEarned += earned; // فقط اینجا زیاد میشه و هیچوقت کم نمیشه
     saveWallet();
     updateSpeed();
     updateDayNight();
