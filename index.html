@@ -116,7 +116,6 @@ canvas{
 
 #shieldTimer .time { color:#4fc3f7; }
 #speedTimer .time { color:#ffd54f; }
-#gemTimer .time { color:#f472b6; }
 
 .timer-item.hidden-timer {
     display:none !important;
@@ -627,11 +626,6 @@ button:active{
     border:2px solid #ffd54f;
 }
 
-#gemIndicator {
-    background:rgba(244,114,182,0.4);
-    border:2px solid #f472b6;
-}
-
 #skinShopGrid .skin-option {
     transition:all 0.2s ease;
 }
@@ -732,17 +726,11 @@ button:active{
         <span class="time" id="speedTimeDisplay">0</span>
         <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
     </div>
-    <div class="timer-item hidden-timer" id="gemTimer">
-        <span class="icon">💎</span>
-        <span class="time" id="gemTimeDisplay">0</span>
-        <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
-    </div>
 </div>
 
 <div id="powerupStatus">
     <div id="shieldIndicator" class="indicator">🛡️ SHIELD</div>
     <div id="speedIndicator" class="indicator">⚡ SPEED</div>
-    <div id="gemIndicator" class="indicator">💎 GEM</div>
 </div>
 
 <button id="menuButton">☰</button>
@@ -858,7 +846,6 @@ button:active{
                 <div class="name" id="themeNameNight">Night</div>
                 <div class="desc" id="themeDescNight">Dark & stars</div>
             </div>
-            <!-- تم‌های جدید -->
             <div class="theme-option" data-theme="volcano">
                 <span class="icon">🌋</span>
                 <div class="name" id="themeNameVolcano">Volcano</div>
@@ -943,7 +930,7 @@ button:active{
 
 <script>
 // ============================================================
-// 🔥 تمام کدهای جاوااسکریپت بازی (یکجا)
+// کد کامل بازی - بدون Gem (جواهر) و بهینه‌سازی شده
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -995,11 +982,9 @@ const copyBtn = document.getElementById("copyReferralCode");
 const powerupTimer = document.getElementById('powerupTimer');
 const shieldTimeDisplay = document.getElementById('shieldTimeDisplay');
 const speedTimeDisplay = document.getElementById('speedTimeDisplay');
-const gemTimeDisplay = document.getElementById('gemTimeDisplay');
 
 const shieldTimerItem = document.getElementById('shieldTimer');
 const speedTimerItem = document.getElementById('speedTimer');
-const gemTimerItem = document.getElementById('gemTimer');
 
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
@@ -1007,7 +992,7 @@ const retryBtn = document.getElementById('retryBtn');
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
 // ============================================================
-// تم‌های جدید (به جز زمستانی، پاییزی، هالووین، کریسمس)
+// تم‌ها
 // ============================================================
 
 const themeConfigs = {
@@ -1125,9 +1110,6 @@ const themeConfigs = {
         rockColor: "#5a4a6a",
         isSpace: false
     },
-    // ============================================================
-    // 🔥 تم‌های جدید (به جز زمستانی، پاییزی، هالووین، کریسمس)
-    // ============================================================
     volcano: {
         id: "volcano",
         icon: "🌋",
@@ -1409,8 +1391,6 @@ let shieldHits = 0;
 let shieldTimer = 0;
 let speedBoostActive = false;
 let speedBoostTimer = 0;
-let gemActive = false;
-let gemTimer = 0;
 let powerupTimerValue = 0;
 let gameTime = 0;
 let shieldTimeout = null;
@@ -1434,13 +1414,6 @@ const POWERUP_CONFIG = {
         spawnRate: 0.02,
         startTime: 10,
         speedMultiplier: 1.2
-    },
-    gem: { 
-        duration: 12,
-        color: '#f472b6', 
-        icon: '💎', 
-        spawnRate: 0.02,
-        startTime: 10
     }
 };
 
@@ -1781,7 +1754,14 @@ async function syncReferralsWithServer() {
     const local = getReferralsFromLocalStorage(code);
     
     try {
-        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`, {
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.referrals) {
@@ -1792,7 +1772,9 @@ async function syncReferralsWithServer() {
                 return all;
             }
         }
-    } catch(e) {}
+    } catch(e) {
+        console.warn('Sync failed:', e);
+    }
     
     return local;
 }
@@ -1845,6 +1827,9 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
     errorElement.textContent = '';
     
     try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        
         const response = await fetch(`${WEBHOOK_URL}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1852,8 +1837,10 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
                 userId: userId,
                 refCode: code,
                 timestamp: Date.now()
-            })
+            }),
+            signal: controller.signal
         });
+        clearTimeout(timeoutId);
         
         const data = await response.json();
         
@@ -2437,17 +2424,10 @@ function createEgg(){
     let r = Math.random();
     let type = 0;
     
-    if (gemActive) {
-        if(r > .3) type = 1;
-        if(r > .6) type = 2;
-        if(r > .8) type = 3;
-        if(r > .92) type = 4;
-    } else {
-        if(r > .55) type = 1;
-        if(r > .78) type = 2;
-        if(r > .91) type = 3;
-        if(r > .98) type = 4;
-    }
+    if(r > .55) type = 1;
+    if(r > .78) type = 2;
+    if(r > .91) type = 3;
+    if(r > .98) type = 4;
     
     const data = eggColors[type];
     eggs.push({
@@ -2495,12 +2475,21 @@ function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
     
-    const chance = Math.random() * 100;
-    const roll = 90;
+    // چک کن کدوم پاوراپ‌ها فعال هستن
+    const activeTypes = [];
+    if (shieldActive) activeTypes.push('shield');
+    if (speedBoostActive) activeTypes.push('speed');
     
-    if (chance < roll) {
-        const types = ['shield', 'speed', 'gem'];
-        const type = types[Math.floor(Math.random() * types.length)];
+    // اگه هر ۲ تا فعال باشن، هیچی اسپاون نکن
+    if (activeTypes.length >= 2) return;
+    
+    // فقط پاوراپ‌هایی رو اسپاون کن که فعال نیستن
+    const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
+    if (available.length === 0) return;
+    
+    const chance = Math.random() * 100;
+    if (chance < 90) {
+        const type = available[Math.floor(Math.random() * available.length)];
         createPowerup(type);
     }
 }
@@ -2513,10 +2502,6 @@ function collectEgg(e){
     else if(combo >= 5) multiplier = 2;
     
     let earned = e.value * multiplier;
-    if (gemActive) {
-        earned = earned * 1.5;
-    }
-    
     score += earned;
     totalEggs += 1;
     totalScore += earned;
@@ -2566,11 +2551,6 @@ function applyPowerup(type) {
             speedBoostTimer = 15;
             createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 5);
             break;
-        case 'gem':
-            gemActive = true;
-            gemTimer = 12;
-            createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#f472b6', 5);
-            break;
     }
     updatePowerupTimers();
 }
@@ -2578,7 +2558,6 @@ function applyPowerup(type) {
 function updatePowerupTimers() {
     shieldTimerItem.classList.add('hidden-timer');
     speedTimerItem.classList.add('hidden-timer');
-    gemTimerItem.classList.add('hidden-timer');
     
     let anyActive = false;
     
@@ -2591,12 +2570,6 @@ function updatePowerupTimers() {
     if (speedBoostActive) {
         speedTimerItem.classList.remove('hidden-timer');
         speedTimeDisplay.textContent = Math.ceil(speedBoostTimer);
-        anyActive = true;
-    }
-    
-    if (gemActive) {
-        gemTimerItem.classList.remove('hidden-timer');
-        gemTimeDisplay.textContent = Math.ceil(gemTimer);
         anyActive = true;
     }
     
@@ -2697,20 +2670,11 @@ function update(dt){
             speedBoostTimer = 0;
         }
     }
-    
-    if (gemActive) {
-        gemTimer -= dt;
-        if (gemTimer <= 0) {
-            gemActive = false;
-            gemTimer = 0;
-        }
-    }
 
     updatePowerupTimers();
 
     document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
     document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
-    document.getElementById('gemIndicator').style.display = gemActive ? 'block' : 'none';
 
     if(combo > 0){
         comboTimer -= dt;
@@ -2753,8 +2717,6 @@ function startGame(){
     shieldTimer = 0;
     speedBoostActive = false;
     speedBoostTimer = 0;
-    gemActive = false;
-    gemTimer = 0;
     powerupTimerValue = 2;
     if (shieldTimeout) {
         clearTimeout(shieldTimeout);
@@ -2766,7 +2728,6 @@ function startGame(){
     comboBox.classList.remove("show");
     document.getElementById('shieldIndicator').style.display = 'none';
     document.getElementById('speedIndicator').style.display = 'none';
-    document.getElementById('gemIndicator').style.display = 'none';
     powerupTimer.classList.add('hidden');
     resetFox();
     playing = true;
@@ -3095,7 +3056,7 @@ window.addEventListener("offline", function() {
 
 retryBtn.addEventListener("click", function() {
     checkInternet();
-    fetch(WEBHOOK_URL)
+    fetch(WEBHOOK_URL, { signal: AbortSignal.timeout(5000) })
         .then(() => {
             if (navigator.onLine) {
                 noInternetOverlay.style.display = 'none';
