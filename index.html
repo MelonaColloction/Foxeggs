@@ -1376,7 +1376,7 @@ let totalScore = loadNumber("foxTotalScore");
 
 let playing = false;
 let score = 0;
-let speed = 450;
+let speed = 380;
 let lastTime = 0;
 let eggTimer = 0;
 let obstacleTimer = 1;
@@ -1492,13 +1492,13 @@ function getEggColors() {
 }
 
 function updateSpeed(){
-    let baseSpeed =450 ;
+    let baseSpeed =380 ;
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
-        baseSpeed = 450 + 850 * smooth;
+        baseSpeed = 380 + 850 * smooth;
     }else{
-        baseSpeed = 1200 + (score - 600) * .12;
+        baseSpeed = 1200 + (score - 600) * .10;
     }
     speed = speedBoostActive ? baseSpeed * 1.2 : baseSpeed;
 }
