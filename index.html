@@ -613,7 +613,7 @@ button:active{
 }
 </style>
 <!-- ============================================================
-     اسکریپت AdsGram - حتماً قبل از کد بازی لود بشه
+     اسکریپت AdsGram
      ============================================================ -->
 <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 </head>
@@ -790,10 +790,6 @@ button:active{
     <button id="openThemeStartBtn" style="background:rgba(255,255,255,0.12);box-shadow:none;font-size:14px;padding:10px 25px;margin-top:10px;border:1px solid rgba(255,255,255,0.1);">
         🎨 <span id="startThemeLabel">Change Theme</span>
     </button>
-    <!-- دکمه جایزه ۲۰۰۰ امتیازی با تبلیغ -->
-    <button id="rewardBtn" style="margin-top:10px; background:#4ade80; box-shadow:0 5px #166534; padding:14px 35px; border-radius:12px; border:none; color:white; font-weight:bold; font-size:18px; cursor:pointer;">
-        🎁 ۲۰۰۰ امتیاز بگیر (تماشای تبلیغ)
-    </button>
     <p id="controlText" style="margin-top:18px;font-size:13px">Tap screen or Space to jump</p>
     <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🌍 Available worldwide</p>
 </div>
@@ -816,7 +812,15 @@ button:active{
             <span id="finalEggs">0</span>
         </div>
     </div>
+    
+    <!-- دکمه Play Again معمولی -->
     <button id="restart">Play Again</button>
+    
+    <!-- دکمه تبلیغ + ادامه (فقط توی Game Over) -->
+    <button id="restartWithAdBtn" style="margin-top:10px; background:#4ade80; box-shadow:0 5px #166534; padding:14px 35px; border-radius:12px; border:none; color:white; font-weight:bold; font-size:18px; cursor:pointer;">
+        🎁 ۲۰۰۰ امتیاز بگیر و ادامه بده (تماشای تبلیغ)
+    </button>
+    
     <button id="changeThemeBtn">🎨 <span id="changeThemeLabel">Change Theme</span></button>
 </div>
 
@@ -835,7 +839,7 @@ button:active{
 
 <script>
 // ============================================================
-// Fox Eggs - نسخه کامل با تبلیغات AdsGram
+// Fox Eggs - کد کامل با تبلیغات فقط در Game Over
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -864,6 +868,7 @@ const finalScore = document.getElementById("finalScore");
 const recordText = document.getElementById("record");
 const startButton = document.getElementById("start");
 const restartButton = document.getElementById("restart");
+const restartWithAdBtn = document.getElementById("restartWithAdBtn");
 const menuButton = document.getElementById("menuButton");
 const menuPanel = document.getElementById("menuPanel");
 const gamesValue = document.getElementById("gamesValue");
@@ -890,14 +895,15 @@ const retryBtn = document.getElementById('retryBtn');
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
 // ============================================================
-// تبلیغات AdsGram - Block ID: 44932
+// تبلیغات AdsGram - فقط در Game Over
 // ============================================================
 
 const BLOCK_ID = "44932";
 
-function showRewardedAd() {
-    if (!playing) {
-        showToast('⏳ اول بازی رو شروع کن!');
+function showRewardedAdOnGameOver() {
+    // ❌ اگه بازی در حال اجراست، تبلیغ نمایش داده نشه
+    if (playing) {
+        showToast('⏳ فقط وقتی باختی می‌تونی ببینی!');
         return;
     }
     
@@ -905,12 +911,14 @@ function showRewardedAd() {
         const controller = window.Adsgram.init({ blockId: BLOCK_ID });
         controller.show().then((result) => {
             if (result.done) {
-                // ✅ جایزه ۲۰۰۰ امتیاز
-                score += 2000;
+                // ✅ جایزه ۲۰۰۰ امتیاز به حساب کل
                 totalScore += 2000;
                 saveWallet();
                 updateUI();
-                showToast('🎉 ۲۰۰۰ امتیاز جایزه گرفتی!');
+                showToast('🎉 ۲۰۰۰ امتیاز به حسابت اضافه شد!');
+                
+                // 🔄 بعد از دیدن تبلیغ، بازی رو دوباره شروع کن
+                startGame();
             } else {
                 showToast('👀 ویدیو رو کامل ببین تا جایزه بگیری!');
             }
@@ -922,10 +930,10 @@ function showRewardedAd() {
     }
 }
 
-// اتصال دکمه جایزه
-document.getElementById("rewardBtn").addEventListener("click", function(e) {
+// اتصال دکمه Game Over
+restartWithAdBtn.addEventListener("click", function(e) {
     e.stopPropagation();
-    showRewardedAd();
+    showRewardedAdOnGameOver();
 });
 
 // ============================================================
@@ -2751,6 +2759,7 @@ function applyLanguage(){
     document.getElementById("gameCountLabel").textContent = fa ? "تعداد بازی‌ها:" : "Games:";
     document.getElementById("totalEggLabel").textContent = fa ? "کل تخم‌ها:" : "Total Eggs:";
     restartButton.textContent = fa ? "دوباره بازی کن" : "Play Again";
+    restartWithAdBtn.textContent = fa ? "🎁 ۲۰۰۰ امتیاز بگیر و ادامه بده (تماشای تبلیغ)" : "🎁 Get 2000 points & continue (Watch Ad)";
     recordText.textContent = fa ? "🏆 رکورد جدید!" : "🏆 New Record!";
     document.getElementById("startThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
     document.getElementById("changeThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
