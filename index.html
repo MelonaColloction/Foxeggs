@@ -59,13 +59,6 @@ canvas{
     margin-top:4px;
 }
 
-#heartsDisplay{
-    font-size:20px;
-    margin-top:4px;
-    color:#ef4444;
-    text-shadow:0 2px 3px #555;
-}
-
 #combo{
     opacity:0;
     font-size:20px;
@@ -74,6 +67,58 @@ canvas{
 
 #combo.show{
     opacity:1;
+}
+
+#powerupTimer {
+    position:absolute;
+    top:70px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:6;
+    pointer-events:none;
+    display:flex;
+    gap:20px;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.5);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    padding:6px 18px;
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,0.1);
+    transition:all 0.3s ease;
+}
+
+#powerupTimer.hidden {
+    opacity:0;
+    transform:translateX(-50%) translateY(-10px);
+    pointer-events:none;
+}
+
+.timer-item {
+    display:flex;
+    align-items:center;
+    gap:6px;
+    color:white;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.timer-item .icon {
+    font-size:16px;
+}
+
+.timer-item .time {
+    min-width:28px;
+    text-align:center;
+    font-variant-numeric:tabular-nums;
+}
+
+#shieldTimer .time { color:#4fc3f7; }
+#speedTimer .time { color:#ffd54f; }
+
+.timer-item.hidden-timer {
+    display:none !important;
 }
 
 #menuButton{
@@ -208,12 +253,6 @@ button{
 button:active{
     transform:translateY(4px);
     box-shadow:0 1px #c2410c;
-}
-
-button:disabled{
-    opacity:0.5;
-    cursor:not-allowed;
-    transform:none;
 }
 
 .final{
@@ -554,6 +593,39 @@ button:disabled{
     transform:translateY(3px);
 }
 
+#powerupStatus {
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:10px;
+    z-index:5;
+    pointer-events:none;
+}
+
+#powerupStatus .indicator {
+    display:none;
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:14px;
+    color:white;
+    font-weight:bold;
+    text-shadow:0 1px 3px rgba(0,0,0,0.5);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+}
+
+#shieldIndicator {
+    background:rgba(79,195,247,0.4);
+    border:2px solid #4fc3f7;
+}
+
+#speedIndicator {
+    background:rgba(255,213,79,0.4);
+    border:2px solid #ffd54f;
+}
+
 #skinShopGrid .skin-option {
     transition:all 0.2s ease;
 }
@@ -624,64 +696,7 @@ button:disabled{
     text-align:center;
     max-width:90%;
 }
-
-/* ============================================================
-     تایمر ۵ ثانیه‌ای برای ادامه
-     ============================================================ */
-#reviveTimer {
-    display:none;
-    position:fixed;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    z-index:20;
-    background:rgba(0,0,0,0.85);
-    padding:20px 30px;
-    border-radius:16px;
-    text-align:center;
-    color:white;
-    border:2px solid #ef4444;
-    max-width:90%;
-}
-
-#reviveTimer .big-icon {
-    font-size:50px;
-    margin-bottom:5px;
-}
-
-#reviveTimer .title {
-    font-size:18px;
-    font-weight:bold;
-    margin-bottom:5px;
-}
-
-#reviveTimer .sub {
-    font-size:14px;
-    color:#aaa;
-    margin-bottom:10px;
-}
-
-#reviveTimer .heart-btn {
-    font-size:48px;
-    margin-bottom:10px;
-    cursor:pointer;
-    transition:transform 0.2s;
-}
-
-#reviveTimer .heart-btn:hover {
-    transform:scale(1.1);
-}
-
-#reviveTimer .countdown {
-    font-size:14px;
-    color:#fbbf24;
-}
 </style>
-
-<!-- ============================================================
-     اسکریپت AdsGram
-     ============================================================ -->
-<script src="https://sad.adsgram.ai/js/sad.min.js"></script>
 </head>
 
 <body>
@@ -690,25 +705,36 @@ button:disabled{
 
 <canvas id="canvas"></canvas>
 
-<!-- ============================================================
-     نمایش امتیاز و قلب‌ها در صفحه اصلی
-     ============================================================ -->
 <div id="ui">
     <div>
         <div id="score">Score: 0</div>
         <div id="best">Best: 0</div>
-        <div id="heartsDisplay">❤️❤️❤️</div>
     </div>
     <div id="combo">
         COMBO ×<span id="comboValue">2</span>
     </div>
 </div>
 
+<div id="powerupTimer" class="hidden">
+    <div class="timer-item hidden-timer" id="shieldTimer">
+        <span class="icon">🛡️</span>
+        <span class="time" id="shieldTimeDisplay">0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
+    </div>
+    <div class="timer-item hidden-timer" id="speedTimer">
+        <span class="icon">⚡</span>
+        <span class="time" id="speedTimeDisplay">0</span>
+        <span style="font-size:11px;color:rgba(255,255,255,0.5);">s</span>
+    </div>
+</div>
+
+<div id="powerupStatus">
+    <div id="shieldIndicator" class="indicator">🛡️ SHIELD</div>
+    <div id="speedIndicator" class="indicator">⚡ SPEED</div>
+</div>
+
 <button id="menuButton">☰</button>
 
-<!-- ============================================================
-     منو
-     ============================================================ -->
 <div id="menuPanel">
 
     <h2 id="menuTitle">Menu</h2>
@@ -785,9 +811,6 @@ button:disabled{
 
 </div>
 
-<!-- ============================================================
-     انتخاب تم
-     ============================================================ -->
 <div class="theme-selector-overlay" id="themeSelectorOverlay">
     <div class="theme-selector-panel">
         <h2 id="themeSelectorTitle">🎨 Select Theme</h2>
@@ -853,14 +876,21 @@ button:disabled{
                 <div class="name" id="themeNameCyberpunk">Cyberpunk</div>
                 <div class="desc" id="themeDescCyberpunk">Neon future</div>
             </div>
+            <div class="theme-option" data-theme="sunset">
+                <span class="icon">🌅</span>
+                <div class="name" id="themeNameSunset">Sunset</div>
+                <div class="desc" id="themeDescSunset">Golden hour</div>
+            </div>
+            <div class="theme-option" data-theme="fantasy">
+                <span class="icon">🧙</span>
+                <div class="name" id="themeNameFantasy">Fantasy</div>
+                <div class="desc" id="themeDescFantasy">Enchanted realm</div>
+            </div>
         </div>
         <button class="btn-close-theme" id="closeThemeSelector">✓ <span id="applyThemeText">Apply Theme</span></button>
     </div>
 </div>
 
-<!-- ============================================================
-     صفحه شروع (Start Screen)
-     ============================================================ -->
 <div id="startScreen" class="screen">
     <div class="logo">🦊</div>
     <h1>Fox Eggs</h1>
@@ -869,31 +899,10 @@ button:disabled{
     <button id="openThemeStartBtn" style="background:rgba(255,255,255,0.12);box-shadow:none;font-size:14px;padding:10px 25px;margin-top:10px;border:1px solid rgba(255,255,255,0.1);">
         🎨 <span id="startThemeLabel">Change Theme</span>
     </button>
-    
-    <!-- دکمه‌های تبلیغات در صفحه Start -->
-    <div style="margin-top:15px; display:flex; flex-direction:column; gap:8px; width:100%; max-width:280px;">
-        
-        <!-- دکمه دریافت قلب -->
-        <button id="rewardHeartBtn" style="padding:10px 20px; background:#ef4444; box-shadow:0 4px #991b1b; font-size:14px; border-radius:10px; border:none; color:white; font-weight:bold; cursor:pointer;">
-            ❤️ +۱ قلب (تماشای تبلیغ)
-            <span style="display:block; font-size:10px; opacity:0.7; font-weight:normal;">(حداکثر ۳ قلب)</span>
-        </button>
-        
-        <!-- دکمه ۵۰۰ امتیاز -->
-        <button id="rewardPointsBtn" style="padding:10px 20px; background:#4ade80; box-shadow:0 4px #166534; font-size:14px; border-radius:10px; border:none; color:white; font-weight:bold; cursor:pointer;">
-            🎁 +۵۰۰ امتیاز (تماشای تبلیغ)
-            <span style="display:block; font-size:10px; opacity:0.7; font-weight:normal;">(بدون محدودیت)</span>
-        </button>
-        
-    </div>
-    
     <p id="controlText" style="margin-top:18px;font-size:13px">Tap screen or Space to jump</p>
     <p style="font-size:10px;color:rgba(255,255,255,0.15);margin-top:20px;">🌍 Available worldwide</p>
 </div>
 
-<!-- ============================================================
-     صفحه باخت (Game Over)
-     ============================================================ -->
 <div id="gameOver" class="screen">
     <div class="logo">🦊</div>
     <h1 id="gameOverTitle">Game Over!</h1>
@@ -912,48 +921,12 @@ button:disabled{
             <span id="finalEggs">0</span>
         </div>
     </div>
-    
-    <!-- نمایش قلب‌های باقی‌مونده -->
-    <div id="heartsDisplay" style="font-size:28px; margin-bottom:10px;">❤️❤️❤️</div>
-    
     <button id="restart">Play Again</button>
-    
-    <!-- دکمه‌های تبلیغات در Game Over -->
-    <div style="margin-top:10px; display:flex; flex-direction:column; gap:6px; width:100%; max-width:280px;">
-        
-        <!-- دکمه دریافت قلب -->
-        <button id="gameoverHeartBtn" style="padding:8px 16px; background:#ef4444; box-shadow:0 3px #991b1b; font-size:13px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer;">
-            ❤️ +۱ قلب (تماشای تبلیغ)
-            <span style="display:block; font-size:9px; opacity:0.6; font-weight:normal;">(حداکثر ۳ قلب)</span>
-        </button>
-        
-        <!-- دکمه ۵۰۰ امتیاز -->
-        <button id="gameoverPointsBtn" style="padding:8px 16px; background:#4ade80; box-shadow:0 3px #166534; font-size:13px; border-radius:8px; border:none; color:white; font-weight:bold; cursor:pointer;">
-            🎁 +۵۰۰ امتیاز (تماشای تبلیغ)
-            <span style="display:block; font-size:9px; opacity:0.6; font-weight:normal;">(بدون محدودیت)</span>
-        </button>
-        
-    </div>
-    
     <button id="changeThemeBtn">🎨 <span id="changeThemeLabel">Change Theme</span></button>
 </div>
 
 </div>
 
-<!-- ============================================================
-     تایمر ۵ ثانیه‌ای برای ادامه
-     ============================================================ -->
-<div id="reviveTimer">
-    <div class="big-icon">💀</div>
-    <div class="title">باختی!</div>
-    <div class="sub">برای ادامه با امتیاز فعلی، روی قلب کلیک کن</div>
-    <div class="heart-btn" id="reviveHeartBtn">❤️</div>
-    <div class="countdown" id="reviveCountdown">۵ ثانیه فرصت داری...</div>
-</div>
-
-<!-- ============================================================
-     خطاهای اینترنت و سایر
-     ============================================================ -->
 <div id="noInternetOverlay">
     <div class="box">
         <div class="icon">📡</div>
@@ -967,7 +940,7 @@ button:disabled{
 
 <script>
 // ============================================================
-// Fox Eggs - کد کامل با تمام تغییرات
+// کد کامل بازی - بدون لگ و باگ
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -1011,11 +984,17 @@ const themeSelectorOverlay = document.getElementById("themeSelectorOverlay");
 const closeThemeSelector = document.getElementById("closeThemeSelector");
 const currentThemeDisplay = document.getElementById("currentThemeDisplay");
 const startThemeLabel = document.getElementById("startThemeLabel");
-const heartsDisplay = document.getElementById("heartsDisplay");
 
 const myReferralCode = document.getElementById("myReferralCode");
 const referralCount = document.getElementById("referralCount");
 const copyBtn = document.getElementById("copyReferralCode");
+
+const powerupTimer = document.getElementById('powerupTimer');
+const shieldTimeDisplay = document.getElementById('shieldTimeDisplay');
+const speedTimeDisplay = document.getElementById('speedTimeDisplay');
+
+const shieldTimerItem = document.getElementById('shieldTimer');
+const speedTimerItem = document.getElementById('speedTimer');
 
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
@@ -1023,188 +1002,7 @@ const retryBtn = document.getElementById('retryBtn');
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
 // ============================================================
-// تبلیغات AdsGram
-// ============================================================
-
-const BLOCK_ID = "44932";
-let adController = null;
-
-// تابع اصلی نمایش تبلیغ
-function showAd(callback) {
-    if (playing) {
-        showToast('⏳ فقط وقتی باختی می‌تونی ببینی!');
-        return;
-    }
-    
-    try {
-        if (!adController) {
-            adController = window.Adsgram.init({ 
-                blockId: BLOCK_ID,
-                debug: false,
-                timeout: 10000
-            });
-        }
-        
-        adController.show().then((result) => {
-            if (result.done) {
-                callback(); // اجرای کد جایزه
-            } else {
-                showToast('👀 ویدیو رو کامل ببین تا جایزه بگیری!');
-            }
-        }).catch((error) => {
-            if (error?.message?.includes('timeout')) {
-                showToast('⏰ زمان اتصال به سرور تموم شد!');
-            } else {
-                showToast('❌ تبلیغ در دسترس نیست');
-            }
-            console.log('Ad error:', error);
-        });
-    } catch(e) {
-        showToast('❌ خطا در نمایش تبلیغ');
-        console.error('Ad failed:', e);
-    }
-}
-
-// ============================================================
-// سیستم قلب‌ها (Lives) + تایمر ۵ ثانیه
-// ============================================================
-
-let lives = 3;
-const MAX_LIVES = 3;
-let reviveTimer = null;
-let reviveCountdown = 5;
-let isWaitingForRevive = false;
-
-// به‌روزرسانی نمایش قلب‌ها
-function updateHeartsDisplay() {
-    const displays = document.querySelectorAll('#heartsDisplay');
-    const heartStr = '❤️'.repeat(lives) + '🖤'.repeat(MAX_LIVES - lives);
-    displays.forEach(el => {
-        if (el) el.textContent = heartStr;
-    });
-}
-
-// ریست قلب‌ها (برای شروع جدید)
-function resetLives() {
-    lives = MAX_LIVES;
-    updateHeartsDisplay();
-    if (restartButton) {
-        restartButton.disabled = false;
-        restartButton.style.opacity = '1';
-    }
-}
-
-// استفاده از ۱ قلب
-function useLife() {
-    if (lives > 0) {
-        lives--;
-        updateHeartsDisplay();
-        return true;
-    }
-    return false;
-}
-
-// اضافه کردن ۱ قلب (با تبلیغ)
-function addLife() {
-    if (lives < MAX_LIVES) {
-        lives++;
-        updateHeartsDisplay();
-        return true;
-    }
-    return false;
-}
-
-// ============================================================
-// تابع نمایش تایمر ۵ ثانیه‌ای موقع باخت
-// ============================================================
-
-function showReviveTimer() {
-    if (isWaitingForRevive) return;
-    if (lives <= 0) {
-        showToast('❤️ قلبی نداری! برای دریافت قلب تبلیغ ببین.');
-        return;
-    }
-    
-    isWaitingForRevive = true;
-    reviveCountdown = 5;
-    
-    const timerDiv = document.getElementById('reviveTimer');
-    const countdownEl = document.getElementById('reviveCountdown');
-    if (timerDiv) timerDiv.style.display = 'block';
-    if (countdownEl) countdownEl.textContent = `${reviveCountdown} ثانیه فرصت داری...`;
-    
-    // شروع تایمر
-    reviveTimer = setInterval(() => {
-        reviveCountdown--;
-        if (reviveCountdown <= 0) {
-            clearInterval(reviveTimer);
-            reviveTimer = null;
-            if (timerDiv) timerDiv.style.display = 'none';
-            isWaitingForRevive = false;
-            // ❌ کاربر فرصت نداشت → بازی از اول شروع میشه
-            showToast('⏰ وقت تموم شد! از اول شروع کن.');
-            startNewGame();
-        } else {
-            if (countdownEl) countdownEl.textContent = `${reviveCountdown} ثانیه فرصت داری...`;
-        }
-    }, 1000);
-}
-
-// ============================================================
-// تابع ادامه بازی با امتیاز قبلی (وقتی روی قلب کلیک کنه)
-// ============================================================
-
-function reviveGame() {
-    if (!isWaitingForRevive) return;
-    if (lives <= 0) {
-        showToast('❤️ قلبی نداری!');
-        return;
-    }
-    
-    // تایمر رو متوقف کن
-    clearInterval(reviveTimer);
-    reviveTimer = null;
-    isWaitingForRevive = false;
-    const timerDiv = document.getElementById('reviveTimer');
-    if (timerDiv) timerDiv.style.display = 'none';
-    
-    // ❌ کم کردن ۱ قلب
-    useLife();
-    
-    // ✅ ادامه با امتیاز قبلی
-    playing = true;
-    menuButton.style.display = "none";
-    menuPanel.style.display = "none";
-    gameOver.style.display = "none";
-    themeSelectorOverlay.style.display = "none";
-    startMusic();
-    lastTime = performance.now();
-    requestAnimationFrame(loop);
-    
-    showToast('❤️ ادامه دادی!');
-}
-
-// ============================================================
-// شروع بازی جدید (از صفر)
-// ============================================================
-
-function startNewGame() {
-    // ریست کامل
-    score = 0;
-    lives = MAX_LIVES;
-    gamesPlayed++;
-    saveWallet();
-    updateUI();
-    updateHeartsDisplay();
-    if (restartButton) {
-        restartButton.disabled = false;
-        restartButton.style.opacity = '1';
-    }
-    startGame();
-}
-
-// ============================================================
-// تم‌ها
+// تم‌ها (14 تم)
 // ============================================================
 
 const themeConfigs = {
@@ -1435,6 +1233,44 @@ const themeConfigs = {
         treeColor: "#ff0066",
         rockColor: "#7a3a9a",
         isSpace: false
+    },
+    sunset: {
+        id: "sunset",
+        icon: "🌅",
+        nameEn: "Sunset",
+        nameFa: "غروب",
+        descEn: "Golden hour",
+        descFa: "ساعت طلایی",
+        skyDay: ["#ff6b35", "#f7931e", "#fbbf24"],
+        skyNight: ["#1a0a0a", "#2a0a0a", "#3a0a0a"],
+        groundDay: ["#d4a050", "#c89040", "#b88030"],
+        groundNight: ["#2a1a0a", "#1a0a0a", "#0a0a0a"],
+        eggColors: [
+            ["#f5deb3", 1], ["#deb887", 2], ["#d2b48c", 5], ["#cd853f", 10], ["#f4a460", 25]
+        ],
+        foxColor: "#cd853f",
+        treeColor: "#8b6914",
+        rockColor: "#a08a6a",
+        isSpace: false
+    },
+    fantasy: {
+        id: "fantasy",
+        icon: "🧙",
+        nameEn: "Fantasy",
+        nameFa: "فانتزی",
+        descEn: "Enchanted realm",
+        descFa: "سرزمین افسانه‌ای",
+        skyDay: ["#6a3a8a", "#8a5aaa", "#aa7aca"],
+        skyNight: ["#1a0a2a", "#2a0a3a", "#3a0a4a"],
+        groundDay: ["#3a5a2a", "#4a6a3a", "#5a7a4a"],
+        groundNight: ["#1a2a1a", "#0a1a0a", "#0a0a1a"],
+        eggColors: [
+            ["#e8d0f0", 1], ["#d4a0e8", 2], ["#c070d0", 5], ["#a040b0", 10], ["#f0d8ff", 25]
+        ],
+        foxColor: "#8b5cf6",
+        treeColor: "#6a4a7a",
+        rockColor: "#7a5a8a",
+        isSpace: false
     }
 };
 
@@ -1596,11 +1432,38 @@ let combo = 0;
 let comboTimer = 0;
 let eggs = [];
 let obstacles = [];
+let powerups = [];
 let particles = [];
+let shieldActive = false;
+let shieldHits = 0;
+let shieldTimer = 0;
+let speedBoostActive = false;
+let speedBoostTimer = 0;
+let powerupTimerValue = 0;
+let gameTime = 0;
+let shieldTimeout = null;
 let isNight = false;
 let lastDayCycle = -1;
-let MAX_PARTICLES = 5;
-let frameCounter = 0;
+let MAX_PARTICLES = 12;
+
+const POWERUP_CONFIG = {
+    shield: { 
+        duration: 15,
+        color: '#4fc3f7', 
+        icon: '🛡️', 
+        spawnRate: 0.02,
+        startTime: 10,
+        maxHits: 1
+    },
+    speed: { 
+        duration: 15,
+        color: '#ffd54f', 
+        icon: '⚡', 
+        spawnRate: 0.02,
+        startTime: 10,
+        speedMultiplier: 1.2
+    }
+};
 
 const fox = {
     x:100, y:0, w:62, h:48, vy:0, gravity:2100, jump:-780, grounded:true, animation:0
@@ -1677,7 +1540,7 @@ function getEggColors() {
 }
 
 function updateSpeed(){
-    let baseSpeed = 380;
+    let baseSpeed =380 ;
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
@@ -1685,7 +1548,7 @@ function updateSpeed(){
     }else{
         baseSpeed = 1200 + (score - 600) * .10;
     }
-    speed = baseSpeed;
+    speed = speedBoostActive ? baseSpeed * 1.2 : baseSpeed;
 }
 
 function updateDayNight(){
@@ -2175,12 +2038,12 @@ function fallbackCopy(text) {
 }
 
 // ============================================================
-// توابع پارتیکل (بهینه شده برای ۳۰ FPS)
+// توابع پارتیکل
 // ============================================================
 
 function createTrailParticle(x, y, color) {
     if (particles.length >= MAX_PARTICLES) return;
-    if (Math.random() > 0.03) return;
+    if (Math.random() > 0.06) return;
     
     particles.push({
         x: x + (Math.random() - 0.5) * 4,
@@ -2195,7 +2058,7 @@ function createTrailParticle(x, y, color) {
 }
 
 function createBurstParticles(x, y, color, count = 6) {
-    const maxBurst = Math.min(count, 6);
+    const maxBurst = Math.min(count, 8);
     for (let i = 0; i < maxBurst; i++) {
         if (particles.length >= MAX_PARTICLES) break;
         const angle = Math.random() * Math.PI * 2;
@@ -2349,6 +2212,29 @@ function drawCloud(x,y,s){
     ctx.arc(x + 25 * s, y - 8 * s, 27 * s, 0, Math.PI * 2);
     ctx.arc(x + 52 * s, y, 20 * s, 0, Math.PI * 2);
     ctx.fill();
+}
+
+function drawPowerup(p) {
+    const cx = p.x + p.w/2;
+    const cy = p.y + p.h/2;
+    p.pulse += 0.05;
+    const scale = 1 + Math.sin(p.pulse) * 0.08;
+    
+    ctx.beginPath();
+    ctx.arc(cx, cy, 18 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = p.color + '30';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(cx, cy, 14 * scale, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    
+    ctx.font = '18px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'white';
+    ctx.fillText(p.icon, cx, cy + 1);
 }
 
 function drawFox(){
@@ -2576,6 +2462,7 @@ function draw(){
     drawBackground();
     for(const e of eggs) drawEgg(e);
     for(const o of obstacles) drawObstacle(o);
+    for(const p of powerups) drawPowerup(p);
     drawParticles();
     drawFox();
 }
@@ -2615,6 +2502,41 @@ function createObstacle(){
         w:w, h:h,
         type:type
     });
+}
+
+function createPowerup(type) {
+    const config = POWERUP_CONFIG[type];
+    if (!config) return;
+    powerups.push({
+        x: W + 30,
+        y: ground() - 80 - Math.random() * 100,
+        w: 30,
+        h: 30,
+        type: type,
+        color: config.color,
+        icon: config.icon,
+        pulse: Math.random() * Math.PI * 2
+    });
+}
+
+function trySpawnPowerup() {
+    gameTime += 0.1;
+    if (gameTime < 10) return;
+    
+    const activeTypes = [];
+    if (shieldActive) activeTypes.push('shield');
+    if (speedBoostActive) activeTypes.push('speed');
+    
+    if (activeTypes.length >= 2) return;
+    
+    const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
+    if (available.length === 0) return;
+    
+    const chance = Math.random() * 100;
+    if (chance < 90) {
+        const type = available[Math.floor(Math.random() * available.length)];
+        createPowerup(type);
+    }
 }
 
 function collectEgg(e){
@@ -2657,7 +2579,54 @@ function collectEgg(e){
     createBurstParticles(e.x + e.w/2, e.y + e.h/2, burstColor, 6);
 }
 
+function applyPowerup(type) {
+    const skin = getSkin(currentSkinId);
+    const color = skin.glowColor || '#fbbf24';
+    
+    switch(type) {
+        case 'shield':
+            shieldActive = true;
+            shieldHits = 1;
+            shieldTimer = 15;
+            createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 5);
+            if (shieldTimeout) clearTimeout(shieldTimeout);
+            break;
+        case 'speed':
+            speedBoostActive = true;
+            speedBoostTimer = 15;
+            createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 5);
+            break;
+    }
+    updatePowerupTimers();
+}
+
+function updatePowerupTimers() {
+    shieldTimerItem.classList.add('hidden-timer');
+    speedTimerItem.classList.add('hidden-timer');
+    
+    let anyActive = false;
+    
+    if (shieldActive) {
+        shieldTimerItem.classList.remove('hidden-timer');
+        shieldTimeDisplay.textContent = Math.ceil(shieldTimer);
+        anyActive = true;
+    }
+    
+    if (speedBoostActive) {
+        speedTimerItem.classList.remove('hidden-timer');
+        speedTimeDisplay.textContent = Math.ceil(speedBoostTimer);
+        anyActive = true;
+    }
+    
+    if (anyActive) {
+        powerupTimer.classList.remove('hidden');
+    } else {
+        powerupTimer.classList.add('hidden');
+    }
+}
+
 function update(dt){
+    gameTime += dt;
     updateSpeed();
 
     fox.vy += fox.gravity * dt;
@@ -2697,11 +2666,60 @@ function update(dt){
         const o = obstacles[i];
         o.x -= speed * dt;
         if(collision(fox,o)){
+            if(shieldActive && shieldHits > 0) {
+                shieldHits--;
+                if(shieldHits === 0) shieldActive = false;
+                obstacles.splice(i, 1);
+                createBurstParticles(o.x + o.w/2, o.y + o.h/2, '#4fc3f7', 5);
+                continue;
+            }
             endGame();
             return;
         }
         if(o.x < -80) obstacles.splice(i, 1);
     }
+
+    powerupTimerValue -= dt;
+    if (powerupTimerValue <= 0) {
+        trySpawnPowerup();
+        powerupTimerValue = 2 + Math.random() * 3;
+    }
+    
+    for(let i = powerups.length - 1; i >= 0; i--){
+        const p = powerups[i];
+        p.x -= speed * dt;
+        if(collision(fox, p)){
+            applyPowerup(p.type);
+            powerups.splice(i, 1);
+            continue;
+        }
+        if(p.x < -60) powerups.splice(i, 1);
+    }
+    
+    if (shieldActive) {
+        shieldTimer -= dt;
+        if (shieldTimer <= 0) {
+            shieldActive = false;
+            shieldTimer = 0;
+            if (shieldTimeout) {
+                clearTimeout(shieldTimeout);
+                shieldTimeout = null;
+            }
+        }
+    }
+
+    if (speedBoostActive) {
+        speedBoostTimer -= dt;
+        if (speedBoostTimer <= 0) {
+            speedBoostActive = false;
+            speedBoostTimer = 0;
+        }
+    }
+
+    updatePowerupTimers();
+
+    document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
+    document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
 
     if(combo > 0){
         comboTimer -= dt;
@@ -2714,52 +2732,48 @@ function update(dt){
     updateParticles(dt);
 }
 
-// ============================================================
-// حلقه بازی با ۳۰ FPS (بهینه شده)
-// ============================================================
-
 function loop(time){
     if(!playing) return;
     let dt = (time - lastTime) / 1000;
     lastTime = time;
     if(dt > .033) dt = .033;
-    
-    frameCounter++;
-    if (frameCounter % 2 === 0) {
-        update(dt);
-        draw();
-    }
-    
+    update(dt);
+    draw();
     if(playing) requestAnimationFrame(loop);
 }
 
-// ============================================================
-// توابع شروع و پایان بازی
-// ============================================================
-
 function startGame(){
-    if (lives <= 0) {
-        showToast('❤️ قلبی برای شروع نداری! با تماشای تبلیغ قلب بگیر.');
-        return;
-    }
-    
     stopMusicTimer();
-    // امتیاز رو ریست نکن (اگه ادامه داره)
-    // score = 0;
-    
-    speed = 380;
+    score = 0;
+    speed = 330;
     eggTimer = .3;
     obstacleTimer = 1;
     combo = 0;
     comboTimer = 0;
     eggs.length = 0;
     obstacles.length = 0;
+    powerups.length = 0;
     particles.length = 0;
     lastDayCycle = -1;
     isNight = false;
+    gameTime = 0;
+    shieldActive = false;
+    shieldHits = 0;
+    shieldTimer = 0;
+    speedBoostActive = false;
+    speedBoostTimer = 0;
+    powerupTimerValue = 2;
+    if (shieldTimeout) {
+        clearTimeout(shieldTimeout);
+        shieldTimeout = null;
+    }
+    gamesPlayed++;
     saveWallet();
     updateUI();
     comboBox.classList.remove("show");
+    document.getElementById('shieldIndicator').style.display = 'none';
+    document.getElementById('speedIndicator').style.display = 'none';
+    powerupTimer.classList.add('hidden');
     resetFox();
     playing = true;
     menuButton.style.display = "none";
@@ -2786,35 +2800,7 @@ function endGame(){
     updateUI();
     menuButton.style.display = "block";
     gameOver.style.display = "flex";
-    updateHeartsDisplay();
-    
-    // ✅ نمایش تایمر ۵ ثانیه‌ای برای ادامه
-    if (lives > 0) {
-        setTimeout(() => {
-            showReviveTimer();
-        }, 500);
-    } else {
-        showToast('❤️ قلبی نداری! با تبلیغ قلب بگیر.');
-        if (restartButton) {
-            restartButton.disabled = true;
-            restartButton.style.opacity = '0.5';
-        }
-    }
-}
-
-function startNewGame() {
-    // ریست کامل
-    score = 0;
-    lives = MAX_LIVES;
-    gamesPlayed++;
-    saveWallet();
-    updateUI();
-    updateHeartsDisplay();
-    if (restartButton) {
-        restartButton.disabled = false;
-        restartButton.style.opacity = '1';
-    }
-    startGame();
+    powerupTimer.classList.add('hidden');
 }
 
 function handleInput(){
@@ -3079,23 +3065,6 @@ function applyLanguage(){
     document.getElementById("startThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
     document.getElementById("changeThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
 
-    // ترجمه دکمه‌های تبلیغات
-    document.querySelectorAll('#rewardHeartBtn, #gameoverHeartBtn').forEach(btn => {
-        if (btn) {
-            btn.innerHTML = fa ? 
-                '❤️ +۱ قلب (تماشای تبلیغ)<span style="display:block; font-size:9px; opacity:0.6; font-weight:normal;">(حداکثر ۳ قلب)</span>' :
-                '❤️ +1 Heart (Watch Ad)<span style="display:block; font-size:9px; opacity:0.6; font-weight:normal;">(Max 3 Hearts)</span>';
-        }
-    });
-    
-    document.querySelectorAll('#rewardPointsBtn, #gameoverPointsBtn').forEach(btn => {
-        if (btn) {
-            btn.innerHTML = fa ?
-                '🎁 +۵۰۰ امتیاز (تماشای تبلیغ)<span style="display:block; font-size:9px; opacity:0.6; font-weight:normal;">(بدون محدودیت)</span>' :
-                '🎁 +500 Points (Watch Ad)<span style="display:block; font-size:9px; opacity:0.6; font-weight:normal;">(Unlimited)</span>';
-        }
-    });
-
     updateSoundButtons();
     updateUI();
     updateThemeUI();
@@ -3121,66 +3090,6 @@ function setLanguage(lang){
 // ============================================================
 // رویدادها و شروع بازی
 // ============================================================
-
-// اتصال دکمه قلب در تایمر
-document.getElementById('reviveHeartBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    reviveGame();
-});
-
-// دکمه‌های دریافت قلب و امتیاز در صفحه Start
-document.getElementById("rewardHeartBtn").addEventListener("click", function(e) {
-    e.stopPropagation();
-    showAd(() => {
-        if (addLife()) {
-            showToast('❤️ ۱ قلب بهت اضافه شد!');
-            updateHeartsDisplay();
-            if (lives > 0 && restartButton) {
-                restartButton.disabled = false;
-                restartButton.style.opacity = '1';
-            }
-        } else {
-            showToast('❤️ قلب‌هات پر هست! (حداکثر ۳)');
-        }
-    });
-});
-
-document.getElementById("rewardPointsBtn").addEventListener("click", function(e) {
-    e.stopPropagation();
-    showAd(() => {
-        totalScore += 500;
-        saveWallet();
-        updateUI();
-        showToast('🎁 ۵۰۰ امتیاز به حسابت اضافه شد!');
-    });
-});
-
-// دکمه‌های دریافت قلب و امتیاز در صفحه Game Over
-document.getElementById("gameoverHeartBtn").addEventListener("click", function(e) {
-    e.stopPropagation();
-    showAd(() => {
-        if (addLife()) {
-            showToast('❤️ ۱ قلب بهت اضافه شد!');
-            updateHeartsDisplay();
-            if (lives > 0 && restartButton) {
-                restartButton.disabled = false;
-                restartButton.style.opacity = '1';
-            }
-        } else {
-            showToast('❤️ قلب‌هات پر هست! (حداکثر ۳)');
-        }
-    });
-});
-
-document.getElementById("gameoverPointsBtn").addEventListener("click", function(e) {
-    e.stopPropagation();
-    showAd(() => {
-        totalScore += 500;
-        saveWallet();
-        updateUI();
-        showToast('🎁 ۵۰۰ امتیاز به حسابت اضافه شد!');
-    });
-});
 
 window.addEventListener("online", function() {
     checkInternet();
@@ -3230,7 +3139,7 @@ startButton.addEventListener("click", function(e){
 
 restartButton.addEventListener("click", function(e){
     e.stopPropagation();
-    startNewGame();
+    startGame();
 });
 
 document.getElementById("soundOnButton").addEventListener("click", function(e){
@@ -3312,7 +3221,6 @@ applyLanguage();
 updateUI();
 resetFox();
 menuButton.style.display = "block";
-resetLives();
 
 const savedTheme = localStorage.getItem("foxTheme") || "classic";
 setTheme(savedTheme);
@@ -3324,6 +3232,7 @@ drawFox();
 
 showReferralDataFromCache();
 renderSkinShop();
+powerupTimer.classList.add('hidden');
 
 setTimeout(() => {
     if (navigator.onLine) {
