@@ -696,6 +696,25 @@ button:active{
     text-align:center;
     max-width:90%;
 }
+
+/* مودال عضویت در کانال */
+@keyframes fadeInModal {
+    from { opacity:0; transform:scale(0.92) translateY(15px); }
+    to { opacity:1; transform:scale(1) translateY(0); }
+}
+
+#channelModal {
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:1000;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    justify-content:center;
+    align-items:center;
+    animation:fadeInModal 0.4s ease;
+}
 </style>
 </head>
 
@@ -928,9 +947,47 @@ button:active{
 
 <div id="toast" style="display:none;"></div>
 
+<!-- مودال عضویت در کانال تلگرام -->
+<div id="channelModal">
+    <div style="background:linear-gradient(145deg, #1a1a2e, #16213e); border-radius:24px; padding:35px 25px; max-width:400px; width:92%; text-align:center; border:1px solid rgba(255,255,255,0.08); box-shadow:0 25px 70px rgba(0,0,0,0.7); position:relative; overflow:hidden;">
+        
+        <button id="closeModalBtn" style="position:absolute; top:12px; right:16px; background:transparent; border:none; color:rgba(255,255,255,0.3); font-size:22px; cursor:pointer; transition:0.3s; padding:5px;" 
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+            ✕
+        </button>
+        
+        <div style="font-size:75px; margin-bottom:8px;">🦊</div>
+        
+        <h2 id="modalTitle" style="color:#fff; font-size:23px; margin-bottom:6px;">🔥 به خانواده Fox Eggs بپیوند!</h2>
+        
+        <p id="modalDesc" style="color:#c4b5d4; font-size:15px; line-height:1.8; margin-bottom:22px;">
+            با عضویت در کانال تلگرام ما، از <strong style="color:#fbbf24;">آپدیت‌های جدید</strong>، 
+            <strong style="color:#fbbf24;">بونوس‌های ویژه</strong> و 
+            <strong style="color:#fbbf24;">کدهای تخفیف و هدیه</strong> مطلع شو! 🎁
+            <br><br>
+            <span style="color:#f97316; font-size:13px;">✨ اولین نفری باش که از اتفاقات جدید باخبر میشه!</span>
+        </p>
+        
+        <a href="https://t.me/foxeggs_farsi" target="_blank" id="joinChannelBtn" 
+           style="display:inline-block; width:100%; background:linear-gradient(135deg, #f97316, #ea580c); color:white; border:none; padding:15px 20px; border-radius:14px; font-size:17px; font-weight:bold; cursor:pointer; text-decoration:none; transition:0.3s; box-shadow:0 4px 25px rgba(249,115,22,0.35);">
+            📱 عضویت در کانال
+        </a>
+        
+        <button id="skipChannelBtn" 
+                style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); padding:12px; border-radius:12px; font-size:14px; cursor:pointer; margin-top:12px; transition:0.3s;">
+            ⏰ بعداً
+        </button>
+        
+        <button id="alreadyJoinedBtn" 
+                style="width:100%; background:transparent; border:none; color:rgba(255,255,255,0.2); padding:10px; font-size:12px; cursor:pointer; margin-top:4px; transition:0.3s; text-decoration:underline;">
+            ✅ قبلاً عضو شدم
+        </button>
+    </div>
+</div>
+
 <script>
 // ============================================================
-// کد کامل بازی - با سیستم بازگردانی خودکار امتیازات
+// کد کامل بازی - بدون باگ
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -989,10 +1046,19 @@ const speedTimerItem = document.getElementById('speedTimer');
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
 
+// المان‌های مودال
+const channelModal = document.getElementById('channelModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalDesc = document.getElementById('modalDesc');
+const joinChannelBtn = document.getElementById('joinChannelBtn');
+const skipChannelBtn = document.getElementById('skipChannelBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const alreadyJoinedBtn = document.getElementById('alreadyJoinedBtn');
+
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
 // ============================================================
-// سیستم بازگردانی خودکار امتیازات - تنظیمات نهایی
+// سیستم بازگردانی خودکار امتیازات
 // ============================================================
 
 const WALLET_KEYS = {
@@ -1009,14 +1075,12 @@ const BACKUP_KEYS = {
     totalScore: 'foxTotalScore_backup'
 };
 
-// متغیرهای زمان برای محاسبه نرخ رشد
 let lastSaveTime = Date.now();
 let lastEggsValue = 0;
 let lastTotalScoreValue = 0;
 let lastGamesValue = 0;
 let lastBestValue = 0;
 
-// ایجاد بکاپ از تمام مقادیر فعلی
 function createBackup() {
     try {
         localStorage.setItem(BACKUP_KEYS.best, String(loadNumber(WALLET_KEYS.best)));
@@ -1034,7 +1098,6 @@ function createBackup() {
     }
 }
 
-// بازیابی از بکاپ
 function restoreFromBackup() {
     try {
         const best = loadNumberFromBackup(BACKUP_KEYS.best);
@@ -1072,7 +1135,6 @@ function loadNumberFromBackup(key, defaultValue = 0) {
     }
 }
 
-// تابع اصلی ذخیره با قابلیت بازگردانی
 function saveWalletSecure() {
     const currentBest = loadNumber(WALLET_KEYS.best);
     const currentGames = loadNumber(WALLET_KEYS.games);
@@ -1090,39 +1152,34 @@ function saveWalletSecure() {
     let needsRestore = false;
     let restoreReason = '';
     
-    // بررسی تعداد بازی (حداکثر ۱ واحد)
     if (currentGames > prevGames + 1) {
         needsRestore = true;
-        restoreReason = `تعداد بازی از ${prevGames} به ${currentGames} افزایش یافته (بیش از ۱ واحد مجاز)`;
+        restoreReason = 'Games count anomaly';
     }
     
-    // بررسی نرخ رشد تخم‌ها (حداکثر ۲ تخم در ثانیه)
     if (timeDiff > 0.1) {
         const eggsPerSecond = (currentEggs - prevEggs) / timeDiff;
         if (eggsPerSecond > 2 && currentEggs > prevEggs) {
             needsRestore = true;
-            restoreReason = `نرخ رشد تخم‌ها: ${eggsPerSecond.toFixed(1)} تخم در ثانیه (حداکثر ۲ مجاز)`;
+            restoreReason = 'Eggs rate anomaly';
         }
     }
     
-    // بررسی نرخ رشد امتیاز کل (حداکثر ۲۵۰ امتیاز در ثانیه)
     if (timeDiff > 0.1) {
         const scorePerSecond = (currentTotalScore - prevTotalScore) / timeDiff;
         if (scorePerSecond > 250 && currentTotalScore > prevTotalScore) {
             needsRestore = true;
-            restoreReason = `نرخ رشد امتیاز: ${scorePerSecond.toFixed(0)} امتیاز در ثانیه (حداکثر ۲۵۰ مجاز)`;
+            restoreReason = 'Score rate anomaly';
         }
     }
     
-    // بررسی کاهش غیرعادی رکورد
     if (currentBest < prevBest && prevBest > 0) {
         needsRestore = true;
-        restoreReason = `رکورد از ${prevBest} به ${currentBest} کاهش یافته (غیرعادی)`;
+        restoreReason = 'Best score decreased';
     }
     
     if (needsRestore) {
-        console.warn('⚠️ تغییر غیرمجاز شناسایی شد:', restoreReason);
-        
+        console.warn('Unauthorized change detected:', restoreReason);
         const restored = restoreFromBackup();
         if (restored) {
             best = restored.best;
@@ -1132,8 +1189,8 @@ function saveWalletSecure() {
             
             const fa = language === 'fa';
             const msg = fa ? 
-                `⚠️ تغییر غیرمجاز شناسایی شد! مقادیر به حالت قبلی بازگردانی شدند.` : 
-                `⚠️ Unauthorized change detected! Values restored to previous state.`;
+                '⚠️ تغییر غیرمجاز شناسایی شد! مقادیر به حالت قبلی بازگردانی شدند.' : 
+                '⚠️ Unauthorized change detected! Values restored.';
             showToast(msg);
             
             updateUI();
@@ -1570,7 +1627,6 @@ let speedBoostActive = false;
 let speedBoostTimer = 0;
 let powerupTimerValue = 0;
 let gameTime = 0;
-let shieldTimeout = null;
 let isNight = false;
 let lastDayCycle = -1;
 let MAX_PARTICLES = 12;
@@ -1660,7 +1716,7 @@ function getEggColors() {
 }
 
 function updateSpeed(){
-    let baseSpeed =380 ;
+    let baseSpeed = 380;
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
@@ -2337,7 +2393,7 @@ function drawCloud(x,y,s){
 function drawPowerup(p) {
     const cx = p.x + p.w/2;
     const cy = p.y + p.h/2;
-    p.pulse += 0.05;
+    p.pulse = (p.pulse || 0) + 0.05;
     const scale = 1 + Math.sin(p.pulse) * 0.08;
     
     ctx.beginPath();
@@ -2709,7 +2765,6 @@ function applyPowerup(type) {
             shieldHits = 1;
             shieldTimer = 15;
             createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 5);
-            if (shieldTimeout) clearTimeout(shieldTimeout);
             break;
         case 'speed':
             speedBoostActive = true;
@@ -2821,10 +2876,6 @@ function update(dt){
         if (shieldTimer <= 0) {
             shieldActive = false;
             shieldTimer = 0;
-            if (shieldTimeout) {
-                clearTimeout(shieldTimeout);
-                shieldTimeout = null;
-            }
         }
     }
 
@@ -2883,10 +2934,6 @@ function startGame(){
     speedBoostActive = false;
     speedBoostTimer = 0;
     powerupTimerValue = 2;
-    if (shieldTimeout) {
-        clearTimeout(shieldTimeout);
-        shieldTimeout = null;
-    }
     gamesPlayed++;
     saveWallet();
     updateUI();
@@ -3189,6 +3236,9 @@ function applyLanguage(){
     updateUI();
     updateThemeUI();
     renderSkinShop();
+    
+    // به‌روزرسانی متن مودال
+    updateChannelModalText();
 }
 
 function setLanguage(lang){
@@ -3205,6 +3255,49 @@ function setLanguage(lang){
             showReferralPrompt();
         }
     }
+}
+
+// ============================================================
+// توابع مودال عضویت در کانال
+// ============================================================
+
+function updateChannelModalText() {
+    const fa = language === 'fa';
+    
+    if (fa) {
+        modalTitle.textContent = '🔥 به خانواده Fox Eggs بپیوند!';
+        modalDesc.innerHTML = `
+            با عضویت در کانال تلگرام ما، از <strong style="color:#fbbf24;">آپدیت‌های جدید</strong>، 
+            <strong style="color:#fbbf24;">بونوس‌های ویژه</strong> و 
+            <strong style="color:#fbbf24;">کدهای تخفیف و هدیه</strong> مطلع شو! 🎁
+            <br><br>
+            <span style="color:#f97316; font-size:13px;">✨ اولین نفری باش که از اتفاقات جدید باخبر میشه!</span>
+        `;
+        joinChannelBtn.textContent = '📱 عضویت در کانال';
+        skipChannelBtn.textContent = '⏰ بعداً';
+        alreadyJoinedBtn.textContent = '✅ قبلاً عضو شدم';
+    } else {
+        modalTitle.textContent = '🔥 Join the Fox Eggs Family!';
+        modalDesc.innerHTML = `
+            By joining our Telegram channel, you'll get <strong style="color:#fbbf24;">latest updates</strong>, 
+            <strong style="color:#fbbf24;">special bonuses</strong> and 
+            <strong style="color:#fbbf24;">gift codes</strong>! 🎁
+            <br><br>
+            <span style="color:#f97316; font-size:13px;">✨ Be the first to know about new features!</span>
+        `;
+        joinChannelBtn.textContent = '📱 Join Channel';
+        skipChannelBtn.textContent = '⏰ Later';
+        alreadyJoinedBtn.textContent = '✅ Already Joined';
+    }
+}
+
+function showChannelModal() {
+    updateChannelModalText();
+    channelModal.style.display = 'flex';
+}
+
+function hideChannelModal() {
+    channelModal.style.display = 'none';
 }
 
 // ============================================================
@@ -3333,6 +3426,27 @@ document.querySelectorAll('.theme-option').forEach(opt => {
     });
 });
 
+// رویدادهای مودال عضویت
+joinChannelBtn.addEventListener('click', function(e) {
+    window.open('https://t.me/foxeggs_farsi', '_blank');
+    hideChannelModal();
+});
+
+skipChannelBtn.addEventListener('click', hideChannelModal);
+closeModalBtn.addEventListener('click', hideChannelModal);
+
+alreadyJoinedBtn.addEventListener('click', function() {
+    hideChannelModal();
+    const fa = language === 'fa';
+    showToast(fa ? '🙏 ممنون که همراه ما هستید!' : '🙏 Thank you for being with us!');
+});
+
+channelModal.addEventListener('click', function(e) {
+    if (e.target === this) {
+        hideChannelModal();
+    }
+});
+
 // ============================================================
 // شروع اولیه
 // ============================================================
@@ -3353,6 +3467,11 @@ drawFox();
 showReferralDataFromCache();
 renderSkinShop();
 powerupTimer.classList.add('hidden');
+
+// نمایش مودال عضویت در کانال (هر بار در ورود به اپ)
+setTimeout(function() {
+    showChannelModal();
+}, 700);
 
 setTimeout(() => {
     if (navigator.onLine) {
@@ -3385,4 +3504,4 @@ setInterval(() => {
 </script>
 
 </body>
-    </html>
+            </html>
