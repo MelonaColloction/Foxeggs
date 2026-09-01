@@ -930,7 +930,7 @@ button:active{
 
 <script>
 // ============================================================
-// کد کامل بازی - بدون Gem (جواهر) و بهینه‌سازی شده
+// کد کامل بازی - با سیستم بازگردانی خودکار امتیازات
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -990,6 +990,181 @@ const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
 
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
+
+// ============================================================
+// سیستم بازگردانی خودکار امتیازات - تنظیمات نهایی
+// ============================================================
+
+const WALLET_KEYS = {
+    best: 'foxBest',
+    games: 'foxGames',
+    eggs: 'foxEggs',
+    totalScore: 'foxTotalScore'
+};
+
+const BACKUP_KEYS = {
+    best: 'foxBest_backup',
+    games: 'foxGames_backup',
+    eggs: 'foxEggs_backup',
+    totalScore: 'foxTotalScore_backup'
+};
+
+// متغیرهای زمان برای محاسبه نرخ رشد
+let lastSaveTime = Date.now();
+let lastEggsValue = 0;
+let lastTotalScoreValue = 0;
+let lastGamesValue = 0;
+let lastBestValue = 0;
+
+// ایجاد بکاپ از تمام مقادیر فعلی
+function createBackup() {
+    try {
+        localStorage.setItem(BACKUP_KEYS.best, String(loadNumber(WALLET_KEYS.best)));
+        localStorage.setItem(BACKUP_KEYS.games, String(loadNumber(WALLET_KEYS.games)));
+        localStorage.setItem(BACKUP_KEYS.eggs, String(loadNumber(WALLET_KEYS.eggs)));
+        localStorage.setItem(BACKUP_KEYS.totalScore, String(loadNumber(WALLET_KEYS.totalScore)));
+        
+        lastSaveTime = Date.now();
+        lastEggsValue = loadNumber(WALLET_KEYS.eggs);
+        lastTotalScoreValue = loadNumber(WALLET_KEYS.totalScore);
+        lastGamesValue = loadNumber(WALLET_KEYS.games);
+        lastBestValue = loadNumber(WALLET_KEYS.best);
+    } catch(e) {
+        console.warn('Backup creation failed:', e);
+    }
+}
+
+// بازیابی از بکاپ
+function restoreFromBackup() {
+    try {
+        const best = loadNumberFromBackup(BACKUP_KEYS.best);
+        const games = loadNumberFromBackup(BACKUP_KEYS.games);
+        const eggs = loadNumberFromBackup(BACKUP_KEYS.eggs);
+        const totalScore = loadNumberFromBackup(BACKUP_KEYS.totalScore);
+        
+        localStorage.setItem(WALLET_KEYS.best, String(best));
+        localStorage.setItem(WALLET_KEYS.games, String(games));
+        localStorage.setItem(WALLET_KEYS.eggs, String(eggs));
+        localStorage.setItem(WALLET_KEYS.totalScore, String(totalScore));
+        
+        lastSaveTime = Date.now();
+        lastEggsValue = eggs;
+        lastTotalScoreValue = totalScore;
+        lastGamesValue = games;
+        lastBestValue = best;
+        
+        return { best, games, eggs, totalScore };
+    } catch(e) {
+        console.warn('Restore from backup failed:', e);
+        return null;
+    }
+}
+
+function loadNumberFromBackup(key, defaultValue = 0) {
+    try {
+        const value = localStorage.getItem(key);
+        if (value === null) return defaultValue;
+        const number = Number(value);
+        if (Number.isFinite(number)) return number;
+        return defaultValue;
+    } catch(e) {
+        return defaultValue;
+    }
+}
+
+// تابع اصلی ذخیره با قابلیت بازگردانی
+function saveWalletSecure() {
+    const currentBest = loadNumber(WALLET_KEYS.best);
+    const currentGames = loadNumber(WALLET_KEYS.games);
+    const currentEggs = loadNumber(WALLET_KEYS.eggs);
+    const currentTotalScore = loadNumber(WALLET_KEYS.totalScore);
+    
+    const prevBest = loadNumberFromBackup(BACKUP_KEYS.best);
+    const prevGames = loadNumberFromBackup(BACKUP_KEYS.games);
+    const prevEggs = loadNumberFromBackup(BACKUP_KEYS.eggs);
+    const prevTotalScore = loadNumberFromBackup(BACKUP_KEYS.totalScore);
+    
+    const now = Date.now();
+    const timeDiff = (now - lastSaveTime) / 1000;
+    
+    let needsRestore = false;
+    let restoreReason = '';
+    
+    // بررسی تعداد بازی (حداکثر ۱ واحد)
+    if (currentGames > prevGames + 1) {
+        needsRestore = true;
+        restoreReason = `تعداد بازی از ${prevGames} به ${currentGames} افزایش یافته (بیش از ۱ واحد مجاز)`;
+    }
+    
+    // بررسی نرخ رشد تخم‌ها (حداکثر ۲ تخم در ثانیه)
+    if (timeDiff > 0.1) {
+        const eggsPerSecond = (currentEggs - prevEggs) / timeDiff;
+        if (eggsPerSecond > 2 && currentEggs > prevEggs) {
+            needsRestore = true;
+            restoreReason = `نرخ رشد تخم‌ها: ${eggsPerSecond.toFixed(1)} تخم در ثانیه (حداکثر ۲ مجاز)`;
+        }
+    }
+    
+    // بررسی نرخ رشد امتیاز کل (حداکثر ۲۵۰ امتیاز در ثانیه)
+    if (timeDiff > 0.1) {
+        const scorePerSecond = (currentTotalScore - prevTotalScore) / timeDiff;
+        if (scorePerSecond > 250 && currentTotalScore > prevTotalScore) {
+            needsRestore = true;
+            restoreReason = `نرخ رشد امتیاز: ${scorePerSecond.toFixed(0)} امتیاز در ثانیه (حداکثر ۲۵۰ مجاز)`;
+        }
+    }
+    
+    // بررسی کاهش غیرعادی رکورد
+    if (currentBest < prevBest && prevBest > 0) {
+        needsRestore = true;
+        restoreReason = `رکورد از ${prevBest} به ${currentBest} کاهش یافته (غیرعادی)`;
+    }
+    
+    if (needsRestore) {
+        console.warn('⚠️ تغییر غیرمجاز شناسایی شد:', restoreReason);
+        
+        const restored = restoreFromBackup();
+        if (restored) {
+            best = restored.best;
+            gamesPlayed = restored.games;
+            totalEggs = restored.eggs;
+            totalScore = restored.totalScore;
+            
+            const fa = language === 'fa';
+            const msg = fa ? 
+                `⚠️ تغییر غیرمجاز شناسایی شد! مقادیر به حالت قبلی بازگردانی شدند.` : 
+                `⚠️ Unauthorized change detected! Values restored to previous state.`;
+            showToast(msg);
+            
+            updateUI();
+            return false;
+        }
+    }
+    
+    createBackup();
+    
+    lastSaveTime = now;
+    lastEggsValue = currentEggs;
+    lastTotalScoreValue = currentTotalScore;
+    lastGamesValue = currentGames;
+    lastBestValue = currentBest;
+    
+    try {
+        localStorage.setItem(WALLET_KEYS.best, String(currentBest));
+        localStorage.setItem(WALLET_KEYS.games, String(currentGames));
+        localStorage.setItem(WALLET_KEYS.eggs, String(currentEggs));
+        localStorage.setItem(WALLET_KEYS.totalScore, String(currentTotalScore));
+    } catch(e) {
+        console.warn('Save failed:', e);
+        return false;
+    }
+    
+    return true;
+}
+
+function saveWallet() {
+    return saveWalletSecure();
+}
 
 // ============================================================
 // تم‌ها
@@ -1374,6 +1549,8 @@ let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
 
+createBackup();
+
 let playing = false;
 let score = 0;
 let speed = 380;
@@ -1434,15 +1611,6 @@ function loadNumber(key, defaultValue = 0){
         localStorage.setItem(key, String(defaultValue));
         return defaultValue;
     }catch(error){ return defaultValue; }
-}
-
-function saveWallet(){
-    try{
-        localStorage.setItem("foxBest", String(best));
-        localStorage.setItem("foxGames", String(gamesPlayed));
-        localStorage.setItem("foxEggs", String(totalEggs));
-        localStorage.setItem("foxTotalScore", String(totalScore));
-    }catch(error){}
 }
 
 function ground(){ return H * .72; }
@@ -1766,7 +1934,7 @@ async function syncReferralsWithServer() {
             const data = await response.json();
             if (data.success && data.referrals) {
                 const all = [...new Set([...local, ...data.referrals])];
-                const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
+                const stored = JSON.parse(localStorage.getItem('fox_referrals') || '{}');
                 stored[code] = all;
                 localStorage.setItem('fox_referrals', JSON.stringify(stored));
                 return all;
@@ -2475,15 +2643,12 @@ function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
     
-    // چک کن کدوم پاوراپ‌ها فعال هستن
     const activeTypes = [];
     if (shieldActive) activeTypes.push('shield');
     if (speedBoostActive) activeTypes.push('speed');
     
-    // اگه هر ۲ تا فعال باشن، هیچی اسپاون نکن
     if (activeTypes.length >= 2) return;
     
-    // فقط پاوراپ‌هایی رو اسپاون کن که فعال نیستن
     const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
     if (available.length === 0) return;
     
@@ -3220,4 +3385,4 @@ setInterval(() => {
 </script>
 
 </body>
-            </html>
+    </html>
