@@ -3468,10 +3468,8 @@ showReferralDataFromCache();
 renderSkinShop();
 powerupTimer.classList.add('hidden');
 
-// نمایش مودال عضویت در کانال (هر بار در ورود به اپ)
-setTimeout(function() {
-    showChannelModal();
-}, 700);
+// نمایش مودال عضویت در کانال - بلافاصله پس از ورود
+showChannelModal();
 
 setTimeout(() => {
     if (navigator.onLine) {
@@ -3504,4 +3502,4 @@ setInterval(() => {
 </script>
 
 </body>
-            </html>
+    </html>
