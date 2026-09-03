@@ -697,23 +697,153 @@ button:active{
     max-width:90%;
 }
 
-/* مودال عضویت در کانال */
-@keyframes fadeInModal {
-    from { opacity:0; transform:scale(0.92) translateY(15px); }
-    to { opacity:1; transform:scale(1) translateY(0); }
-}
-
-#channelModal {
-    display:none;
+/* استایل‌های پاپ‌آپ کانال تلگرام */
+#channelPopup {
     position:fixed;
     inset:0;
-    z-index:1000;
+    z-index:70;
+    display:none;
+    justify-content:center;
+    align-items:center;
     background:rgba(0,0,0,0.85);
     backdrop-filter:blur(12px);
     -webkit-backdrop-filter:blur(12px);
-    justify-content:center;
+    animation:fadeInUp 0.4s ease;
+}
+
+#channelPopup .box {
+    background:linear-gradient(135deg,#1a1a2e,#2a1a3e);
+    padding:35px 30px 30px;
+    border-radius:24px;
+    max-width:380px;
+    width:90%;
+    text-align:center;
+    border:1px solid rgba(255,255,255,0.08);
+    box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    position:relative;
+    overflow:hidden;
+}
+
+#closeChannelBtn {
+    position:absolute;
+    top:12px;
+    right:16px;
+    background:none;
+    border:none;
+    color:rgba(255,255,255,0.3);
+    font-size:24px;
+    cursor:pointer;
+    transition:all 0.3s ease;
+    z-index:2;
+    padding:4px 8px;
+    line-height:1;
+}
+
+#closeChannelBtn:hover {
+    color:rgba(255,255,255,0.8);
+    transform:rotate(90deg);
+}
+
+#channelPopup .box::before {
+    content:'';
+    position:absolute;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:radial-gradient(circle at center, rgba(249,115,22,0.05) 0%, transparent 70%);
+    animation:rotateGlow 20s linear infinite;
+}
+
+@keyframes rotateGlow {
+    0% { transform:rotate(0deg); }
+    100% { transform:rotate(360deg); }
+}
+
+#channelPopup .icon-big {
+    font-size:72px;
+    margin-bottom:10px;
+    display:block;
+    animation:bounce 2s ease infinite;
+}
+
+@keyframes bounce {
+    0%,100% { transform:translateY(0); }
+    50% { transform:translateY(-10px); }
+}
+
+#channelPopup h2 {
+    color:white;
+    font-size:24px;
+    margin-bottom:8px;
+    position:relative;
+    z-index:1;
+}
+
+#channelPopup .sub-text {
+    color:rgba(255,255,255,0.6);
+    font-size:14px;
+    line-height:1.6;
+    margin-bottom:20px;
+    position:relative;
+    z-index:1;
+}
+
+#channelPopup .channel-link {
+    display:inline-flex;
     align-items:center;
-    animation:fadeInModal 0.4s ease;
+    gap:10px;
+    background:rgba(249,115,22,0.15);
+    border:2px solid #f97316;
+    border-radius:14px;
+    padding:12px 20px;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    text-decoration:none;
+    transition:all 0.3s ease;
+    position:relative;
+    z-index:1;
+    width:100%;
+    justify-content:center;
+    box-sizing:border-box;
+}
+
+#channelPopup .channel-link:hover {
+    background:#f97316;
+    transform:scale(1.02);
+    box-shadow:0 0 30px rgba(249,115,22,0.3);
+}
+
+#channelPopup .channel-link:active {
+    transform:scale(0.97);
+}
+
+#channelPopup .channel-link .telegram-icon {
+    font-size:28px;
+}
+
+#channelPopup .features {
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:8px;
+    margin:15px 0 20px;
+    position:relative;
+    z-index:1;
+}
+
+#channelPopup .feature-item {
+    background:rgba(255,255,255,0.05);
+    border-radius:10px;
+    padding:8px 4px;
+    font-size:11px;
+    color:rgba(255,255,255,0.6);
+}
+
+#channelPopup .feature-item .emoji {
+    display:block;
+    font-size:20px;
+    margin-bottom:2px;
 }
 </style>
 </head>
@@ -936,6 +1066,38 @@ button:active{
 
 </div>
 
+<!-- پاپ‌آپ کانال تلگرام -->
+<div id="channelPopup">
+    <div class="box">
+        <button id="closeChannelBtn">✕</button>
+        <span class="icon-big">🦊</span>
+        <h2 id="channelTitle">به کانال تلگرام بپیوندید!</h2>
+        <p class="sub-text" id="channelSub">
+            برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان
+        </p>
+        
+        <div class="features">
+            <div class="feature-item">
+                <span class="emoji">🎁</span>
+                <span id="feature1">جوایز</span>
+            </div>
+            <div class="feature-item">
+                <span class="emoji">🔄</span>
+                <span id="feature2">بروزرسانی</span>
+            </div>
+            <div class="feature-item">
+                <span class="emoji">👥</span>
+                <span id="feature3">جامعه</span>
+            </div>
+        </div>
+        
+        <a href="https://t.me/foxeggs_farsi" target="_blank" class="channel-link" id="channelLink">
+            <span class="telegram-icon">✈️</span>
+            <span id="channelBtnText">عضویت در کانال</span>
+        </a>
+    </div>
+</div>
+
 <div id="noInternetOverlay">
     <div class="box">
         <div class="icon">📡</div>
@@ -947,47 +1109,9 @@ button:active{
 
 <div id="toast" style="display:none;"></div>
 
-<!-- مودال عضویت در کانال تلگرام -->
-<div id="channelModal">
-    <div style="background:linear-gradient(145deg, #1a1a2e, #16213e); border-radius:24px; padding:35px 25px; max-width:400px; width:92%; text-align:center; border:1px solid rgba(255,255,255,0.08); box-shadow:0 25px 70px rgba(0,0,0,0.7); position:relative; overflow:hidden;">
-        
-        <button id="closeModalBtn" style="position:absolute; top:12px; right:16px; background:transparent; border:none; color:rgba(255,255,255,0.3); font-size:22px; cursor:pointer; transition:0.3s; padding:5px;" 
-                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
-            ✕
-        </button>
-        
-        <div style="font-size:75px; margin-bottom:8px;">🦊</div>
-        
-        <h2 id="modalTitle" style="color:#fff; font-size:23px; margin-bottom:6px;">🔥 به خانواده Fox Eggs بپیوند!</h2>
-        
-        <p id="modalDesc" style="color:#c4b5d4; font-size:15px; line-height:1.8; margin-bottom:22px;">
-            با عضویت در کانال تلگرام ما، از <strong style="color:#fbbf24;">آپدیت‌های جدید</strong>، 
-            <strong style="color:#fbbf24;">بونوس‌های ویژه</strong> و 
-            <strong style="color:#fbbf24;">کدهای تخفیف و هدیه</strong> مطلع شو! 🎁
-            <br><br>
-            <span style="color:#f97316; font-size:13px;">✨ اولین نفری باش که از اتفاقات جدید باخبر میشه!</span>
-        </p>
-        
-        <a href="https://t.me/foxeggs_farsi" target="_blank" id="joinChannelBtn" 
-           style="display:inline-block; width:100%; background:linear-gradient(135deg, #f97316, #ea580c); color:white; border:none; padding:15px 20px; border-radius:14px; font-size:17px; font-weight:bold; cursor:pointer; text-decoration:none; transition:0.3s; box-shadow:0 4px 25px rgba(249,115,22,0.35);">
-            📱 عضویت در کانال
-        </a>
-        
-        <button id="skipChannelBtn" 
-                style="width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); color:rgba(255,255,255,0.5); padding:12px; border-radius:12px; font-size:14px; cursor:pointer; margin-top:12px; transition:0.3s;">
-            ⏰ بعداً
-        </button>
-        
-        <button id="alreadyJoinedBtn" 
-                style="width:100%; background:transparent; border:none; color:rgba(255,255,255,0.2); padding:10px; font-size:12px; cursor:pointer; margin-top:4px; transition:0.3s; text-decoration:underline;">
-            ✅ قبلاً عضو شدم
-        </button>
-    </div>
-</div>
-
 <script>
 // ============================================================
-// کد کامل بازی - بدون باگ
+// کد کامل بازی
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -1046,182 +1170,7 @@ const speedTimerItem = document.getElementById('speedTimer');
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
 
-// المان‌های مودال
-const channelModal = document.getElementById('channelModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalDesc = document.getElementById('modalDesc');
-const joinChannelBtn = document.getElementById('joinChannelBtn');
-const skipChannelBtn = document.getElementById('skipChannelBtn');
-const closeModalBtn = document.getElementById('closeModalBtn');
-const alreadyJoinedBtn = document.getElementById('alreadyJoinedBtn');
-
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
-
-// ============================================================
-// سیستم بازگردانی خودکار امتیازات
-// ============================================================
-
-const WALLET_KEYS = {
-    best: 'foxBest',
-    games: 'foxGames',
-    eggs: 'foxEggs',
-    totalScore: 'foxTotalScore'
-};
-
-const BACKUP_KEYS = {
-    best: 'foxBest_backup',
-    games: 'foxGames_backup',
-    eggs: 'foxEggs_backup',
-    totalScore: 'foxTotalScore_backup'
-};
-
-let lastSaveTime = Date.now();
-let lastEggsValue = 0;
-let lastTotalScoreValue = 0;
-let lastGamesValue = 0;
-let lastBestValue = 0;
-
-function createBackup() {
-    try {
-        localStorage.setItem(BACKUP_KEYS.best, String(loadNumber(WALLET_KEYS.best)));
-        localStorage.setItem(BACKUP_KEYS.games, String(loadNumber(WALLET_KEYS.games)));
-        localStorage.setItem(BACKUP_KEYS.eggs, String(loadNumber(WALLET_KEYS.eggs)));
-        localStorage.setItem(BACKUP_KEYS.totalScore, String(loadNumber(WALLET_KEYS.totalScore)));
-        
-        lastSaveTime = Date.now();
-        lastEggsValue = loadNumber(WALLET_KEYS.eggs);
-        lastTotalScoreValue = loadNumber(WALLET_KEYS.totalScore);
-        lastGamesValue = loadNumber(WALLET_KEYS.games);
-        lastBestValue = loadNumber(WALLET_KEYS.best);
-    } catch(e) {
-        console.warn('Backup creation failed:', e);
-    }
-}
-
-function restoreFromBackup() {
-    try {
-        const best = loadNumberFromBackup(BACKUP_KEYS.best);
-        const games = loadNumberFromBackup(BACKUP_KEYS.games);
-        const eggs = loadNumberFromBackup(BACKUP_KEYS.eggs);
-        const totalScore = loadNumberFromBackup(BACKUP_KEYS.totalScore);
-        
-        localStorage.setItem(WALLET_KEYS.best, String(best));
-        localStorage.setItem(WALLET_KEYS.games, String(games));
-        localStorage.setItem(WALLET_KEYS.eggs, String(eggs));
-        localStorage.setItem(WALLET_KEYS.totalScore, String(totalScore));
-        
-        lastSaveTime = Date.now();
-        lastEggsValue = eggs;
-        lastTotalScoreValue = totalScore;
-        lastGamesValue = games;
-        lastBestValue = best;
-        
-        return { best, games, eggs, totalScore };
-    } catch(e) {
-        console.warn('Restore from backup failed:', e);
-        return null;
-    }
-}
-
-function loadNumberFromBackup(key, defaultValue = 0) {
-    try {
-        const value = localStorage.getItem(key);
-        if (value === null) return defaultValue;
-        const number = Number(value);
-        if (Number.isFinite(number)) return number;
-        return defaultValue;
-    } catch(e) {
-        return defaultValue;
-    }
-}
-
-function saveWalletSecure() {
-    const currentBest = loadNumber(WALLET_KEYS.best);
-    const currentGames = loadNumber(WALLET_KEYS.games);
-    const currentEggs = loadNumber(WALLET_KEYS.eggs);
-    const currentTotalScore = loadNumber(WALLET_KEYS.totalScore);
-    
-    const prevBest = loadNumberFromBackup(BACKUP_KEYS.best);
-    const prevGames = loadNumberFromBackup(BACKUP_KEYS.games);
-    const prevEggs = loadNumberFromBackup(BACKUP_KEYS.eggs);
-    const prevTotalScore = loadNumberFromBackup(BACKUP_KEYS.totalScore);
-    
-    const now = Date.now();
-    const timeDiff = (now - lastSaveTime) / 1000;
-    
-    let needsRestore = false;
-    let restoreReason = '';
-    
-    if (currentGames > prevGames + 1) {
-        needsRestore = true;
-        restoreReason = 'Games count anomaly';
-    }
-    
-    if (timeDiff > 0.1) {
-        const eggsPerSecond = (currentEggs - prevEggs) / timeDiff;
-        if (eggsPerSecond > 2 && currentEggs > prevEggs) {
-            needsRestore = true;
-            restoreReason = 'Eggs rate anomaly';
-        }
-    }
-    
-    if (timeDiff > 0.1) {
-        const scorePerSecond = (currentTotalScore - prevTotalScore) / timeDiff;
-        if (scorePerSecond > 250 && currentTotalScore > prevTotalScore) {
-            needsRestore = true;
-            restoreReason = 'Score rate anomaly';
-        }
-    }
-    
-    if (currentBest < prevBest && prevBest > 0) {
-        needsRestore = true;
-        restoreReason = 'Best score decreased';
-    }
-    
-    if (needsRestore) {
-        console.warn('Unauthorized change detected:', restoreReason);
-        const restored = restoreFromBackup();
-        if (restored) {
-            best = restored.best;
-            gamesPlayed = restored.games;
-            totalEggs = restored.eggs;
-            totalScore = restored.totalScore;
-            
-            const fa = language === 'fa';
-            const msg = fa ? 
-                '⚠️ تغییر غیرمجاز شناسایی شد! مقادیر به حالت قبلی بازگردانی شدند.' : 
-                '⚠️ Unauthorized change detected! Values restored.';
-            showToast(msg);
-            
-            updateUI();
-            return false;
-        }
-    }
-    
-    createBackup();
-    
-    lastSaveTime = now;
-    lastEggsValue = currentEggs;
-    lastTotalScoreValue = currentTotalScore;
-    lastGamesValue = currentGames;
-    lastBestValue = currentBest;
-    
-    try {
-        localStorage.setItem(WALLET_KEYS.best, String(currentBest));
-        localStorage.setItem(WALLET_KEYS.games, String(currentGames));
-        localStorage.setItem(WALLET_KEYS.eggs, String(currentEggs));
-        localStorage.setItem(WALLET_KEYS.totalScore, String(currentTotalScore));
-    } catch(e) {
-        console.warn('Save failed:', e);
-        return false;
-    }
-    
-    return true;
-}
-
-function saveWallet() {
-    return saveWalletSecure();
-}
 
 // ============================================================
 // تم‌ها
@@ -1606,8 +1555,6 @@ let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
 
-createBackup();
-
 let playing = false;
 let score = 0;
 let speed = 380;
@@ -1627,6 +1574,7 @@ let speedBoostActive = false;
 let speedBoostTimer = 0;
 let powerupTimerValue = 0;
 let gameTime = 0;
+let shieldTimeout = null;
 let isNight = false;
 let lastDayCycle = -1;
 let MAX_PARTICLES = 12;
@@ -1667,6 +1615,15 @@ function loadNumber(key, defaultValue = 0){
         localStorage.setItem(key, String(defaultValue));
         return defaultValue;
     }catch(error){ return defaultValue; }
+}
+
+function saveWallet(){
+    try{
+        localStorage.setItem("foxBest", String(best));
+        localStorage.setItem("foxGames", String(gamesPlayed));
+        localStorage.setItem("foxEggs", String(totalEggs));
+        localStorage.setItem("foxTotalScore", String(totalScore));
+    }catch(error){}
 }
 
 function ground(){ return H * .72; }
@@ -1716,7 +1673,7 @@ function getEggColors() {
 }
 
 function updateSpeed(){
-    let baseSpeed = 380;
+    let baseSpeed =380 ;
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
@@ -1990,7 +1947,7 @@ async function syncReferralsWithServer() {
             const data = await response.json();
             if (data.success && data.referrals) {
                 const all = [...new Set([...local, ...data.referrals])];
-                const stored = JSON.parse(localStorage.getItem('fox_referrals') || '{}');
+                const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
                 stored[code] = all;
                 localStorage.setItem('fox_referrals', JSON.stringify(stored));
                 return all;
@@ -2393,7 +2350,7 @@ function drawCloud(x,y,s){
 function drawPowerup(p) {
     const cx = p.x + p.w/2;
     const cy = p.y + p.h/2;
-    p.pulse = (p.pulse || 0) + 0.05;
+    p.pulse += 0.05;
     const scale = 1 + Math.sin(p.pulse) * 0.08;
     
     ctx.beginPath();
@@ -2699,12 +2656,15 @@ function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
     
+    // چک کن کدوم پاوراپ‌ها فعال هستن
     const activeTypes = [];
     if (shieldActive) activeTypes.push('shield');
     if (speedBoostActive) activeTypes.push('speed');
     
+    // اگه هر ۲ تا فعال باشن، هیچی اسپاون نکن
     if (activeTypes.length >= 2) return;
     
+    // فقط پاوراپ‌هایی رو اسپاون کن که فعال نیستن
     const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
     if (available.length === 0) return;
     
@@ -2765,6 +2725,7 @@ function applyPowerup(type) {
             shieldHits = 1;
             shieldTimer = 15;
             createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 5);
+            if (shieldTimeout) clearTimeout(shieldTimeout);
             break;
         case 'speed':
             speedBoostActive = true;
@@ -2876,6 +2837,10 @@ function update(dt){
         if (shieldTimer <= 0) {
             shieldActive = false;
             shieldTimer = 0;
+            if (shieldTimeout) {
+                clearTimeout(shieldTimeout);
+                shieldTimeout = null;
+            }
         }
     }
 
@@ -2934,6 +2899,10 @@ function startGame(){
     speedBoostActive = false;
     speedBoostTimer = 0;
     powerupTimerValue = 2;
+    if (shieldTimeout) {
+        clearTimeout(shieldTimeout);
+        shieldTimeout = null;
+    }
     gamesPlayed++;
     saveWallet();
     updateUI();
@@ -2948,6 +2917,7 @@ function startGame(){
     startScreen.style.display = "none";
     gameOver.style.display = "none";
     themeSelectorOverlay.style.display = "none";
+    closeChannelPopup();
     startMusic();
     lastTime = performance.now();
     requestAnimationFrame(loop);
@@ -3236,9 +3206,7 @@ function applyLanguage(){
     updateUI();
     updateThemeUI();
     renderSkinShop();
-    
-    // به‌روزرسانی متن مودال
-    updateChannelModalText();
+    updateChannelPopup();
 }
 
 function setLanguage(lang){
@@ -3258,50 +3226,95 @@ function setLanguage(lang){
 }
 
 // ============================================================
-// توابع مودال عضویت در کانال
+// پاپ‌آپ کانال تلگرام - پشتیبانی کامل از فارسی و انگلیسی
 // ============================================================
 
-function updateChannelModalText() {
+let channelPopupShown = false;
+
+function getChannelTexts() {
     const fa = language === 'fa';
+    return {
+        title: fa ? '🦊 به کانال تلگرام بپیوندید!' : '🦊 Join our Telegram Channel!',
+        subtitle: fa 
+            ? 'برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان' 
+            : 'Get special rewards, updates, and connect with other players!',
+        feature1: fa ? '🎁 جوایز' : '🎁 Rewards',
+        feature2: fa ? '🔄 بروزرسانی' : '🔄 Updates',
+        feature3: fa ? '👥 جامعه' : '👥 Community',
+        btnText: fa ? '✈️ عضویت در کانال' : '✈️ Join Channel',
+        closeText: '✕'
+    };
+}
+
+function showChannelPopup() {
+    // اگر پاپ‌آپ قبلاً نمایش داده شده یا بازی در حال اجراست، نمایش نده
+    if (channelPopupShown || playing) {
+        return;
+    }
     
-    if (fa) {
-        modalTitle.textContent = '🔥 به خانواده Fox Eggs بپیوند!';
-        modalDesc.innerHTML = `
-            با عضویت در کانال تلگرام ما، از <strong style="color:#fbbf24;">آپدیت‌های جدید</strong>، 
-            <strong style="color:#fbbf24;">بونوس‌های ویژه</strong> و 
-            <strong style="color:#fbbf24;">کدهای تخفیف و هدیه</strong> مطلع شو! 🎁
-            <br><br>
-            <span style="color:#f97316; font-size:13px;">✨ اولین نفری باش که از اتفاقات جدید باخبر میشه!</span>
-        `;
-        joinChannelBtn.textContent = '📱 عضویت در کانال';
-        skipChannelBtn.textContent = '⏰ بعداً';
-        alreadyJoinedBtn.textContent = '✅ قبلاً عضو شدم';
+    // فقط اگه صفحه شروع نمایش داده شده
+    if (startScreen.style.display === 'none') {
+        return;
+    }
+    
+    const popup = document.getElementById('channelPopup');
+    if (!popup) return;
+    
+    // دریافت متن‌ها بر اساس زبان
+    const texts = getChannelTexts();
+    
+    document.getElementById('channelTitle').textContent = texts.title;
+    document.getElementById('channelSub').textContent = texts.subtitle;
+    document.getElementById('feature1').textContent = texts.feature1;
+    document.getElementById('feature2').textContent = texts.feature2;
+    document.getElementById('feature3').textContent = texts.feature3;
+    document.getElementById('channelBtnText').textContent = texts.btnText;
+    document.getElementById('closeChannelBtn').textContent = texts.closeText;
+    
+    // تنظیم جهت متن بر اساس زبان
+    const box = document.querySelector('#channelPopup .box');
+    if (language === 'fa') {
+        box.style.direction = 'rtl';
     } else {
-        modalTitle.textContent = '🔥 Join the Fox Eggs Family!';
-        modalDesc.innerHTML = `
-            By joining our Telegram channel, you'll get <strong style="color:#fbbf24;">latest updates</strong>, 
-            <strong style="color:#fbbf24;">special bonuses</strong> and 
-            <strong style="color:#fbbf24;">gift codes</strong>! 🎁
-            <br><br>
-            <span style="color:#f97316; font-size:13px;">✨ Be the first to know about new features!</span>
-        `;
-        joinChannelBtn.textContent = '📱 Join Channel';
-        skipChannelBtn.textContent = '⏰ Later';
-        alreadyJoinedBtn.textContent = '✅ Already Joined';
+        box.style.direction = 'ltr';
+    }
+    box.style.textAlign = 'center';
+    
+    // نمایش پاپ‌آپ
+    popup.style.display = 'flex';
+    channelPopupShown = true;
+}
+
+function closeChannelPopup() {
+    const popup = document.getElementById('channelPopup');
+    if (popup) {
+        popup.style.display = 'none';
     }
 }
 
-function showChannelModal() {
-    updateChannelModalText();
-    channelModal.style.display = 'flex';
-}
-
-function hideChannelModal() {
-    channelModal.style.display = 'none';
+function updateChannelPopup() {
+    const popup = document.getElementById('channelPopup');
+    if (!popup || popup.style.display !== 'flex') return;
+    
+    const texts = getChannelTexts();
+    document.getElementById('channelTitle').textContent = texts.title;
+    document.getElementById('channelSub').textContent = texts.subtitle;
+    document.getElementById('feature1').textContent = texts.feature1;
+    document.getElementById('feature2').textContent = texts.feature2;
+    document.getElementById('feature3').textContent = texts.feature3;
+    document.getElementById('channelBtnText').textContent = texts.btnText;
+    document.getElementById('closeChannelBtn').textContent = texts.closeText;
+    
+    const box = document.querySelector('#channelPopup .box');
+    if (language === 'fa') {
+        box.style.direction = 'rtl';
+    } else {
+        box.style.direction = 'ltr';
+    }
 }
 
 // ============================================================
-// رویدادها و شروع بازی
+// رویدادها
 // ============================================================
 
 window.addEventListener("online", function() {
@@ -3426,24 +3439,16 @@ document.querySelectorAll('.theme-option').forEach(opt => {
     });
 });
 
-// رویدادهای مودال عضویت
-joinChannelBtn.addEventListener('click', function(e) {
-    window.open('https://t.me/foxeggs_farsi', '_blank');
-    hideChannelModal();
+// دکمه ضربدر برای بستن پاپ‌آپ کانال
+document.getElementById('closeChannelBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    closeChannelPopup();
 });
 
-skipChannelBtn.addEventListener('click', hideChannelModal);
-closeModalBtn.addEventListener('click', hideChannelModal);
-
-alreadyJoinedBtn.addEventListener('click', function() {
-    hideChannelModal();
-    const fa = language === 'fa';
-    showToast(fa ? '🙏 ممنون که همراه ما هستید!' : '🙏 Thank you for being with us!');
-});
-
-channelModal.addEventListener('click', function(e) {
+// کلیک خارج از باکس پاپ‌آپ کانال
+document.getElementById('channelPopup').addEventListener('click', function(e) {
     if (e.target === this) {
-        hideChannelModal();
+        closeChannelPopup();
     }
 });
 
@@ -3468,16 +3473,18 @@ showReferralDataFromCache();
 renderSkinShop();
 powerupTimer.classList.add('hidden');
 
-// نمایش مودال عضویت در کانال - بلافاصله پس از ورود
-showChannelModal();
-
 setTimeout(() => {
+    // نمایش پاپ‌آپ کانال فقط در صفحه شروع
+    if (!playing && startScreen.style.display !== 'none') {
+        showChannelPopup();
+    }
+    
     if (navigator.onLine) {
         showReferralPrompt();
     } else {
         showNoInternet();
     }
-}, 400);
+}, 500);
 
 setTimeout(() => {
     if (navigator.onLine) {
