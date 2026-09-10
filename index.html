@@ -697,7 +697,6 @@ button:active{
     max-width:90%;
 }
 
-/* استایل‌های پاپ‌آپ کانال تلگرام */
 #channelPopup {
     position:fixed;
     inset:0;
@@ -1066,7 +1065,6 @@ button:active{
 
 </div>
 
-<!-- پاپ‌آپ کانال تلگرام -->
 <div id="channelPopup">
     <div class="box">
         <button id="closeChannelBtn">✕</button>
@@ -1111,7 +1109,7 @@ button:active{
 
 <script>
 // ============================================================
-// کد کامل بازی
+// کد کامل بازی - بهینه‌شده بدون هنگ و لگ
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -1173,240 +1171,251 @@ const retryBtn = document.getElementById('retryBtn');
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
 // ============================================================
-// تم‌ها
+// تم‌ها - پاییزی
 // ============================================================
 
 const themeConfigs = {
     classic: {
         id: "classic",
-        icon: "☀️",
-        nameEn: "Classic",
-        nameFa: "کلاسیک",
-        descEn: "Original summer",
-        descFa: "تابستانی اصلی",
-        skyDay: ["#87CEEB", "#a8d8f0", "#c8e8f5"],
-        skyNight: ["#0a1525", "#152535", "#1a2a40"],
-        groundDay: ["#7dbb4b", "#6aaa3a", "#55963b"],
-        groundNight: ["#2a3a2a", "#1a2a1a", "#0a1a0a"],
+        icon: "🍂",
+        nameEn: "Autumn",
+        nameFa: "پاییز",
+        descEn: "Golden autumn",
+        descFa: "پاییز طلایی",
+        skyDay: ["#d98c4a", "#e8a85c", "#f0c070"],
+        skyNight: ["#2a1a0a", "#3a2a15", "#4a3a20"],
+        groundDay: ["#8a6a3a", "#7a5a2a", "#6a4a1a"],
+        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
         eggColors: [
-            ["#ffffff", 1], ["#45d46b", 2], ["#3498db", 5], ["#a855f7", 10], ["#ffd43b", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff6b6b", 10], ["#a8e6cf", 25]
         ],
         foxColor: "#f97316",
-        treeColor: "#6a4a2a",
-        rockColor: "#7a8a9a",
+        treeColor: "#3a2510",
+        rockColor: "#5a6a7a",
+        cactusColor: "#1a5a2a",
         isSpace: false
     },
     city: {
         id: "city",
         icon: "🏙️",
-        nameEn: "City",
-        nameFa: "شهری",
-        descEn: "Urban streets",
-        descFa: "خیابان‌های شهری",
-        skyDay: ["#b8c8d8", "#d0dce8", "#e0e8f0"],
-        skyNight: ["#0a1520", "#15202a", "#1a2a3a"],
-        groundDay: ["#8a9aa8", "#7a8a98", "#6a7a88"],
-        groundNight: ["#3a4a5a", "#2a3a4a", "#1a2a3a"],
+        nameEn: "Urban Autumn",
+        nameFa: "پاییز شهری",
+        descEn: "City in fall",
+        descFa: "شهر در پاییز",
+        skyDay: ["#c8a870", "#d8b880", "#e8c890"],
+        skyNight: ["#1a1520", "#25202a", "#302a3a"],
+        groundDay: ["#6a5a48", "#5a4a38", "#4a3a28"],
+        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
         eggColors: [
-            ["#e8eef0", 1], ["#b8c8d8", 2], ["#8898a8", 5], ["#5a6a7a", 10], ["#c8d8e0", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff6b6b", 10], ["#a8e6cf", 25]
         ],
         foxColor: "#d47a3a",
-        treeColor: "#6a4a2a",
-        rockColor: "#7a8a9a",
+        treeColor: "#2a1a10",
+        rockColor: "#3a4a5a",
+        cactusColor: "#1a5a2a",
         isSpace: false
     },
     beach: {
         id: "beach",
         icon: "🏖️",
-        nameEn: "Beach",
-        nameFa: "ساحلی",
-        descEn: "Sun & sand",
-        descFa: "آفتاب و شن",
-        skyDay: ["#87CEEB", "#b0d8f0", "#d0e8f5"],
-        skyNight: ["#0a1a2a", "#152535", "#1a2a40"],
-        groundDay: ["#f0d8a0", "#e8c888", "#d4b070"],
-        groundNight: ["#5a4a2a", "#4a3a1a", "#3a2a10"],
+        nameEn: "Autumn Shore",
+        nameFa: "ساحل پاییزی",
+        descEn: "Fall by the sea",
+        descFa: "پاییز کنار دریا",
+        skyDay: ["#e8a860", "#f0b870", "#f8c880"],
+        skyNight: ["#2a1a10", "#3a2a1a", "#4a3a2a"],
+        groundDay: ["#c8a860", "#b89850", "#a88840"],
+        groundNight: ["#4a3a1a", "#3a2a0a", "#2a1a00"],
         eggColors: [
-            ["#f5e8c8", 1], ["#f0c878", 2], ["#e8a848", 5], ["#d48838", 10], ["#f5d898", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#7bed9f", 25]
         ],
         foxColor: "#d47a3a",
-        treeColor: "#6a5a3a",
-        rockColor: "#b8a888",
+        treeColor: "#3a2a15",
+        rockColor: "#5a4a3a",
+        cactusColor: "#1a6a2a",
         isSpace: false
     },
     forest: {
         id: "forest",
-        icon: "🌲",
-        nameEn: "Forest",
-        nameFa: "جنگلی",
-        descEn: "Deep woods",
-        descFa: "جنگل انبوه",
-        skyDay: ["#6a9a6a", "#7aaa7a", "#8aba8a"],
-        skyNight: ["#0a1a0a", "#152a15", "#1a3a1a"],
-        groundDay: ["#3a5a2a", "#2a4a1a", "#1a3a0a"],
-        groundNight: ["#1a2a0a", "#0a1a0a", "#050a00"],
+        icon: "🍁",
+        nameEn: "Falling Forest",
+        nameFa: "جنگل پاییزی",
+        descEn: "Autumn woods",
+        descFa: "جنگل خزان",
+        skyDay: ["#b89060", "#c8a070", "#d8b080"],
+        skyNight: ["#1a1005", "#2a1a0a", "#3a2a15"],
+        groundDay: ["#4a2a0a", "#3a1a00", "#2a0a00"],
+        groundNight: ["#1a0a00", "#0a0500", "#050000"],
         eggColors: [
-            ["#d4e8c8", 1], ["#a8c878", 2], ["#6a9a3a", 5], ["#3a6a1a", 10], ["#c8e8a8", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#7bed9f", 25]
         ],
         foxColor: "#d47a3a",
-        treeColor: "#3a2a1a",
-        rockColor: "#5a6a4a",
+        treeColor: "#1a0a00",
+        rockColor: "#3a4a3a",
+        cactusColor: "#1a6a2a",
         isSpace: false
     },
     space: {
         id: "space",
-        icon: "🚀",
-        nameEn: "Space",
-        nameFa: "فضایی",
-        descEn: "Galaxy fox",
-        descFa: "روباه کهکشانی",
-        skyDay: ["#1a0a3a", "#2a1a4a", "#3a2a5a"],
-        skyNight: ["#0a0a1a", "#0a0a2a", "#1a0a2a"],
-        groundDay: ["#3a2a4a", "#4a3a5a", "#5a4a6a"],
-        groundNight: ["#1a0a2a", "#0a0a1a", "#05000a"],
+        icon: "🌌",
+        nameEn: "Cosmic Fall",
+        nameFa: "پاییز کیهانی",
+        descEn: "Autumn galaxy",
+        descFa: "کهکشان پاییزی",
+        skyDay: ["#3a1a2a", "#4a2a3a", "#5a3a4a"],
+        skyNight: ["#1a0a1a", "#2a0a2a", "#3a0a3a"],
+        groundDay: ["#3a2a2a", "#4a3a3a", "#5a4a4a"],
+        groundNight: ["#1a0a0a", "#0a0000", "#050000"],
         eggColors: [
-            ["#c8a8e8", 1], ["#a878d8", 2], ["#f0d060", 5], ["#6a3a9a", 10], ["#e8e0f0", 25]
+            ["#ffffff", 1], ["#00e5ff", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#a8e6cf", 25]
         ],
-        foxColor: "#a878d8",
-        treeColor: "#4a2a6a",
+        foxColor: "#d88858",
+        treeColor: "#2a1a2a",
         rockColor: "#5a4a6a",
+        cactusColor: "#1a5a4a",
         isSpace: true
     },
     night: {
         id: "night",
         icon: "🌙",
-        nameEn: "Night",
-        nameFa: "شب",
-        descEn: "Dark & stars",
-        descFa: "تاریک و ستاره‌ها",
-        skyDay: ["#1a1a2e", "#16213e", "#0f3460"],
-        skyNight: ["#0a0a1a", "#0a0a2a", "#1a0a2a"],
-        groundDay: ["#2a2a3a", "#1a1a2a", "#0a0a1a"],
-        groundNight: ["#1a0a2a", "#0a0a1a", "#05000a"],
+        nameEn: "Autumn Night",
+        nameFa: "شب پاییزی",
+        descEn: "Dark autumn",
+        descFa: "پاییز تاریک",
+        skyDay: ["#2a1a1a", "#3a2525", "#4a3030"],
+        skyNight: ["#1a0a0a", "#2a0a0a", "#3a0a0a"],
+        groundDay: ["#2a1a1a", "#1a0a0a", "#0a0000"],
+        groundNight: ["#1a0a0a", "#0a0000", "#050000"],
         eggColors: [
-            ["#e8e0f0", 1], ["#c8b8e8", 2], ["#a898d8", 5], ["#8878c8", 10], ["#d8c8f0", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#7bed9f", 25]
         ],
-        foxColor: "#d47a3a",
-        treeColor: "#3a2a5a",
-        rockColor: "#5a4a6a",
+        foxColor: "#ff9a3a",
+        treeColor: "#0a0000",
+        rockColor: "#4a4a5a",
+        cactusColor: "#1a5a2a",
         isSpace: false
     },
     volcano: {
         id: "volcano",
         icon: "🌋",
-        nameEn: "Volcano",
-        nameFa: "آتشفشانی",
-        descEn: "Lava & fire",
-        descFa: "گدازه و آتش",
-        skyDay: ["#4a1a0a", "#6a2a0a", "#8a3a0a"],
-        skyNight: ["#2a0a0a", "#3a0a0a", "#4a0a0a"],
-        groundDay: ["#2a1a0a", "#1a0a0a", "#0a0a0a"],
-        groundNight: ["#1a0a0a", "#0a0a0a", "#050000"],
+        nameEn: "Ember Fall",
+        nameFa: "پاییز آتشفشانی",
+        descEn: "Fire & autumn",
+        descFa: "آتش و پاییز",
+        skyDay: ["#6a2a0a", "#8a3a10", "#a84a18"],
+        skyNight: ["#3a0a00", "#4a0a00", "#5a0a00"],
+        groundDay: ["#2a0a00", "#1a0000", "#0a0000"],
+        groundNight: ["#0a0000", "#050000", "#000000"],
         eggColors: [
-            ["#ff6b35", 1], ["#ff4500", 2], ["#ff8c00", 5], ["#dc143c", 10], ["#ffd700", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#00e5ff", 5], ["#7bed9f", 10], ["#c8a8ff", 25]
         ],
-        foxColor: "#ff4500",
-        treeColor: "#8b4513",
-        rockColor: "#4a4a4a",
+        foxColor: "#ffcc44",
+        treeColor: "#1a0a00",
+        rockColor: "#3a3a3a",
+        cactusColor: "#2a4a1a",
         isSpace: false
     },
     ocean: {
         id: "ocean",
         icon: "🌊",
-        nameEn: "Ocean",
-        nameFa: "اقیانوسی",
-        descEn: "Deep blue sea",
-        descFa: "دریای آبی عمیق",
-        skyDay: ["#006994", "#0088b0", "#00a0c0"],
-        skyNight: ["#001a30", "#002a40", "#003a50"],
-        groundDay: ["#f4d03f", "#e8c840", "#d4b840"],
-        groundNight: ["#2a3a2a", "#1a2a1a", "#0a1a0a"],
+        nameEn: "Autumn Tide",
+        nameFa: "پاییز اقیانوسی",
+        descEn: "Fall on waves",
+        descFa: "پاییز روی موج",
+        skyDay: ["#4a7a9a", "#5a8aaa", "#6a9aba"],
+        skyNight: ["#0a2030", "#153040", "#204050"],
+        groundDay: ["#b89850", "#a88840", "#987830"],
+        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
         eggColors: [
-            ["#7fffd4", 1], ["#00ced1", 2], ["#4682b4", 5], ["#1e90ff", 10], ["#00bfff", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#a8e6cf", 25]
         ],
-        foxColor: "#1e90ff",
-        treeColor: "#2f4f4f",
-        rockColor: "#8B4513",
+        foxColor: "#ff9a3a",
+        treeColor: "#1a3a2a",
+        rockColor: "#4a3a2a",
+        cactusColor: "#1a6a2a",
         isSpace: false
     },
     desert: {
         id: "desert",
         icon: "🏜️",
-        nameEn: "Desert",
-        nameFa: "صحرایی",
-        descEn: "Golden sands",
-        descFa: "شن‌های طلایی",
-        skyDay: ["#f4a460", "#f5b86e", "#f7c88c"],
-        skyNight: ["#1a0f0a", "#2a1a0a", "#3a2a0a"],
-        groundDay: ["#d4a050", "#c89040", "#b88030"],
-        groundNight: ["#3a2a0a", "#2a1a0a", "#1a0a0a"],
+        nameEn: "Golden Fall",
+        nameFa: "پاییز طلایی",
+        descEn: "Desert autumn",
+        descFa: "خزان صحرا",
+        skyDay: ["#e8a050", "#f0b060", "#f8c070"],
+        skyNight: ["#2a1a0a", "#3a2a0a", "#4a3a0a"],
+        groundDay: ["#a88040", "#987030", "#886020"],
+        groundNight: ["#3a2a0a", "#2a1a00", "#1a0a00"],
         eggColors: [
-            ["#f5deb3", 1], ["#deb887", 2], ["#d2b48c", 5], ["#cd853f", 10], ["#f4a460", 25]
+            ["#ffffff", 1], ["#00e5ff", 2], ["#ff4757", 5], ["#c8a8ff", 10], ["#7bed9f", 25]
         ],
-        foxColor: "#cd853f",
-        treeColor: "#8b6914",
-        rockColor: "#a08a6a",
+        foxColor: "#8b4513",
+        treeColor: "#2a1a05",
+        rockColor: "#4a3a2a",
+        cactusColor: "#1a6a2a",
         isSpace: false
     },
     magic: {
         id: "magic",
         icon: "✨",
-        nameEn: "Magic",
-        nameFa: "جادویی",
-        descEn: "Enchanted forest",
-        descFa: "جنگل جادویی",
-        skyDay: ["#4a1a6a", "#6a2a8a", "#8a3aaa"],
-        skyNight: ["#1a0a2a", "#2a0a3a", "#3a0a4a"],
-        groundDay: ["#3a2a4a", "#2a1a3a", "#1a0a2a"],
-        groundNight: ["#1a0a2a", "#0a0a1a", "#05000a"],
+        nameEn: "Enchanted Fall",
+        nameFa: "پاییز جادویی",
+        descEn: "Magic autumn",
+        descFa: "خزان جادویی",
+        skyDay: ["#8a5a7a", "#9a6a8a", "#aa7a9a"],
+        skyNight: ["#2a1a3a", "#3a2a4a", "#4a3a5a"],
+        groundDay: ["#3a1a2a", "#2a0a1a", "#1a000a"],
+        groundNight: ["#1a0a1a", "#0a000a", "#050005"],
         eggColors: [
-            ["#e8d0f0", 1], ["#d4a0e8", 2], ["#c070d0", 5], ["#a040b0", 10], ["#f0d8ff", 25]
+            ["#ffffff", 1], ["#ffe45e", 2], ["#00e5ff", 5], ["#7bed9f", 10], ["#ff9f43", 25]
         ],
-        foxColor: "#8b5cf6",
-        treeColor: "#5a2a6a",
-        rockColor: "#6a4a7a",
+        foxColor: "#ffb84d",
+        treeColor: "#2a0a1a",
+        rockColor: "#5a3a5a",
+        cactusColor: "#1a6a4a",
         isSpace: false
     },
     toon: {
         id: "toon",
         icon: "🎨",
-        nameEn: "Toon",
-        nameFa: "کارتونی",
-        descEn: "Cartoon world",
-        descFa: "دنیای کارتونی",
-        skyDay: ["#87CEEB", "#90d8f0", "#a0e0f5"],
-        skyNight: ["#1a1a3a", "#2a2a4a", "#3a3a5a"],
-        groundDay: ["#4ade80", "#3ab870", "#2aa060"],
-        groundNight: ["#1a2a1a", "#0a1a0a", "#050a05"],
+        nameEn: "Toon Fall",
+        nameFa: "پاییز کارتونی",
+        descEn: "Cartoon autumn",
+        descFa: "خزان کارتونی",
+        skyDay: ["#e8a860", "#f0b870", "#f8c880"],
+        skyNight: ["#3a2a1a", "#4a3a2a", "#5a4a3a"],
+        groundDay: ["#8a7040", "#7a6030", "#6a5020"],
+        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
         eggColors: [
-            ["#ff6b6b", 1], ["#feca57", 2], ["#48dbfb", 5], ["#ff9ff3", 10], ["#f368e0", 25]
+            ["#ffffff", 1], ["#00e5ff", 2], ["#ff4757", 5], ["#c8a8ff", 10], ["#7bed9f", 25]
         ],
-        foxColor: "#f0932b",
-        treeColor: "#6ab04c",
-        rockColor: "#badc58",
+        foxColor: "#c8642a",
+        treeColor: "#2a1a05",
+        rockColor: "#4a4030",
+        cactusColor: "#1a6a2a",
         isSpace: false
     },
     cyberpunk: {
         id: "cyberpunk",
         icon: "💜",
-        nameEn: "Cyberpunk",
-        nameFa: "سایبرپانک",
-        descEn: "Neon future",
-        descFa: "آینده نئونی",
-        skyDay: ["#1a0a2a", "#2a1a3a", "#3a2a4a"],
-        skyNight: ["#0a001a", "#1a002a", "#2a003a"],
-        groundDay: ["#1a1a2a", "#2a2a3a", "#3a3a4a"],
-        groundNight: ["#0a0a1a", "#1a0a2a", "#2a0a3a"],
+        nameEn: "Neon Fall",
+        nameFa: "پاییز نئونی",
+        descEn: "Cyber autumn",
+        descFa: "خزان سایبری",
+        skyDay: ["#4a2a3a", "#5a3a4a", "#6a4a5a"],
+        skyNight: ["#2a0a1a", "#3a0a2a", "#4a0a3a"],
+        groundDay: ["#2a1a2a", "#1a0a1a", "#0a000a"],
+        groundNight: ["#0a000a", "#050005", "#000000"],
         eggColors: [
-            ["#ff6bff", 1], ["#00ffff", 2], ["#ff00ff", 5], ["#00ff00", 10], ["#ffff00", 25]
+            ["#ffffff", 1], ["#00ffff", 2], ["#ff00ff", 5], ["#00ff88", 10], ["#ffff00", 25]
         ],
-        foxColor: "#ff2d95",
-        treeColor: "#ff0066",
-        rockColor: "#7a3a9a",
+        foxColor: "#ff6b9d",
+        treeColor: "#1a0a1a",
+        rockColor: "#3a2a4a",
+        cactusColor: "#0a5a3a",
         isSpace: false
     }
 };
-
 // ============================================================
 // اسکین‌های روباه
 // ============================================================
@@ -2069,6 +2078,9 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
 function showReferralPrompt() {
     if (localStorage.getItem("foxRegistered") === "true") return;
     
+    const existing = document.getElementById('referralPrompt');
+    if (existing) existing.remove();
+    
     const overlay = document.createElement('div');
     overlay.id = 'referralPrompt';
     
@@ -2235,7 +2247,7 @@ function drawParticles() {
 }
 
 // ============================================================
-// توابع رسم (Draw Functions)
+// توابع رسم
 // ============================================================
 
 function drawBackground(){
@@ -2397,7 +2409,6 @@ function drawFox(){
         createTrailParticle(x - 6, y + 28, trailColor);
     }
     
-    // Body
     ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.moveTo(x + 15, y + 28);
@@ -2464,7 +2475,6 @@ function drawFox(){
     ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Eyes
     ctx.fillStyle = skin.eyeColor || "#1a1a2a";
     ctx.beginPath();
     ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
@@ -2526,11 +2536,11 @@ function drawObstacle(o){
         } else {
             ctx.fillStyle = theme.treeColor || "#6a4a2a";
             ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
-            ctx.fillStyle = isNight ? "#3a4a3a" : "#23823c";
+            ctx.fillStyle = isNight ? "#3a2a1a" : "#8a6a3a";
             ctx.beginPath();
             ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
             ctx.fill();
-            ctx.fillStyle = isNight ? "#2a3a2a" : "#2f9e44";
+            ctx.fillStyle = isNight ? "#2a1a0a" : "#a07a4a";
             ctx.beginPath();
             ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
             ctx.fill();
@@ -2579,7 +2589,7 @@ function drawObstacle(o){
             ctx.ellipse(o.x + 16, o.y + 8, 6, 3, 0, 0, Math.PI*2);
             ctx.fill();
         } else {
-            ctx.fillStyle = "#25834a";
+            ctx.fillStyle = "#6a8a3a";
             ctx.fillRect(o.x + 9, o.y, 14, o.h);
             ctx.fillRect(o.x, o.y + 20, 13, 11);
             ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
@@ -2656,15 +2666,12 @@ function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
     
-    // چک کن کدوم پاوراپ‌ها فعال هستن
     const activeTypes = [];
     if (shieldActive) activeTypes.push('shield');
     if (speedBoostActive) activeTypes.push('speed');
     
-    // اگه هر ۲ تا فعال باشن، هیچی اسپاون نکن
     if (activeTypes.length >= 2) return;
     
-    // فقط پاوراپ‌هایی رو اسپاون کن که فعال نیستن
     const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
     if (available.length === 0) return;
     
@@ -3069,9 +3076,8 @@ function renderSkinShop() {
                 cursorStyle = 'not-allowed';
             }
             
-            const rarityLabel = fa ? getRarityLabel(skin.rarity) : getRarityLabel(skin.rarity);
-            const descText = fa ? skin.desc : skin.desc;
-            
+            const rarityLabel = getRarityLabel(skin.rarity);
+            const descText = skin.desc;
             const isLocked = !owned && !canBuy && !isFree;
             
             html += `
@@ -3226,7 +3232,7 @@ function setLanguage(lang){
 }
 
 // ============================================================
-// پاپ‌آپ کانال تلگرام - پشتیبانی کامل از فارسی و انگلیسی
+// پاپ‌آپ کانال تلگرام
 // ============================================================
 
 let channelPopupShown = false;
@@ -3247,12 +3253,10 @@ function getChannelTexts() {
 }
 
 function showChannelPopup() {
-    // اگر پاپ‌آپ قبلاً نمایش داده شده یا بازی در حال اجراست، نمایش نده
     if (channelPopupShown || playing) {
         return;
     }
     
-    // فقط اگه صفحه شروع نمایش داده شده
     if (startScreen.style.display === 'none') {
         return;
     }
@@ -3260,7 +3264,6 @@ function showChannelPopup() {
     const popup = document.getElementById('channelPopup');
     if (!popup) return;
     
-    // دریافت متن‌ها بر اساس زبان
     const texts = getChannelTexts();
     
     document.getElementById('channelTitle').textContent = texts.title;
@@ -3271,7 +3274,6 @@ function showChannelPopup() {
     document.getElementById('channelBtnText').textContent = texts.btnText;
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
     
-    // تنظیم جهت متن بر اساس زبان
     const box = document.querySelector('#channelPopup .box');
     if (language === 'fa') {
         box.style.direction = 'rtl';
@@ -3280,7 +3282,6 @@ function showChannelPopup() {
     }
     box.style.textAlign = 'center';
     
-    // نمایش پاپ‌آپ
     popup.style.display = 'flex';
     channelPopupShown = true;
 }
@@ -3439,13 +3440,11 @@ document.querySelectorAll('.theme-option').forEach(opt => {
     });
 });
 
-// دکمه ضربدر برای بستن پاپ‌آپ کانال
 document.getElementById('closeChannelBtn').addEventListener('click', function(e) {
     e.stopPropagation();
     closeChannelPopup();
 });
 
-// کلیک خارج از باکس پاپ‌آپ کانال
 document.getElementById('channelPopup').addEventListener('click', function(e) {
     if (e.target === this) {
         closeChannelPopup();
@@ -3474,7 +3473,6 @@ renderSkinShop();
 powerupTimer.classList.add('hidden');
 
 setTimeout(() => {
-    // نمایش پاپ‌آپ کانال فقط در صفحه شروع
     if (!playing && startScreen.style.display !== 'none') {
         showChannelPopup();
     }
@@ -3509,4 +3507,4 @@ setInterval(() => {
 </script>
 
 </body>
-    </html>
+                   </html>
