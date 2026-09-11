@@ -6,1083 +6,126 @@
 <title>Fox Eggs</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-}
-
-html,body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#87ceeb;
-    touch-action:none;
-    user-select:none;
-    font-family:Arial,sans-serif;
-}
-
-#game{
-    position:fixed;
-    inset:0;
-    overflow:hidden;
-}
-
-canvas{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    display:block;
-}
-
-#ui{
-    position:absolute;
-    top:15px;
-    left:15px;
-    right:15px;
-    display:flex;
-    justify-content:space-between;
-    color:white;
-    font-weight:bold;
-    text-shadow:0 2px 3px #555;
-    pointer-events:none;
-    z-index:5;
-}
-
-#score{
-    font-size:22px;
-}
-
-#best{
-    font-size:14px;
-    margin-top:4px;
-}
-
-#combo{
-    opacity:0;
-    font-size:20px;
-    transition:opacity .1s;
-}
-
-#combo.show{
-    opacity:1;
-}
-
-#powerupTimer {
-    position:absolute;
-    top:70px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:6;
-    pointer-events:none;
-    display:flex;
-    gap:20px;
-    justify-content:center;
-    align-items:center;
-    background:rgba(0,0,0,0.5);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-    padding:6px 18px;
-    border-radius:30px;
-    border:1px solid rgba(255,255,255,0.1);
-    transition:all 0.3s ease;
-}
-
-#powerupTimer.hidden {
-    opacity:0;
-    transform:translateX(-50%) translateY(-10px);
-    pointer-events:none;
-}
-
-.timer-item {
-    display:flex;
-    align-items:center;
-    gap:6px;
-    color:white;
-    font-size:13px;
-    font-weight:bold;
-}
-
-.timer-item .icon {
-    font-size:16px;
-}
-
-.timer-item .time {
-    min-width:28px;
-    text-align:center;
-    font-variant-numeric:tabular-nums;
-}
-
-#shieldTimer .time { color:#4fc3f7; }
-#speedTimer .time { color:#ffd54f; }
-
-.timer-item.hidden-timer {
-    display:none !important;
-}
-
-#menuButton{
-    position:fixed;
-    top:12px;
-    left:12px;
-    z-index:99999;
-    width:48px;
-    height:48px;
-    padding:0;
-    font-size:27px;
-    line-height:48px;
-    background:rgba(0,0,0,.35);
-    box-shadow:none;
-    border-radius:12px;
-    display:block;
-    cursor:pointer;
-    color:white;
-    border:none;
-    pointer-events:auto;
-}
-
-#menuPanel{
-    position:fixed;
-    top:68px;
-    left:12px;
-    right:12px;
-    max-width:320px;
-    height:auto;
-    max-height:calc(100vh - 140px);
-    background:rgba(20,20,20,.94);
-    color:white;
-    border-radius:16px;
-    padding:18px;
-    z-index:99998;
-    display:none;
-    box-shadow:0 8px 30px rgba(0,0,0,.45);
-    overflow-y:auto;
-    -webkit-overflow-scrolling:touch;
-}
-
-#menuPanel::-webkit-scrollbar{
-    width:4px;
-}
-
-#menuPanel::-webkit-scrollbar-track{
-    background:transparent;
-}
-
-#menuPanel::-webkit-scrollbar-thumb{
-    background:rgba(255,255,255,.2);
-    border-radius:10px;
-}
-
-#menuPanel h2{
-    font-size:22px;
-    margin-bottom:15px;
-    position:sticky;
-    top:0;
-    background:rgba(20,20,20,.94);
-    padding-bottom:8px;
-    z-index:1;
-}
-
-.menuItem{
-    margin:8px 0;
-    padding:12px;
-    background:rgba(255,255,255,.08);
-    border-radius:10px;
-}
-
-.langButtons,
-.soundButtons{
-    display:flex;
-    gap:8px;
-    margin-top:8px;
-    flex-wrap:wrap;
-}
-
-.langButtons button,
-.soundButtons button{
-    flex:1;
-    min-width:60px;
-    padding:9px;
-    font-size:14px;
-}
-
-.screen{
-    position:absolute;
-    inset:0;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    color:white;
-    background:rgba(0,0,0,.2);
-    z-index:10;
-    text-align:center;
-    pointer-events:auto;
-    overflow-y:auto;
-    padding:20px 15px;
-    -webkit-overflow-scrolling:touch;
-}
-
-#gameOver{
-    display:none;
-}
-
-.logo{
-    font-size:70px;
-    margin-bottom:10px;
-}
-
-h1{
-    font-size:42px;
-    margin-bottom:10px;
-}
-
-p{
-    margin-bottom:25px;
-}
-
-button{
-    border:none;
-    background:#f97316;
-    color:white;
-    font-size:18px;
-    font-weight:bold;
-    padding:14px 35px;
-    border-radius:12px;
-    box-shadow:0 5px #c2410c;
-    cursor:pointer;
-    transition:transform .1s;
-}
-
-button:active{
-    transform:translateY(4px);
-    box-shadow:0 1px #c2410c;
-}
-
-.final{
-    font-size:28px;
-    margin-bottom:15px;
-}
-
-#record{
-    display:none;
-    color:#ffe45e;
-    font-weight:bold;
-    margin-bottom:15px;
-}
-
-#stats{
-    margin-top:15px;
-    margin-bottom:20px;
-    font-size:15px;
-    line-height:2;
-}
-
-#noInternetOverlay{
-    position:fixed;
-    inset:0;
-    z-index:100000;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    background:rgba(0,0,0,0.85);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-    color:white;
-    padding:20px;
-}
-
-#noInternetOverlay .box{
-    background:#1a1a2e;
-    padding:40px 30px;
-    border-radius:24px;
-    max-width:380px;
-    width:100%;
-    text-align:center;
-    border:1px solid rgba(255,255,255,.05);
-}
-
-#noInternetOverlay .box .icon{
-    font-size:64px;
-    margin-bottom:12px;
-}
-
-#noInternetOverlay .box h2{
-    font-size:22px;
-    margin-bottom:8px;
-    color:#fff;
-}
-
-#noInternetOverlay .box p{
-    color:#c4b5d4;
-    font-size:14px;
-    margin-bottom:20px;
-    opacity:0.7;
-    line-height:1.6;
-}
-
-#noInternetOverlay .box .retry-btn{
-    background:linear-gradient(135deg,#a78bfa,#7c3aed);
-    border:none;
-    color:white;
-    padding:12px 35px;
-    border-radius:40px;
-    font-size:15px;
-    font-weight:600;
-    cursor:pointer;
-    transition:0.3s;
-    box-shadow:0 4px 20px rgba(124,58,237,0.3);
-}
-
-#noInternetOverlay .box .retry-btn:hover{
-    transform:scale(1.02);
-    box-shadow:0 6px 28px rgba(124,58,237,0.45);
-}
-
-#noInternetOverlay .box .retry-btn:active{
-    transform:scale(0.97);
-}
-
-#referralPrompt{
-    position:fixed;
-    inset:0;
-    z-index:100001;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    background:rgba(0,0,0,0.75);
-    color:white;
-    padding:20px;
-}
-
-#referralPrompt .box{
-    background:#1a1a2e;
-    padding:30px;
-    border-radius:20px;
-    max-width:350px;
-    width:100%;
-    text-align:center;
-    position:relative;
-}
-
-#referralPrompt .box .error-msg{
-    color:#f87171;
-    font-size:13px;
-    margin-bottom:10px;
-    min-height:20px;
-    display:block;
-}
-
-#referralPrompt .box input{
-    width:100%;
-    padding:12px;
-    border-radius:10px;
-    border:2px solid #f97316;
-    background:#2a2a3e;
-    color:white;
-    font-size:18px;
-    text-align:center;
-    margin-bottom:12px;
-    outline:none;
-    transition:border-color 0.3s;
-}
-
-#referralPrompt .box input:focus{
-    border-color:#ffb347;
-}
-
-#referralPrompt .box input.error{
-    border-color:#f87171;
-    animation: shake 0.4s ease;
-}
-
-@keyframes shake{
-    0%,100%{transform:translateX(0);}
-    20%{transform:translateX(-8px);}
-    40%{transform:translateX(8px);}
-    60%{transform:translateX(-5px);}
-    80%{transform:translateX(5px);}
-}
-
-#referralPrompt .box .btn-submit{
-    width:100%;
-    background:#f97316;
-    box-shadow:0 4px #c2410c;
-    padding:12px;
-    margin-bottom:8px;
-}
-
-#referralPrompt .box .btn-submit:disabled{
-    opacity:0.4;
-    cursor:not-allowed;
-    transform:none;
-}
-
-#referralPrompt .box .btn-submit.loading{
-    background:linear-gradient(135deg,#6b7280,#4b5563);
-    box-shadow:none;
-    cursor:wait;
-}
-
-#referralPrompt .box .btn-skip{
-    width:100%;
-    background:transparent;
-    border:1px solid #555;
-    box-shadow:none;
-    padding:10px;
-    font-size:14px;
-    color:#888;
-}
-
-#referralPrompt .box .btn-skip:hover{
-    background:rgba(255,255,255,.05);
-}
-
-#referralPrompt .box .hint{
-    color:#666;
-    font-size:12px;
-    margin-top:15px;
-}
-
-.ref-code-display{
-    display:flex;
-    gap:8px;
-    margin-top:8px;
-    align-items:center;
-}
-
-.ref-code-display code{
-    flex:1;
-    padding:8px;
-    background:rgba(255,255,255,.1);
-    border-radius:6px;
-    font-size:14px;
-    direction:ltr;
-    text-align:center;
-    user-select:all;
-    font-family:monospace;
-    letter-spacing:1px;
-}
-
-.ref-code-display button{
-    padding:8px 12px;
-    font-size:14px;
-    background:#2d7a3d;
-    box-shadow:0 3px #1a4a25;
-}
-
-.ref-count{
-    font-size:18px;
-    color:#ffe45e;
-}
-
-.global-badge{
-    font-size:10px;
-    color:rgba(255,255,255,0.2);
-    text-align:center;
-    margin-top:12px;
-    letter-spacing:0.5px;
-}
-
-.theme-selector-overlay {
-    position:fixed;
-    inset:0;
-    z-index:99997;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    background:rgba(0,0,0,0.7);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
-}
-
-.theme-selector-panel {
-    background:rgba(20,20,30,0.95);
-    border-radius:20px;
-    padding:30px 25px;
-    max-width:420px;
-    width:90%;
-    max-height:85vh;
-    overflow-y:auto;
-    box-shadow:0 20px 60px rgba(0,0,0,0.5);
-    border:1px solid rgba(255,255,255,0.05);
-}
-
-.theme-selector-panel h2 {
-    color:white;
-    font-size:24px;
-    text-align:center;
-    margin-bottom:8px;
-}
-
-.theme-selector-panel .subtitle {
-    color:rgba(255,255,255,0.4);
-    font-size:13px;
-    text-align:center;
-    margin-bottom:20px;
-}
-
-.theme-grid {
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:10px;
-}
-
-.theme-option {
-    background:rgba(255,255,255,0.05);
-    border:2px solid rgba(255,255,255,0.08);
-    border-radius:14px;
-    padding:14px 10px;
-    text-align:center;
-    cursor:pointer;
-    transition:all 0.25s ease;
-    color:white;
-}
-
-.theme-option:hover {
-    background:rgba(255,255,255,0.1);
-    transform:scale(1.02);
-}
-
-.theme-option.active {
-    border-color:#f97316;
-    background:rgba(249,115,22,0.15);
-    box-shadow:0 0 20px rgba(249,115,22,0.1);
-}
-
-.theme-option .icon {
-    font-size:32px;
-    display:block;
-    margin-bottom:4px;
-}
-
-.theme-option .name {
-    font-size:13px;
-    font-weight:bold;
-}
-
-.theme-option .desc {
-    font-size:10px;
-    color:rgba(255,255,255,0.3);
-}
-
-.theme-selector-panel .btn-close-theme {
-    width:100%;
-    margin-top:15px;
-    background:rgba(255,255,255,0.08);
-    box-shadow:none;
-    font-size:15px;
-    padding:12px;
-}
-
-.theme-selector-panel .btn-close-theme:hover {
-    background:rgba(255,255,255,0.15);
-}
-
-#changeThemeBtn {
-    background:rgba(255,255,255,0.12);
-    box-shadow:none;
-    font-size:15px;
-    padding:12px 25px;
-    margin-top:8px;
-    border:1px solid rgba(255,255,255,0.1);
-}
-
-#changeThemeBtn:hover {
-    background:rgba(255,255,255,0.2);
-}
-
-#changeThemeBtn:active {
-    transform:translateY(3px);
-}
-
-#powerupStatus {
-    position:absolute;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    display:flex;
-    gap:10px;
-    z-index:5;
-    pointer-events:none;
-}
-
-#powerupStatus .indicator {
-    display:none;
-    padding:5px 12px;
-    border-radius:20px;
-    font-size:14px;
-    color:white;
-    font-weight:bold;
-    text-shadow:0 1px 3px rgba(0,0,0,0.5);
-    backdrop-filter:blur(4px);
-    -webkit-backdrop-filter:blur(4px);
-}
-
-#shieldIndicator {
-    background:rgba(79,195,247,0.4);
-    border:2px solid #4fc3f7;
-}
-
-#speedIndicator {
-    background:rgba(255,213,79,0.4);
-    border:2px solid #ffd54f;
-}
-
-#skinShopGrid .skin-option {
-    transition:all 0.2s ease;
-}
-
-#skinShopGrid .skin-option:hover:not(.locked) {
-    transform:scale(1.03);
-}
-
-#skinShopGrid .skin-option.active {
-    box-shadow:0 0 20px rgba(249,115,22,0.2);
-}
-
-#skinShopGrid .skin-option.locked {
-    opacity:0.5;
-    cursor:not-allowed;
-}
-
-.rarity-common { background:#6b7280; }
-.rarity-uncommon { background:#22c55e; }
-.rarity-rare { background:#3b82f6; }
-.rarity-epic { background:#8b5cf6; }
-.rarity-legendary { background:#f59e0b; }
-.rarity-mythic { background:#ef4444; }
-
-#skinCount {
-    font-size:12px;
-    color:#888;
-}
-
-#totalScoreDisplay {
-    color:#fbbf24;
-    font-weight:bold;
-    font-size:14px;
-}
-
-@keyframes fadeInUp {
-    from { opacity:0; transform:translateY(20px); }
-    to { opacity:1; transform:translateY(0); }
-}
-
-@keyframes fadeOutDown {
-    from { opacity:1; transform:translateY(0); }
-    to { opacity:0; transform:translateY(20px); }
-}
-
-@keyframes pulse {
-    0%,100% { transform:scale(1); }
-    50% { transform:scale(1.05); }
-}
-
-.pulse {
-    animation:pulse 0.5s ease 2;
-}
-
-#toast {
-    position:fixed;
-    bottom:80px;
-    left:50%;
-    transform:translateX(-50%);
-    background:rgba(0,0,0,0.85);
-    color:white;
-    padding:12px 24px;
-    border-radius:12px;
-    font-size:14px;
-    z-index:100002;
-    animation:fadeInUp 0.3s ease;
-    pointer-events:none;
-    text-align:center;
-    max-width:90%;
-}
-
-#channelPopup {
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    display:none;
-    justify-content:center;
-    align-items:center;
-    background:rgba(0,0,0,0.85);
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
-    animation:fadeInUp 0.4s ease;
-}
-
-#channelPopup .box {
-    background:linear-gradient(135deg,#1a1a2e,#2a1a3e);
-    padding:35px 30px 30px;
-    border-radius:24px;
-    max-width:380px;
-    width:90%;
-    text-align:center;
-    border:1px solid rgba(255,255,255,0.08);
-    box-shadow:0 20px 60px rgba(0,0,0,0.6);
-    position:relative;
-    overflow:hidden;
-}
-
-#closeChannelBtn {
-    position:absolute;
-    top:12px;
-    right:16px;
-    background:none;
-    border:none;
-    color:rgba(255,255,255,0.3);
-    font-size:24px;
-    cursor:pointer;
-    transition:all 0.3s ease;
-    z-index:2;
-    padding:4px 8px;
-    line-height:1;
-}
-
-#closeChannelBtn:hover {
-    color:rgba(255,255,255,0.8);
-    transform:rotate(90deg);
-}
-
-#channelPopup .box::before {
-    content:'';
-    position:absolute;
-    top:-50%;
-    left:-50%;
-    width:200%;
-    height:200%;
-    background:radial-gradient(circle at center, rgba(249,115,22,0.05) 0%, transparent 70%);
-    animation:rotateGlow 20s linear infinite;
-}
-
-@keyframes rotateGlow {
-    0% { transform:rotate(0deg); }
-    100% { transform:rotate(360deg); }
-}
-
-#channelPopup .icon-big {
-    font-size:72px;
-    margin-bottom:10px;
-    display:block;
-    animation:bounce 2s ease infinite;
-}
-
-@keyframes bounce {
-    0%,100% { transform:translateY(0); }
-    50% { transform:translateY(-10px); }
-}
-
-#channelPopup h2 {
-    color:white;
-    font-size:24px;
-    margin-bottom:8px;
-    position:relative;
-    z-index:1;
-}
-
-#channelPopup .sub-text {
-    color:rgba(255,255,255,0.6);
-    font-size:14px;
-    line-height:1.6;
-    margin-bottom:20px;
-    position:relative;
-    z-index:1;
-}
-
-#channelPopup .channel-link {
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    background:rgba(249,115,22,0.15);
-    border:2px solid #f97316;
-    border-radius:14px;
-    padding:12px 20px;
-    color:white;
-    font-size:16px;
-    font-weight:bold;
-    text-decoration:none;
-    transition:all 0.3s ease;
-    position:relative;
-    z-index:1;
-    width:100%;
-    justify-content:center;
-    box-sizing:border-box;
-}
-
-#channelPopup .channel-link:hover {
-    background:#f97316;
-    transform:scale(1.02);
-    box-shadow:0 0 30px rgba(249,115,22,0.3);
-}
-
-#channelPopup .channel-link:active {
-    transform:scale(0.97);
-}
-
-#channelPopup .channel-link .telegram-icon {
-    font-size:28px;
-}
-
-#channelPopup .features {
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    gap:8px;
-    margin:15px 0 20px;
-    position:relative;
-    z-index:1;
-}
-
-#channelPopup .feature-item {
-    background:rgba(255,255,255,0.05);
-    border-radius:10px;
-    padding:8px 4px;
-    font-size:11px;
-    color:rgba(255,255,255,0.6);
-}
-
-#channelPopup .feature-item .emoji {
-    display:block;
-    font-size:20px;
-    margin-bottom:2px;
-}
-
-/* ==================== ریسپانسیو برای گوشی عمودی ==================== */
-
-@media (max-height: 700px) {
-    .logo {
-        font-size: 48px !important;
-        margin-bottom: 5px !important;
-    }
-    h1 {
-        font-size: 32px !important;
-        margin-bottom: 8px !important;
-    }
-    #editionBadge {
-        font-size: 13px !important;
-        margin-top: -4px !important;
-    }
-    #startText {
-        margin-top: 8px !important;
-        margin-bottom: 15px !important;
-        font-size: 14px !important;
-    }
-    button {
-        padding: 11px 28px !important;
-        font-size: 16px !important;
-    }
-    #controlText {
-        margin-top: 12px !important;
-        font-size: 12px !important;
-    }
-    .final {
-        font-size: 22px !important;
-        margin-bottom: 10px !important;
-    }
-    #stats {
-        margin-top: 10px !important;
-        margin-bottom: 14px !important;
-        font-size: 13px !important;
-        line-height: 1.7 !important;
-    }
-    .screen {
-        padding: 15px !important;
-    }
-}
-
-@media (max-height: 600px) {
-    .logo {
-        font-size: 38px !important;
-    }
-    h1 {
-        font-size: 26px !important;
-    }
-    #editionBadge {
-        font-size: 11px !important;
-    }
-    #startText {
-        font-size: 12px !important;
-        margin-bottom: 10px !important;
-    }
-    button {
-        padding: 9px 22px !important;
-        font-size: 14px !important;
-    }
-    #openThemeStartBtn {
-        padding: 7px 18px !important;
-        font-size: 12px !important;
-        margin-top: 6px !important;
-    }
-    #controlText {
-        font-size: 11px !important;
-        margin-top: 8px !important;
-    }
-    .final {
-        font-size: 18px !important;
-    }
-    #stats {
-        font-size: 12px !important;
-        line-height: 1.6 !important;
-    }
-}
-
-@media (orientation: portrait) {
-    #startScreen .logo,
-    #gameOver .logo {
-        font-size: 60px;
-    }
-    
-    #menuPanel {
-        top: 68px;
-        left: 8px;
-        right: 8px;
-        max-width: none;
-        max-height: calc(100vh - 90px);
-        padding: 14px;
-    }
-    
-    .theme-selector-panel {
-        padding: 22px 18px;
-        max-height: 90vh;
-        width: 94%;
-    }
-    
-    .theme-selector-panel h2 {
-        font-size: 20px;
-    }
-    
-    .theme-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-    }
-    
-    .theme-option {
-        padding: 10px 6px;
-    }
-    
-    .theme-option .icon {
-        font-size: 26px;
-    }
-    
-    .theme-option .name {
-        font-size: 12px;
-    }
-    
-    .theme-option .desc {
-        font-size: 9px;
-    }
-    
-    #channelPopup .box {
-        padding: 25px 18px 22px;
-        width: 92%;
-        max-width: 340px;
-    }
-    
-    #channelPopup .icon-big {
-        font-size: 54px;
-    }
-    
-    #channelPopup h2 {
-        font-size: 20px;
-    }
-    
-    #channelPopup .sub-text {
-        font-size: 13px;
-        margin-bottom: 16px;
-    }
-    
-    #channelPopup .channel-link {
-        padding: 11px 16px;
-        font-size: 15px;
-    }
-    
-    #referralPrompt .box {
-        padding: 22px 18px;
-        max-width: 92%;
-    }
-    
-    #referralPrompt .box input {
-        font-size: 16px;
-        padding: 10px;
-    }
-    
-    #noInternetOverlay .box {
-        padding: 28px 20px;
-        max-width: 90%;
-    }
-    
-    #noInternetOverlay .box .icon {
-        font-size: 48px;
-    }
-    
-    #noInternetOverlay .box h2 {
-        font-size: 18px;
-    }
-}
-
-@media (max-width: 360px) {
-    h1 {
-        font-size: 26px !important;
-    }
-    .logo {
-        font-size: 42px !important;
-    }
-    button {
-        padding: 11px 22px !important;
-        font-size: 15px !important;
-    }
-    #menuPanel {
-        padding: 12px;
-    }
-    .menuItem {
-        padding: 10px;
-    }
-    .theme-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-height: 500px) and (orientation: portrait) {
-    .logo {
-        font-size: 32px !important;
-        margin-bottom: 3px !important;
-    }
-    h1 {
-        font-size: 22px !important;
-        margin-bottom: 5px !important;
-    }
-    #editionBadge {
-        font-size: 10px !important;
-        letter-spacing: 1px !important;
-    }
-    #startText {
-        font-size: 11px !important;
-        margin-top: 5px !important;
-        margin-bottom: 8px !important;
-    }
-    button {
-        padding: 8px 18px !important;
-        font-size: 13px !important;
-    }
-    #openThemeStartBtn {
-        padding: 6px 14px !important;
-        font-size: 11px !important;
-        margin-top: 5px !important;
-    }
-    #controlText {
-        font-size: 10px !important;
-        margin-top: 5px !important;
-    }
-    #startScreen p:last-child {
-        margin-top: 8px !important;
-        font-size: 8px !important;
-    }
-}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;background:#87ceeb;touch-action:none;user-select:none;font-family:Arial,sans-serif;}
+#game{position:fixed;inset:0;overflow:hidden;}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;}
+#ui{position:absolute;top:15px;left:15px;right:15px;display:flex;justify-content:space-between;color:white;font-weight:bold;text-shadow:0 2px 3px #555;pointer-events:none;z-index:5;}
+#score{font-size:22px;}
+#best{font-size:14px;margin-top:4px;}
+#combo{opacity:0;font-size:20px;transition:opacity .1s;}
+#combo.show{opacity:1;}
+#powerupTimer{position:absolute;top:70px;left:50%;transform:translateX(-50%);z-index:6;pointer-events:none;display:flex;gap:20px;justify-content:center;align-items:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);padding:6px 18px;border-radius:30px;border:1px solid rgba(255,255,255,0.1);transition:all 0.3s ease;}
+#powerupTimer.hidden{opacity:0;transform:translateX(-50%) translateY(-10px);pointer-events:none;}
+.timer-item{display:flex;align-items:center;gap:6px;color:white;font-size:13px;font-weight:bold;}
+.timer-item .icon{font-size:16px;}
+.timer-item .time{min-width:28px;text-align:center;font-variant-numeric:tabular-nums;}
+#shieldTimer .time{color:#4fc3f7;}
+#speedTimer .time{color:#ffd54f;}
+.timer-item.hidden-timer{display:none !important;}
+#menuButton{position:absolute;top:12px;left:12px;z-index:30;width:48px;height:48px;padding:0;font-size:27px;line-height:48px;background:rgba(0,0,0,.35);box-shadow:none;border-radius:12px;display:block;cursor:pointer;color:white;border:none;}
+#menuPanel{position:absolute;top:68px;left:12px;right:12px;max-width:320px;height:auto;max-height:calc(100vh - 140px);background:rgba(20,20,20,.94);color:white;border-radius:16px;padding:18px;z-index:29;display:none;box-shadow:0 8px 30px rgba(0,0,0,.45);overflow-y:auto;-webkit-overflow-scrolling:touch;}
+#menuPanel::-webkit-scrollbar{width:4px;}
+#menuPanel::-webkit-scrollbar-track{background:transparent;}
+#menuPanel::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:10px;}
+#menuPanel h2{font-size:22px;margin-bottom:15px;position:sticky;top:0;background:rgba(20,20,20,.94);padding-bottom:8px;z-index:1;}
+.menuItem{margin:8px 0;padding:12px;background:rgba(255,255,255,.08);border-radius:10px;}
+.langButtons,.soundButtons{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;}
+.langButtons button,.soundButtons button{flex:1;min-width:60px;padding:9px;font-size:14px;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;background:rgba(0,0,0,.2);z-index:10;text-align:center;pointer-events:auto;overflow-y:auto;padding:20px 15px;}
+#gameOver{display:none;}
+.logo{font-size:70px;margin-bottom:10px;}
+h1{font-size:42px;margin-bottom:10px;}
+p{margin-bottom:25px;}
+button{border:none;background:#f97316;color:white;font-size:18px;font-weight:bold;padding:14px 35px;border-radius:12px;box-shadow:0 5px #c2410c;cursor:pointer;transition:transform .1s;}
+button:active{transform:translateY(4px);box-shadow:0 1px #c2410c;}
+.final{font-size:28px;margin-bottom:15px;}
+#record{display:none;color:#ffe45e;font-weight:bold;margin-bottom:15px;}
+#stats{margin-top:15px;margin-bottom:20px;font-size:15px;line-height:2;}
+#noInternetOverlay{position:fixed;inset:0;z-index:100;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);color:white;padding:20px;}
+#noInternetOverlay .box{background:#1a1a2e;padding:40px 30px;border-radius:24px;max-width:380px;width:100%;text-align:center;border:1px solid rgba(255,255,255,.05);}
+#noInternetOverlay .box .icon{font-size:64px;margin-bottom:12px;}
+#noInternetOverlay .box h2{font-size:22px;margin-bottom:8px;color:#fff;}
+#noInternetOverlay .box p{color:#c4b5d4;font-size:14px;margin-bottom:20px;opacity:0.7;line-height:1.6;}
+#noInternetOverlay .box .retry-btn{background:linear-gradient(135deg,#a78bfa,#7c3aed);border:none;color:white;padding:12px 35px;border-radius:40px;font-size:15px;font-weight:600;cursor:pointer;transition:0.3s;box-shadow:0 4px 20px rgba(124,58,237,0.3);}
+#noInternetOverlay .box .retry-btn:hover{transform:scale(1.02);}
+#noInternetOverlay .box .retry-btn:active{transform:scale(0.97);}
+#referralPrompt{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;justify-content:center;align-items:center;background:rgba(0,0,0,0.75);color:white;padding:20px;}
+#referralPrompt .box{background:#1a1a2e;padding:30px;border-radius:20px;max-width:350px;width:100%;text-align:center;position:relative;}
+#referralPrompt .box .error-msg{color:#f87171;font-size:13px;margin-bottom:10px;min-height:20px;display:block;}
+#referralPrompt .box input{width:100%;padding:12px;border-radius:10px;border:2px solid #f97316;background:#2a2a3e;color:white;font-size:18px;text-align:center;margin-bottom:12px;outline:none;transition:border-color 0.3s;}
+#referralPrompt .box input:focus{border-color:#ffb347;}
+#referralPrompt .box input.error{border-color:#f87171;animation:shake 0.4s ease;}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-8px);}40%{transform:translateX(8px);}60%{transform:translateX(-5px);}80%{transform:translateX(5px);}}
+#referralPrompt .box .btn-submit{width:100%;background:#f97316;box-shadow:0 4px #c2410c;padding:12px;margin-bottom:8px;}
+#referralPrompt .box .btn-submit:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+#referralPrompt .box .btn-submit.loading{background:linear-gradient(135deg,#6b7280,#4b5563);box-shadow:none;cursor:wait;}
+#referralPrompt .box .btn-skip{width:100%;background:transparent;border:1px solid #555;box-shadow:none;padding:10px;font-size:14px;color:#888;}
+#referralPrompt .box .btn-skip:hover{background:rgba(255,255,255,.05);}
+#referralPrompt .box .hint{color:#666;font-size:12px;margin-top:15px;}
+.ref-code-display{display:flex;gap:8px;margin-top:8px;align-items:center;}
+.ref-code-display code{flex:1;padding:8px;background:rgba(255,255,255,.1);border-radius:6px;font-size:14px;direction:ltr;text-align:center;user-select:all;font-family:monospace;letter-spacing:1px;}
+.ref-code-display button{padding:8px 12px;font-size:14px;background:#2d7a3d;box-shadow:0 3px #1a4a25;}
+.ref-count{font-size:18px;color:#ffe45e;}
+.global-badge{font-size:10px;color:rgba(255,255,255,0.2);text-align:center;margin-top:12px;letter-spacing:0.5px;}
+.theme-selector-overlay{position:fixed;inset:0;z-index:50;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);}
+.theme-selector-panel{background:rgba(20,20,30,0.95);border-radius:20px;padding:30px 25px;max-width:420px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.05);}
+.theme-selector-panel h2{color:white;font-size:24px;text-align:center;margin-bottom:8px;}
+.theme-selector-panel .subtitle{color:rgba(255,255,255,0.4);font-size:13px;text-align:center;margin-bottom:20px;}
+.theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+.theme-option{background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.08);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all 0.25s ease;color:white;}
+.theme-option:hover{background:rgba(255,255,255,0.1);transform:scale(1.02);}
+.theme-option.active{border-color:#f97316;background:rgba(249,115,22,0.15);box-shadow:0 0 20px rgba(249,115,22,0.1);}
+.theme-option .icon{font-size:32px;display:block;margin-bottom:4px;}
+.theme-option .name{font-size:13px;font-weight:bold;}
+.theme-option .desc{font-size:10px;color:rgba(255,255,255,0.3);}
+.theme-selector-panel .btn-close-theme{width:100%;margin-top:15px;background:rgba(255,255,255,0.08);box-shadow:none;font-size:15px;padding:12px;}
+.theme-selector-panel .btn-close-theme:hover{background:rgba(255,255,255,0.15);}
+#changeThemeBtn{background:rgba(255,255,255,0.12);box-shadow:none;font-size:15px;padding:12px 25px;margin-top:8px;border:1px solid rgba(255,255,255,0.1);}
+#changeThemeBtn:hover{background:rgba(255,255,255,0.2);}
+#changeThemeBtn:active{transform:translateY(3px);}
+#powerupStatus{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:5;pointer-events:none;}
+#powerupStatus .indicator{display:none;padding:5px 12px;border-radius:20px;font-size:14px;color:white;font-weight:bold;text-shadow:0 1px 3px rgba(0,0,0,0.5);backdrop-filter:blur(4px);}
+#shieldIndicator{background:rgba(79,195,247,0.4);border:2px solid #4fc3f7;}
+#speedIndicator{background:rgba(255,213,79,0.4);border:2px solid #ffd54f;}
+#skinShopGrid .skin-option{transition:all 0.2s ease;}
+#skinShopGrid .skin-option:hover:not(.locked){transform:scale(1.03);}
+#skinShopGrid .skin-option.active{box-shadow:0 0 20px rgba(249,115,22,0.2);}
+#skinShopGrid .skin-option.locked{opacity:0.5;cursor:not-allowed;}
+.rarity-common{background:#6b7280;}
+.rarity-uncommon{background:#22c55e;}
+.rarity-rare{background:#3b82f6;}
+.rarity-epic{background:#8b5cf6;}
+.rarity-legendary{background:#f59e0b;}
+.rarity-mythic{background:#ef4444;}
+#skinCount{font-size:12px;color:#888;}
+#totalScoreDisplay{color:#fbbf24;font-weight:bold;font-size:14px;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeOutDown{from{opacity:1;transform:translateY(0);}to{opacity:0;transform:translateY(20px);}}
+@keyframes pulse{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.pulse{animation:pulse 0.5s ease 2;}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:white;padding:12px 24px;border-radius:12px;font-size:14px;z-index:200;animation:fadeInUp 0.3s ease;pointer-events:none;text-align:center;max-width:90%;}
+#channelPopup{position:fixed;inset:0;z-index:70;display:none;justify-content:center;align-items:center;background:rgba(0,0,0,0.85);backdrop-filter:blur(12px);animation:fadeInUp 0.4s ease;}
+#channelPopup .box{background:linear-gradient(135deg,#1a1a2e,#2a1a3e);padding:35px 30px 30px;border-radius:24px;max-width:380px;width:90%;text-align:center;border:1px solid rgba(255,255,255,0.08);box-shadow:0 20px 60px rgba(0,0,0,0.6);position:relative;overflow:hidden;}
+#closeChannelBtn{position:absolute;top:12px;right:16px;background:none;border:none;color:rgba(255,255,255,0.3);font-size:24px;cursor:pointer;transition:all 0.3s ease;z-index:2;padding:4px 8px;line-height:1;}
+#closeChannelBtn:hover{color:rgba(255,255,255,0.8);transform:rotate(90deg);}
+#channelPopup .box::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at center, rgba(249,115,22,0.05) 0%, transparent 70%);animation:rotateGlow 20s linear infinite;}
+@keyframes rotateGlow{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+#channelPopup .icon-big{font-size:72px;margin-bottom:10px;display:block;animation:bounce 2s ease infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+#channelPopup h2{color:white;font-size:24px;margin-bottom:8px;position:relative;z-index:1;}
+#channelPopup .sub-text{color:#ffd700;font-size:14px;line-height:1.6;margin-bottom:20px;position:relative;z-index:1;}
+#channelPopup .channel-link{display:inline-flex;align-items:center;gap:10px;background:rgba(249,115,22,0.15);border:2px solid #f97316;border-radius:14px;padding:12px 20px;color:white;font-size:16px;font-weight:bold;text-decoration:none;transition:all 0.3s ease;position:relative;z-index:1;width:100%;justify-content:center;box-sizing:border-box;}
+#channelPopup .channel-link:hover{background:#f97316;transform:scale(1.02);}
+#channelPopup .channel-link:active{transform:scale(0.97);}
+#channelPopup .channel-link .telegram-icon{font-size:28px;}
+#channelPopup .features{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:15px 0 20px;position:relative;z-index:1;}
+#channelPopup .feature-item{background:rgba(255,255,255,0.05);border-radius:10px;padding:8px 4px;font-size:11px;color:rgba(255,255,255,0.6);}
+#channelPopup .feature-item .emoji{display:block;font-size:20px;margin-bottom:2px;}
+@media (max-height:700px){.logo{font-size:48px !important;}h1{font-size:32px !important;}button{padding:11px 28px !important;font-size:16px !important;}.final{font-size:22px !important;}}
+@media (max-height:600px){.logo{font-size:38px !important;}h1{font-size:26px !important;}button{padding:9px 22px !important;font-size:14px !important;}}
 </style>
 </head>
-
 <body>
 
 <div id="game">
@@ -1201,64 +244,64 @@ button:active{
         <p class="subtitle" id="themeSelectorSub">Choose your adventure style</p>
         <div class="theme-grid" id="themeGrid">
             <div class="theme-option active" data-theme="classic">
-                <span class="icon">🍂</span>
-                <div class="name" id="themeNameClassic">Autumn</div>
-                <div class="desc" id="themeDescClassic">Golden autumn</div>
+                <span class="icon">☀️</span>
+                <div class="name" id="themeNameClassic">Classic</div>
+                <div class="desc" id="themeDescClassic">Original summer</div>
             </div>
             <div class="theme-option" data-theme="city">
                 <span class="icon">🏙️</span>
-                <div class="name" id="themeNameCity">Urban Autumn</div>
-                <div class="desc" id="themeDescCity">City in fall</div>
+                <div class="name" id="themeNameCity">City</div>
+                <div class="desc" id="themeDescCity">Urban streets</div>
             </div>
             <div class="theme-option" data-theme="beach">
                 <span class="icon">🏖️</span>
-                <div class="name" id="themeNameBeach">Autumn Shore</div>
-                <div class="desc" id="themeDescBeach">Fall by the sea</div>
+                <div class="name" id="themeNameBeach">Beach</div>
+                <div class="desc" id="themeDescBeach">Sun & sand</div>
             </div>
             <div class="theme-option" data-theme="forest">
-                <span class="icon">🍁</span>
-                <div class="name" id="themeNameForest">Falling Forest</div>
-                <div class="desc" id="themeDescForest">Autumn woods</div>
+                <span class="icon">🌲</span>
+                <div class="name" id="themeNameForest">Forest</div>
+                <div class="desc" id="themeDescForest">Deep woods</div>
             </div>
             <div class="theme-option" data-theme="space">
-                <span class="icon">🌌</span>
-                <div class="name" id="themeNameSpace">Cosmic Fall</div>
-                <div class="desc" id="themeDescSpace">Autumn galaxy</div>
+                <span class="icon">🚀</span>
+                <div class="name" id="themeNameSpace">Space</div>
+                <div class="desc" id="themeDescSpace">Galaxy fox</div>
             </div>
             <div class="theme-option" data-theme="night">
                 <span class="icon">🌙</span>
-                <div class="name" id="themeNameNight">Autumn Night</div>
-                <div class="desc" id="themeDescNight">Dark autumn</div>
+                <div class="name" id="themeNameNight">Night</div>
+                <div class="desc" id="themeDescNight">Dark & stars</div>
             </div>
             <div class="theme-option" data-theme="volcano">
                 <span class="icon">🌋</span>
-                <div class="name" id="themeNameVolcano">Ember Fall</div>
-                <div class="desc" id="themeDescVolcano">Fire & autumn</div>
+                <div class="name" id="themeNameVolcano">Volcano</div>
+                <div class="desc" id="themeDescVolcano">Lava & fire</div>
             </div>
             <div class="theme-option" data-theme="ocean">
                 <span class="icon">🌊</span>
-                <div class="name" id="themeNameOcean">Autumn Tide</div>
-                <div class="desc" id="themeDescOcean">Fall on waves</div>
+                <div class="name" id="themeNameOcean">Ocean</div>
+                <div class="desc" id="themeDescOcean">Deep blue sea</div>
             </div>
             <div class="theme-option" data-theme="desert">
                 <span class="icon">🏜️</span>
-                <div class="name" id="themeNameDesert">Golden Fall</div>
-                <div class="desc" id="themeDescDesert">Desert autumn</div>
+                <div class="name" id="themeNameDesert">Desert</div>
+                <div class="desc" id="themeDescDesert">Golden sands</div>
             </div>
             <div class="theme-option" data-theme="magic">
                 <span class="icon">✨</span>
-                <div class="name" id="themeNameMagic">Enchanted Fall</div>
-                <div class="desc" id="themeDescMagic">Magic autumn</div>
+                <div class="name" id="themeNameMagic">Magic</div>
+                <div class="desc" id="themeDescMagic">Enchanted forest</div>
             </div>
             <div class="theme-option" data-theme="toon">
                 <span class="icon">🎨</span>
-                <div class="name" id="themeNameToon">Toon Fall</div>
-                <div class="desc" id="themeDescToon">Cartoon autumn</div>
+                <div class="name" id="themeNameToon">Toon</div>
+                <div class="desc" id="themeDescToon">Cartoon world</div>
             </div>
             <div class="theme-option" data-theme="cyberpunk">
                 <span class="icon">💜</span>
-                <div class="name" id="themeNameCyberpunk">Neon Fall</div>
-                <div class="desc" id="themeDescCyberpunk">Cyber autumn</div>
+                <div class="name" id="themeNameCyberpunk">Cyberpunk</div>
+                <div class="desc" id="themeDescCyberpunk">Neon future</div>
             </div>
         </div>
         <button class="btn-close-theme" id="closeThemeSelector">✓ <span id="applyThemeText">Apply Theme</span></button>
@@ -1267,7 +310,7 @@ button:active{
 
 <div id="startScreen" class="screen">
     <div class="logo" id="startLogo">🍂🦊🍁</div>
-    <h1 id="gameTitle">Fox Eggs</h1>
+    <h1>Fox Eggs</h1>
     <p id="editionBadge" style="font-size:16px;color:#ffd700;margin-top:-8px;letter-spacing:3px;font-weight:bold;text-shadow:0 2px 6px rgba(255,140,0,0.5);">🍁 AUTUMN EDITION 🍁</p>
     <p id="startText" style="margin-top:15px;">Collect eggs and beat your record!</p>
     <button id="start">Start Game</button>
@@ -1279,7 +322,7 @@ button:active{
 </div>
 
 <div id="gameOver" class="screen">
-    <div class="logo">🍂🦊🍁</div>
+    <div class="logo" id="gameOverLogo">🍂🦊🍁</div>
     <h1 id="gameOverTitle">Game Over!</h1>
     <div class="final">
         <span id="finalScoreLabel">Score:</span>
@@ -1305,7 +348,7 @@ button:active{
 <div id="channelPopup">
     <div class="box">
         <button id="closeChannelBtn">✕</button>
-        <span class="icon-big">🍂🦊🍁</span>
+        <span class="icon-big" id="channelIcon">🍂🦊🍁</span>
         <h2 id="channelTitle">به کانال تلگرام بپیوندید!</h2>
         <p class="sub-text" id="channelSub">
             برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان
@@ -1346,7 +389,7 @@ button:active{
 
 <script>
 // ============================================================
-// کد کامل بازی - نسخه پاییزی نهایی
+// کد کامل بازی - نسخه فصلی با رنگ‌های واضح (بدون حاشیه مشکی)
 // ============================================================
 
 const canvas = document.getElementById("canvas");
@@ -1355,27 +398,16 @@ const ctx = canvas.getContext("2d", { alpha:false, desynchronized:true });
 let W = 0, H = 0, scale = 1;
 
 function resize(){
-    // استفاده از visualViewport اگر موجود باشد (برای موبایل بهتره)
-    const vw = window.visualViewport ? window.visualViewport.width : window.innerWidth;
-    const vh = window.visualViewport ? window.visualViewport.height : window.innerHeight;
-    
-    W = vw;
-    H = vh;
+    W = window.innerWidth;
+    H = window.innerHeight;
     scale = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.floor(W * scale);
     canvas.height = Math.floor(H * scale);
-    canvas.style.width = W + 'px';
-    canvas.style.height = H + 'px';
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
 }
 resize();
 window.addEventListener("resize", resize);
-window.addEventListener("orientationchange", function() {
-    setTimeout(resize, 150);
-});
-if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", resize);
-}
+window.addEventListener("orientationchange", function() { setTimeout(resize, 150); });
 
 const scoreText = document.getElementById("score");
 const bestText = document.getElementById("best");
@@ -1402,268 +434,222 @@ const themeSelectorOverlay = document.getElementById("themeSelectorOverlay");
 const closeThemeSelector = document.getElementById("closeThemeSelector");
 const currentThemeDisplay = document.getElementById("currentThemeDisplay");
 const startThemeLabel = document.getElementById("startThemeLabel");
-
 const myReferralCode = document.getElementById("myReferralCode");
 const referralCount = document.getElementById("referralCount");
 const copyBtn = document.getElementById("copyReferralCode");
-
 const powerupTimer = document.getElementById('powerupTimer');
 const shieldTimeDisplay = document.getElementById('shieldTimeDisplay');
 const speedTimeDisplay = document.getElementById('speedTimeDisplay');
-
 const shieldTimerItem = document.getElementById('shieldTimer');
 const speedTimerItem = document.getElementById('speedTimer');
-
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
 
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
 
 // ============================================================
-// تم‌ها - پاییزی
+// سیستم فصل‌ها
 // ============================================================
 
-const themeConfigs = {
-    classic: {
-        id: "classic",
-        icon: "🍂",
-        nameEn: "Autumn",
-        nameFa: "پاییز",
-        descEn: "Golden autumn",
-        descFa: "پاییز طلایی",
-        skyDay: ["#d98c4a", "#e8a85c", "#f0c070"],
-        skyNight: ["#2a1a0a", "#3a2a15", "#4a3a20"],
-        groundDay: ["#8a6a3a", "#7a5a2a", "#6a4a1a"],
-        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff6b6b", 10], ["#a8e6cf", 25]
-        ],
-        foxColor: "#f97316",
-        treeColor: "#3a2510",
-        rockColor: "#5a6a7a",
-        cactusColor: "#1a5a2a",
-        isSpace: false
-    },
-    city: {
-        id: "city",
-        icon: "🏙️",
-        nameEn: "Urban Autumn",
-        nameFa: "پاییز شهری",
-        descEn: "City in fall",
-        descFa: "شهر در پاییز",
-        skyDay: ["#c8a870", "#d8b880", "#e8c890"],
-        skyNight: ["#1a1520", "#25202a", "#302a3a"],
-        groundDay: ["#6a5a48", "#5a4a38", "#4a3a28"],
-        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff6b6b", 10], ["#a8e6cf", 25]
-        ],
-        foxColor: "#d47a3a",
-        treeColor: "#2a1a10",
-        rockColor: "#3a4a5a",
-        cactusColor: "#1a5a2a",
-        isSpace: false
-    },
-    beach: {
-        id: "beach",
-        icon: "🏖️",
-        nameEn: "Autumn Shore",
-        nameFa: "ساحل پاییزی",
-        descEn: "Fall by the sea",
-        descFa: "پاییز کنار دریا",
-        skyDay: ["#e8a860", "#f0b870", "#f8c880"],
-        skyNight: ["#2a1a10", "#3a2a1a", "#4a3a2a"],
-        groundDay: ["#c8a860", "#b89850", "#a88840"],
-        groundNight: ["#4a3a1a", "#3a2a0a", "#2a1a00"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#7bed9f", 25]
-        ],
-        foxColor: "#d47a3a",
-        treeColor: "#3a2a15",
-        rockColor: "#5a4a3a",
-        cactusColor: "#1a6a2a",
-        isSpace: false
-    },
-    forest: {
-        id: "forest",
-        icon: "🍁",
-        nameEn: "Falling Forest",
-        nameFa: "جنگل پاییزی",
-        descEn: "Autumn woods",
-        descFa: "جنگل خزان",
-        skyDay: ["#b89060", "#c8a070", "#d8b080"],
-        skyNight: ["#1a1005", "#2a1a0a", "#3a2a15"],
-        groundDay: ["#4a2a0a", "#3a1a00", "#2a0a00"],
-        groundNight: ["#1a0a00", "#0a0500", "#050000"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#7bed9f", 25]
-        ],
-        foxColor: "#d47a3a",
-        treeColor: "#1a0a00",
-        rockColor: "#3a4a3a",
-        cactusColor: "#1a6a2a",
-        isSpace: false
-    },
-    space: {
-        id: "space",
-        icon: "🌌",
-        nameEn: "Cosmic Fall",
-        nameFa: "پاییز کیهانی",
-        descEn: "Autumn galaxy",
-        descFa: "کهکشان پاییزی",
-        skyDay: ["#3a1a2a", "#4a2a3a", "#5a3a4a"],
-        skyNight: ["#1a0a1a", "#2a0a2a", "#3a0a3a"],
-        groundDay: ["#3a2a2a", "#4a3a3a", "#5a4a4a"],
-        groundNight: ["#1a0a0a", "#0a0000", "#050000"],
-        eggColors: [
-            ["#ffffff", 1], ["#00e5ff", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#a8e6cf", 25]
-        ],
-        foxColor: "#d88858",
-        treeColor: "#2a1a2a",
-        rockColor: "#5a4a6a",
-        cactusColor: "#1a5a4a",
-        isSpace: true
-    },
-    night: {
-        id: "night",
-        icon: "🌙",
-        nameEn: "Autumn Night",
-        nameFa: "شب پاییزی",
-        descEn: "Dark autumn",
-        descFa: "پاییز تاریک",
-        skyDay: ["#2a1a1a", "#3a2525", "#4a3030"],
-        skyNight: ["#1a0a0a", "#2a0a0a", "#3a0a0a"],
-        groundDay: ["#2a1a1a", "#1a0a0a", "#0a0000"],
-        groundNight: ["#1a0a0a", "#0a0000", "#050000"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#7bed9f", 25]
-        ],
-        foxColor: "#ff9a3a",
-        treeColor: "#0a0000",
-        rockColor: "#4a4a5a",
-        cactusColor: "#1a5a2a",
-        isSpace: false
-    },
-    volcano: {
-        id: "volcano",
-        icon: "🌋",
-        nameEn: "Ember Fall",
-        nameFa: "پاییز آتشفشانی",
-        descEn: "Fire & autumn",
-        descFa: "آتش و پاییز",
-        skyDay: ["#6a2a0a", "#8a3a10", "#a84a18"],
-        skyNight: ["#3a0a00", "#4a0a00", "#5a0a00"],
-        groundDay: ["#2a0a00", "#1a0000", "#0a0000"],
-        groundNight: ["#0a0000", "#050000", "#000000"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#00e5ff", 5], ["#7bed9f", 10], ["#c8a8ff", 25]
-        ],
-        foxColor: "#ffcc44",
-        treeColor: "#1a0a00",
-        rockColor: "#3a3a3a",
-        cactusColor: "#2a4a1a",
-        isSpace: false
-    },
-    ocean: {
-        id: "ocean",
-        icon: "🌊",
-        nameEn: "Autumn Tide",
-        nameFa: "پاییز اقیانوسی",
-        descEn: "Fall on waves",
-        descFa: "پاییز روی موج",
-        skyDay: ["#4a7a9a", "#5a8aaa", "#6a9aba"],
-        skyNight: ["#0a2030", "#153040", "#204050"],
-        groundDay: ["#b89850", "#a88840", "#987830"],
-        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#ff9f43", 5], ["#ff4757", 10], ["#a8e6cf", 25]
-        ],
-        foxColor: "#ff9a3a",
-        treeColor: "#1a3a2a",
-        rockColor: "#4a3a2a",
-        cactusColor: "#1a6a2a",
-        isSpace: false
-    },
-    desert: {
-        id: "desert",
-        icon: "🏜️",
-        nameEn: "Golden Fall",
-        nameFa: "پاییز طلایی",
-        descEn: "Desert autumn",
-        descFa: "خزان صحرا",
-        skyDay: ["#e8a050", "#f0b060", "#f8c070"],
-        skyNight: ["#2a1a0a", "#3a2a0a", "#4a3a0a"],
-        groundDay: ["#a88040", "#987030", "#886020"],
-        groundNight: ["#3a2a0a", "#2a1a00", "#1a0a00"],
-        eggColors: [
-            ["#ffffff", 1], ["#00e5ff", 2], ["#ff4757", 5], ["#c8a8ff", 10], ["#7bed9f", 25]
-        ],
-        foxColor: "#8b4513",
-        treeColor: "#2a1a05",
-        rockColor: "#4a3a2a",
-        cactusColor: "#1a6a2a",
-        isSpace: false
-    },
-    magic: {
-        id: "magic",
-        icon: "✨",
-        nameEn: "Enchanted Fall",
-        nameFa: "پاییز جادویی",
-        descEn: "Magic autumn",
-        descFa: "خزان جادویی",
-        skyDay: ["#8a5a7a", "#9a6a8a", "#aa7a9a"],
-        skyNight: ["#2a1a3a", "#3a2a4a", "#4a3a5a"],
-        groundDay: ["#3a1a2a", "#2a0a1a", "#1a000a"],
-        groundNight: ["#1a0a1a", "#0a000a", "#050005"],
-        eggColors: [
-            ["#ffffff", 1], ["#ffe45e", 2], ["#00e5ff", 5], ["#7bed9f", 10], ["#ff9f43", 25]
-        ],
-        foxColor: "#ffb84d",
-        treeColor: "#2a0a1a",
-        rockColor: "#5a3a5a",
-        cactusColor: "#1a6a4a",
-        isSpace: false
-    },
-    toon: {
-        id: "toon",
-        icon: "🎨",
-        nameEn: "Toon Fall",
-        nameFa: "پاییز کارتونی",
-        descEn: "Cartoon autumn",
-        descFa: "خزان کارتونی",
-        skyDay: ["#e8a860", "#f0b870", "#f8c880"],
-        skyNight: ["#3a2a1a", "#4a3a2a", "#5a4a3a"],
-        groundDay: ["#8a7040", "#7a6030", "#6a5020"],
-        groundNight: ["#2a1a0a", "#1a0a00", "#0a0000"],
-        eggColors: [
-            ["#ffffff", 1], ["#00e5ff", 2], ["#ff4757", 5], ["#c8a8ff", 10], ["#7bed9f", 25]
-        ],
-        foxColor: "#c8642a",
-        treeColor: "#2a1a05",
-        rockColor: "#4a4030",
-        cactusColor: "#1a6a2a",
-        isSpace: false
-    },
-    cyberpunk: {
-        id: "cyberpunk",
-        icon: "💜",
-        nameEn: "Neon Fall",
-        nameFa: "پاییز نئونی",
-        descEn: "Cyber autumn",
-        descFa: "خزان سایبری",
-        skyDay: ["#4a2a3a", "#5a3a4a", "#6a4a5a"],
-        skyNight: ["#2a0a1a", "#3a0a2a", "#4a0a3a"],
-        groundDay: ["#2a1a2a", "#1a0a1a", "#0a000a"],
-        groundNight: ["#0a000a", "#050005", "#000000"],
-        eggColors: [
-            ["#ffffff", 1], ["#00ffff", 2], ["#ff00ff", 5], ["#00ff88", 10], ["#ffff00", 25]
-        ],
-        foxColor: "#ff6b9d",
-        treeColor: "#1a0a1a",
-        rockColor: "#3a2a4a",
-        cactusColor: "#0a5a3a",
-        isSpace: false
+const SEASONS = {
+    spring: { id:'spring', nameFa:'بهار', nameEn:'Spring', icon:'🌸', logo:'🌸🦊🌷', editionFa:'🌸 نسخه بهاری 🌸', editionEn:'🌸 SPRING EDITION 🌸', badgeColor:'#ff6fa8' },
+    summer: { id:'summer', nameFa:'تابستان', nameEn:'Summer', icon:'☀️', logo:'☀️🦊🌊', editionFa:'☀️ نسخه تابستانی ☀️', editionEn:'☀️ SUMMER EDITION ☀️', badgeColor:'#ffb030' },
+    autumn: { id:'autumn', nameFa:'پاییز', nameEn:'Autumn', icon:'🍂', logo:'🍂🦊🍁', editionFa:'🍁 نسخه پاییزی 🍁', editionEn:'🍁 AUTUMN EDITION 🍁', badgeColor:'#ffd700' },
+    winter: { id:'winter', nameFa:'زمستان', nameEn:'Winter', icon:'❄️', logo:'❄️🦊⛄', editionFa:'❄️ نسخه زمستانی ❄️', editionEn:'❄️ WINTER EDITION ❄️', badgeColor:'#a8d8ff' }
+};
+
+function getCurrentSeason() {
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const day = now.getDate();
+    if ((month === 3 && day >= 21) || month === 4 || month === 5 || (month === 6 && day <= 20)) return 'spring';
+    if ((month === 6 && day >= 21) || month === 7 || month === 8 || (month === 9 && day <= 22)) return 'summer';
+    if ((month === 9 && day >= 23) || month === 10 || month === 11 || (month === 12 && day <= 20)) return 'autumn';
+    return 'winter';
+}
+
+let currentSeason = getCurrentSeason();
+function getSeasonConfig() { return SEASONS[currentSeason]; }
+
+// ============================================================
+// اسم‌ها و آیکون‌های فصلی تم‌ها
+// ============================================================
+
+const THEME_NAMES = {
+    classic: { spring:{fa:'بهار',en:'Spring',icon:'🌷'}, summer:{fa:'تابستان',en:'Summer',icon:'🌻'}, autumn:{fa:'پاییز',en:'Autumn',icon:'🍂'}, winter:{fa:'زمستان',en:'Winter',icon:'⛄'} },
+    city: { spring:{fa:'شهر بهاری',en:'Urban Spring',icon:'🏡'}, summer:{fa:'شهر تابستانی',en:'Urban Summer',icon:'🏙️'}, autumn:{fa:'پاییز شهری',en:'Urban Autumn',icon:'🏢'}, winter:{fa:'شهر زمستانی',en:'Urban Winter',icon:'🌃'} },
+    beach: { spring:{fa:'ساحل بهاری',en:'Spring Shore',icon:'⛵'}, summer:{fa:'ساحل تابستانی',en:'Summer Shore',icon:'🏖️'}, autumn:{fa:'ساحل پاییزی',en:'Autumn Shore',icon:'🌅'}, winter:{fa:'ساحل زمستانی',en:'Winter Shore',icon:'🏝️'} },
+    forest: { spring:{fa:'جنگل شکوفا',en:'Blooming Forest',icon:'🌱'}, summer:{fa:'جنگل سبز',en:'Green Forest',icon:'🌳'}, autumn:{fa:'جنگل خزان',en:'Falling Forest',icon:'🍁'}, winter:{fa:'جنگل برفی',en:'Snowy Forest',icon:'🌲'} },
+    space: { spring:{fa:'بهار کیهانی',en:'Cosmic Spring',icon:'🪐'}, summer:{fa:'تابستان کیهانی',en:'Cosmic Summer',icon:'🌌'}, autumn:{fa:'پاییز کیهانی',en:'Cosmic Fall',icon:'☄️'}, winter:{fa:'زمستان کیهانی',en:'Cosmic Winter',icon:'🌠'} },
+    night: { spring:{fa:'شب بهاری',en:'Spring Night',icon:'🌙'}, summer:{fa:'شب تابستانی',en:'Summer Night',icon:'🌆'}, autumn:{fa:'شب پاییزی',en:'Autumn Night',icon:'🌃'}, winter:{fa:'شب زمستانی',en:'Winter Night',icon:'✨'} },
+    volcano: { spring:{fa:'بهار آتشفشانی',en:'Ember Spring',icon:'♨️'}, summer:{fa:'تابستان آتشفشانی',en:'Ember Summer',icon:'🌋'}, autumn:{fa:'پاییز آتشفشانی',en:'Ember Fall',icon:'🔥'}, winter:{fa:'زمستان آتشفشانی',en:'Ember Winter',icon:'🗻'} },
+    ocean: { spring:{fa:'موج بهاری',en:'Spring Tide',icon:'🐚'}, summer:{fa:'موج تابستانی',en:'Summer Tide',icon:'🌊'}, autumn:{fa:'موج پاییزی',en:'Autumn Tide',icon:'⚓'}, winter:{fa:'موج زمستانی',en:'Winter Tide',icon:'🧊'} },
+    desert: { spring:{fa:'صحرای شکوفا',en:'Blooming Desert',icon:'🌵'}, summer:{fa:'صحرای طلایی',en:'Golden Desert',icon:'🏜️'}, autumn:{fa:'خزان صحرا',en:'Golden Fall',icon:'🐪'}, winter:{fa:'صحرای یخی',en:'Frozen Desert',icon:'🏔️'} },
+    magic: { spring:{fa:'بهار جادویی',en:'Enchanted Spring',icon:'🦋'}, summer:{fa:'تابستان جادویی',en:'Enchanted Summer',icon:'🪄'}, autumn:{fa:'خزان جادویی',en:'Enchanted Fall',icon:'🔮'}, winter:{fa:'زمستان جادویی',en:'Enchanted Winter',icon:'❄️'} },
+    toon: { spring:{fa:'بهار کارتونی',en:'Toon Spring',icon:'🎈'}, summer:{fa:'تابستان کارتونی',en:'Toon Summer',icon:'🎨'}, autumn:{fa:'خزان کارتونی',en:'Toon Fall',icon:'🎭'}, winter:{fa:'زمستان کارتونی',en:'Toon Winter',icon:'🎪'} },
+    cyberpunk: { spring:{fa:'بهار نئونی',en:'Neon Spring',icon:'💚'}, summer:{fa:'تابستان نئونی',en:'Neon Summer',icon:'💜'}, autumn:{fa:'خزان سایبری',en:'Neon Fall',icon:'🟣'}, winter:{fa:'زمستان نئونی',en:'Neon Winter',icon:'💙'} }
+};
+
+// ============================================================
+// پالت فصلی
+// ============================================================
+
+const SEASONAL_TINTS = {
+    spring: { skyMix:'#ffb8d8', groundMix:'#a8d8a0', skyAmount:0.22, groundAmount:0.18 },
+    summer: { skyMix:'#ffe680', groundMix:'#c8b878', skyAmount:0.18, groundAmount:0.14 },
+    autumn: { skyMix:'#ffb060', groundMix:'#a06830', skyAmount:0.15, groundAmount:0.12 },
+    winter: { skyMix:'#c8e0f0', groundMix:'#e0e8f0', skyAmount:0.28, groundAmount:0.22 }
+};
+
+function mixHex(hex1, hex2, amount) {
+    const c1 = hex1.replace('#',''); const c2 = hex2.replace('#','');
+    const r1 = parseInt(c1.substr(0,2),16), g1 = parseInt(c1.substr(2,2),16), b1 = parseInt(c1.substr(4,2),16);
+    const r2 = parseInt(c2.substr(0,2),16), g2 = parseInt(c2.substr(2,2),16), b2 = parseInt(c2.substr(4,2),16);
+    const r = Math.round(r1 + (r2 - r1) * amount);
+    const g = Math.round(g1 + (g2 - g1) * amount);
+    const b = Math.round(b1 + (b2 - b1) * amount);
+    return '#' + r.toString(16).padStart(2,'0') + g.toString(16).padStart(2,'0') + b.toString(16).padStart(2,'0');
+}
+
+function applySeasonTint(colors, mixColor, amount) { return colors.map(c => mixHex(c, mixColor, amount)); }
+function getSeasonalSky(theme, isNight) {
+    const base = isNight ? theme.skyNight : theme.skyDay;
+    const tint = SEASONAL_TINTS[currentSeason];
+    return applySeasonTint(base, tint.skyMix, tint.skyAmount);
+}
+function getSeasonalGround(theme, isNight) {
+    const base = isNight ? theme.groundNight : theme.groundDay;
+    const tint = SEASONAL_TINTS[currentSeason];
+    return applySeasonTint(base, tint.groundMix, tint.groundAmount);
+}
+
+// ============================================================
+// رنگ درخت فصلی - هر فصل رنگ خودش
+// ============================================================
+
+function getTreeColors() {
+    const seasonalTreeColors = {
+        spring: { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },   // صورتی شکوفه
+        summer: { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },   // سبز پر
+        autumn: { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },   // نارنجی پاییزی
+        winter: { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' }    // سفید برفی
+    };
+    return seasonalTreeColors[currentSeason] || seasonalTreeColors.summer;
+}
+
+// ============================================================
+// رنگ سنگ - نارنجی آتشین نئونی (واضح در همه تم‌ها)
+// ============================================================
+
+function getRockColor() {
+    return '#ff5722';
+}
+
+// ============================================================
+// رنگ کاکتوس - فیروزه‌ای نئونی (واضح در همه تم‌ها)
+// ============================================================
+
+function getCactusColor() {
+    return '#00e5ff';
+}
+
+// ============================================================
+// افکت‌های فصلی
+// ============================================================
+
+let seasonalParticles = [];
+
+const SEASONAL_EFFECTS = {
+    spring: { enabled:true, maxCount:8, color:'#ffb8d8', colorDark:'#ff8ab8', size:3.5, speedY:25, speedXRange:[-15,-30], rotation:true, shape:'petal', swayAmount:0.8 },
+    summer: { enabled:false, maxCount:0 },
+    autumn: { enabled:true, maxCount:8, color:'#ffb347', colorDark:'#e08a20', size:4, speedY:20, speedXRange:[-20,-40], rotation:true, shape:'leaf', swayAmount:1.0 },
+    winter: { enabled:true, maxCount:8, color:'#ffffff', colorDark:'#e0e8f0', size:2.5, speedY:30, speedXRange:[-10,-20], rotation:false, shape:'snow', swayAmount:0.6 }
+};
+
+function getSeasonalEffect() { return SEASONAL_EFFECTS[currentSeason] || { enabled:false, maxCount:0 }; }
+
+function spawnSeasonalParticle(isInitial) {
+    const fx = getSeasonalEffect();
+    if (!fx.enabled) return;
+    if (seasonalParticles.length >= fx.maxCount) return;
+    const speedX = fx.speedXRange[0] + Math.random() * (fx.speedXRange[1] - fx.speedXRange[0]);
+    seasonalParticles.push({
+        x: Math.random() * (W + 50),
+        y: isInitial ? Math.random() * H : -10 - Math.random() * 30,
+        vx: speedX,
+        vy: fx.speedY * (0.8 + Math.random() * 0.4),
+        size: fx.size * (0.7 + Math.random() * 0.6),
+        rotation: Math.random() * Math.PI * 2,
+        rotationSpeed: (Math.random() - 0.5) * 2,
+        swayOffset: Math.random() * Math.PI * 2,
+        swaySpeed: 1 + Math.random() * 1.5,
+        color: Math.random() > 0.5 ? fx.color : fx.colorDark
+    });
+}
+
+function updateSeasonalParticles(dt) {
+    const fx = getSeasonalEffect();
+    if (!fx.enabled) {
+        if (seasonalParticles.length > 0) seasonalParticles.length = 0;
+        return;
     }
+    const t = Date.now() / 1000;
+    const arr = seasonalParticles;
+    for (let i = arr.length - 1; i >= 0; i--) {
+        const p = arr[i];
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
+        if (fx.swayAmount > 0) p.x += Math.sin(t * p.swaySpeed + p.swayOffset) * fx.swayAmount * dt * 30;
+        if (fx.rotation) p.rotation += p.rotationSpeed * dt;
+        if (p.y > H + 20 || p.x < -30) { arr[i] = arr[arr.length - 1]; arr.pop(); }
+    }
+    const needed = fx.maxCount - arr.length;
+    for (let i = 0; i < needed; i++) spawnSeasonalParticle(false);
+}
+
+function drawSeasonalParticles() {
+    const fx = getSeasonalEffect();
+    if (!fx.enabled || seasonalParticles.length === 0) return;
+    ctx.globalAlpha = 0.75;
+    for (let i = 0; i < seasonalParticles.length; i++) {
+        const p = seasonalParticles[i];
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        if (fx.shape === 'snow') {
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        } else {
+            ctx.ellipse(p.x, p.y, p.size * 1.2, p.size * 0.5, p.rotation, 0, Math.PI * 2);
+        }
+        ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+}
+
+// ============================================================
+// تم‌ها - همه با یک رنگ تخم نئونی یکسان
+// ============================================================
+
+const NEON_EGG_COLORS = [
+    ["#ffffff", 1],   // سفید خالص
+    ["#00ff88", 2],   // سبز نئون
+    ["#00aaff", 5],   // آبی نئون
+    ["#ff00ff", 10],  // مگنتا نئون
+    ["#ffff00", 25]   // زرد نئون
+];
+
+const themeConfigs = {
+    classic: { id:"classic", icon:"☀️", nameEn:"Classic", nameFa:"کلاسیک", descEn:"Original summer", descFa:"تابستانی اصلی", skyDay:["#87CEEB","#a8d8f0","#c8e8f5"], skyNight:["#0a1525","#152535","#1a2a40"], groundDay:["#7dbb4b","#6aaa3a","#55963b"], groundNight:["#2a3a2a","#1a2a1a","#0a1a0a"], eggColors:NEON_EGG_COLORS, foxColor:"#f97316", isSpace:false },
+    city: { id:"city", icon:"🏙️", nameEn:"City", nameFa:"شهری", descEn:"Urban streets", descFa:"خیابان‌های شهری", skyDay:["#b8c8d8","#d0dce8","#e0e8f0"], skyNight:["#0a1520","#15202a","#1a2a3a"], groundDay:["#8a9aa8","#7a8a98","#6a7a88"], groundNight:["#3a4a5a","#2a3a4a","#1a2a3a"], eggColors:NEON_EGG_COLORS, foxColor:"#d47a3a", isSpace:false },
+    beach: { id:"beach", icon:"🏖️", nameEn:"Beach", nameFa:"ساحلی", descEn:"Sun & sand", descFa:"آفتاب و شن", skyDay:["#87CEEB","#b0d8f0","#d0e8f5"], skyNight:["#0a1a2a","#152535","#1a2a40"], groundDay:["#f0d8a0","#e8c888","#d4b070"], groundNight:["#5a4a2a","#4a3a1a","#3a2a10"], eggColors:NEON_EGG_COLORS, foxColor:"#d47a3a", isSpace:false },
+    forest: { id:"forest", icon:"🌲", nameEn:"Forest", nameFa:"جنگلی", descEn:"Deep woods", descFa:"جنگل انبوه", skyDay:["#6a9a6a","#7aaa7a","#8aba8a"], skyNight:["#0a1a0a","#152a15","#1a3a1a"], groundDay:["#3a5a2a","#2a4a1a","#1a3a0a"], groundNight:["#1a2a0a","#0a1a0a","#050a00"], eggColors:NEON_EGG_COLORS, foxColor:"#d47a3a", isSpace:false },
+    space: { id:"space", icon:"🚀", nameEn:"Space", nameFa:"فضایی", descEn:"Galaxy fox", descFa:"روباه کهکشانی", skyDay:["#1a0a3a","#2a1a4a","#3a2a5a"], skyNight:["#0a0a1a","#0a0a2a","#1a0a2a"], groundDay:["#3a2a4a","#4a3a5a","#5a4a6a"], groundNight:["#1a0a2a","#0a0a1a","#05000a"], eggColors:NEON_EGG_COLORS, foxColor:"#a878d8", isSpace:true },
+    night: { id:"night", icon:"🌙", nameEn:"Night", nameFa:"شب", descEn:"Dark & stars", descFa:"تاریک و ستاره‌ها", skyDay:["#1a1a2e","#16213e","#0f3460"], skyNight:["#0a0a1a","#0a0a2a","#1a0a2a"], groundDay:["#2a2a3a","#1a1a2a","#0a0a1a"], groundNight:["#1a0a2a","#0a0a1a","#05000a"], eggColors:NEON_EGG_COLORS, foxColor:"#d47a3a", isSpace:false },
+    volcano: { id:"volcano", icon:"🌋", nameEn:"Volcano", nameFa:"آتشفشانی", descEn:"Lava & fire", descFa:"گدازه و آتش", skyDay:["#4a1a0a","#6a2a0a","#8a3a0a"], skyNight:["#2a0a0a","#3a0a0a","#4a0a0a"], groundDay:["#2a1a0a","#1a0a0a","#0a0a0a"], groundNight:["#1a0a0a","#0a0a0a","#050000"], eggColors:NEON_EGG_COLORS, foxColor:"#ff4500", isSpace:false },
+    ocean: { id:"ocean", icon:"🌊", nameEn:"Ocean", nameFa:"اقیانوسی", descEn:"Deep blue sea", descFa:"دریای آبی عمیق", skyDay:["#006994","#0088b0","#00a0c0"], skyNight:["#001a30","#002a40","#003a50"], groundDay:["#f4d03f","#e8c840","#d4b840"], groundNight:["#2a3a2a","#1a2a1a","#0a1a0a"], eggColors:NEON_EGG_COLORS, foxColor:"#1e90ff", isSpace:false },
+    desert: { id:"desert", icon:"🏜️", nameEn:"Desert", nameFa:"صحرایی", descEn:"Golden sands", descFa:"شن‌های طلایی", skyDay:["#f4a460","#f5b86e","#f7c88c"], skyNight:["#1a0f0a","#2a1a0a","#3a2a0a"], groundDay:["#d4a050","#c89040","#b88030"], groundNight:["#3a2a0a","#2a1a0a","#1a0a0a"], eggColors:NEON_EGG_COLORS, foxColor:"#cd853f", isSpace:false },
+    magic: { id:"magic", icon:"✨", nameEn:"Magic", nameFa:"جادویی", descEn:"Enchanted forest", descFa:"جنگل جادویی", skyDay:["#4a1a6a","#6a2a8a","#8a3aaa"], skyNight:["#1a0a2a","#2a0a3a","#3a0a4a"], groundDay:["#3a2a4a","#2a1a3a","#1a0a2a"], groundNight:["#1a0a2a","#0a0a1a","#05000a"], eggColors:NEON_EGG_COLORS, foxColor:"#8b5cf6", isSpace:false },
+    toon: { id:"toon", icon:"🎨", nameEn:"Toon", nameFa:"کارتونی", descEn:"Cartoon world", descFa:"دنیای کارتونی", skyDay:["#87CEEB","#90d8f0","#a0e0f5"], skyNight:["#1a1a3a","#2a2a4a","#3a3a5a"], groundDay:["#4ade80","#3ab870","#2aa060"], groundNight:["#1a2a1a","#0a1a0a","#050a05"], eggColors:NEON_EGG_COLORS, foxColor:"#f0932b", isSpace:false },
+    cyberpunk: { id:"cyberpunk", icon:"💜", nameEn:"Cyberpunk", nameFa:"سایبرپانک", descEn:"Neon future", descFa:"آینده نئونی", skyDay:["#1a0a2a","#2a1a3a","#3a2a4a"], skyNight:["#0a001a","#1a002a","#2a003a"], groundDay:["#1a1a2a","#2a2a3a","#3a3a4a"], groundNight:["#0a0a1a","#1a0a2a","#2a0a3a"], eggColors:NEON_EGG_COLORS, foxColor:"#ff2d95", isSpace:false }
 };
 
 // ============================================================
@@ -1671,126 +657,16 @@ const themeConfigs = {
 // ============================================================
 
 const FOX_SKINS = [
-    { 
-        id: 'classic', 
-        name: 'Classic Fox', 
-        nameFa: 'روباه کلاسیک', 
-        color: '#f97316', 
-        price: 0, 
-        rarity: 'common', 
-        trailColor: 'rgba(249,115,22,0.3)',
-        glowColor: '#f97316',
-        eyeColor: '#1a1a2a',
-        desc: '🔥 Orange trail'
-    },
-    { 
-        id: 'ember', 
-        name: 'Ember Fox', 
-        nameFa: 'روباه آتشین', 
-        color: '#ef4444', 
-        price: 250000, 
-        rarity: 'uncommon', 
-        trailColor: 'rgba(239,68,68,0.3)',
-        glowColor: '#ff6b35',
-        eyeColor: '#fbbf24',
-        desc: '💥 Fire sparks'
-    },
-    { 
-        id: 'frost', 
-        name: 'Frost Fox', 
-        nameFa: 'روباه یخی', 
-        color: '#3b82f6', 
-        price: 500000, 
-        rarity: 'uncommon', 
-        trailColor: 'rgba(59,130,246,0.3)',
-        glowColor: '#93c5fd',
-        eyeColor: '#ffffff',
-        desc: '❄️ Ice trail'
-    },
-    { 
-        id: 'shadow', 
-        name: 'Shadow Fox', 
-        nameFa: 'روباه شب', 
-        color: '#7c3aed', 
-        price: 1000000, 
-        rarity: 'rare', 
-        trailColor: 'rgba(124,58,237,0.3)',
-        glowColor: '#4ade80',
-        eyeColor: '#4ade80',
-        desc: '🌑 Purple shadow'
-    },
-    { 
-        id: 'golden', 
-        name: 'Golden Fox', 
-        nameFa: 'روباه طلایی', 
-        color: '#fbbf24', 
-        price: 1750000, 
-        rarity: 'rare', 
-        trailColor: 'rgba(251,191,36,0.3)',
-        glowColor: '#fcd34d',
-        eyeColor: '#78350f',
-        desc: '✨ Gold trail'
-    },
-    { 
-        id: 'neon', 
-        name: 'Neon Fox', 
-        nameFa: 'روباه نئونی', 
-        color: '#ec4899', 
-        price: 2500000, 
-        rarity: 'epic', 
-        trailColor: 'rgba(236,72,153,0.3)',
-        glowColor: '#f472b6',
-        eyeColor: '#3b82f6',
-        desc: '💜 Neon trail'
-    },
-    { 
-        id: 'crystal', 
-        name: 'Crystal Fox', 
-        nameFa: 'روباه کریستالی', 
-        color: '#8b5cf6', 
-        price: 4000000, 
-        rarity: 'epic', 
-        trailColor: 'rgba(139,92,246,0.3)',
-        glowColor: '#a78bfa',
-        eyeColor: '#c4b5d4',
-        desc: '💎 Crystal trail'
-    },
-    { 
-        id: 'galaxy', 
-        name: 'Galaxy Fox', 
-        nameFa: 'روباه کهکشانی', 
-        color: '#1e1b4b', 
-        price: 7500000, 
-        rarity: 'legendary', 
-        trailColor: 'rgba(129,140,248,0.3)',
-        glowColor: '#818cf8',
-        eyeColor: '#c7d2fe',
-        desc: '🌌 Galaxy trail'
-    },
-    { 
-        id: 'rainbow', 
-        name: 'Rainbow Fox', 
-        nameFa: 'روباه رنگین‌کمان', 
-        color: 'rainbow', 
-        price: 12500000, 
-        rarity: 'legendary', 
-        trailColor: 'rgba(255,255,255,0.2)',
-        glowColor: null,
-        eyeColor: '#ffffff',
-        desc: '🌈 Rainbow trail'
-    },
-    { 
-        id: 'phoenix', 
-        name: 'Phoenix Fox', 
-        nameFa: 'روباه ققنوس', 
-        color: '#dc2626', 
-        price: 25000000, 
-        rarity: 'mythic', 
-        trailColor: 'rgba(220,38,38,0.3)',
-        glowColor: '#f97316',
-        eyeColor: '#fcd34d',
-        desc: '🔥 Phoenix trail'
-    }
+    { id:'classic', name:'Classic Fox', nameFa:'روباه کلاسیک', color:'#f97316', price:0, rarity:'common', trailColor:'rgba(249,115,22,0.3)', glowColor:'#f97316', eyeColor:'#1a1a2a', desc:'🔥 Orange trail' },
+    { id:'ember', name:'Ember Fox', nameFa:'روباه آتشین', color:'#ef4444', price:250000, rarity:'uncommon', trailColor:'rgba(239,68,68,0.3)', glowColor:'#ff6b35', eyeColor:'#fbbf24', desc:'💥 Fire sparks' },
+    { id:'frost', name:'Frost Fox', nameFa:'روباه یخی', color:'#3b82f6', price:500000, rarity:'uncommon', trailColor:'rgba(59,130,246,0.3)', glowColor:'#93c5fd', eyeColor:'#ffffff', desc:'❄️ Ice trail' },
+    { id:'shadow', name:'Shadow Fox', nameFa:'روباه شب', color:'#7c3aed', price:1000000, rarity:'rare', trailColor:'rgba(124,58,237,0.3)', glowColor:'#4ade80', eyeColor:'#4ade80', desc:'🌑 Purple shadow' },
+    { id:'golden', name:'Golden Fox', nameFa:'روباه طلایی', color:'#fbbf24', price:1750000, rarity:'rare', trailColor:'rgba(251,191,36,0.3)', glowColor:'#fcd34d', eyeColor:'#78350f', desc:'✨ Gold trail' },
+    { id:'neon', name:'Neon Fox', nameFa:'روباه نئونی', color:'#ec4899', price:2500000, rarity:'epic', trailColor:'rgba(236,72,153,0.3)', glowColor:'#f472b6', eyeColor:'#3b82f6', desc:'💜 Neon trail' },
+    { id:'crystal', name:'Crystal Fox', nameFa:'روباه کریستالی', color:'#8b5cf6', price:4000000, rarity:'epic', trailColor:'rgba(139,92,246,0.3)', glowColor:'#a78bfa', eyeColor:'#c4b5d4', desc:'💎 Crystal trail' },
+    { id:'galaxy', name:'Galaxy Fox', nameFa:'روباه کهکشانی', color:'#1e1b4b', price:7500000, rarity:'legendary', trailColor:'rgba(129,140,248,0.3)', glowColor:'#818cf8', eyeColor:'#c7d2fe', desc:'🌌 Galaxy trail' },
+    { id:'rainbow', name:'Rainbow Fox', nameFa:'روباه رنگین‌کمان', color:'rainbow', price:12500000, rarity:'legendary', trailColor:'rgba(255,255,255,0.2)', glowColor:null, eyeColor:'#ffffff', desc:'🌈 Rainbow trail' },
+    { id:'phoenix', name:'Phoenix Fox', nameFa:'روباه ققنوس', color:'#dc2626', price:25000000, rarity:'mythic', trailColor:'rgba(220,38,38,0.3)', glowColor:'#f97316', eyeColor:'#fcd34d', desc:'🔥 Phoenix trail' }
 ];
 
 // ============================================================
@@ -1803,17 +679,14 @@ let musicMaster = null;
 let musicTimer = null;
 let musicStep = 0;
 let soundEnabled = localStorage.getItem("foxSound") !== "off";
-
 let currentTheme = localStorage.getItem("foxTheme") || "classic";
 let language = localStorage.getItem("foxLanguage") || "en";
 let currentSkinId = localStorage.getItem('foxSkin') || 'classic';
 let purchasedSkins = JSON.parse(localStorage.getItem('purchasedSkins') || '["classic"]');
-
 let best = loadNumber("foxBest");
 let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
-
 let playing = false;
 let score = 0;
 let speed = 380;
@@ -1839,27 +712,11 @@ let lastDayCycle = -1;
 let MAX_PARTICLES = 12;
 
 const POWERUP_CONFIG = {
-    shield: { 
-        duration: 15,
-        color: '#4fc3f7', 
-        icon: '🛡️', 
-        spawnRate: 0.02,
-        startTime: 10,
-        maxHits: 1
-    },
-    speed: { 
-        duration: 15,
-        color: '#ffd54f', 
-        icon: '⚡', 
-        spawnRate: 0.02,
-        startTime: 10,
-        speedMultiplier: 1.2
-    }
+    shield: { duration:15, color:'#4fc3f7', icon:'🛡️', startTime:10, maxHits:1 },
+    speed: { duration:15, color:'#ffd54f', icon:'⚡', startTime:10, speedMultiplier:1.2 }
 };
 
-const fox = {
-    x:100, y:0, w:62, h:48, vy:0, gravity:2100, jump:-780, grounded:true, animation:0
-};
+const fox = { x:100, y:0, w:62, h:48, vy:0, gravity:2100, jump:-780, grounded:true, animation:0 };
 
 // ============================================================
 // توابع کمکی
@@ -1885,59 +742,45 @@ function saveWallet(){
     }catch(error){}
 }
 
-function ground(){ 
-    // در ارتفاع کم، زمین رو بالاتر بیار تا فاکس جا بشه
-    const minGround = 200;
-    const calculated = H * 0.72;
-    return Math.max(calculated, minGround);
-}
-
-function getTheme() {
-    return themeConfigs[currentTheme] || themeConfigs.classic;
-}
+function ground(){ return H * .72; }
+function getTheme() { return themeConfigs[currentTheme] || themeConfigs.classic; }
 
 function getThemeName(themeId) {
-    const t = themeConfigs[themeId];
-    if (!t) return themeId;
-    return language === 'fa' ? t.nameFa : t.nameEn;
+    const names = THEME_NAMES[themeId];
+    if (!names) return themeId;
+    const seasonal = names[currentSeason];
+    if (!seasonal) return themeId;
+    return language === 'fa' ? seasonal.fa : seasonal.en;
+}
+
+function getThemeIcon(themeId) {
+    const names = THEME_NAMES[themeId];
+    if (!names) return '🎨';
+    const seasonal = names[currentSeason];
+    if (!seasonal) return '🎨';
+    return seasonal.icon;
 }
 
 function getThemeDesc(themeId) {
-    const t = themeConfigs[themeId];
-    if (!t) return '';
-    return language === 'fa' ? t.descFa : t.descEn;
+    const icons = { spring:'🌸', summer:'☀️', autumn:'🍂', winter:'❄️' };
+    const fa = { spring:'بهاری', summer:'تابستانی', autumn:'پاییزی', winter:'زمستانی' };
+    const en = { spring:'Spring', summer:'Summer', autumn:'Autumn', winter:'Winter' };
+    return language === 'fa' ? icons[currentSeason] + ' تم ' + fa[currentSeason] : icons[currentSeason] + ' ' + en[currentSeason] + ' Theme';
 }
 
-function getSkin(id) {
-    return FOX_SKINS.find(s => s.id === id) || FOX_SKINS[0];
-}
-
-function isSkinOwned(id) {
-    return purchasedSkins.includes(id);
-}
-
-function isSkinActive(id) {
-    return currentSkinId === id;
-}
+function getSkin(id) { return FOX_SKINS.find(s => s.id === id) || FOX_SKINS[0]; }
+function isSkinOwned(id) { return purchasedSkins.includes(id); }
+function isSkinActive(id) { return currentSkinId === id; }
 
 function getRarityLabel(rarity) {
-    const labels = {
-        'common': { fa: 'معمولی', en: 'Common' },
-        'uncommon': { fa: 'نادر', en: 'Uncommon' },
-        'rare': { fa: 'کمیاب', en: 'Rare' },
-        'epic': { fa: 'حماسی', en: 'Epic' },
-        'legendary': { fa: 'افسانه‌ای', en: 'Legendary' },
-        'mythic': { fa: 'اسطوره‌ای', en: 'Mythic' }
-    };
+    const labels = { common:{fa:'معمولی',en:'Common'}, uncommon:{fa:'نادر',en:'Uncommon'}, rare:{fa:'کمیاب',en:'Rare'}, epic:{fa:'حماسی',en:'Epic'}, legendary:{fa:'افسانه‌ای',en:'Legendary'}, mythic:{fa:'اسطوره‌ای',en:'Mythic'} };
     return labels[rarity] ? (language === 'fa' ? labels[rarity].fa : labels[rarity].en) : rarity;
 }
 
-function getEggColors() {
-    return getTheme().eggColors;
-}
+function getEggColors() { return getTheme().eggColors; }
 
 function updateSpeed(){
-    let baseSpeed =380 ;
+    let baseSpeed = 380;
     if(score <= 600){
         const progress = Math.max(0, Math.min(score / 600, 1));
         const smooth = progress * progress * (3 - 2 * progress);
@@ -1957,27 +800,14 @@ function updateDayNight(){
 function resetFox(){
     fox.x = Math.max(70, W * .14);
     fox.y = ground() - fox.h;
-    fox.vy = 0;
-    fox.grounded = true;
-    fox.animation = 0;
+    fox.vy = 0; fox.grounded = true; fox.animation = 0;
 }
 
 function collision(a,b){
-    return(
-        a.x + 8 < b.x + b.w &&
-        a.x + a.w - 8 > b.x &&
-        a.y + 7 < b.y + b.h &&
-        a.y + a.h - 5 > b.y
-    );
+    return a.x + 8 < b.x + b.w && a.x + a.w - 8 > b.x && a.y + 7 < b.y + b.h && a.y + a.h - 5 > b.y;
 }
 
-function jump(){
-    if(!playing) return;
-    if(fox.grounded){
-        fox.vy = fox.jump;
-        fox.grounded = false;
-    }
-}
+function jump(){ if(!playing) return; if(fox.grounded){ fox.vy = fox.jump; fox.grounded = false; } }
 
 function showToast(msg) {
     const toast = document.getElementById('toast');
@@ -1989,14 +819,12 @@ function showToast(msg) {
     clearTimeout(toast._timeout);
     toast._timeout = setTimeout(() => {
         toast.style.animation = 'fadeOutDown 0.3s ease';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 300);
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
     }, 2500);
 }
 
 // ============================================================
-// توابع صدا
+// صدا
 // ============================================================
 
 function initAudio(){
@@ -2012,33 +840,29 @@ function initAudio(){
 function playTone(frequency, duration, type="square", volume=.08, delay=0){
     if(!audioContext || !soundEnabled) return;
     const now = audioContext.currentTime + delay;
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, now);
-    gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(volume, now + .008);
-    gain.gain.exponentialRampToValueAtTime(.001, now + duration);
-    oscillator.connect(gain);
-    gain.connect(musicMaster);
-    oscillator.start(now);
-    oscillator.stop(now + duration + .03);
+    const o = audioContext.createOscillator();
+    const g = audioContext.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(frequency, now);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(volume, now + .008);
+    g.gain.exponentialRampToValueAtTime(.001, now + duration);
+    o.connect(g); g.connect(musicMaster);
+    o.start(now); o.stop(now + duration + .03);
 }
 
 function playKick(){
     if(!audioContext || !soundEnabled) return;
     const now = audioContext.currentTime;
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(120, now);
-    oscillator.frequency.exponentialRampToValueAtTime(45, now + .12);
-    gain.gain.setValueAtTime(.12, now);
-    gain.gain.exponentialRampToValueAtTime(.001, now + .14);
-    oscillator.connect(gain);
-    gain.connect(musicMaster);
-    oscillator.start(now);
-    oscillator.stop(now + .15);
+    const o = audioContext.createOscillator();
+    const g = audioContext.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(120, now);
+    o.frequency.exponentialRampToValueAtTime(45, now + .12);
+    g.gain.setValueAtTime(.12, now);
+    g.gain.exponentialRampToValueAtTime(.001, now + .14);
+    o.connect(g); g.connect(musicMaster);
+    o.start(now); o.stop(now + .15);
 }
 
 function playHat(){
@@ -2046,16 +870,14 @@ function playHat(){
     const buffer = audioContext.createBuffer(1, audioContext.sampleRate * .035, audioContext.sampleRate);
     const data = buffer.getChannelData(0);
     for(let i=0;i<data.length;i++) data[i] = Math.random() * 2 - 1;
-    const source = audioContext.createBufferSource();
-    const gain = audioContext.createGain();
-    gain.gain.value = .025;
-    source.buffer = buffer;
-    source.connect(gain);
-    gain.connect(musicMaster);
-    source.start();
+    const s = audioContext.createBufferSource();
+    const g = audioContext.createGain();
+    g.gain.value = .025;
+    s.buffer = buffer; s.connect(g); g.connect(musicMaster);
+    s.start();
 }
 
-const melody = [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880.00, 698.46, 523.25, 659.25, 783.99, 987.77, 880.00, 783.99, 659.25, 587.33];
+const melody = [523.25,659.25,783.99,659.25,587.33,698.46,880.00,698.46,523.25,659.25,783.99,987.77,880.00,783.99,659.25,587.33];
 
 function musicTick(){
     if(!playing || !soundEnabled) return;
@@ -2079,9 +901,7 @@ function startMusic(){
     musicTimer = setInterval(musicTick, 190);
 }
 
-function stopMusicTimer(){
-    if(musicTimer){ clearInterval(musicTimer); musicTimer = null; }
-}
+function stopMusicTimer(){ if(musicTimer){ clearInterval(musicTimer); musicTimer = null; } }
 
 function stopMusic(){
     stopMusicTimer();
@@ -2111,14 +931,14 @@ function disableSound(){
 }
 
 function updateSoundButtons(){
-    const onButton = document.getElementById("soundOnButton");
-    const offButton = document.getElementById("soundOffButton");
+    const onB = document.getElementById("soundOnButton");
+    const offB = document.getElementById("soundOffButton");
     if(language === "fa"){
-        onButton.textContent = soundEnabled ? "🔊 روشن ✓" : "🔊 روشن";
-        offButton.textContent = !soundEnabled ? "🔇 خاموش ✓" : "🔇 خاموش";
+        onB.textContent = soundEnabled ? "🔊 روشن ✓" : "🔊 روشن";
+        offB.textContent = !soundEnabled ? "🔇 خاموش ✓" : "🔇 خاموش";
     }else{
-        onButton.textContent = soundEnabled ? "🔊 On ✓" : "🔊 On";
-        offButton.textContent = !soundEnabled ? "🔇 Off ✓" : "🔇 Off";
+        onB.textContent = soundEnabled ? "🔊 On ✓" : "🔊 On";
+        offB.textContent = !soundEnabled ? "🔇 Off ✓" : "🔇 Off";
     }
 }
 
@@ -2132,26 +952,17 @@ function checkInternet() {
             noInternetOverlay.style.display = 'none';
             isOnline = true;
             showReferralDataFromCache();
-            setTimeout(() => {
-                syncReferralsWithServer().then(() => {
-                    showReferralDataFromCache();
-                });
-            }, 500);
+            setTimeout(() => { syncReferralsWithServer().then(() => { showReferralDataFromCache(); }); }, 500);
         }
         return true;
-    } else {
-        showNoInternet();
-        return false;
-    }
+    } else { showNoInternet(); return false; }
 }
 
 function showNoInternet() {
     isOnline = false;
     const fa = language === 'fa';
     document.getElementById('noInternetTitle').textContent = fa ? '❌ اتصال اینترنت برقرار نیست' : '❌ No Internet Connection';
-    document.getElementById('noInternetMessage').textContent = fa ? 
-        'لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.' : 
-        'Please check your internet connection and try again.';
+    document.getElementById('noInternetMessage').textContent = fa ? 'لطفاً اتصال اینترنت خود را بررسی کنید.' : 'Please check your internet connection.';
     noInternetOverlay.style.display = 'flex';
 }
 
@@ -2159,9 +970,7 @@ function getUserId() {
     try {
         if (window.Telegram && window.Telegram.WebApp) {
             const tg = window.Telegram.WebApp;
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                return String(tg.initDataUnsafe.user.id);
-            }
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) return String(tg.initDataUnsafe.user.id);
         }
         let userId = localStorage.getItem("foxUserId");
         if (!userId) {
@@ -2169,16 +978,12 @@ function getUserId() {
             localStorage.setItem("foxUserId", userId);
         }
         return userId;
-    } catch(e) {
-        return "user_" + Date.now();
-    }
+    } catch(e) { return "user_" + Date.now(); }
 }
 
 function generateReferralCode(userId) {
     let code = userId.toString().slice(-6).toUpperCase();
-    while (code.length < 6) {
-        code += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
-    }
+    while (code.length < 6) code += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
     return code;
 }
 
@@ -2190,23 +995,15 @@ function getReferralsFromLocalStorage(refCode) {
 }
 
 async function syncReferralsWithServer() {
-    if (!navigator.onLine) {
-        return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
-    }
-    
+    if (!navigator.onLine) return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
     const userId = getUserId();
     const code = generateReferralCode(userId);
     const local = getReferralsFromLocalStorage(code);
-    
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
-        
-        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`, {
-            signal: controller.signal
-        });
+        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`, { signal: controller.signal });
         clearTimeout(timeoutId);
-        
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.referrals) {
@@ -2217,10 +1014,7 @@ async function syncReferralsWithServer() {
                 return all;
             }
         }
-    } catch(e) {
-        console.warn('Sync failed:', e);
-    }
-    
+    } catch(e) { console.warn('Sync failed:', e); }
     return local;
 }
 
@@ -2242,9 +1036,7 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
         setTimeout(() => inputElement.classList.remove('error'), 500);
         return false;
     }
-    
     const userId = getUserId();
-    
     if (!referralCodeInput || referralCodeInput.trim() === '') {
         const fa = language === 'fa';
         errorElement.textContent = fa ? '⚠️ لطفاً کد دعوت را وارد کنید.' : '⚠️ Please enter an invite code.';
@@ -2253,9 +1045,7 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
         setTimeout(() => inputElement.classList.remove('error'), 500);
         return false;
     }
-    
     const code = referralCodeInput.trim().toUpperCase();
-    
     if (!/^[A-Z0-9]{4,10}$/.test(code)) {
         const fa = language === 'fa';
         errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر!' : '⚠️ Invalid code format!';
@@ -2264,31 +1054,22 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
         setTimeout(() => inputElement.classList.remove('error'), 500);
         return false;
     }
-    
     submitBtn.disabled = true;
     submitBtn.classList.add('loading');
     const fa = language === 'fa';
     submitBtn.textContent = fa ? '⏳ در حال ارسال...' : '⏳ Sending...';
     errorElement.textContent = '';
-    
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
-        
         const response = await fetch(`${WEBHOOK_URL}/api/register`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: userId,
-                refCode: code,
-                timestamp: Date.now()
-            }),
+            body: JSON.stringify({ userId: userId, refCode: code, timestamp: Date.now() }),
             signal: controller.signal
         });
         clearTimeout(timeoutId);
-        
         const data = await response.json();
-        
         if (data.success) {
             errorElement.textContent = fa ? '✅ کد تایید شد!' : '✅ Code verified!';
             errorElement.style.color = '#34d399';
@@ -2296,13 +1077,9 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
             localStorage.setItem("foxRegistered", "true");
             localStorage.setItem("foxReferralCode", code);
             setTimeout(() => {
-                if (overlayElement && overlayElement.parentNode) {
-                    overlayElement.remove();
-                }
+                if (overlayElement && overlayElement.parentNode) overlayElement.remove();
                 showReferralDataFromCache();
-                syncReferralsWithServer().then(() => {
-                    showReferralDataFromCache();
-                });
+                syncReferralsWithServer().then(() => { showReferralDataFromCache(); });
             }, 1000);
             return true;
         } else {
@@ -2332,91 +1109,41 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
 
 function showReferralPrompt() {
     if (localStorage.getItem("foxRegistered") === "true") return;
-    
-    const existing = document.getElementById('referralPrompt');
-    if (existing) existing.remove();
-    
     const overlay = document.createElement('div');
     overlay.id = 'referralPrompt';
-    
     const fa = language === 'fa';
-    const title = fa ? 'خوش اومدی!' : 'Welcome!';
-    const subtitle = fa ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here';
-    const placeholder = fa ? 'مثلاً: FOX123' : 'e.g. FOX123';
-    const submitText = fa ? '✅ تایید کد' : '✅ Verify Code';
-    const skipText = fa ? '⏭ رد کردن' : '⏭ Skip';
-    const hint = fa ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later';
-    
-    overlay.innerHTML = `
-        <div class="box">
-            <div style="font-size:60px;margin-bottom:10px;">🦊</div>
-            <h2 style="margin-bottom:5px;">${title}</h2>
-            <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${subtitle}</p>
-            <span class="error-msg" id="refErrorMsg"></span>
-            <input type="text" id="refCodeInput" placeholder="${placeholder}" maxlength="10" autofocus>
-            <button class="btn-submit" id="refSubmitBtn">${submitText}</button>
-            <button class="btn-skip" id="refSkipBtn">${skipText}</button>
-            <p class="hint">${hint}</p>
-        </div>
-    `;
+    overlay.innerHTML = `<div class="box">
+        <div style="font-size:60px;margin-bottom:10px;">🦊</div>
+        <h2 style="margin-bottom:5px;">${fa ? 'خوش اومدی!' : 'Welcome!'}</h2>
+        <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${fa ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here'}</p>
+        <span class="error-msg" id="refErrorMsg"></span>
+        <input type="text" id="refCodeInput" placeholder="${fa ? 'مثلاً: FOX123' : 'e.g. FOX123'}" maxlength="10" autofocus>
+        <button class="btn-submit" id="refSubmitBtn">${fa ? '✅ تایید کد' : '✅ Verify Code'}</button>
+        <button class="btn-skip" id="refSkipBtn">${fa ? '⏭ رد کردن' : '⏭ Skip'}</button>
+        <p class="hint">${fa ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later'}</p>
+    </div>`;
     document.body.appendChild(overlay);
-    
     const input = document.getElementById('refCodeInput');
     const submitBtn = document.getElementById('refSubmitBtn');
     const skipBtn = document.getElementById('refSkipBtn');
     const errorMsg = document.getElementById('refErrorMsg');
-    
-    async function handleSubmit() {
-        await registerReferralWithRetry(input.value, overlay, input, errorMsg, submitBtn);
-    }
-    
-    function handleSkip() {
-        localStorage.setItem("foxRegistered", "true");
-        overlay.remove();
-        showReferralDataFromCache();
-    }
-    
-    submitBtn.addEventListener('click', handleSubmit);
-    skipBtn.addEventListener('click', handleSkip);
-    
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            submitBtn.click();
-        }
-    });
-    
-    input.addEventListener('input', function() {
-        errorMsg.textContent = '';
-        errorMsg.style.color = '';
-        this.classList.remove('error');
-        this.style.borderColor = '#f97316';
-    });
-    
+    submitBtn.addEventListener('click', async function() { await registerReferralWithRetry(input.value, overlay, input, errorMsg, submitBtn); });
+    skipBtn.addEventListener('click', function() { localStorage.setItem("foxRegistered", "true"); overlay.remove(); showReferralDataFromCache(); });
+    input.addEventListener('keydown', function(e) { if (e.key === 'Enter') { e.preventDefault(); submitBtn.click(); } });
+    input.addEventListener('input', function() { errorMsg.textContent = ''; this.classList.remove('error'); this.style.borderColor = '#f97316'; });
     setTimeout(() => input.focus(), 200);
 }
 
 function copyReferralCode() {
     const code = myReferralCode.textContent;
-    if (code === "---" || !code) {
-        const msg = language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!';
-        alert(msg);
-        return;
-    }
+    if (code === "---" || !code) { alert(language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!'); return; }
     if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
             const originalText = copyBtn.textContent;
-            const copiedText = language === 'fa' ? '✅ کپی شد!' : '✅ Copied!';
-            copyBtn.textContent = copiedText;
-            setTimeout(() => {
-                copyBtn.textContent = originalText;
-            }, 2000);
-        }).catch(() => {
-            fallbackCopy(code);
-        });
-    } else {
-        fallbackCopy(code);
-    }
+            copyBtn.textContent = language === 'fa' ? '✅ کپی شد!' : '✅ Copied!';
+            setTimeout(() => { copyBtn.textContent = originalText; }, 2000);
+        }).catch(() => fallbackCopy(code));
+    } else fallbackCopy(code);
 }
 
 function fallbackCopy(text) {
@@ -2426,35 +1153,18 @@ function fallbackCopy(text) {
     textarea.style.opacity = '0';
     document.body.appendChild(textarea);
     textarea.select();
-    try {
-        document.execCommand('copy');
-        const msg = language === 'fa' ? 'کد کپی شد!' : 'Code copied!';
-        alert(msg);
-    } catch(e) {
-        const msg = language === 'fa' ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ';
-        alert(msg + text);
-    }
+    try { document.execCommand('copy'); alert(language === 'fa' ? 'کد کپی شد!' : 'Code copied!'); } catch(e) {}
     document.body.removeChild(textarea);
 }
 
 // ============================================================
-// توابع پارتیکل
+// پارتیکل‌ها
 // ============================================================
 
 function createTrailParticle(x, y, color) {
     if (particles.length >= MAX_PARTICLES) return;
     if (Math.random() > 0.06) return;
-    
-    particles.push({
-        x: x + (Math.random() - 0.5) * 4,
-        y: y + (Math.random() - 0.5) * 4,
-        vx: (Math.random() - 0.5) * 10,
-        vy: (Math.random() - 0.5) * 10,
-        life: 1,
-        maxLife: 0.2 + Math.random() * 0.2,
-        size: 2 + Math.random() * 2,
-        color: color
-    });
+    particles.push({ x: x + (Math.random()-0.5)*4, y: y + (Math.random()-0.5)*4, vx: (Math.random()-0.5)*10, vy: (Math.random()-0.5)*10, life:1, maxLife:0.2 + Math.random()*0.2, size:2 + Math.random()*2, color: color });
 }
 
 function createBurstParticles(x, y, color, count = 6) {
@@ -2463,36 +1173,22 @@ function createBurstParticles(x, y, color, count = 6) {
         if (particles.length >= MAX_PARTICLES) break;
         const angle = Math.random() * Math.PI * 2;
         const speed = 30 + Math.random() * 50;
-        particles.push({
-            x: x + (Math.random() - 0.5) * 8,
-            y: y + (Math.random() - 0.5) * 8,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed - 15,
-            life: 1,
-            maxLife: 0.25 + Math.random() * 0.25,
-            size: 2 + Math.random() * 2,
-            color: color
-        });
+        particles.push({ x: x + (Math.random()-0.5)*8, y: y + (Math.random()-0.5)*8, vx: Math.cos(angle)*speed, vy: Math.sin(angle)*speed - 15, life:1, maxLife:0.25 + Math.random()*0.25, size:2 + Math.random()*2, color: color });
     }
 }
 
 function updateParticles(dt) {
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.x += p.vx * dt;
-        p.y += p.vy * dt;
-        p.vy += 20 * dt;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.vy += 20 * dt;
         p.life -= dt / p.maxLife;
-        if (p.life <= 0) {
-            particles.splice(i, 1);
-        }
+        if (p.life <= 0) particles.splice(i, 1);
     }
 }
 
 function drawParticles() {
     for (const p of particles) {
-        const alpha = p.life * 0.7;
-        ctx.globalAlpha = alpha;
+        ctx.globalAlpha = p.life * 0.7;
         ctx.fillStyle = p.color;
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
@@ -2502,15 +1198,14 @@ function drawParticles() {
 }
 
 // ============================================================
-// توابع رسم
+// رسم
 // ============================================================
 
 function drawBackground(){
     const theme = getTheme();
     const gy = ground();
-    const colors = isNight ? theme.skyNight : theme.skyDay;
+    const colors = getSeasonalSky(theme, isNight);
     const isSpace = theme.isSpace || false;
-    
     const gradient = ctx.createLinearGradient(0, 0, 0, gy);
     gradient.addColorStop(0, colors[0]);
     gradient.addColorStop(0.5, colors[1]);
@@ -2520,344 +1215,246 @@ function drawBackground(){
 
     if(isSpace){
         for(let i=0; i<15; i++){
-            const x = (i * 137 + 53) % W;
-            const y = (i * 97 + 31) % (gy * 0.7);
-            const size = 1 + (i % 3);
-            ctx.fillStyle = `rgba(200,180,255,${0.03 + (i % 3) * 0.02})`;
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
+            const x = (i*137+53)%W;
+            const y = (i*97+31)%(gy*0.7);
+            const size = 1+(i%3);
+            ctx.fillStyle = `rgba(200,180,255,${0.03+(i%3)*0.02})`;
+            ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI*2); ctx.fill();
         }
-        ctx.fillStyle = "rgba(150,100,200,0.05)";
-        ctx.beginPath();
-        ctx.ellipse(W*0.2, gy*0.3, 150, 80, 0.5, 0, Math.PI*2);
-        ctx.fill();
-        ctx.fillStyle = "rgba(100,150,255,0.04)";
-        ctx.beginPath();
-        ctx.ellipse(W*0.7, gy*0.2, 180, 60, -0.3, 0, Math.PI*2);
-        ctx.fill();
     }
+
+    const sunColors = { spring:'rgba(255,220,235,0.75)', summer:'rgba(255,240,150,0.8)', autumn:'rgba(255,230,180,0.7)', winter:'rgba(220,235,255,0.6)' };
 
     if(isNight){
         ctx.fillStyle = isSpace ? "rgba(255,240,220,0.1)" : "rgba(255,240,220,0.15)";
-        ctx.beginPath();
-        ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
-        ctx.fill();
-        const starColor = isSpace ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
-        ctx.fillStyle = starColor;
-        for(let i=0; i< (isSpace ? 20 : 10); i++){
-            const x = (i * 47 + 13) % W;
-            const y = 20 + (i * 37) % (gy * 0.5);
-            const size = isSpace ? 1 + (i%3) : 1 + (i%2);
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        if(isSpace){
-            const t = Date.now() / 1000;
-            for(let i=0; i<5; i++){
-                const x = (i * 73 + 17 + t * 5) % W;
-                const y = 30 + (i * 53 + 11 + t * 3) % (gy * 0.4);
-                const brightness = 0.3 + Math.sin(t * 2 + i) * 0.2;
-                ctx.fillStyle = `rgba(255,255,255,${brightness})`;
-                ctx.beginPath();
-                ctx.arc(x, y, 1 + (i%2), 0, Math.PI * 2);
-                ctx.fill();
-            }
+        ctx.beginPath(); ctx.arc(W-90, 90, 28, 0, Math.PI*2); ctx.fill();
+        ctx.fillStyle = isSpace ? "rgba(255,255,255,0.5)" : "rgba(255,255,255,0.2)";
+        for(let i=0; i<(isSpace?20:10); i++){
+            const x = (i*47+13)%W;
+            const y = 20+(i*37)%(gy*0.5);
+            const size = isSpace ? 1+(i%3) : 1+(i%2);
+            ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI*2); ctx.fill();
         }
     } else {
-        ctx.fillStyle = isSpace ? "rgba(200,180,255,0.3)" : "rgba(255,230,180,0.7)";
-        ctx.beginPath();
-        ctx.arc(W - 90, 90, isSpace ? 30 : 35, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillStyle = isSpace ? "rgba(200,180,255,0.3)" : sunColors[currentSeason];
+        ctx.beginPath(); ctx.arc(W-90, 90, isSpace?30:35, 0, Math.PI*2); ctx.fill();
         if(!isSpace){
             ctx.fillStyle = "rgba(255,255,255,0.25)";
             drawCloud(120, 100, 1);
-            drawCloud(W * .55, 145, .7);
-            drawCloud(W * .85, 80, .8);
+            drawCloud(W*.55, 145, .7);
+            drawCloud(W*.85, 80, .8);
         }
     }
 
-    const groundColors = isNight ? theme.groundNight : theme.groundDay;
+    const groundColors = getSeasonalGround(theme, isNight);
     const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
     groundGrad.addColorStop(0, groundColors[0]);
     groundGrad.addColorStop(0.5, groundColors[1]);
     groundGrad.addColorStop(1, groundColors[2]);
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, gy, W, H - gy);
-    
     ctx.fillStyle = isNight ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
     ctx.fillRect(0, gy, W, 3);
-
-    if(isSpace){
-        ctx.fillStyle = "rgba(0,0,0,0.08)";
-        for(let i=0; i<3; i++){
-            const x = (i * 87 + 23) % W;
-            const y = gy + 20 + (i * 43) % (H - gy - 30);
-            ctx.beginPath();
-            ctx.ellipse(x, y, 15 + i*5, 8 + i*3, 0, 0, Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = "rgba(255,255,255,0.05)";
-            ctx.beginPath();
-            ctx.ellipse(x-4, y-2, 8 + i*3, 4 + i*2, 0, 0, Math.PI*2);
-            ctx.fill();
-            ctx.fillStyle = "rgba(0,0,0,0.08)";
-        }
-    }
 }
 
 function drawCloud(x,y,s){
     ctx.beginPath();
-    ctx.arc(x, y, 20 * s, 0, Math.PI * 2);
-    ctx.arc(x + 25 * s, y - 8 * s, 27 * s, 0, Math.PI * 2);
-    ctx.arc(x + 52 * s, y, 20 * s, 0, Math.PI * 2);
+    ctx.arc(x, y, 20*s, 0, Math.PI*2);
+    ctx.arc(x+25*s, y-8*s, 27*s, 0, Math.PI*2);
+    ctx.arc(x+52*s, y, 20*s, 0, Math.PI*2);
     ctx.fill();
 }
 
 function drawPowerup(p) {
-    const cx = p.x + p.w/2;
-    const cy = p.y + p.h/2;
+    const cx = p.x + p.w/2, cy = p.y + p.h/2;
     p.pulse += 0.05;
-    const scale = 1 + Math.sin(p.pulse) * 0.08;
-    
-    ctx.beginPath();
-    ctx.arc(cx, cy, 18 * scale, 0, Math.PI * 2);
-    ctx.fillStyle = p.color + '30';
-    ctx.fill();
-    
-    ctx.beginPath();
-    ctx.arc(cx, cy, 14 * scale, 0, Math.PI * 2);
-    ctx.fillStyle = p.color;
-    ctx.fill();
-    
-    ctx.font = '18px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillStyle = 'white';
-    ctx.fillText(p.icon, cx, cy + 1);
+    const scale = 1 + Math.sin(p.pulse)*0.08;
+    ctx.beginPath(); ctx.arc(cx, cy, 18*scale, 0, Math.PI*2); ctx.fillStyle = p.color + '30'; ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 14*scale, 0, Math.PI*2); ctx.fillStyle = p.color; ctx.fill();
+    ctx.font = '18px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = 'white'; ctx.fillText(p.icon, cx, cy + 1);
 }
 
 function drawFox(){
-    const x = fox.x;
-    const y = fox.y;
-    const running = fox.grounded ? Math.sin(fox.animation) * 4 : 0;
+    const x = fox.x, y = fox.y;
+    const running = fox.grounded ? Math.sin(fox.animation)*4 : 0;
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     const skin = getSkin(currentSkinId);
-
     ctx.fillStyle = isSpace ? "rgba(100,80,150,0.15)" : "rgba(0,0,0,.12)";
-    ctx.beginPath();
-    ctx.ellipse(x + 30, ground() + 3, 28, 6, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(x+30, ground()+3, 28, 6, 0, 0, Math.PI*2); ctx.fill();
     let foxColor = skin.color;
     let trailColor = skin.trailColor || 'rgba(249,115,22,0.25)';
-    
     if (skin.id === 'rainbow') {
-        const hue = (Date.now() / 50) % 360;
-        foxColor = `hsl(${hue}, 80%, 60%)`;
-        trailColor = `hsla(${hue}, 80%, 60%, 0.2)`;
+        const hue = (Date.now()/50)%360;
+        foxColor = `hsl(${hue},80%,60%)`;
+        trailColor = `hsla(${hue},80%,60%,0.2)`;
     }
-    
     if (playing && fox.grounded && particles.length < MAX_PARTICLES) {
-        createTrailParticle(x - 2, y + 22, trailColor);
-        createTrailParticle(x - 6, y + 28, trailColor);
+        createTrailParticle(x-2, y+22, trailColor);
+        createTrailParticle(x-6, y+28, trailColor);
     }
-    
     ctx.fillStyle = foxColor;
     ctx.beginPath();
-    ctx.moveTo(x + 15, y + 28);
-    ctx.quadraticCurveTo(x - 22, y + 5 + running, x - 10, y - 10 + running);
-    ctx.quadraticCurveTo(x + 5, y + 5, x + 20, y + 23);
+    ctx.moveTo(x+15, y+28);
+    ctx.quadraticCurveTo(x-22, y+5+running, x-10, y-10+running);
+    ctx.quadraticCurveTo(x+5, y+5, x+20, y+23);
     ctx.fill();
-
     ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
-    ctx.moveTo(x - 10, y - 10 + running);
-    ctx.quadraticCurveTo(x - 25, y, x - 14, y + 12);
-    ctx.quadraticCurveTo(x - 5, y + 5, x + 1, y + 7);
+    ctx.moveTo(x-10, y-10+running);
+    ctx.quadraticCurveTo(x-25, y, x-14, y+12);
+    ctx.quadraticCurveTo(x-5, y+5, x+1, y+7);
     ctx.fill();
-
     ctx.fillStyle = foxColor;
-    ctx.beginPath();
-    ctx.ellipse(x + 29, y + 29, 27, 18, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(x+29, y+29, 27, 18, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
-    ctx.beginPath();
-    ctx.ellipse(x + 34, y + 31, 14, 10, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(x+34, y+31, 14, 10, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = isSpace ? "#9a7aba" : "#b86b3a";
-    ctx.fillRect(x + 14, y + 39 + running, 10, 11);
-    ctx.fillRect(x + 39, y + 39 - running, 10, 11);
-
+    ctx.fillRect(x+14, y+39+running, 10, 11);
+    ctx.fillRect(x+39, y+39-running, 10, 11);
     ctx.fillStyle = foxColor;
-    ctx.beginPath();
-    ctx.ellipse(x + 43, y + 18, 16, 17, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(x+43, y+18, 16, 17, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = isSpace ? "#9a7aba" : "#c47a3a";
-    ctx.beginPath();
-    ctx.ellipse(x + 52, y + 8, 21, 17, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(x+52, y+8, 21, 17, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = foxColor;
     ctx.beginPath();
-    ctx.moveTo(x + 38, y - 3);
-    ctx.lineTo(x + 39, y - 20);
-    ctx.lineTo(x + 50, y - 6);
-    ctx.closePath();
-    ctx.fill();
-
+    ctx.moveTo(x+38, y-3); ctx.lineTo(x+39, y-20); ctx.lineTo(x+50, y-6); ctx.closePath(); ctx.fill();
     ctx.beginPath();
-    ctx.moveTo(x + 53, y - 4);
-    ctx.lineTo(x + 62, y - 19);
-    ctx.lineTo(x + 68, y);
-    ctx.closePath();
-    ctx.fill();
-
+    ctx.moveTo(x+53, y-4); ctx.lineTo(x+62, y-19); ctx.lineTo(x+68, y); ctx.closePath(); ctx.fill();
     ctx.fillStyle = isSpace ? "#c8b8e0" : "#f5cba0";
     ctx.beginPath();
-    ctx.moveTo(x + 41, y - 6);
-    ctx.lineTo(x + 41, y - 14);
-    ctx.lineTo(x + 47, y - 7);
-    ctx.closePath();
-    ctx.fill();
-
+    ctx.moveTo(x+41, y-6); ctx.lineTo(x+41, y-14); ctx.lineTo(x+47, y-7); ctx.closePath(); ctx.fill();
     ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
-    ctx.beginPath();
-    ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.ellipse(x+67, y+13, 12, 8, 0, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = skin.eyeColor || "#1a1a2a";
-    ctx.beginPath();
-    ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(x + 58, y + 5, 3.5, 0, Math.PI * 2);
-    ctx.fill();
-
+    ctx.beginPath(); ctx.arc(x+75, y+10, 3.5, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x+58, y+5, 3.5, 0, Math.PI*2); ctx.fill();
     ctx.fillStyle = isSpace ? "#ccffdd" : "#fff";
-    ctx.beginPath();
-    ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.arc(x+59, y+4, 1.2, 0, Math.PI*2); ctx.fill();
 }
 
+// ============================================================
+// رسم تخم - رنگ نئونی واضح، بدون حاشیه مشکی
+// ============================================================
+
 function drawEgg(e){
-    const cx = e.x + e.w / 2;
+    const cx = e.x + e.w/2;
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     
+    // بدنه تخم با رنگ نئونی
     ctx.fillStyle = e.color;
     ctx.beginPath();
     ctx.moveTo(cx, e.y);
-    ctx.bezierCurveTo(e.x + e.w, e.y + 5, e.x + e.w, e.y + 23, cx, e.y + e.h);
-    ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
+    ctx.bezierCurveTo(e.x+e.w, e.y+5, e.x+e.w, e.y+23, cx, e.y+e.h);
+    ctx.bezierCurveTo(e.x, e.y+23, e.x, e.y+5, cx, e.y);
     ctx.fill();
     
-    ctx.strokeStyle = isSpace ? "rgba(200,180,255,0.15)" : "rgba(0,0,0,.04)";
+    // هایلایت براق بالای تخم
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.beginPath();
+    ctx.ellipse(cx - e.w*0.15, e.y + e.h*0.28, e.w*0.16, e.h*0.18, -0.3, 0, Math.PI*2);
+    ctx.fill();
+    
+    // خط تزئینی روی تخم
+    ctx.strokeStyle = isSpace ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.35)";
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(e.x + 6, e.y + 18);
-    ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
+    ctx.moveTo(e.x+6, e.y+18);
+    ctx.quadraticCurveTo(cx, e.y+12, e.x+e.w-6, e.y+18);
     ctx.stroke();
-    
-    ctx.fillStyle = isSpace ? "rgba(255,255,255,0.15)" : "rgba(255,255,255,0.08)";
-    ctx.beginPath();
-    ctx.ellipse(cx - 4, e.y + 8, 3, 6, -0.2, 0, Math.PI * 2);
-    ctx.fill();
 }
+
+// ============================================================
+// رسم موانع - درخت فصلی، سنگ و کاکتوس نئونی، بدون حاشیه مشکی
+// ============================================================
 
 function drawObstacle(o){
     const theme = getTheme();
     const isSpace = theme.isSpace || false;
     
     if(o.type === "tree"){
-        if(isSpace){
-            ctx.fillStyle = "#4a2a6a";
-            ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
-            ctx.fillStyle = "#6a3a8a";
-            ctx.beginPath();
-            ctx.arc(o.x + 23, o.y + 20, 22, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = "#8a5aaa";
-            ctx.beginPath();
-            ctx.arc(o.x + 7, o.y + 32, 14, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(o.x + 40, o.y + 32, 14, 0, Math.PI * 2);
-            ctx.fill();
-        } else {
-            ctx.fillStyle = theme.treeColor || "#6a4a2a";
-            ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
-            ctx.fillStyle = isNight ? "#3a2a1a" : "#8a6a3a";
-            ctx.beginPath();
-            ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = isNight ? "#2a1a0a" : "#a07a4a";
-            ctx.beginPath();
-            ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
-            ctx.fill();
+        // درخت فصلی - رنگ با فصل تغییر می‌کند
+        const treeColors = getTreeColors();
+        // تنه درخت
+        ctx.fillStyle = treeColors.trunk;
+        ctx.fillRect(o.x+16, o.y+27, 14, o.h-27);
+        
+        // برگ‌های درخت با رنگ فصلی
+        ctx.fillStyle = treeColors.main;
+        ctx.beginPath(); ctx.arc(o.x+23, o.y+20, 25, 0, Math.PI*2); ctx.fill();
+        
+        ctx.fillStyle = treeColors.dark;
+        ctx.beginPath(); ctx.arc(o.x+7, o.y+32, 16, 0, Math.PI*2); ctx.fill();
+        ctx.beginPath(); ctx.arc(o.x+40, o.y+32, 16, 0, Math.PI*2); ctx.fill();
+        
+        ctx.fillStyle = treeColors.light;
+        ctx.beginPath(); ctx.arc(o.x+18, o.y+14, 10, 0, Math.PI*2); ctx.fill();
+        
+        // هایلایت روی برگ برای وضوح بیشتر
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.beginPath(); ctx.arc(o.x+20, o.y+12, 5, 0, Math.PI*2); ctx.fill();
+        
+        // اگر زمستان است، برف روی درخت
+        if(currentSeason === 'winter'){
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            ctx.beginPath(); ctx.arc(o.x+23, o.y+5, 22, Math.PI, 0); ctx.fill();
+            ctx.beginPath(); ctx.arc(o.x+7, o.y+22, 14, Math.PI, 0); ctx.fill();
+            ctx.beginPath(); ctx.arc(o.x+40, o.y+22, 14, Math.PI, 0); ctx.fill();
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.beginPath(); ctx.ellipse(o.x+23, o.y+28, 12, 4, 0, 0, Math.PI*2); ctx.fill();
         }
-    }else if(o.type === "rock"){
-        if(isSpace){
-            ctx.fillStyle = "#4a3a5a";
-            ctx.beginPath();
-            ctx.moveTo(o.x, o.y + o.h);
-            ctx.lineTo(o.x + 10, o.y + 10);
-            ctx.lineTo(o.x + 28, o.y);
-            ctx.lineTo(o.x + o.w, o.y + 15);
-            ctx.lineTo(o.x + o.w - 8, o.y + o.h);
-            ctx.closePath();
-            ctx.fill();
-            ctx.fillStyle = "rgba(200,180,255,0.08)";
-            ctx.beginPath();
-            ctx.ellipse(o.x + 15, o.y + 8, 10, 5, 0, 0, Math.PI*2);
-            ctx.fill();
-        } else {
-            ctx.fillStyle = theme.rockColor || "#7a8a9a";
-            ctx.beginPath();
-            ctx.moveTo(o.x, o.y + o.h);
-            ctx.lineTo(o.x + 10, o.y + 10);
-            ctx.lineTo(o.x + 28, o.y);
-            ctx.lineTo(o.x + o.w, o.y + 15);
-            ctx.lineTo(o.x + o.w - 8, o.y + o.h);
-            ctx.closePath();
-            ctx.fill();
-        }
-    }else{
-        if(isSpace){
-            ctx.fillStyle = "#3a7a5a";
-            ctx.fillRect(o.x + 9, o.y, 14, o.h);
-            ctx.fillRect(o.x, o.y + 20, 13, 11);
-            ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
-            ctx.fillStyle = "#2a6a4a";
-            ctx.fillRect(o.x + 12, o.y + 5, 8, 5);
-            ctx.fillRect(o.x + 3, o.y + 25, 7, 4);
-            ctx.fillRect(o.x + 22, o.y + 43, 7, 4);
-            ctx.fillStyle = "rgba(100,255,200,0.06)";
-            ctx.beginPath();
-            ctx.ellipse(o.x + 16, o.y + 8, 6, 3, 0, 0, Math.PI*2);
-            ctx.fill();
-        } else {
-            ctx.fillStyle = theme.cactusColor || "#1a6a2a";
-            ctx.fillRect(o.x + 9, o.y, 14, o.h);
-            ctx.fillRect(o.x, o.y + 20, 13, 11);
-            ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
-        }
+    } else if(o.type === "rock"){
+        // سنگ نارنجی آتشین نئونی - واضح در همه تم‌ها
+        ctx.fillStyle = getRockColor();
+        ctx.beginPath();
+        ctx.moveTo(o.x, o.y+o.h);
+        ctx.lineTo(o.x+10, o.y+10);
+        ctx.lineTo(o.x+28, o.y);
+        ctx.lineTo(o.x+o.w, o.y+15);
+        ctx.lineTo(o.x+o.w-8, o.y+o.h);
+        ctx.closePath(); ctx.fill();
+        
+        // هایلایت روشن روی سنگ
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.beginPath();
+        ctx.moveTo(o.x+12, o.y+12);
+        ctx.lineTo(o.x+26, o.y+4);
+        ctx.lineTo(o.x+22, o.y+20);
+        ctx.closePath(); ctx.fill();
+        
+        // سایه تیره برای عمق
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.beginPath();
+        ctx.moveTo(o.x+o.w-8, o.y+o.h);
+        ctx.lineTo(o.x+o.w, o.y+15);
+        ctx.lineTo(o.x+o.w-15, o.y+o.h);
+        ctx.closePath(); ctx.fill();
+    } else {
+        // کاکتوس فیروزه‌ای نئونی - واضح در همه تم‌ها
+        ctx.fillStyle = getCactusColor();
+        ctx.fillRect(o.x+9, o.y, 14, o.h);
+        ctx.fillRect(o.x, o.y+20, 13, 11);
+        ctx.fillRect(o.x+20, o.y+38, 13, 11);
+        
+        // هایلایت روشن روی کاکتوس
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillRect(o.x+10, o.y+2, 4, o.h-4);
+        ctx.fillRect(o.x+2, o.y+22, 3, 7);
+        ctx.fillRect(o.x+22, o.y+40, 3, 7);
+        
+        // سایه تیره برای عمق
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.fillRect(o.x+19, o.y, 4, o.h);
+        ctx.fillRect(o.x+10, o.y+20, 3, 11);
+        ctx.fillRect(o.x+30, o.y+38, 3, 11);
     }
 }
 
-// ============================================================
-// توابع اصلی بازی
-// ============================================================
-
 function draw(){
     drawBackground();
+    drawSeasonalParticles();
     for(const e of eggs) drawEgg(e);
     for(const o of obstacles) drawObstacle(o);
     for(const p of powerups) drawPowerup(p);
@@ -2865,24 +1462,19 @@ function draw(){
     drawFox();
 }
 
+// ============================================================
+// بازی
+// ============================================================
+
 function createEgg(){
     const eggColors = getEggColors();
-    let r = Math.random();
-    let type = 0;
-    
+    let r = Math.random(); let type = 0;
     if(r > .55) type = 1;
     if(r > .78) type = 2;
     if(r > .91) type = 3;
     if(r > .98) type = 4;
-    
     const data = eggColors[type];
-    eggs.push({
-        x:W + 30,
-        y: ground() - 50 - Math.random() * 130,
-        w:25, h:34,
-        color:data[0],
-        value:data[1]
-    });
+    eggs.push({ x:W+30, y: ground()-50-Math.random()*130, w:25, h:34, color:data[0], value:data[1] });
 }
 
 function createObstacle(){
@@ -2894,42 +1486,24 @@ function createObstacle(){
     let w = 45, h = 65;
     if(type === "rock"){ w = 55; h = 40; }
     if(type === "cactus"){ w = 32; h = 62; }
-    obstacles.push({
-        x:W + 40,
-        y:ground() - h,
-        w:w, h:h,
-        type:type
-    });
+    obstacles.push({ x:W+40, y:ground()-h, w:w, h:h, type:type });
 }
 
 function createPowerup(type) {
     const config = POWERUP_CONFIG[type];
     if (!config) return;
-    powerups.push({
-        x: W + 30,
-        y: ground() - 80 - Math.random() * 100,
-        w: 30,
-        h: 30,
-        type: type,
-        color: config.color,
-        icon: config.icon,
-        pulse: Math.random() * Math.PI * 2
-    });
+    powerups.push({ x: W+30, y: ground()-80-Math.random()*100, w: 30, h: 30, type: type, color: config.color, icon: config.icon, pulse: Math.random()*Math.PI*2 });
 }
 
 function trySpawnPowerup() {
     gameTime += 0.1;
     if (gameTime < 10) return;
-    
     const activeTypes = [];
     if (shieldActive) activeTypes.push('shield');
     if (speedBoostActive) activeTypes.push('speed');
-    
     if (activeTypes.length >= 2) return;
-    
     const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
     if (available.length === 0) return;
-    
     const chance = Math.random() * 100;
     if (chance < 90) {
         const type = available[Math.floor(Math.random() * available.length)];
@@ -2938,33 +1512,17 @@ function trySpawnPowerup() {
 }
 
 function collectEgg(e){
-    combo++;
-    comboTimer = 2;
+    combo++; comboTimer = 2;
     let multiplier = 1;
     if(combo >= 10) multiplier = 3;
     else if(combo >= 5) multiplier = 2;
-    
     let earned = e.value * multiplier;
-    score += earned;
-    totalEggs += 1;
-    totalScore += earned;
-    saveWallet();
-    updateSpeed();
-    updateDayNight();
-    updateUI();
-    
-    if(combo >= 2){
-        comboBox.classList.add("show");
-        comboValue.textContent = combo;
-    }
-    
+    score += earned; totalEggs += 1; totalScore += earned;
+    saveWallet(); updateSpeed(); updateDayNight(); updateUI();
+    if(combo >= 2){ comboBox.classList.add("show"); comboValue.textContent = combo; }
     const skin = getSkin(currentSkinId);
     let burstColor = skin.color;
-    
-    if (skin.id === 'rainbow') {
-        const hue = (Date.now() / 30) % 360;
-        burstColor = `hsl(${hue}, 80%, 60%)`;
-    }
+    if (skin.id === 'rainbow') { const hue = (Date.now()/30)%360; burstColor = `hsl(${hue},80%,60%)`; }
     if (skin.id === 'galaxy') burstColor = '#818cf8';
     if (skin.id === 'shadow') burstColor = '#4ade80';
     if (skin.id === 'phoenix') burstColor = '#f97316';
@@ -2973,25 +1531,18 @@ function collectEgg(e){
     if (skin.id === 'golden') burstColor = '#fcd34d';
     if (skin.id === 'frost') burstColor = '#93c5fd';
     if (skin.id === 'ember') burstColor = '#ff6b35';
-    
     createBurstParticles(e.x + e.w/2, e.y + e.h/2, burstColor, 6);
 }
 
 function applyPowerup(type) {
-    const skin = getSkin(currentSkinId);
-    const color = skin.glowColor || '#fbbf24';
-    
     switch(type) {
         case 'shield':
-            shieldActive = true;
-            shieldHits = 1;
-            shieldTimer = 15;
+            shieldActive = true; shieldHits = 1; shieldTimer = 15;
             createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#4fc3f7', 5);
             if (shieldTimeout) clearTimeout(shieldTimeout);
             break;
         case 'speed':
-            speedBoostActive = true;
-            speedBoostTimer = 15;
+            speedBoostActive = true; speedBoostTimer = 15;
             createBurstParticles(fox.x + fox.w/2, fox.y + fox.h/2, '#ffd54f', 5);
             break;
     }
@@ -3001,65 +1552,31 @@ function applyPowerup(type) {
 function updatePowerupTimers() {
     shieldTimerItem.classList.add('hidden-timer');
     speedTimerItem.classList.add('hidden-timer');
-    
     let anyActive = false;
-    
-    if (shieldActive) {
-        shieldTimerItem.classList.remove('hidden-timer');
-        shieldTimeDisplay.textContent = Math.ceil(shieldTimer);
-        anyActive = true;
-    }
-    
-    if (speedBoostActive) {
-        speedTimerItem.classList.remove('hidden-timer');
-        speedTimeDisplay.textContent = Math.ceil(speedBoostTimer);
-        anyActive = true;
-    }
-    
-    if (anyActive) {
-        powerupTimer.classList.remove('hidden');
-    } else {
-        powerupTimer.classList.add('hidden');
-    }
+    if (shieldActive) { shieldTimerItem.classList.remove('hidden-timer'); shieldTimeDisplay.textContent = Math.ceil(shieldTimer); anyActive = true; }
+    if (speedBoostActive) { speedTimerItem.classList.remove('hidden-timer'); speedTimeDisplay.textContent = Math.ceil(speedBoostTimer); anyActive = true; }
+    if (anyActive) powerupTimer.classList.remove('hidden');
+    else powerupTimer.classList.add('hidden');
 }
 
 function update(dt){
     gameTime += dt;
     updateSpeed();
-
     fox.vy += fox.gravity * dt;
     fox.y += fox.vy * dt;
-    if(fox.y + fox.h >= ground()){
-        fox.y = ground() - fox.h;
-        fox.vy = 0;
-        fox.grounded = true;
-    }
+    if(fox.y + fox.h >= ground()){ fox.y = ground() - fox.h; fox.vy = 0; fox.grounded = true; }
     fox.animation += dt * 15;
-
     updateDayNight();
-
     eggTimer -= dt;
-    if(eggTimer <= 0){
-        createEgg();
-        eggTimer = .55 + Math.random() * .4;
-    }
-    
+    if(eggTimer <= 0){ createEgg(); eggTimer = .55 + Math.random()*.4; }
     for(let i = eggs.length - 1; i >= 0; i--){
         const e = eggs[i];
         e.x -= speed * dt;
-        if(collision(fox,e)){
-            collectEgg(e);
-            eggs.splice(i, 1);
-            continue;
-        }
+        if(collision(fox,e)){ collectEgg(e); eggs.splice(i, 1); continue; }
         if(e.x < -60) eggs.splice(i, 1);
     }
-
     obstacleTimer -= dt;
-    if(obstacleTimer <= 0){
-        createObstacle();
-        obstacleTimer = 1.05 + Math.random() * .55;
-    }
+    if(obstacleTimer <= 0){ createObstacle(); obstacleTimer = 1.05 + Math.random()*.55; }
     for(let i = obstacles.length - 1; i >= 0; i--){
         const o = obstacles[i];
         o.x -= speed * dt;
@@ -3068,66 +1585,29 @@ function update(dt){
                 shieldHits--;
                 if(shieldHits === 0) shieldActive = false;
                 obstacles.splice(i, 1);
-                createBurstParticles(o.x + o.w/2, o.y + o.h/2, '#4fc3f7', 5);
+                createBurstParticles(o.x+o.w/2, o.y+o.h/2, '#4fc3f7', 5);
                 continue;
             }
-            endGame();
-            return;
+            endGame(); return;
         }
         if(o.x < -80) obstacles.splice(i, 1);
     }
-
     powerupTimerValue -= dt;
-    if (powerupTimerValue <= 0) {
-        trySpawnPowerup();
-        powerupTimerValue = 2 + Math.random() * 3;
-    }
-    
+    if (powerupTimerValue <= 0) { trySpawnPowerup(); powerupTimerValue = 2 + Math.random()*3; }
     for(let i = powerups.length - 1; i >= 0; i--){
         const p = powerups[i];
         p.x -= speed * dt;
-        if(collision(fox, p)){
-            applyPowerup(p.type);
-            powerups.splice(i, 1);
-            continue;
-        }
+        if(collision(fox, p)){ applyPowerup(p.type); powerups.splice(i, 1); continue; }
         if(p.x < -60) powerups.splice(i, 1);
     }
-    
-    if (shieldActive) {
-        shieldTimer -= dt;
-        if (shieldTimer <= 0) {
-            shieldActive = false;
-            shieldTimer = 0;
-            if (shieldTimeout) {
-                clearTimeout(shieldTimeout);
-                shieldTimeout = null;
-            }
-        }
-    }
-
-    if (speedBoostActive) {
-        speedBoostTimer -= dt;
-        if (speedBoostTimer <= 0) {
-            speedBoostActive = false;
-            speedBoostTimer = 0;
-        }
-    }
-
+    if (shieldActive) { shieldTimer -= dt; if (shieldTimer <= 0) { shieldActive = false; shieldTimer = 0; } }
+    if (speedBoostActive) { speedBoostTimer -= dt; if (speedBoostTimer <= 0) { speedBoostActive = false; speedBoostTimer = 0; } }
     updatePowerupTimers();
-
     document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
     document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
-
-    if(combo > 0){
-        comboTimer -= dt;
-        if(comboTimer <= 0){
-            combo = 0;
-            comboBox.classList.remove("show");
-        }
-    }
-    
+    if(combo > 0){ comboTimer -= dt; if(comboTimer <= 0){ combo = 0; comboBox.classList.remove("show"); } }
     updateParticles(dt);
+    updateSeasonalParticles(dt);
 }
 
 function loop(time){
@@ -3142,32 +1622,18 @@ function loop(time){
 
 function startGame(){
     stopMusicTimer();
-    score = 0;
-    speed = 330;
-    eggTimer = .3;
-    obstacleTimer = 1;
-    combo = 0;
-    comboTimer = 0;
-    eggs.length = 0;
-    obstacles.length = 0;
-    powerups.length = 0;
-    particles.length = 0;
-    lastDayCycle = -1;
-    isNight = false;
-    gameTime = 0;
-    shieldActive = false;
-    shieldHits = 0;
-    shieldTimer = 0;
-    speedBoostActive = false;
-    speedBoostTimer = 0;
+    score = 0; speed = 330; eggTimer = .3; obstacleTimer = 1;
+    combo = 0; comboTimer = 0;
+    eggs.length = 0; obstacles.length = 0; powerups.length = 0; particles.length = 0;
+    seasonalParticles.length = 0;
+    const fx0 = getSeasonalEffect();
+    if (fx0.enabled) { for (let i = 0; i < fx0.maxCount; i++) spawnSeasonalParticle(true); }
+    lastDayCycle = -1; isNight = false; gameTime = 0;
+    shieldActive = false; shieldHits = 0; shieldTimer = 0;
+    speedBoostActive = false; speedBoostTimer = 0;
     powerupTimerValue = 2;
-    if (shieldTimeout) {
-        clearTimeout(shieldTimeout);
-        shieldTimeout = null;
-    }
-    gamesPlayed++;
-    saveWallet();
-    updateUI();
+    if (shieldTimeout) { clearTimeout(shieldTimeout); shieldTimeout = null; }
+    gamesPlayed++; saveWallet(); updateUI();
     comboBox.classList.remove("show");
     document.getElementById('shieldIndicator').style.display = 'none';
     document.getElementById('speedIndicator').style.display = 'none';
@@ -3189,38 +1655,24 @@ function endGame(){
     playing = false;
     stopMusic();
     finalScore.textContent = score;
-    if(score > best){
-        best = score;
-        recordText.style.display = "block";
-        saveWallet();
-    }else{
-        recordText.style.display = "none";
-    }
+    if(score > best){ best = score; recordText.style.display = "block"; saveWallet(); }
+    else recordText.style.display = "none";
     updateUI();
     menuButton.style.display = "block";
-    menuButton.style.zIndex = "99999";
-    menuButton.style.position = "fixed";
     gameOver.style.display = "flex";
     powerupTimer.classList.add('hidden');
 }
 
-function handleInput(){
-    if(!playing) startGame();
-    else jump();
-}
+function handleInput(){ if(!playing) startGame(); else jump(); }
 
 // ============================================================
-// توابع UI و زبان
+// UI و زبان
 // ============================================================
 
 function updateUI(){
     const fa = language === "fa";
-    const scoreLabel = fa ? "امتیاز: " : "Score: ";
-    const bestLabel = fa ? "رکورد: " : "Best: ";
-    
-    scoreText.textContent = scoreLabel + score;
-    bestText.textContent = bestLabel + best;
-    
+    scoreText.textContent = (fa ? "امتیاز: " : "Score: ") + score;
+    bestText.textContent = (fa ? "رکورد: " : "Best: ") + best;
     gamesValue.textContent = gamesPlayed;
     walletBest.textContent = best;
     walletEggs.textContent = totalEggs;
@@ -3234,30 +1686,23 @@ function setTheme(themeId) {
     currentTheme = themeId;
     localStorage.setItem("foxTheme", themeId);
     updateThemeUI();
-    if (!playing) {
-        drawBackground();
-        drawFox();
-    }
+    if (!playing) { drawBackground(); drawFox(); }
 }
 
 function updateThemeUI() {
-    const theme = getTheme();
-    const name = language === 'fa' ? theme.nameFa : theme.nameEn;
-    currentThemeDisplay.textContent = name;
+    currentThemeDisplay.textContent = getThemeIcon(currentTheme) + ' ' + getThemeName(currentTheme);
     startThemeLabel.textContent = language === 'fa' ? 'تغییر تم' : 'Change Theme';
-    
     document.querySelectorAll('.theme-option').forEach(opt => {
         const tid = opt.dataset.theme;
         const t = themeConfigs[tid];
         if (!t) return;
-        const isActive = tid === currentTheme;
-        opt.classList.toggle('active', isActive);
-        opt.querySelector('.name').textContent = language === 'fa' ? t.nameFa : t.nameEn;
-        opt.querySelector('.desc').textContent = language === 'fa' ? t.descFa : t.descEn;
-        opt.querySelector('.icon').textContent = t.icon;
+        opt.classList.toggle('active', tid === currentTheme);
+        opt.querySelector('.name').textContent = getThemeName(tid);
+        opt.querySelector('.desc').textContent = getThemeDesc(tid);
+        opt.querySelector('.icon').textContent = getThemeIcon(tid);
     });
-    
-    document.getElementById('themeSelectorTitle').textContent = language === 'fa' ? '🎨 انتخاب تم' : '🎨 Select Theme';
+    const season = getSeasonConfig();
+    document.getElementById('themeSelectorTitle').textContent = language === 'fa' ? season.icon + ' انتخاب تم ' + season.nameFa : season.icon + ' Select ' + season.nameEn + ' Theme';
     document.getElementById('themeSelectorSub').textContent = language === 'fa' ? 'سبک ماجراجویی خود را انتخاب کنید' : 'Choose your adventure style';
     document.getElementById('applyThemeText').textContent = language === 'fa' ? 'اعمال تم' : 'Apply Theme';
     document.getElementById('changeThemeLabel').textContent = language === 'fa' ? 'تغییر تم' : 'Change Theme';
@@ -3266,12 +1711,9 @@ function updateThemeUI() {
 function renderSkinShop() {
     const grid = document.getElementById('skinShopGrid');
     if (!grid) return;
-    
     const fa = language === 'fa';
-    const ownedCount = purchasedSkins.length;
-    document.getElementById('skinCount').textContent = ownedCount + '/' + FOX_SKINS.length;
+    document.getElementById('skinCount').textContent = purchasedSkins.length + '/' + FOX_SKINS.length;
     document.getElementById('totalScoreDisplay').textContent = totalScore.toLocaleString();
-    
     const rarityOrder = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'mythic'];
     const rarityLabels = {
         common: { fa: '⚪ معمولی', en: '⚪ Common', color: '#6b7280' },
@@ -3281,93 +1723,49 @@ function renderSkinShop() {
         legendary: { fa: '🟠 افسانه‌ای', en: '🟠 Legendary', color: '#f59e0b' },
         mythic: { fa: '🔴 اسطوره‌ای', en: '🔴 Mythic', color: '#ef4444' }
     };
-    
     let html = '';
-    
     rarityOrder.forEach(rarity => {
         const skinsInRarity = FOX_SKINS.filter(s => s.rarity === rarity);
         if (skinsInRarity.length === 0) return;
-        
         const label = fa ? rarityLabels[rarity].fa : rarityLabels[rarity].en;
         const color = rarityLabels[rarity].color;
-        
         html += `<div style="margin-top:12px;margin-bottom:6px;">`;
-        html += `<div style="font-size:11px;font-weight:bold;color:${color};letter-spacing:0.5px;border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:4px;">${label}</div>`;
+        html += `<div style="font-size:11px;font-weight:bold;color:${color};border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:4px;">${label}</div>`;
         html += `<div style="display:grid;grid-template-columns:repeat(${skinsInRarity.length === 1 ? 1 : 2},1fr);gap:6px;margin-top:6px;">`;
-        
         skinsInRarity.forEach(skin => {
             const owned = isSkinOwned(skin.id);
             const active = isSkinActive(skin.id);
             const canBuy = totalScore >= skin.price && !owned && skin.price > 0;
             const isFree = skin.price === 0;
-            
-            const colorStyle = skin.id === 'rainbow' 
-                ? 'linear-gradient(45deg,red,orange,yellow,green,blue,indigo,violet)' 
-                : skin.color;
-            
-            let statusText = '';
-            let statusColor = '';
-            let bgColor = 'rgba(255,255,255,0.03)';
-            let borderColor = 'rgba(255,255,255,0.06)';
-            let cursorStyle = 'pointer';
-            
-            if (active) {
-                statusText = fa ? '✓ فعال' : '✓ Active';
-                statusColor = '#4ade80';
-                bgColor = 'rgba(74,222,128,0.1)';
-                borderColor = '#4ade80';
-            } else if (owned) {
-                statusText = fa ? '✅ خریداری شده' : '✅ Owned';
-                statusColor = '#60a5fa';
-                bgColor = 'rgba(96,165,250,0.08)';
-                borderColor = 'rgba(96,165,250,0.3)';
-            } else if (isFree) {
-                statusText = fa ? 'رایگان' : 'Free';
-                statusColor = '#fbbf24';
-            } else if (canBuy) {
-                statusText = '💰 ' + skin.price.toLocaleString();
-                statusColor = '#fbbf24';
-            } else {
-                statusText = '🔒 ' + skin.price.toLocaleString();
-                statusColor = '#ef4444';
-                bgColor = 'rgba(239,68,68,0.05)';
-                cursorStyle = 'not-allowed';
-            }
-            
+            const colorStyle = skin.id === 'rainbow' ? 'linear-gradient(45deg,red,orange,yellow,green,blue,indigo,violet)' : skin.color;
+            let statusText = '', statusColor = '';
+            let bgColor = 'rgba(255,255,255,0.03)', borderColor = 'rgba(255,255,255,0.06)', cursorStyle = 'pointer';
+            if (active) { statusText = fa ? '✓ فعال' : '✓ Active'; statusColor = '#4ade80'; bgColor = 'rgba(74,222,128,0.1)'; borderColor = '#4ade80'; }
+            else if (owned) { statusText = fa ? '✅ خریداری شده' : '✅ Owned'; statusColor = '#60a5fa'; bgColor = 'rgba(96,165,250,0.08)'; borderColor = 'rgba(96,165,250,0.3)'; }
+            else if (isFree) { statusText = fa ? 'رایگان' : 'Free'; statusColor = '#fbbf24'; }
+            else if (canBuy) { statusText = '💰 ' + skin.price.toLocaleString(); statusColor = '#fbbf24'; }
+            else { statusText = '🔒 ' + skin.price.toLocaleString(); statusColor = '#ef4444'; bgColor = 'rgba(239,68,68,0.05)'; cursorStyle = 'not-allowed'; }
             const rarityLabel = getRarityLabel(skin.rarity);
-            const descText = skin.desc;
             const isLocked = !owned && !canBuy && !isFree;
-            
-            html += `
-                <div class="skin-option ${active ? 'active' : ''} ${owned ? 'owned' : ''} ${isLocked ? 'locked' : ''}" 
-                     data-skin="${skin.id}"
-                     style="background:${bgColor};border:2px solid ${borderColor};border-radius:10px;padding:8px;text-align:center;cursor:${cursorStyle};transition:all 0.2s;position:relative;${isLocked ? 'opacity:0.5;' : ''}">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                        <span style="font-size:10px;color:${statusColor};">${statusText}</span>
-                        <span style="font-size:8px;color:rgba(255,255,255,0.2);">${rarityLabel}</span>
-                    </div>
-                    <div style="width:36px;height:36px;border-radius:50%;margin:0 auto 4px;background:${colorStyle};border:2px solid rgba(255,255,255,0.1);box-shadow:${active ? '0 0 15px ' + (skin.glowColor || 'rgba(249,115,22,0.3)') : 'none'};"></div>
-                    <div style="font-size:11px;font-weight:bold;color:white;">${fa ? skin.nameFa : skin.name}</div>
-                    <div style="font-size:8px;color:rgba(255,255,255,0.4);">${descText}</div>
-                    ${active ? '<div style="position:absolute;top:-4px;right:-4px;font-size:12px;">⭐</div>' : ''}
+            html += `<div class="skin-option ${active?'active':''} ${owned?'owned':''} ${isLocked?'locked':''}" data-skin="${skin.id}" style="background:${bgColor};border:2px solid ${borderColor};border-radius:10px;padding:8px;text-align:center;cursor:${cursorStyle};position:relative;${isLocked?'opacity:0.5;':''}">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <span style="font-size:10px;color:${statusColor};">${statusText}</span>
+                    <span style="font-size:8px;color:rgba(255,255,255,0.2);">${rarityLabel}</span>
                 </div>
-            `;
+                <div style="width:36px;height:36px;border-radius:50%;margin:0 auto 4px;background:${colorStyle};border:2px solid rgba(255,255,255,0.1);box-shadow:${active?'0 0 15px '+(skin.glowColor||'rgba(249,115,22,0.3)'):'none'};"></div>
+                <div style="font-size:11px;font-weight:bold;color:white;">${fa?skin.nameFa:skin.name}</div>
+                <div style="font-size:8px;color:rgba(255,255,255,0.4);">${skin.desc}</div>
+                ${active?'<div style="position:absolute;top:-4px;right:-4px;font-size:12px;">⭐</div>':''}
+            </div>`;
         });
-        
         html += `</div></div>`;
     });
-    
     grid.innerHTML = html;
-    
     document.querySelectorAll('.skin-option').forEach(el => {
         el.addEventListener('click', function() {
             const skinId = this.dataset.skin;
-            if (!this.classList.contains('locked')) {
-                handleSkinClick(skinId);
-            } else {
-                const fa = language === 'fa';
-                showToast(fa ? '❌ امتیاز کافی نیست!' : '❌ Not enough points!');
-            }
+            if (!this.classList.contains('locked')) handleSkinClick(skinId);
+            else showToast(language === 'fa' ? '❌ امتیاز کافی نیست!' : '❌ Not enough points!');
         });
     });
 }
@@ -3375,52 +1773,33 @@ function renderSkinShop() {
 function handleSkinClick(skinId) {
     const skin = getSkin(skinId);
     if (!skin) return;
-    
     const owned = isSkinOwned(skinId);
     const fa = language === 'fa';
-    
     if (owned) {
         currentSkinId = skinId;
         localStorage.setItem('foxSkin', skinId);
-        renderSkinShop();
-        updateUI();
-        if (!playing) {
-            drawBackground();
-            drawFox();
-        }
+        renderSkinShop(); updateUI();
+        if (!playing) { drawBackground(); drawFox(); }
         showToast((fa ? '✅ رنگ ' : '✅ Skin ') + (fa ? skin.nameFa : skin.name) + (fa ? ' انتخاب شد!' : ' selected!'));
         return;
     }
-    
     if (skin.price === 0) {
         purchasedSkins.push(skinId);
         localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
-        currentSkinId = skinId;
-        localStorage.setItem('foxSkin', skinId);
-        renderSkinShop();
-        updateUI();
-        if (!playing) {
-            drawBackground();
-            drawFox();
-        }
+        currentSkinId = skinId; localStorage.setItem('foxSkin', skinId);
+        renderSkinShop(); updateUI();
+        if (!playing) { drawBackground(); drawFox(); }
         showToast((fa ? '✅ رنگ ' : '✅ Skin ') + (fa ? skin.nameFa : skin.name) + (fa ? ' فعال شد!' : ' activated!'));
         return;
     }
-    
     if (totalScore >= skin.price) {
         if (confirm((fa ? 'آیا مطمئنی می‌خوای رنگ "' : 'Buy skin "') + (fa ? skin.nameFa : skin.name) + '" ' + (fa ? 'را به قیمت ' : 'for ') + skin.price.toLocaleString() + (fa ? ' امتیاز بخری؟' : ' points?'))) {
             totalScore -= skin.price;
             purchasedSkins.push(skinId);
             localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
-            currentSkinId = skinId;
-            localStorage.setItem('foxSkin', skinId);
-            saveWallet();
-            renderSkinShop();
-            updateUI();
-            if (!playing) {
-                drawBackground();
-                drawFox();
-            }
+            currentSkinId = skinId; localStorage.setItem('foxSkin', skinId);
+            saveWallet(); renderSkinShop(); updateUI();
+            if (!playing) { drawBackground(); drawFox(); }
             showToast((fa ? '✅ رنگ "' : '✅ Skin "') + (fa ? skin.nameFa : skin.name) + '" ' + (fa ? 'خریداری شد!' : 'purchased!'));
         }
     } else {
@@ -3429,30 +1808,54 @@ function handleSkinClick(skinId) {
 }
 
 function openThemeSelector() {
-    if (gameOver.style.display === 'flex') {
-        gameOver.style.display = 'none';
-        gameOver.dataset.wasVisible = 'true';
-    }
+    if (gameOver.style.display === 'flex') { gameOver.style.display = 'none'; gameOver.dataset.wasVisible = 'true'; }
     themeSelectorOverlay.style.display = 'flex';
     updateThemeUI();
 }
 
 function closeThemeSelectorFn() {
     themeSelectorOverlay.style.display = 'none';
-    if (gameOver.dataset.wasVisible === 'true') {
-        gameOver.style.display = 'flex';
-        gameOver.dataset.wasVisible = 'false';
+    if (gameOver.dataset.wasVisible === 'true') { gameOver.style.display = 'flex'; gameOver.dataset.wasVisible = 'false'; }
+}
+
+function applySeasonToUI() {
+    const season = getSeasonConfig();
+    const fa = language === 'fa';
+    const startLogo = document.getElementById('startLogo');
+    if (startLogo) startLogo.textContent = season.logo;
+    const gameOverLogo = document.getElementById('gameOverLogo');
+    if (gameOverLogo) gameOverLogo.textContent = season.logo;
+    const channelIcon = document.getElementById('channelIcon');
+    if (channelIcon) channelIcon.textContent = season.logo;
+    const editionBadge = document.getElementById('editionBadge');
+    if (editionBadge) {
+        editionBadge.textContent = fa ? season.editionFa : season.editionEn;
+        editionBadge.style.color = season.badgeColor;
+        editionBadge.style.textShadow = `0 2px 8px ${season.badgeColor}80`;
     }
+}
+
+function refreshSeason() {
+    const newSeason = getCurrentSeason();
+    if (newSeason === currentSeason) return;
+    console.log(`🍂 Season changed: ${currentSeason} → ${newSeason}`);
+    currentSeason = newSeason;
+    seasonalParticles.length = 0;
+    applySeasonToUI();
+    updateThemeUI();
+    renderSkinShop();
+    if (!playing) { drawBackground(); drawFox(); }
 }
 
 function applyLanguage(){
     const fa = language === "fa";
     document.documentElement.lang = fa ? "fa" : "en";
     document.documentElement.dir = fa ? "rtl" : "ltr";
-
-    document.getElementById("gameTitle").textContent = "Fox Eggs";
-    document.getElementById("editionBadge").textContent = fa ? "🍁 نسخه پاییزی 🍁" : "🍁 AUTUMN EDITION 🍁";
-
+    const season = getSeasonConfig();
+    document.getElementById("editionBadge").textContent = fa ? season.editionFa : season.editionEn;
+    document.getElementById("startLogo").textContent = season.logo;
+    document.getElementById("gameOverLogo").textContent = season.logo;
+    document.getElementById("channelIcon").textContent = season.logo;
     document.getElementById("menuTitle").textContent = fa ? "منو" : "Menu";
     document.getElementById("languageTitle").textContent = fa ? "زبان" : "Language";
     document.getElementById("soundTitle").textContent = fa ? "صدا" : "Sound";
@@ -3464,7 +1867,6 @@ function applyLanguage(){
     document.getElementById("referralCodeLabel").textContent = fa ? "کد دعوت من" : "My Invite Code";
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
     document.getElementById("skinShopTitle").textContent = fa ? "🎨 پوست روباه" : "🎨 Fox Skins";
-    
     document.getElementById("startText").textContent = fa ? "تخم‌ها را جمع کن و رکورد بزن!" : "Collect eggs and beat your record!";
     startButton.textContent = fa ? "شروع بازی" : "Start Game";
     document.getElementById("controlText").textContent = fa ? "لمس صفحه یا Space برای پرش" : "Tap screen or Space to jump";
@@ -3476,7 +1878,6 @@ function applyLanguage(){
     recordText.textContent = fa ? "🏆 رکورد جدید!" : "🏆 New Record!";
     document.getElementById("startThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
     document.getElementById("changeThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
-
     updateSoundButtons();
     updateUI();
     updateThemeUI();
@@ -3490,18 +1891,11 @@ function setLanguage(lang){
     applyLanguage();
     menuPanel.style.display = "none";
     const prompt = document.getElementById('referralPrompt');
-    if (prompt) {
-        const oldOverlay = prompt;
-        const parent = oldOverlay.parentNode;
-        if (parent) {
-            parent.removeChild(oldOverlay);
-            showReferralPrompt();
-        }
-    }
+    if (prompt) { const parent = prompt.parentNode; if (parent) { parent.removeChild(prompt); showReferralPrompt(); } }
 }
 
 // ============================================================
-// پاپ‌آپ کانال تلگرام
+// پاپ‌آپ کانال
 // ============================================================
 
 let channelPopupShown = false;
@@ -3510,9 +1904,7 @@ function getChannelTexts() {
     const fa = language === 'fa';
     return {
         title: fa ? '🦊 به کانال تلگرام بپیوندید!' : '🦊 Join our Telegram Channel!',
-        subtitle: fa 
-            ? 'برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان' 
-            : 'Get special rewards, updates, and connect with other players!',
+        subtitle: fa ? 'برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان' : 'Get special rewards, updates, and connect with other players!',
         feature1: fa ? '🎁 جوایز' : '🎁 Rewards',
         feature2: fa ? '🔄 بروزرسانی' : '🔄 Updates',
         feature3: fa ? '👥 جامعه' : '👥 Community',
@@ -3522,19 +1914,12 @@ function getChannelTexts() {
 }
 
 function showChannelPopup() {
-    if (channelPopupShown || playing) {
-        return;
-    }
-    
-    if (startScreen.style.display === 'none') {
-        return;
-    }
-    
+    if (channelPopupShown || playing) return;
+    if (startScreen.style.display === 'none') return;
     const popup = document.getElementById('channelPopup');
     if (!popup) return;
-    
     const texts = getChannelTexts();
-    
+    const season = getSeasonConfig();
     document.getElementById('channelTitle').textContent = texts.title;
     document.getElementById('channelSub').textContent = texts.subtitle;
     document.getElementById('feature1').textContent = texts.feature1;
@@ -3542,31 +1927,24 @@ function showChannelPopup() {
     document.getElementById('feature3').textContent = texts.feature3;
     document.getElementById('channelBtnText').textContent = texts.btnText;
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
-    
+    document.getElementById('channelIcon').textContent = season.logo;
     const box = document.querySelector('#channelPopup .box');
-    if (language === 'fa') {
-        box.style.direction = 'rtl';
-    } else {
-        box.style.direction = 'ltr';
-    }
+    box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
     box.style.textAlign = 'center';
-    
     popup.style.display = 'flex';
     channelPopupShown = true;
 }
 
 function closeChannelPopup() {
     const popup = document.getElementById('channelPopup');
-    if (popup) {
-        popup.style.display = 'none';
-    }
+    if (popup) popup.style.display = 'none';
 }
 
 function updateChannelPopup() {
     const popup = document.getElementById('channelPopup');
     if (!popup || popup.style.display !== 'flex') return;
-    
     const texts = getChannelTexts();
+    const season = getSeasonConfig();
     document.getElementById('channelTitle').textContent = texts.title;
     document.getElementById('channelSub').textContent = texts.subtitle;
     document.getElementById('feature1').textContent = texts.feature1;
@@ -3574,131 +1952,50 @@ function updateChannelPopup() {
     document.getElementById('feature3').textContent = texts.feature3;
     document.getElementById('channelBtnText').textContent = texts.btnText;
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
-    
-    const box = document.querySelector('#channelPopup .box');
-    if (language === 'fa') {
-        box.style.direction = 'rtl';
-    } else {
-        box.style.direction = 'ltr';
-    }
+    document.getElementById('channelIcon').textContent = season.logo;
 }
 
 // ============================================================
 // رویدادها
 // ============================================================
 
-window.addEventListener("online", function() {
-    checkInternet();
-});
-
-window.addEventListener("offline", function() {
-    showNoInternet();
-});
+window.addEventListener("online", function() { checkInternet(); });
+window.addEventListener("offline", function() { showNoInternet(); });
 
 retryBtn.addEventListener("click", function() {
     checkInternet();
     fetch(WEBHOOK_URL, { signal: AbortSignal.timeout(5000) })
-        .then(() => {
-            if (navigator.onLine) {
-                noInternetOverlay.style.display = 'none';
-                isOnline = true;
-                showReferralDataFromCache();
-                syncReferralsWithServer().then(() => {
-                    showReferralDataFromCache();
-                });
-            }
-        })
-        .catch(() => {
-            showNoInternet();
-        });
+        .then(() => { if (navigator.onLine) { noInternetOverlay.style.display = 'none'; isOnline = true; showReferralDataFromCache(); syncReferralsWithServer().then(() => { showReferralDataFromCache(); }); } })
+        .catch(() => { showNoInternet(); });
 });
 
 window.addEventListener("keydown", function(e){
-    if(e.code === "Space" || e.code === "ArrowUp"){
-        e.preventDefault();
-        handleInput();
-    }
-    if(e.code === "Escape" && themeSelectorOverlay.style.display === 'flex') {
-        closeThemeSelectorFn();
-    }
+    if(e.code === "Space" || e.code === "ArrowUp"){ e.preventDefault(); handleInput(); }
+    if(e.code === "Escape" && themeSelectorOverlay.style.display === 'flex') closeThemeSelectorFn();
 });
 
-canvas.addEventListener("pointerdown", function(e){
-    e.preventDefault();
-    handleInput();
-}, { passive:false });
-
-startButton.addEventListener("click", function(e){
-    e.stopPropagation();
-    startGame();
-});
-
-restartButton.addEventListener("click", function(e){
-    e.stopPropagation();
-    startGame();
-});
-
-document.getElementById("soundOnButton").addEventListener("click", function(e){
-    e.stopPropagation();
-    enableSound();
-});
-
-document.getElementById("soundOffButton").addEventListener("click", function(e){
-    e.stopPropagation();
-    disableSound();
-});
+canvas.addEventListener("pointerdown", function(e){ e.preventDefault(); handleInput(); }, { passive:false });
+startButton.addEventListener("click", function(e){ e.stopPropagation(); startGame(); });
+restartButton.addEventListener("click", function(e){ e.stopPropagation(); startGame(); });
+document.getElementById("soundOnButton").addEventListener("click", function(e){ e.stopPropagation(); enableSound(); });
+document.getElementById("soundOffButton").addEventListener("click", function(e){ e.stopPropagation(); disableSound(); });
 
 menuButton.addEventListener("click", function(e){
     e.stopPropagation();
     if(playing) return;
-    if (menuPanel.style.display === "block") {
-        menuPanel.style.display = "none";
-    } else {
-        menuPanel.style.display = "block";
-        updateUI();
-        renderSkinShop();
-        syncReferralsWithServer().then(() => {
-            showReferralDataFromCache();
-        });
-    }
+    if (menuPanel.style.display === "block") menuPanel.style.display = "none";
+    else { menuPanel.style.display = "block"; updateUI(); renderSkinShop(); syncReferralsWithServer().then(() => { showReferralDataFromCache(); }); }
 });
 
-menuPanel.addEventListener("click", function(e){
-    e.stopPropagation();
-});
-
-document.getElementById("faButton").addEventListener("click", function(e){
-    e.stopPropagation();
-    setLanguage("fa");
-});
-
-document.getElementById("enButton").addEventListener("click", function(e){
-    e.stopPropagation();
-    setLanguage("en");
-});
-
+menuPanel.addEventListener("click", function(e){ e.stopPropagation(); });
+document.getElementById("faButton").addEventListener("click", function(e){ e.stopPropagation(); setLanguage("fa"); });
+document.getElementById("enButton").addEventListener("click", function(e){ e.stopPropagation(); setLanguage("en"); });
 copyBtn.addEventListener("click", copyReferralCode);
-
 closeThemeSelector.addEventListener("click", closeThemeSelectorFn);
-themeSelectorOverlay.addEventListener("click", function(e) {
-    if (e.target === this) closeThemeSelectorFn();
-});
-
-changeThemeBtn.addEventListener("click", function(e) {
-    e.stopPropagation();
-    openThemeSelector();
-});
-
-openThemeStartBtn.addEventListener("click", function(e) {
-    e.stopPropagation();
-    openThemeSelector();
-});
-
-openThemeFromMenu.addEventListener("click", function(e) {
-    e.stopPropagation();
-    menuPanel.style.display = "none";
-    openThemeSelector();
-});
+themeSelectorOverlay.addEventListener("click", function(e) { if (e.target === this) closeThemeSelectorFn(); });
+changeThemeBtn.addEventListener("click", function(e) { e.stopPropagation(); openThemeSelector(); });
+openThemeStartBtn.addEventListener("click", function(e) { e.stopPropagation(); openThemeSelector(); });
+openThemeFromMenu.addEventListener("click", function(e) { e.stopPropagation(); menuPanel.style.display = "none"; openThemeSelector(); });
 
 document.querySelectorAll('.theme-option').forEach(opt => {
     opt.addEventListener('click', function() {
@@ -3709,26 +2006,19 @@ document.querySelectorAll('.theme-option').forEach(opt => {
     });
 });
 
-document.getElementById('closeChannelBtn').addEventListener('click', function(e) {
-    e.stopPropagation();
-    closeChannelPopup();
-});
-
-document.getElementById('channelPopup').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeChannelPopup();
-    }
-});
+document.getElementById('closeChannelBtn').addEventListener('click', function(e) { e.stopPropagation(); closeChannelPopup(); });
+document.getElementById('channelPopup').addEventListener('click', function(e) { if (e.target === this) closeChannelPopup(); });
 
 // ============================================================
 // شروع اولیه
 // ============================================================
 
+currentSeason = getCurrentSeason();
+applySeasonToUI();
 applyLanguage();
 updateUI();
 resetFox();
-menuButton.style.zIndex = "99999";
-menuButton.style.position = "fixed";
+menuButton.style.display = "block";
 
 const savedTheme = localStorage.getItem("foxTheme") || "classic";
 setTheme(savedTheme);
@@ -3743,38 +2033,22 @@ renderSkinShop();
 powerupTimer.classList.add('hidden');
 
 setTimeout(() => {
-    if (!playing && startScreen.style.display !== 'none') {
-        showChannelPopup();
-    }
-    
-    if (navigator.onLine) {
-        showReferralPrompt();
-    } else {
-        showNoInternet();
-    }
+    if (!playing && startScreen.style.display !== 'none') showChannelPopup();
+    if (navigator.onLine) showReferralPrompt();
+    else showNoInternet();
 }, 500);
 
-setTimeout(() => {
-    if (navigator.onLine) {
-        syncReferralsWithServer().then(() => {
-            showReferralDataFromCache();
-        });
-    }
-}, 1000);
-
-setTimeout(() => {
-    checkInternet();
-}, 300);
+setTimeout(() => { if (navigator.onLine) syncReferralsWithServer().then(() => { showReferralDataFromCache(); }); }, 1000);
+setTimeout(() => { checkInternet(); }, 300);
 
 setInterval(() => {
-    if (navigator.onLine && noInternetOverlay.style.display === 'flex') {
-        checkInternet();
-    } else if (!navigator.onLine) {
-        showNoInternet();
-    }
+    if (navigator.onLine && noInternetOverlay.style.display === 'flex') checkInternet();
+    else if (!navigator.onLine) showNoInternet();
 }, 10000);
 
-</script>
+setInterval(() => { refreshSeason(); }, 60 * 1000);
+setInterval(() => { if (getCurrentSeason() !== currentSeason) refreshSeason(); }, 5 * 60 * 1000);
 
+</script>
 </body>
-    </html>
+                </html>
