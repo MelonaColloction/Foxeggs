@@ -429,16 +429,58 @@ jobs:
 
 
       # =========================================
-      # Use custom game icon
+      # Find custom game icon automatically
       # =========================================
 
-      - name: Prepare custom game icon
+      - name: Find custom game icon
         run: |
 
-          test -f game-logo.png
+          python3 - <<'PY'
 
-          echo "Custom game logo found:"
-          ls -lh game-logo.png
+          import os
+
+          extensions = (
+              ".png",
+              ".jpg",
+              ".jpeg",
+              ".webp"
+          )
+
+          files = [
+              f
+              for f in os.listdir(".")
+              if os.path.isfile(f)
+              and f.lower().endswith(extensions)
+          ]
+
+          # Ignore known generated/release files
+          ignored = {
+              "fox-eggs-icon.png",
+              "game-logo.png"
+          }
+
+          files = [
+              f
+              for f in files
+              if f.lower() not in ignored
+          ]
+
+          if not files:
+              raise SystemExit(
+                  "No image file found in project root."
+              )
+
+          logo = files[0]
+
+          print("==========================================")
+          print("CUSTOM GAME ICON")
+          print("==========================================")
+          print("Using image:", logo)
+
+          with open("CUSTOM_ICON", "w") as f:
+              f.write(logo)
+
+          PY
 
 
       # =========================================
@@ -454,8 +496,15 @@ jobs:
           import os
 
 
+          with open("CUSTOM_ICON", "r") as f:
+              filename = f.read().strip()
+
+
+          print("Loading custom icon:", filename)
+
+
           source = Image.open(
-              "game-logo.png"
+              filename
           ).convert("RGBA")
 
 
@@ -496,7 +545,7 @@ jobs:
               )
 
 
-          print("Android icons generated.")
+          print("Android icons generated successfully.")
 
           PY
 
@@ -626,19 +675,18 @@ jobs:
 
           mkdir -p release
 
-
           cp \
             android/app/build/outputs/apk/release/app-release.apk \
             release/FoxEggs.apk
-
 
           cp \
             android/app/build/outputs/bundle/release/app-release.aab \
             release/FoxEggs.aab
 
+          CUSTOM_ICON=$(cat CUSTOM_ICON)
 
           cp \
-            game-logo.png \
+            "$CUSTOM_ICON" \
             release/FoxEggs-Icon.png
 
 
