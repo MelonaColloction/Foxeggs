@@ -429,174 +429,16 @@ jobs:
 
 
       # =========================================
-      # Create Fox + Egg icon
+      # Use custom game icon
       # =========================================
 
-      - name: Create Fox Eggs icon
+      - name: Prepare custom game icon
         run: |
 
-          cat > create_icon.py <<'PY'
+          test -f game-logo.png
 
-          from PIL import Image, ImageDraw
-
-          S = 1024
-
-          img = Image.new(
-              "RGBA",
-              (S, S),
-              (255, 190, 70, 255)
-          )
-
-          d = ImageDraw.Draw(img)
-
-
-          # Background
-          d.rounded_rectangle(
-              (30, 30, 994, 994),
-              radius=190,
-              fill=(255, 184, 70, 255)
-          )
-
-
-          # Fox head
-          d.polygon(
-              [
-                  (150,350),
-                  (190,135),
-                  (365,245),
-                  (512,205),
-                  (659,245),
-                  (834,135),
-                  (874,350),
-                  (825,610),
-                  (700,770),
-                  (512,830),
-                  (324,770),
-                  (199,610)
-              ],
-              fill=(215,91,42,255)
-          )
-
-
-          # Inner ears
-          d.polygon(
-              [
-                  (205,300),
-                  (215,185),
-                  (345,275)
-              ],
-              fill=(255,145,115,255)
-          )
-
-          d.polygon(
-              [
-                  (679,275),
-                  (809,185),
-                  (819,300)
-              ],
-              fill=(255,145,115,255)
-          )
-
-
-          # Face
-          d.polygon(
-              [
-                  (512,400),
-                  (430,455),
-                  (390,590),
-                  (425,700),
-                  (512,755),
-                  (599,700),
-                  (634,590),
-                  (594,455)
-              ],
-              fill=(255,239,211,255)
-          )
-
-
-          # Eyes
-          d.ellipse(
-              (330,430,410,520),
-              fill=(35,25,20,255)
-          )
-
-          d.ellipse(
-              (614,430,694,520),
-              fill=(35,25,20,255)
-          )
-
-
-          # Eye highlights
-          d.ellipse(
-              (350,447,375,472),
-              fill=(255,255,255,255)
-          )
-
-          d.ellipse(
-              (634,447,659,472),
-              fill=(255,255,255,255)
-          )
-
-
-          # Nose
-          d.ellipse(
-              (468,555,556,625),
-              fill=(40,25,22,255)
-          )
-
-
-          # Egg
-          egg = [
-              (760,455),
-              (735,480),
-              (720,530),
-              (725,600),
-              (745,680),
-              (780,755),
-              (825,805),
-              (870,775),
-              (900,710),
-              (920,625),
-              (918,550),
-              (900,490),
-              (870,455),
-              (815,435)
-          ]
-
-          d.polygon(
-              egg,
-              fill=(255,250,232,255)
-          )
-
-
-          # Egg spots
-          d.ellipse(
-              (760,535,805,580),
-              fill=(235,115,55,255)
-          )
-
-          d.ellipse(
-              (830,620,875,665),
-              fill=(235,115,55,255)
-          )
-
-          d.ellipse(
-              (785,700,825,740),
-              fill=(235,115,55,255)
-          )
-
-
-          img.save(
-              "fox-eggs-icon.png",
-              "PNG"
-          )
-
-
-          print("Fox Eggs icon created.")
-
-          PY
-
-          python3 create_icon.py
+          echo "Custom game logo found:"
+          ls -lh game-logo.png
 
 
       # =========================================
@@ -613,7 +455,7 @@ jobs:
 
 
           source = Image.open(
-              "fox-eggs-icon.png"
+              "game-logo.png"
           ).convert("RGBA")
 
 
@@ -796,7 +638,7 @@ jobs:
 
 
           cp \
-            fox-eggs-icon.png \
+            game-logo.png \
             release/FoxEggs-Icon.png
 
 
