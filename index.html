@@ -3719,18 +3719,23 @@ function openThemeSelector() {
         gameOver.style.display = 'none';
         gameOver.dataset.wasVisible = 'true';
     }
+    menuButton.style.display = "none";   // ← مخفی کردن منو ☰
+    nftButton.style.display = "none";    // ← مخفی کردن دکمه NFT
     themeSelectorOverlay.style.display = 'flex';
     updateThemeUI();
 }
 
 function closeThemeSelectorFn() {
     themeSelectorOverlay.style.display = 'none';
+    menuButton.style.display = "block";  // ← نمایش دکمه منو ☰
+    nftButton.style.display = "flex";    // ← نمایش دکمه NFT
+
+    // اگه از گیم اور اومده بودیم، گیم اور برگرده
     if (gameOver.dataset.wasVisible === 'true') {
         gameOver.style.display = 'flex';
         gameOver.dataset.wasVisible = 'false';
     }
 }
-
 function applySeasonToUI() {
     const season = getSeasonConfig();
     const fa = language === 'fa';
