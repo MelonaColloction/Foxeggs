@@ -122,6 +122,38 @@ canvas {
     pointer-events:auto;
 }
 
+#nftButton {
+    position:fixed;
+    top:68px;
+    left:12px;
+    z-index:99999;
+    height:48px;
+    padding:0 18px;
+    font-size:15px;
+    font-weight:bold;
+    background:linear-gradient(135deg,#a855f7,#ec4899);
+    box-shadow:0 4px #7e22ce;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    cursor:pointer;
+    color:white;
+    border:none;
+    pointer-events:auto;
+    transition:all 0.2s ease;
+}
+
+#nftButton:hover {
+    transform:scale(1.05);
+}
+
+#nftButton:active {
+    transform:translateY(3px);
+    box-shadow:0 1px #7e22ce;
+}
+
 #menuPanel {
     position:fixed;
     top:68px;
@@ -620,6 +652,74 @@ button:active {
     margin-bottom:2px;
 }
 
+#nftModal {
+    position:fixed;
+    inset:0;
+    z-index:100003;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+    padding:20px;
+    animation:fadeInUp 0.3s ease;
+}
+
+#nftModal > div {
+    background:linear-gradient(135deg,#1a1a2e,#2a1a3e);
+    padding:30px 25px;
+    border-radius:24px;
+    max-width:420px;
+    width:100%;
+    max-height:85vh;
+    overflow-y:auto;
+    border:1px solid rgba(168,85,247,0.3);
+    box-shadow:0 20px 60px rgba(168,85,247,0.3);
+    position:relative;
+}
+
+#closeNftModal {
+    position:absolute;
+    top:12px;
+    right:16px;
+    background:none;
+    border:none;
+    color:rgba(255,255,255,0.4);
+    font-size:24px;
+    cursor:pointer;
+    padding:4px 8px;
+    line-height:1;
+    transition:all 0.3s ease;
+}
+
+#closeNftModal:hover {
+    color:rgba(255,255,255,0.9);
+    transform:rotate(90deg);
+}
+
+#nftChannelLink {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    background:rgba(168,85,247,0.15);
+    border:2px solid #a855f7;
+    border-radius:14px;
+    padding:12px 20px;
+    color:white;
+    font-size:15px;
+    font-weight:bold;
+    text-decoration:none;
+    margin-top:20px;
+    transition:all 0.3s ease;
+}
+
+#nftChannelLink:hover {
+    background:#a855f7;
+    transform:scale(1.02);
+}
+
 @media (max-height:700px) {
     .logo {font-size:48px !important;margin-bottom:5px !important;}
     h1 {font-size:32px !important;}
@@ -655,7 +755,6 @@ button:active {
 }
 </style>
 </head>
-
 <body>
 
 <div id="game">
@@ -691,6 +790,11 @@ button:active {
 </div>
 
 <button id="menuButton">☰</button>
+
+<button id="nftButton">
+    <span style="font-size:20px;">🎁</span>
+    <span id="nftButtonText">NFT</span>
+</button>
 
 <div id="menuPanel">
     <h2 id="menuTitle">Menu</h2>
@@ -891,6 +995,21 @@ button:active {
     </div>
 </div>
 
+<div id="nftModal">
+    <div>
+        <button id="closeNftModal">✕</button>
+        <div style="text-align:center;margin-bottom:20px;">
+            <div style="font-size:60px;margin-bottom:8px;">🎁</div>
+            <h2 id="nftTitle" style="color:white;font-size:20px;margin-bottom:4px;">NFTهای Fox Eggs</h2>
+        </div>
+        <div id="nftContent" style="color:#e0e0e0;font-size:14px;line-height:1.9;text-align:left;"></div>
+        <a href="https://t.me/foxeggs_farsi" target="_blank" id="nftChannelLink">
+            <span style="font-size:22px;">✈️</span>
+            <span id="nftChannelText">عضویت در کانال تلگرام</span>
+        </a>
+    </div>
+</div>
+
 <div id="noInternetOverlay">
     <div class="box">
         <div class="icon">📡</div>
@@ -903,7 +1022,7 @@ button:active {
 <div id="toast" style="display:none;"></div>
 
 <script>
-  // ============================================================
+    // ============================================================
 // کد کامل بازی Fox Eggs - نسخه فصلی
 // ============================================================
 
@@ -951,6 +1070,8 @@ const recordText = document.getElementById("record");
 const startButton = document.getElementById("start");
 const restartButton = document.getElementById("restart");
 const menuButton = document.getElementById("menuButton");
+const nftButton = document.getElementById("nftButton");
+const nftButtonText = document.getElementById("nftButtonText");
 const menuPanel = document.getElementById("menuPanel");
 const gamesValue = document.getElementById("gamesValue");
 const walletBest = document.getElementById("walletBest");
@@ -975,8 +1096,23 @@ const shieldTimerItem = document.getElementById('shieldTimer');
 const speedTimerItem = document.getElementById('speedTimer');
 const noInternetOverlay = document.getElementById('noInternetOverlay');
 const retryBtn = document.getElementById('retryBtn');
+const nftModal = document.getElementById('nftModal');
+const closeNftModal = document.getElementById('closeNftModal');
+const nftTitle = document.getElementById('nftTitle');
+const nftContent = document.getElementById('nftContent');
+const nftChannelText = document.getElementById('nftChannelText');
 
 const WEBHOOK_URL = "https://benula-webhook-production.up.railway.app";
+
+// لینک کانال‌های تلگرام بر اساس زبان
+const TELEGRAM_CHANNELS = {
+    fa: 'https://t.me/foxeggs_farsi',
+    en: 'https://t.me/foxeggs'
+};
+
+function getChannelUrl() {
+    return language === 'fa' ? TELEGRAM_CHANNELS.fa : TELEGRAM_CHANNELS.en;
+}
 
 // ============================================================
 // بخش ۳: سیستم فصل‌ها
@@ -1049,24 +1185,11 @@ function getSeasonConfig() {
 }
 
 // ============================================================
-// بخش ۴: پالت‌های فصلی - ۱۲ تم × ۴ فصل = ۴۸ پالت
-// ساختار هر پالت:
-//   skyDay     : [رنگ۱، رنگ۲، رنگ۳] گرادیان آسمان روز
-//   skyNight   : [رنگ۱، رنگ۲، رنگ۳] گرادیان آسمان شب
-//   groundDay  : [رنگ۱، رنگ۲، رنگ۳] گرادیان زمین روز
-//   groundNight: [رنگ۱، رنگ۲، رنگ۳] گرادیان زمین شب
-//   sun        : رنگ خورشید/ماه
-//   tree       : { trunk، main، light، dark } رنگ درخت
-//   rock       : رنگ سنگ (نئونی برای وضوح)
-//   cactus     : رنگ کاکتوس (نئونی برای وضوح)
-//   skyStars   : رنگ ستاره‌ها (فقط برای تم‌های شبانه)
+// بخش ۴: پالت‌های فصلی - ۱۲ تم × ۴ فصل
 // ============================================================
 
 const THEME_PALETTES = {
 
-    // ============================================================
-    // CLASSIC - کلاسیک
-    // ============================================================
     classic: {
         spring: {
             skyDay:     ['#ffd6e8','#ffe0ec','#ffeaf2'],
@@ -1114,9 +1237,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // CITY - شهری
-    // ============================================================
     city: {
         spring: {
             skyDay:     ['#d8d0d8','#e0d8e0','#e8e0e8'],
@@ -1164,9 +1284,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // BEACH - ساحلی
-    // ============================================================
     beach: {
         spring: {
             skyDay:     ['#a8d8f0','#c0e0f5','#d8e8fa'],
@@ -1214,9 +1331,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // FOREST - جنگلی
-    // ============================================================
     forest: {
         spring: {
             skyDay:     ['#c8e0c8','#d8e8d8','#e8f0e8'],
@@ -1264,9 +1378,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // SPACE - فضایی
-    // ============================================================
     space: {
         spring: {
             skyDay:     ['#3a1a5a','#4a2a6a','#5a3a7a'],
@@ -1314,9 +1425,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // NIGHT - شب
-    // ============================================================
     night: {
         spring: {
             skyDay:     ['#3a2a4e','#4a3a5e','#5a4a6e'],
@@ -1364,9 +1472,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // VOLCANO - آتشفشانی
-    // ============================================================
     volcano: {
         spring: {
             skyDay:     ['#6a3a2a','#7a4a3a','#8a5a4a'],
@@ -1414,9 +1519,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // OCEAN - اقیانوسی
-    // ============================================================
     ocean: {
         spring: {
             skyDay:     ['#6ac8d8','#8ad0e0','#aad8e8'],
@@ -1464,9 +1566,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // DESERT - صحرایی
-    // ============================================================
     desert: {
         spring: {
             skyDay:     ['#f5c090','#f8d0a8','#fbe0c0'],
@@ -1514,9 +1613,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // MAGIC - جادویی
-    // ============================================================
     magic: {
         spring: {
             skyDay:     ['#d8a8c8','#e0b8d8','#e8c8e8'],
@@ -1564,9 +1660,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // TOON - کارتونی
-    // ============================================================
     toon: {
         spring: {
             skyDay:     ['#ffd6e8','#ffe0ec','#ffeaf2'],
@@ -1614,9 +1707,6 @@ const THEME_PALETTES = {
         }
     },
 
-    // ============================================================
-    // CYBERPUNK - سایبرپانک
-    // ============================================================
     cyberpunk: {
         spring: {
             skyDay:     ['#4a1a4a','#5a2a5a','#6a3a6a'],
@@ -1707,6 +1797,7 @@ function getSunColor() {
 function getSkyStarsColor() {
     return getTheme().skyStars || 'rgba(255,255,255,0.2)';
 }
+
 // ============================================================
 // بخش ۶: نام‌ها و آیکون‌های فصلی تم‌ها
 // ============================================================
@@ -2083,7 +2174,6 @@ function getRarityLabel(rarity) {
     return labels[rarity] ? (language === 'fa' ? labels[rarity].fa : labels[rarity].en) : rarity;
 }
 
-// رنگ تخم‌ها - همیشه نئونی ثابت برای وضوح در همه تم‌ها و فصل‌ها
 const NEON_EGG_COLORS = [
     ["#ffffff", 1],
     ["#00ff88", 2],
@@ -2150,6 +2240,7 @@ function showToast(msg) {
         setTimeout(() => { toast.style.display = 'none'; }, 300);
     }, 2500);
 }
+
 // ============================================================
 // بخش ۱۱: سیستم صدا
 // ============================================================
@@ -2641,6 +2732,7 @@ function drawParticles() {
     }
     ctx.globalAlpha = 1;
 }
+
 // ============================================================
 // بخش ۱۴: رسم پس‌زمینه
 // ============================================================
@@ -2651,7 +2743,6 @@ function drawBackground() {
     const skyColors = getSkyColors(isNight);
     const isSpace = currentTheme === 'space';
 
-    // --- آسمان (گرادیان) ---
     const gradient = ctx.createLinearGradient(0, 0, 0, gy);
     gradient.addColorStop(0, skyColors[0]);
     gradient.addColorStop(0.5, skyColors[1]);
@@ -2659,7 +2750,6 @@ function drawBackground() {
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, W, gy);
 
-    // --- افکت فضایی: سحابی ---
     if (isSpace) {
         ctx.fillStyle = "rgba(150,100,200,0.05)";
         ctx.beginPath();
@@ -2682,17 +2772,14 @@ function drawBackground() {
         }
     }
 
-    // --- خورشید یا ماه ---
     const sunColor = getSunColor();
 
     if (isNight) {
-        // ماه
         ctx.fillStyle = isSpace ? "rgba(255,240,220,0.1)" : "rgba(255,240,220,0.15)";
         ctx.beginPath();
         ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
         ctx.fill();
 
-        // ستاره‌ها
         const starColor = getSkyStarsColor();
         ctx.fillStyle = starColor;
         const starCount = isSpace ? 20 : 10;
@@ -2705,7 +2792,6 @@ function drawBackground() {
             ctx.fill();
         }
 
-        // ستاره‌های چشمک‌زن در فضا
         if (isSpace) {
             const t = Date.now() / 1000;
             for (let i = 0; i < 5; i++) {
@@ -2719,13 +2805,11 @@ function drawBackground() {
             }
         }
     } else {
-        // خورشید
         ctx.fillStyle = sunColor;
         ctx.beginPath();
         ctx.arc(W - 90, 90, isSpace ? 30 : 35, 0, Math.PI * 2);
         ctx.fill();
 
-        // ابرها
         if (!isSpace) {
             ctx.fillStyle = "rgba(255,255,255,0.25)";
             drawCloud(120, 100, 1);
@@ -2734,7 +2818,6 @@ function drawBackground() {
         }
     }
 
-    // --- زمین (گرادیان) ---
     const groundColors = getGroundColors(isNight);
     const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
     groundGrad.addColorStop(0, groundColors[0]);
@@ -2743,11 +2826,9 @@ function drawBackground() {
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, gy, W, H - gy);
 
-    // خط جداکننده افق
     ctx.fillStyle = isNight ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
     ctx.fillRect(0, gy, W, 3);
 
-    // --- سنگ‌های فضایی روی زمین ---
     if (isSpace) {
         for (let i = 0; i < 3; i++) {
             const x = (i * 87 + 23) % W;
@@ -2803,7 +2884,10 @@ function drawPowerup(p) {
 }
 
 // ============================================================
-// بخش ۱۶: رسم روباه (بدون تغییر فصل)
+// پایان پیام ۳
+// ============================================================
+// ============================================================
+// بخش ۱۶: رسم روباه
 // ============================================================
 
 function drawFox() {
@@ -2813,13 +2897,11 @@ function drawFox() {
     const isSpace = currentTheme === 'space';
     const skin = getSkin(currentSkinId);
 
-    // سایه زیر روباه
     ctx.fillStyle = isSpace ? "rgba(100,80,150,0.15)" : "rgba(0,0,0,.12)";
     ctx.beginPath();
     ctx.ellipse(x + 30, ground() + 3, 28, 6, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // رنگ روباه (بر اساس اسکین)
     let foxColor = skin.color;
     let trailColor = skin.trailColor || 'rgba(249,115,22,0.25)';
 
@@ -2829,13 +2911,11 @@ function drawFox() {
         trailColor = `hsla(${hue}, 80%, 60%, 0.2)`;
     }
 
-    // ذرات دنباله
     if (playing && fox.grounded && particles.length < MAX_PARTICLES) {
         createTrailParticle(x - 2, y + 22, trailColor);
         createTrailParticle(x - 6, y + 28, trailColor);
     }
 
-    // دُم
     ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.moveTo(x + 15, y + 28);
@@ -2843,7 +2923,6 @@ function drawFox() {
     ctx.quadraticCurveTo(x + 5, y + 5, x + 20, y + 23);
     ctx.fill();
 
-    // نوک سفید دُم
     ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
     ctx.moveTo(x - 10, y - 10 + running);
@@ -2851,36 +2930,30 @@ function drawFox() {
     ctx.quadraticCurveTo(x - 5, y + 5, x + 1, y + 7);
     ctx.fill();
 
-    // بدن
     ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.ellipse(x + 29, y + 29, 27, 18, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // شکم سفید
     ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
     ctx.ellipse(x + 34, y + 31, 14, 10, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // پاها
     ctx.fillStyle = isSpace ? "#9a7aba" : "#b86b3a";
     ctx.fillRect(x + 14, y + 39 + running, 10, 11);
     ctx.fillRect(x + 39, y + 39 - running, 10, 11);
 
-    // سر
     ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.ellipse(x + 43, y + 18, 16, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // پوزه
     ctx.fillStyle = isSpace ? "#9a7aba" : "#c47a3a";
     ctx.beginPath();
     ctx.ellipse(x + 52, y + 8, 21, 17, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // گوش‌ها
     ctx.fillStyle = foxColor;
     ctx.beginPath();
     ctx.moveTo(x + 38, y - 3);
@@ -2896,7 +2969,6 @@ function drawFox() {
     ctx.closePath();
     ctx.fill();
 
-    // داخل گوش
     ctx.fillStyle = isSpace ? "#c8b8e0" : "#f5cba0";
     ctx.beginPath();
     ctx.moveTo(x + 41, y - 6);
@@ -2905,13 +2977,11 @@ function drawFox() {
     ctx.closePath();
     ctx.fill();
 
-    // پوزه سفید
     ctx.fillStyle = isSpace ? "#d8c8f0" : "#f5e6d0";
     ctx.beginPath();
     ctx.ellipse(x + 67, y + 13, 12, 8, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // چشم‌ها
     ctx.fillStyle = skin.eyeColor || "#1a1a2a";
     ctx.beginPath();
     ctx.arc(x + 75, y + 10, 3.5, 0, Math.PI * 2);
@@ -2920,7 +2990,6 @@ function drawFox() {
     ctx.arc(x + 58, y + 5, 3.5, 0, Math.PI * 2);
     ctx.fill();
 
-    // برق چشم
     ctx.fillStyle = isSpace ? "#ccffdd" : "#fff";
     ctx.beginPath();
     ctx.arc(x + 59, y + 4, 1.2, 0, Math.PI * 2);
@@ -2928,14 +2997,13 @@ function drawFox() {
 }
 
 // ============================================================
-// بخش ۱۷: رسم تخم (نئونی ثابت برای وضوح)
+// بخش ۱۷: رسم تخم
 // ============================================================
 
 function drawEgg(e) {
     const cx = e.x + e.w / 2;
     const isSpace = currentTheme === 'space';
 
-    // بدنه تخم
     ctx.fillStyle = e.color;
     ctx.beginPath();
     ctx.moveTo(cx, e.y);
@@ -2943,13 +3011,11 @@ function drawEgg(e) {
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
 
-    // هایلایت براق
     ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.beginPath();
     ctx.ellipse(cx - e.w * 0.15, e.y + e.h * 0.28, e.w * 0.16, e.h * 0.18, -0.3, 0, Math.PI * 2);
     ctx.fill();
 
-    // خط تزئینی
     ctx.strokeStyle = isSpace ? "rgba(200,180,255,0.25)" : "rgba(255,255,255,0.35)";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -2959,7 +3025,7 @@ function drawEgg(e) {
 }
 
 // ============================================================
-// بخش ۱۸: رسم موانع (رنگ‌ها با تم + فصل عوض می‌شن)
+// بخش ۱۸: رسم موانع
 // ============================================================
 
 function drawObstacle(o) {
@@ -2969,13 +3035,9 @@ function drawObstacle(o) {
     const cactusColor = getCactusColor();
 
     if (o.type === "tree") {
-        // درخت با رنگ‌های فصلی مخصوص تم
-
-        // تنه درخت (همیشه قهوه‌ای تیره)
         ctx.fillStyle = treeColors.trunk;
         ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
 
-        // برگ‌ها - لایه پایین (تیره)
         ctx.fillStyle = treeColors.dark;
         ctx.beginPath();
         ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
@@ -2984,25 +3046,21 @@ function drawObstacle(o) {
         ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
         ctx.fill();
 
-        // برگ‌ها - لایه میانی (اصلی)
         ctx.fillStyle = treeColors.main;
         ctx.beginPath();
         ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
         ctx.fill();
 
-        // برگ‌ها - هایلایت (روشن)
         ctx.fillStyle = treeColors.light;
         ctx.beginPath();
         ctx.arc(o.x + 18, o.y + 14, 10, 0, Math.PI * 2);
         ctx.fill();
 
-        // هایلایت درخشان اضافه برای وضوح
         ctx.fillStyle = 'rgba(255,255,255,0.35)';
         ctx.beginPath();
         ctx.arc(o.x + 20, o.y + 12, 5, 0, Math.PI * 2);
         ctx.fill();
 
-        // اگر زمستان است، برف روی درخت
         if (currentSeason === 'winter') {
             ctx.fillStyle = isNight ? 'rgba(200,220,240,0.85)' : 'rgba(255,255,255,0.95)';
             ctx.beginPath();
@@ -3021,7 +3079,6 @@ function drawObstacle(o) {
             ctx.fill();
         }
 
-        // اگر بهار است، چند گل کوچک روی درخت
         if (currentSeason === 'spring' && !isSpace) {
             ctx.fillStyle = '#ffeb3b';
             ctx.beginPath();
@@ -3036,8 +3093,6 @@ function drawObstacle(o) {
         }
 
     } else if (o.type === "rock") {
-        // سنگ - با رنگ مخصوص تم+فصل (نئونی برای وضوح)
-
         ctx.fillStyle = rockColor;
         ctx.beginPath();
         ctx.moveTo(o.x, o.y + o.h);
@@ -3048,7 +3103,6 @@ function drawObstacle(o) {
         ctx.closePath();
         ctx.fill();
 
-        // هایلایت روشن
         ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.beginPath();
         ctx.moveTo(o.x + 12, o.y + 12);
@@ -3057,7 +3111,6 @@ function drawObstacle(o) {
         ctx.closePath();
         ctx.fill();
 
-        // سایه تیره
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.beginPath();
         ctx.moveTo(o.x + o.w - 8, o.y + o.h);
@@ -3067,26 +3120,21 @@ function drawObstacle(o) {
         ctx.fill();
 
     } else {
-        // کاکتوس - با رنگ مخصوص تم+فصل (نئونی برای وضوح)
-
         ctx.fillStyle = cactusColor;
         ctx.fillRect(o.x + 9, o.y, 14, o.h);
         ctx.fillRect(o.x, o.y + 20, 13, 11);
         ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
 
-        // هایلایت روشن
         ctx.fillStyle = 'rgba(255,255,255,0.5)';
         ctx.fillRect(o.x + 10, o.y + 2, 4, o.h - 4);
         ctx.fillRect(o.x + 2, o.y + 22, 3, 7);
         ctx.fillRect(o.x + 22, o.y + 40, 3, 7);
 
-        // سایه تیره
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.fillRect(o.x + 19, o.y, 4, o.h);
         ctx.fillRect(o.x + 10, o.y + 20, 3, 11);
         ctx.fillRect(o.x + 30, o.y + 38, 3, 11);
 
-        // اگر بهار است، گل کوچک روی کاکتوس
         if (currentSeason === 'spring') {
             ctx.fillStyle = '#ff6fa8';
             ctx.beginPath();
@@ -3113,6 +3161,7 @@ function draw() {
     drawParticles();
     drawFox();
 }
+
 // ============================================================
 // بخش ۲۰: منطق بازی
 // ============================================================
@@ -3215,7 +3264,6 @@ function collectEgg(e) {
         comboValue.textContent = combo;
     }
 
-    // رنگ انفجار بر اساس اسکین
     const skin = getSkin(currentSkinId);
     let burstColor = skin.color;
     if (skin.id === 'rainbow') {
@@ -3276,7 +3324,6 @@ function update(dt) {
     gameTime += dt;
     updateSpeed();
 
-    // حرکت روباه
     fox.vy += fox.gravity * dt;
     fox.y += fox.vy * dt;
     if (fox.y + fox.h >= ground()) {
@@ -3288,14 +3335,12 @@ function update(dt) {
 
     updateDayNight();
 
-    // تولید تخم
     eggTimer -= dt;
     if (eggTimer <= 0) {
         createEgg();
         eggTimer = .55 + Math.random() * .4;
     }
 
-    // حرکت تخم‌ها
     for (let i = eggs.length - 1; i >= 0; i--) {
         const e = eggs[i];
         e.x -= speed * dt;
@@ -3307,14 +3352,12 @@ function update(dt) {
         if (e.x < -60) eggs.splice(i, 1);
     }
 
-    // تولید موانع
     obstacleTimer -= dt;
     if (obstacleTimer <= 0) {
         createObstacle();
         obstacleTimer = 1.05 + Math.random() * .55;
     }
 
-    // حرکت موانع
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const o = obstacles[i];
         o.x -= speed * dt;
@@ -3332,14 +3375,12 @@ function update(dt) {
         if (o.x < -80) obstacles.splice(i, 1);
     }
 
-    // تولید پاورآپ
     powerupTimerValue -= dt;
     if (powerupTimerValue <= 0) {
         trySpawnPowerup();
         powerupTimerValue = 2 + Math.random() * 3;
     }
 
-    // حرکت پاورآپ‌ها
     for (let i = powerups.length - 1; i >= 0; i--) {
         const p = powerups[i];
         p.x -= speed * dt;
@@ -3351,7 +3392,6 @@ function update(dt) {
         if (p.x < -60) powerups.splice(i, 1);
     }
 
-    // تایمر پاورآپ‌ها
     if (shieldActive) {
         shieldTimer -= dt;
         if (shieldTimer <= 0) {
@@ -3371,7 +3411,6 @@ function update(dt) {
     document.getElementById('shieldIndicator').style.display = shieldActive ? 'block' : 'none';
     document.getElementById('speedIndicator').style.display = speedBoostActive ? 'block' : 'none';
 
-    // کمبو
     if (combo > 0) {
         comboTimer -= dt;
         if (comboTimer <= 0) {
@@ -3438,6 +3477,7 @@ function startGame() {
 
     playing = true;
     menuButton.style.display = "none";
+    nftButton.style.display = "none";
     menuPanel.style.display = "none";
     startScreen.style.display = "none";
     gameOver.style.display = "none";
@@ -3467,6 +3507,7 @@ function endGame() {
     menuButton.style.display = "block";
     menuButton.style.zIndex = "99999";
     menuButton.style.position = "fixed";
+    nftButton.style.display = "flex";
     gameOver.style.display = "flex";
     powerupTimer.classList.add('hidden');
 }
@@ -3772,6 +3813,7 @@ function applyLanguage() {
     updateThemeUI();
     renderSkinShop();
     updateChannelPopup();
+    updateNftUI();
 }
 
 function setLanguage(lang) {
@@ -3779,6 +3821,7 @@ function setLanguage(lang) {
     localStorage.setItem("foxLanguage", lang);
     applyLanguage();
     menuPanel.style.display = "none";
+    nftButton.style.display = "flex";
 
     const prompt = document.getElementById('referralPrompt');
     if (prompt) {
@@ -3830,6 +3873,10 @@ function showChannelPopup() {
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
     document.getElementById('channelIcon').textContent = season.logo;
 
+    // لینک کانال بر اساس زبان
+    const channelLink = document.getElementById('channelLink');
+    if (channelLink) channelLink.href = getChannelUrl();
+
     const box = document.querySelector('#channelPopup .box');
     box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
     box.style.textAlign = 'center';
@@ -3859,12 +3906,111 @@ function updateChannelPopup() {
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
     document.getElementById('channelIcon').textContent = season.logo;
 
+    // لینک کانال بر اساس زبان
+    const channelLink = document.getElementById('channelLink');
+    if (channelLink) channelLink.href = getChannelUrl();
+
     const box = document.querySelector('#channelPopup .box');
     box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
 }
 
 // ============================================================
-// بخش ۲۳: رویدادها
+// بخش ۲۳: NFT Modal
+// ============================================================
+
+const NFT_CONTENT = {
+    fa: {
+        title: '🎁 درباره NFTهای Fox Eggs',
+        channelText: '✈️ عضویت در کانال تلگرام',
+        content: `
+            <p style="margin-bottom:16px;">توی Fox Eggs، به کاربرانی که به دستاوردهای مشخصی می‌رسند، یک NFT یادبود به عنوان نشان افتخار اهدا می‌شود.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💎 NFT چیه؟</p>
+            <p style="margin-bottom:16px;">NFT یه نوع دارایی دیجیتال منحصربه‌فرده که نشون می‌ده شما به یه دستاورد خاص توی بازی رسیدید.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">🎯 چطور دریافتش کنم؟</p>
+            <p style="margin-bottom:16px;">شرایط دریافت NFT به‌صورت دوره‌ای و بر اساس رویدادهای فصلی اعلام می‌شود. برای اطلاع از شرایط فعلی، به کانال تلگرام Fox Eggs مراجعه کنید.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💰 آیا هزینه‌ای داره؟</p>
+            <p style="margin-bottom:16px;">خیر — کاملاً رایگانه و هیچ پرداخت مالی درون بازی وجود نداره.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">📊 آیا ارزش مالی داره؟</p>
+            <p style="margin-bottom:0;">NFTها صرفاً جنبه‌ی یادبودی و کلکسیونی دارند و هیچ ارزش مالی تضمین‌شده‌ای ندارند.</p>
+        `
+    },
+    en: {
+        title: '🎁 About Fox Eggs NFTs',
+        channelText: '✈️ Join Telegram Channel',
+        content: `
+            <p style="margin-bottom:16px;">In Fox Eggs, users who reach certain achievements are awarded a commemorative NFT as a badge of honor.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💎 What is an NFT?</p>
+            <p style="margin-bottom:16px;">An NFT is a unique digital asset that proves you reached a specific achievement in the game.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">🎯 How do I get one?</p>
+            <p style="margin-bottom:16px;">NFT distribution conditions are announced periodically based on seasonal events. To learn about current conditions, visit the Fox Eggs Telegram channel.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💰 Does it cost anything?</p>
+            <p style="margin-bottom:16px;">No — it's completely free and there are no in-game payments.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">📊 Does it have monetary value?</p>
+            <p style="margin-bottom:0;">NFTs are purely commemorative and collectible, with no guaranteed monetary value.</p>
+        `
+    }
+};
+
+function updateNftUI() {
+    const fa = language === 'fa';
+    const data = fa ? NFT_CONTENT.fa : NFT_CONTENT.en;
+
+    if (nftTitle) nftTitle.textContent = data.title;
+    if (nftContent) nftContent.innerHTML = data.content;
+    if (nftChannelText) nftChannelText.textContent = data.channelText;
+    if (nftButtonText) nftButtonText.textContent = 'NFT';
+
+    // لینک کانال NFT بر اساس زبان
+    const nftLink = document.getElementById('nftChannelLink');
+    if (nftLink) nftLink.href = getChannelUrl();
+
+    if (nftContent) {
+        nftContent.style.direction = fa ? 'rtl' : 'ltr';
+        nftContent.style.textAlign = fa ? 'right' : 'left';
+    }
+    const modalBox = document.querySelector('#nftModal > div');
+    if (modalBox) modalBox.style.direction = fa ? 'rtl' : 'ltr';
+}
+
+function openNftModal() {
+    if (!nftModal) return;
+    updateNftUI();
+    nftModal.style.display = 'flex';
+}
+
+function closeNftModalFn() {
+    if (nftModal) nftModal.style.display = 'none';
+}
+
+function initNftEvents() {
+    if (nftButton) {
+        nftButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openNftModal();
+        });
+    }
+    if (closeNftModal) {
+        closeNftModal.addEventListener('click', closeNftModalFn);
+    }
+    if (nftModal) {
+        nftModal.addEventListener('click', function(e) {
+            if (e.target === nftModal) closeNftModalFn();
+        });
+    }
+
+    updateNftUI();
+}
+
+// ============================================================
+// بخش ۲۴: رویدادها
 // ============================================================
 
 window.addEventListener("online", function() { checkInternet(); });
@@ -3891,8 +4037,9 @@ window.addEventListener("keydown", function(e) {
         e.preventDefault();
         handleInput();
     }
-    if (e.code === "Escape" && themeSelectorOverlay.style.display === 'flex') {
-        closeThemeSelectorFn();
+    if (e.code === "Escape") {
+        if (themeSelectorOverlay.style.display === 'flex') closeThemeSelectorFn();
+        if (nftModal && nftModal.style.display === 'flex') closeNftModalFn();
     }
 });
 
@@ -3926,8 +4073,10 @@ menuButton.addEventListener("click", function(e) {
     if (playing) return;
     if (menuPanel.style.display === "block") {
         menuPanel.style.display = "none";
+        nftButton.style.display = "flex";   // نمایش دکمه NFT وقتی منو بسته شد
     } else {
         menuPanel.style.display = "block";
+        nftButton.style.display = "none";   // مخفی کردن دکمه NFT وقتی منو باز شد
         updateUI();
         renderSkinShop();
         syncReferralsWithServer().then(() => {
@@ -3968,6 +4117,7 @@ openThemeStartBtn.addEventListener("click", function(e) {
 openThemeFromMenu.addEventListener("click", function(e) {
     e.stopPropagation();
     menuPanel.style.display = "none";
+    nftButton.style.display = "flex";   // نمایش دکمه NFT وقتی منو بسته شد
     openThemeSelector();
 });
 
@@ -3988,8 +4138,9 @@ document.getElementById('closeChannelBtn').addEventListener('click', function(e)
 document.getElementById('channelPopup').addEventListener('click', function(e) {
     if (e.target === this) closeChannelPopup();
 });
+
 // ============================================================
-// بخش ۲۴: راه‌اندازی اولیه
+// بخش ۲۵: راه‌اندازی اولیه
 // ============================================================
 
 currentSeason = getCurrentSeason();
@@ -4000,26 +4151,27 @@ resetFox();
 
 menuButton.style.zIndex = "99999";
 menuButton.style.position = "fixed";
+nftButton.style.zIndex = "99999";
+nftButton.style.position = "fixed";
 
 const savedTheme = localStorage.getItem("foxTheme") || "classic";
 setTheme(savedTheme);
 
-// رسم اولیه پس‌زمینه
 ctx.fillStyle = "#87CEEB";
 ctx.fillRect(0, 0, W, H);
 drawBackground();
 drawFox();
 
-// راه‌اندازی کد دعوت
 showReferralDataFromCache();
 renderSkinShop();
 powerupTimer.classList.add('hidden');
 
+initNftEvents();
+
 // ============================================================
-// بخش ۲۵: تایمرها و راه‌اندازی تعاملی
+// بخش ۲۶: تایمرها و راه‌اندازی تعاملی
 // ============================================================
 
-// نمایش پاپ‌آپ‌های اولیه بعد از نیم ثانیه
 setTimeout(() => {
     if (!playing && startScreen.style.display !== 'none') {
         showChannelPopup();
@@ -4031,7 +4183,6 @@ setTimeout(() => {
     }
 }, 500);
 
-// همگام‌سازی اولیه با سرور
 setTimeout(() => {
     if (navigator.onLine) {
         syncReferralsWithServer().then(() => {
@@ -4040,12 +4191,10 @@ setTimeout(() => {
     }
 }, 1000);
 
-// بررسی اینترنت اولیه
 setTimeout(() => {
     checkInternet();
 }, 300);
 
-// بررسی دوره‌ای اینترنت (هر ۱۰ ثانیه)
 setInterval(() => {
     if (navigator.onLine && noInternetOverlay.style.display === 'flex') {
         checkInternet();
@@ -4054,12 +4203,10 @@ setInterval(() => {
     }
 }, 10000);
 
-// بررسی فصل هر ۱ دقیقه
 setInterval(() => {
     refreshSeason();
 }, 60 * 1000);
 
-// بررسی مضاعف فصل هر ۵ دقیقه
 setInterval(() => {
     if (getCurrentSeason() !== currentSeason) refreshSeason();
 }, 5 * 60 * 1000);
