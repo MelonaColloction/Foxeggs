@@ -131,13 +131,12 @@ canvas {
     padding:0 18px;
     font-size:15px;
     font-weight:bold;
-    background:linear-gradient(135deg,#a855f7,#ec4899);
-    box-shadow:0 4px #7e22ce;
+    background:rgba(0,0,0,.35);
+    box-shadow:none;
     border-radius:12px;
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:8px;
     cursor:pointer;
     color:white;
     border:none;
@@ -145,14 +144,8 @@ canvas {
     transition:all 0.2s ease;
 }
 
-#nftButton:hover {
-    transform:scale(1.05);
-}
-
-#nftButton:active {
-    transform:translateY(3px);
-    box-shadow:0 1px #7e22ce;
-}
+#nftButton:hover {transform:scale(1.05);}
+#nftButton:active {transform:scale(0.95);}
 
 #menuPanel {
     position:fixed;
@@ -792,7 +785,6 @@ button:active {
 <button id="menuButton">☰</button>
 
 <button id="nftButton">
-    <span style="font-size:20px;">🎁</span>
     <span id="nftButtonText">NFT</span>
 </button>
 
@@ -876,64 +868,64 @@ button:active {
         <p class="subtitle" id="themeSelectorSub">Choose your adventure style</p>
         <div class="theme-grid" id="themeGrid">
             <div class="theme-option active" data-theme="classic">
-                <span class="icon">🍂</span>
-                <div class="name" id="themeNameClassic">Autumn</div>
-                <div class="desc" id="themeDescClassic">Golden autumn</div>
+                <span class="icon">🌷</span>
+                <div class="name" id="themeNameClassic">Classic</div>
+                <div class="desc" id="themeDescClassic">Original theme</div>
             </div>
             <div class="theme-option" data-theme="city">
                 <span class="icon">🏙️</span>
-                <div class="name" id="themeNameCity">Urban Autumn</div>
-                <div class="desc" id="themeDescCity">City in fall</div>
+                <div class="name" id="themeNameCity">City</div>
+                <div class="desc" id="themeDescCity">Urban streets</div>
             </div>
             <div class="theme-option" data-theme="beach">
                 <span class="icon">🏖️</span>
-                <div class="name" id="themeNameBeach">Autumn Shore</div>
-                <div class="desc" id="themeDescBeach">Fall by the sea</div>
+                <div class="name" id="themeNameBeach">Beach</div>
+                <div class="desc" id="themeDescBeach">Sun & sand</div>
             </div>
             <div class="theme-option" data-theme="forest">
-                <span class="icon">🍁</span>
-                <div class="name" id="themeNameForest">Falling Forest</div>
-                <div class="desc" id="themeDescForest">Autumn woods</div>
+                <span class="icon">🌲</span>
+                <div class="name" id="themeNameForest">Forest</div>
+                <div class="desc" id="themeDescForest">Deep woods</div>
             </div>
             <div class="theme-option" data-theme="space">
-                <span class="icon">🌌</span>
-                <div class="name" id="themeNameSpace">Cosmic Fall</div>
-                <div class="desc" id="themeDescSpace">Autumn galaxy</div>
+                <span class="icon">🚀</span>
+                <div class="name" id="themeNameSpace">Space</div>
+                <div class="desc" id="themeDescSpace">Galaxy fox</div>
             </div>
             <div class="theme-option" data-theme="night">
                 <span class="icon">🌙</span>
-                <div class="name" id="themeNameNight">Autumn Night</div>
-                <div class="desc" id="themeDescNight">Dark autumn</div>
+                <div class="name" id="themeNameNight">Night</div>
+                <div class="desc" id="themeDescNight">Dark & stars</div>
             </div>
             <div class="theme-option" data-theme="volcano">
                 <span class="icon">🌋</span>
-                <div class="name" id="themeNameVolcano">Ember Fall</div>
-                <div class="desc" id="themeDescVolcano">Fire & autumn</div>
+                <div class="name" id="themeNameVolcano">Volcano</div>
+                <div class="desc" id="themeDescVolcano">Lava & fire</div>
             </div>
             <div class="theme-option" data-theme="ocean">
                 <span class="icon">🌊</span>
-                <div class="name" id="themeNameOcean">Autumn Tide</div>
-                <div class="desc" id="themeDescOcean">Fall on waves</div>
+                <div class="name" id="themeNameOcean">Ocean</div>
+                <div class="desc" id="themeDescOcean">Deep blue sea</div>
             </div>
             <div class="theme-option" data-theme="desert">
                 <span class="icon">🏜️</span>
-                <div class="name" id="themeNameDesert">Golden Fall</div>
-                <div class="desc" id="themeDescDesert">Desert autumn</div>
+                <div class="name" id="themeNameDesert">Desert</div>
+                <div class="desc" id="themeDescDesert">Golden sands</div>
             </div>
             <div class="theme-option" data-theme="magic">
                 <span class="icon">✨</span>
-                <div class="name" id="themeNameMagic">Enchanted Fall</div>
-                <div class="desc" id="themeDescMagic">Magic autumn</div>
+                <div class="name" id="themeNameMagic">Magic</div>
+                <div class="desc" id="themeDescMagic">Enchanted forest</div>
             </div>
             <div class="theme-option" data-theme="toon">
                 <span class="icon">🎨</span>
-                <div class="name" id="themeNameToon">Toon Fall</div>
-                <div class="desc" id="themeDescToon">Cartoon autumn</div>
+                <div class="name" id="themeNameToon">Toon</div>
+                <div class="desc" id="themeDescToon">Cartoon world</div>
             </div>
             <div class="theme-option" data-theme="cyberpunk">
                 <span class="icon">💜</span>
-                <div class="name" id="themeNameCyberpunk">Neon Fall</div>
-                <div class="desc" id="themeDescCyberpunk">Cyber autumn</div>
+                <div class="name" id="themeNameCyberpunk">Cyberpunk</div>
+                <div class="desc" id="themeDescCyberpunk">Neon future</div>
             </div>
         </div>
         <button class="btn-close-theme" id="closeThemeSelector">✓ <span id="applyThemeText">Apply Theme</span></button>
@@ -941,9 +933,9 @@ button:active {
 </div>
 
 <div id="startScreen" class="screen">
-    <div class="logo" id="startLogo">🍂🦊🍁</div>
+    <div class="logo" id="startLogo">🌸🦊🌷</div>
     <h1 id="gameTitle">Fox Eggs</h1>
-    <p id="editionBadge" style="font-size:16px;color:#ffd700;margin-top:-8px;letter-spacing:3px;font-weight:bold;">🍁 AUTUMN EDITION 🍁</p>
+    <p id="editionBadge" style="font-size:16px;color:#ffd700;margin-top:-8px;letter-spacing:3px;font-weight:bold;">🌸 SPRING EDITION 🌸</p>
     <p id="startText" style="margin-top:15px;">Collect eggs and beat your record!</p>
     <button id="start">Start Game</button>
     <button id="openThemeStartBtn" style="background:rgba(255,255,255,0.12);box-shadow:none;font-size:14px;padding:10px 25px;margin-top:10px;">
@@ -954,7 +946,7 @@ button:active {
 </div>
 
 <div id="gameOver" class="screen">
-    <div class="logo" id="gameOverLogo">🍂🦊🍁</div>
+    <div class="logo" id="gameOverLogo">🌸🦊🌷</div>
     <h1 id="gameOverTitle">Game Over!</h1>
     <div class="final">
         <span id="finalScoreLabel">Score:</span>
@@ -980,7 +972,7 @@ button:active {
 <div id="channelPopup">
     <div class="box">
         <button id="closeChannelBtn">✕</button>
-        <span class="icon-big" id="channelIcon">🍂🦊🍁</span>
+        <span class="icon-big" id="channelIcon">🌸🦊🌷</span>
         <h2 id="channelTitle">به کانال تلگرام بپیوندید!</h2>
         <p class="sub-text" id="channelSub">برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان</p>
         <div class="features">
@@ -1022,8 +1014,8 @@ button:active {
 <div id="toast" style="display:none;"></div>
 
 <script>
-    // ============================================================
-// کد کامل بازی Fox Eggs - نسخه فصلی
+  // ============================================================
+// کد کامل بازی Fox Eggs - نسخه فصلی با ۹۶ پالت
 // ============================================================
 
 // ============================================================
@@ -1115,7 +1107,7 @@ function getChannelUrl() {
 }
 
 // ============================================================
-// بخش ۳: سیستم فصل‌ها
+// بخش ۳: سیستم فصل‌ها و Event ها (۸ حالت)
 // ============================================================
 
 const SEASONS = {
@@ -1125,8 +1117,8 @@ const SEASONS = {
         nameEn:'Spring',
         icon:'🌸',
         logo:'🌸🦊🌷',
-        editionFa:'🌸 نسخه بهاری 🌸',
-        editionEn:'🌸 SPRING EDITION 🌸',
+        editionFa:'🌸 فصل شکوفه‌ها 🌸',
+        editionEn:'🌸 SEASON OF BLOOMS 🌸',
         badgeColor:'#ff6fa8'
     },
     summer: {
@@ -1135,8 +1127,8 @@ const SEASONS = {
         nameEn:'Summer',
         icon:'☀️',
         logo:'☀️🦊🌊',
-        editionFa:'☀️ نسخه تابستانی ☀️',
-        editionEn:'☀️ SUMMER EDITION ☀️',
+        editionFa:'☀️ فصل آفتاب ☀️',
+        editionEn:'☀️ SUNNY DAYS ☀️',
         badgeColor:'#ffb030'
     },
     autumn: {
@@ -1145,8 +1137,8 @@ const SEASONS = {
         nameEn:'Autumn',
         icon:'🍂',
         logo:'🍂🦊🍁',
-        editionFa:'🍁 نسخه پاییزی 🍁',
-        editionEn:'🍁 AUTUMN EDITION 🍁',
+        editionFa:'🍁 فصل برگ‌های طلایی 🍁',
+        editionEn:'🍁 GOLDEN LEAVES 🍁',
         badgeColor:'#ffd700'
     },
     winter: {
@@ -1155,9 +1147,50 @@ const SEASONS = {
         nameEn:'Winter',
         icon:'❄️',
         logo:'❄️🦊⛄',
-        editionFa:'❄️ نسخه زمستانی ❄️',
-        editionEn:'❄️ WINTER EDITION ❄️',
+        editionFa:'❄️ فصل برف و سرما ❄️',
+        editionEn:'❄️ FROSTY DAYS ❄️',
         badgeColor:'#a8d8ff'
+    },
+    // ========== Event های خاص ==========
+    christmas: {
+        id:'christmas',
+        nameFa:'کریسمس',
+        nameEn:'Christmas',
+        icon:'🎄',
+        logo:'🎄🦊🎁',
+        editionFa:'🎄 جشن کریسمس 🎄',
+        editionEn:'🎄 MERRY CHRISTMAS 🎄',
+        badgeColor:'#ff4444'
+    },
+    nowruz: {
+        id:'nowruz',
+        nameFa:'نوروز',
+        nameEn:'Nowruz',
+        icon:'🌷',
+        logo:'🌷🦊🐟',
+        editionFn:'🌷 عید نوروز مبارک 🌷',
+        editionEn:'🌷 HAPPY NOWRUZ 🌷',
+        badgeColor:'#00d96a'
+    },
+    birthday: {
+        id:'birthday',
+        nameFa:'تولد',
+        nameEn:'Birthday',
+        icon:'🎂',
+        logo:'🎂🦊🎈',
+        editionFa:'🎂 جشن تولد 🎂',
+        editionEn:'🎂 HAPPY BIRTHDAY 🎂',
+        badgeColor:'#ff69b4'
+    },
+    anniversary: {
+        id:'anniversary',
+        nameFa:'سالگرد',
+        nameEn:'Anniversary',
+        icon:'🎉',
+        logo:'🎉🦊🎊',
+        editionFa:'🎉 سالگرد Fox Eggs 🎉',
+        editionEn:'🎉 FOX EGGS ANNIVERSARY 🎉',
+        badgeColor:'#ffd700'
     }
 };
 
@@ -1165,7 +1198,29 @@ function getCurrentSeason() {
     const now = new Date();
     const month = now.getMonth() + 1;
     const day = now.getDate();
+    const year = now.getFullYear();
 
+    // 🎂 تولد: ۹ دسامبر (۱ روز)
+    if (month === 12 && day === 9) {
+        return 'birthday';
+    }
+
+    // 🎉 سالگرد بازی: ۱۵-۲۱ اگوست (۷ روز)
+    if (month === 8 && day >= 15 && day <= 21) {
+        return 'anniversary';
+    }
+
+    // 🌸 نوروز: ۲۱ مارس تا ۲ آوریل (۱۳ روز)
+    if ((month === 3 && day >= 21) || (month === 4 && day <= 2)) {
+        return 'nowruz';
+    }
+
+    // 🎄 کریسمس: ۲۴-۲۶ دسامبر (۳ روز)
+    if (month === 12 && day >= 24 && day <= 26) {
+        return 'christmas';
+    }
+
+    // فصل‌های عادی
     if ((month === 3 && day >= 21) || month === 4 || month === 5 || (month === 6 && day <= 20)) {
         return 'spring';
     }
@@ -1184,622 +1239,23 @@ function getSeasonConfig() {
     return SEASONS[currentSeason];
 }
 
-// ============================================================
-// بخش ۴: پالت‌های فصلی - ۱۲ تم × ۴ فصل
-// ============================================================
-
-const THEME_PALETTES = {
-
-    classic: {
-        spring: {
-            skyDay:     ['#ffd6e8','#ffe0ec','#ffeaf2'],
-            skyNight:   ['#2a1a2e','#3a1a3e','#4a2a4e'],
-            groundDay:  ['#a8d8a0','#98c890','#88b880'],
-            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:        'rgba(255,220,235,0.75)',
-            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:     ['#87CEEB','#a8d8f0','#c8e8f5'],
-            skyNight:   ['#0a1525','#152535','#1a2a40'],
-            groundDay:  ['#7dbb4b','#6aaa3a','#55963b'],
-            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:        'rgba(255,240,150,0.8)',
-            tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:     ['#ffb060','#ffc080','#ffd0a0'],
-            skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
-            groundDay:  ['#c8a060','#b89050','#a88040'],
-            groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
-            sun:        'rgba(255,230,180,0.7)',
-            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        winter: {
-            skyDay:     ['#c8e0f0','#d8e8f5','#e8f0fa'],
-            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:  ['#e0e8f0','#d0d8e0','#c0c8d0'],
-            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:        'rgba(220,235,255,0.6)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.4)'
-        }
-    },
-
-    city: {
-        spring: {
-            skyDay:     ['#d8d0d8','#e0d8e0','#e8e0e8'],
-            skyNight:   ['#1a1a2e','#2a2a3e','#3a3a4e'],
-            groundDay:  ['#a8a898','#989888','#888878'],
-            groundNight:['#3a3a4a','#2a2a3a','#1a1a2a'],
-            sun:        'rgba(255,220,235,0.7)',
-            tree:       { trunk:'#5a4a3a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#22c55e',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.15)'
-        },
-        summer: {
-            skyDay:     ['#b8c8d8','#d0dce8','#e0e8f0'],
-            skyNight:   ['#0a1520','#15202a','#1a2a3a'],
-            groundDay:  ['#8a9aa8','#7a8a98','#6a7a88'],
-            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:        'rgba(255,240,150,0.7)',
-            tree:       { trunk:'#5a4a3a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.15)'
-        },
-        autumn: {
-            skyDay:     ['#c8b0a0','#d0b8a8','#d8c0b0'],
-            skyNight:   ['#2a1a1a','#3a2a2a','#4a3a3a'],
-            groundDay:  ['#8a8a78','#7a7a68','#6a6a58'],
-            groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
-            sun:        'rgba(255,230,180,0.6)',
-            tree:       { trunk:'#5a4a3a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.15)'
-        },
-        winter: {
-            skyDay:     ['#d8e0e8','#e0e8f0','#e8f0f8'],
-            skyNight:   ['#2a3a4a','#3a4a5a','#4a5a6a'],
-            groundDay:  ['#b8c0c8','#a8b0b8','#98a0a8'],
-            groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:        'rgba(220,235,255,0.55)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.3)'
-        }
-    },
-
-    beach: {
-        spring: {
-            skyDay:     ['#a8d8f0','#c0e0f5','#d8e8fa'],
-            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:  ['#f5e0b0','#f0d8a0','#e8d090'],
-            groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
-            sun:        'rgba(255,220,200,0.75)',
-            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:     ['#87CEEB','#b0d8f0','#d0e8f5'],
-            skyNight:   ['#0a1a2a','#152535','#1a2a40'],
-            groundDay:  ['#f0d8a0','#e8c888','#d4b070'],
-            groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
-            sun:        'rgba(255,245,180,0.85)',
-            tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:     ['#f0b090','#f5c0a0','#fad0b0'],
-            skyNight:   ['#2a1a1a','#3a2a1a','#4a3a2a'],
-            groundDay:  ['#e8c880','#d8b870','#c8a860'],
-            groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
-            sun:        'rgba(255,220,180,0.7)',
-            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        winter: {
-            skyDay:     ['#b0d8f0','#c8e0f5','#e0e8fa'],
-            skyNight:   ['#2a3a4a','#3a4a5a','#4a5a6a'],
-            groundDay:  ['#f0f0f0','#e8e8e8','#dcdcdc'],
-            groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:        'rgba(220,235,255,0.6)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.35)'
-        }
-    },
-
-    forest: {
-        spring: {
-            skyDay:     ['#c8e0c8','#d8e8d8','#e8f0e8'],
-            skyNight:   ['#1a2a1a','#2a3a2a','#3a4a3a'],
-            groundDay:  ['#5a7a3a','#4a6a2a','#3a5a1a'],
-            groundNight:['#1a2a0a','#0a1a0a','#050a00'],
-            sun:        'rgba(240,220,240,0.7)',
-            tree:       { trunk:'#5a3a1a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:     ['#6a9a6a','#7aaa7a','#8aba8a'],
-            skyNight:   ['#0a1a0a','#152a15','#1a3a1a'],
-            groundDay:  ['#3a5a2a','#2a4a1a','#1a3a0a'],
-            groundNight:['#1a2a0a','#0a1a0a','#050a00'],
-            sun:        'rgba(255,240,150,0.75)',
-            tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:     ['#d8a070','#e0b080','#e8c090'],
-            skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
-            groundDay:  ['#8a6a3a','#7a5a2a','#6a4a1a'],
-            groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:        'rgba(255,220,160,0.7)',
-            tree:       { trunk:'#5a3a1a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        winter: {
-            skyDay:     ['#c8d8e0','#d8e0e8','#e8f0f5'],
-            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:  ['#b0c0c8','#a0b0b8','#90a0a8'],
-            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:        'rgba(220,235,255,0.55)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.4)'
-        }
-    },
-
-    space: {
-        spring: {
-            skyDay:     ['#3a1a5a','#4a2a6a','#5a3a7a'],
-            skyNight:   ['#0a0a1a','#1a0a2a','#2a0a3a'],
-            groundDay:  ['#4a2a6a','#5a3a7a','#6a4a8a'],
-            groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:        'rgba(255,180,220,0.4)',
-            tree:       { trunk:'#3a2a4a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#00e5ff',
-            cactus:     '#ff9ec7',
-            skyStars:   'rgba(200,180,255,0.4)'
-        },
-        summer: {
-            skyDay:     ['#1a0a3a','#2a1a4a','#3a2a5a'],
-            skyNight:   ['#0a0a1a','#0a0a2a','#1a0a2a'],
-            groundDay:  ['#3a2a4a','#4a3a5a','#5a4a6a'],
-            groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:        'rgba(200,180,255,0.35)',
-            tree:       { trunk:'#3a2a4a', main:'#818cf8', light:'#a5b4fc', dark:'#6366f1' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.5)'
-        },
-        autumn: {
-            skyDay:     ['#4a1a2a','#5a2a3a','#6a3a4a'],
-            skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:  ['#4a2a3a','#5a3a4a','#6a4a5a'],
-            groundNight:['#1a0a1a','#0a0a1a','#05000a'],
-            sun:        'rgba(255,200,180,0.4)',
-            tree:       { trunk:'#3a2a4a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#00e5ff',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.4)'
-        },
-        winter: {
-            skyDay:     ['#1a2a4a','#2a3a5a','#3a4a6a'],
-            skyNight:   ['#0a0a1a','#1a1a2a','#2a2a3a'],
-            groundDay:  ['#2a3a5a','#3a4a6a','#4a5a7a'],
-            groundNight:['#1a1a2a','#0a0a1a','#05000a'],
-            sun:        'rgba(200,220,255,0.4)',
-            tree:       { trunk:'#3a2a4a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(200,220,255,0.5)'
-        }
-    },
-
-    night: {
-        spring: {
-            skyDay:     ['#3a2a4e','#4a3a5e','#5a4a6e'],
-            skyNight:   ['#0a0a1a','#1a0a2a','#2a1a3a'],
-            groundDay:  ['#3a2a4a','#2a1a3a','#1a0a2a'],
-            groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:        'rgba(255,180,220,0.3)',
-            tree:       { trunk:'#3a2a3a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#00e5ff',
-            cactus:     '#ff9ec7',
-            skyStars:   'rgba(255,255,255,0.4)'
-        },
-        summer: {
-            skyDay:     ['#1a1a2e','#16213e','#0f3460'],
-            skyNight:   ['#0a0a1a','#0a0a2a','#1a0a2a'],
-            groundDay:  ['#2a2a3a','#1a1a2a','#0a0a1a'],
-            groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:        'rgba(200,180,255,0.25)',
-            tree:       { trunk:'#3a2a3a', main:'#818cf8', light:'#a5b4fc', dark:'#6366f1' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.5)'
-        },
-        autumn: {
-            skyDay:     ['#3a1a1a','#4a2a2a','#5a3a3a'],
-            skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:  ['#3a2a2a','#2a1a1a','#1a0a0a'],
-            groundNight:['#1a0a0a','#0a0000','#050000'],
-            sun:        'rgba(255,200,180,0.3)',
-            tree:       { trunk:'#3a2a3a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.4)'
-        },
-        winter: {
-            skyDay:     ['#1a2a3a','#2a3a4a','#3a4a5a'],
-            skyNight:   ['#0a1a2a','#1a2a3a','#2a3a4a'],
-            groundDay:  ['#2a3a4a','#1a2a3a','#0a1a2a'],
-            groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
-            sun:        'rgba(220,235,255,0.3)',
-            tree:       { trunk:'#3a2a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,235,255,0.5)'
-        }
-    },
-
-    volcano: {
-        spring: {
-            skyDay:     ['#6a3a2a','#7a4a3a','#8a5a4a'],
-            skyNight:   ['#2a0a0a','#3a0a0a','#4a0a0a'],
-            groundDay:  ['#3a1a0a','#2a0a0a','#1a0a0a'],
-            groundNight:['#1a0a0a','#0a0a0a','#050000'],
-            sun:        'rgba(255,180,200,0.5)',
-            tree:       { trunk:'#3a1a0a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#00e5ff',
-            cactus:     '#ff9ec7',
-            skyStars:   'rgba(255,220,180,0.3)'
-        },
-        summer: {
-            skyDay:     ['#4a1a0a','#6a2a0a','#8a3a0a'],
-            skyNight:   ['#2a0a0a','#3a0a0a','#4a0a0a'],
-            groundDay:  ['#2a1a0a','#1a0a0a','#0a0a0a'],
-            groundNight:['#1a0a0a','#0a0a0a','#050000'],
-            sun:        'rgba(255,150,100,0.6)',
-            tree:       { trunk:'#3a1a0a', main:'#dc2626', light:'#ef4444', dark:'#991b1b' },
-            rock:       '#00e5ff',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,200,150,0.3)'
-        },
-        autumn: {
-            skyDay:     ['#3a1a0a','#4a2a0a','#5a3a1a'],
-            skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:  ['#2a1a0a','#1a0a0a','#0a0a0a'],
-            groundNight:['#1a0a0a','#0a0a0a','#050000'],
-            sun:        'rgba(255,160,100,0.5)',
-            tree:       { trunk:'#3a1a0a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#00e5ff',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:     ['#4a4a5a','#5a5a6a','#6a6a7a'],
-            skyNight:   ['#1a1a2a','#2a2a3a','#3a3a4a'],
-            groundDay:  ['#3a3a4a','#2a2a3a','#1a1a2a'],
-            groundNight:['#1a1a2a','#0a0a1a','#05000a'],
-            sun:        'rgba(220,235,255,0.4)',
-            tree:       { trunk:'#3a2a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,235,255,0.4)'
-        }
-    },
-
-    ocean: {
-        spring: {
-            skyDay:     ['#6ac8d8','#8ad0e0','#aad8e8'],
-            skyNight:   ['#0a2a3a','#1a3a4a','#2a4a5a'],
-            groundDay:  ['#f5e0a0','#f0d090','#e8c880'],
-            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:        'rgba(255,220,220,0.7)',
-            tree:       { trunk:'#4a3a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:     ['#4aa8c8','#6ab8d8','#8ac8e8'],
-            skyNight:   ['#0a1a30','#0a2a40','#0a3a50'],
-            groundDay:  ['#f4d090','#e8c880','#dcc070'],
-            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:        'rgba(255,250,200,0.85)',
-            tree:       { trunk:'#4a3a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:     ['#d8a888','#e0b898','#e8c8a8'],
-            skyNight:   ['#2a1a1a','#3a2a2a','#4a3a3a'],
-            groundDay:  ['#e8c880','#d8b870','#c8a860'],
-            groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
-            sun:        'rgba(255,200,160,0.7)',
-            tree:       { trunk:'#4a3a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:     ['#a8d8f0','#c0e0f5','#d8e8fa'],
-            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:  ['#e8f0f5','#d8e0e8','#c8d0d8'],
-            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:        'rgba(220,240,255,0.6)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,235,255,0.4)'
-        }
-    },
-
-    desert: {
-        spring: {
-            skyDay:     ['#f5c090','#f8d0a8','#fbe0c0'],
-            skyNight:   ['#2a1a0a','#3a2a0a','#4a3a0a'],
-            groundDay:  ['#e0c080','#d0b070','#c0a060'],
-            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:        'rgba(255,230,200,0.75)',
-            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.2)'
-        },
-        summer: {
-            skyDay:     ['#e8a050','#f0b060','#f8c070'],
-            skyNight:   ['#2a1a0a','#3a2a0a','#4a3a0a'],
-            groundDay:  ['#d8b060','#c8a050','#b89040'],
-            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:        'rgba(255,245,180,0.85)',
-            tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,200,150,0.2)'
-        },
-        autumn: {
-            skyDay:     ['#e88850','#f09860','#f8a870'],
-            skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
-            groundDay:  ['#c8a050','#b89040','#a88030'],
-            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:        'rgba(255,200,160,0.75)',
-            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:     ['#d8d8e0','#e0e0e8','#e8e8f0'],
-            skyNight:   ['#2a2a3a','#3a3a4a','#4a4a5a'],
-            groundDay:  ['#e8e8f0','#d8d8e0','#c8c8d0'],
-            groundNight:['#4a4a5a','#3a3a4a','#2a2a3a'],
-            sun:        'rgba(230,240,255,0.6)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,235,255,0.45)'
-        }
-    },
-
-    magic: {
-        spring: {
-            skyDay:     ['#d8a8c8','#e0b8d8','#e8c8e8'],
-            skyNight:   ['#2a1a3a','#3a2a4a','#4a3a5a'],
-            groundDay:  ['#5a3a5a','#4a2a4a','#3a1a3a'],
-            groundNight:['#1a0a1a','#0a000a','#050005'],
-            sun:        'rgba(255,200,240,0.7)',
-            tree:       { trunk:'#4a2a4a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#00e5ff',
-            cactus:     '#ffd700',
-            skyStars:   'rgba(255,220,255,0.4)'
-        },
-        summer: {
-            skyDay:     ['#b888d8','#c898e0','#d8a8e8'],
-            skyNight:   ['#1a0a2a','#2a0a3a','#3a0a4a'],
-            groundDay:  ['#4a2a5a','#3a1a4a','#2a0a3a'],
-            groundNight:['#1a0a1a','#0a000a','#050005'],
-            sun:        'rgba(220,180,255,0.75)',
-            tree:       { trunk:'#4a2a4a', main:'#818cf8', light:'#a5b4fc', dark:'#6366f1' },
-            rock:       '#ffd700',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,180,255,0.5)'
-        },
-        autumn: {
-            skyDay:     ['#c888a8','#d898b8','#e8a8c8'],
-            skyNight:   ['#2a0a1a','#3a0a2a','#4a0a3a'],
-            groundDay:  ['#4a2a4a','#3a1a3a','#2a0a2a'],
-            groundNight:['#1a0a1a','#0a000a','#050005'],
-            sun:        'rgba(255,180,220,0.7)',
-            tree:       { trunk:'#4a2a4a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#00e5ff',
-            cactus:     '#ffd700',
-            skyStars:   'rgba(255,200,220,0.4)'
-        },
-        winter: {
-            skyDay:     ['#b8c8e8','#c8d8f0','#d8e8f8'],
-            skyNight:   ['#1a1a3a','#2a2a4a','#3a3a5a'],
-            groundDay:  ['#4a4a6a','#3a3a5a','#2a2a4a'],
-            groundNight:['#1a1a2a','#0a0a1a','#050005'],
-            sun:        'rgba(220,230,255,0.65)',
-            tree:       { trunk:'#4a3a5a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ffd700',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,230,255,0.5)'
-        }
-    },
-
-    toon: {
-        spring: {
-            skyDay:     ['#ffd6e8','#ffe0ec','#ffeaf2'],
-            skyNight:   ['#3a2a4a','#4a3a5a','#5a4a6a'],
-            groundDay:  ['#8ad870','#7ac860','#6ab850'],
-            groundNight:['#2a1a3a','#1a0a2a','#0a001a'],
-            sun:        'rgba(255,240,200,0.9)',
-            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:     ['#87CEEB','#a0d8f0','#b8e0f5'],
-            skyNight:   ['#1a1a3a','#2a2a4a','#3a3a5a'],
-            groundDay:  ['#4ade80','#3ab870','#2aa060'],
-            groundNight:['#1a2a1a','#0a1a0a','#050a05'],
-            sun:        'rgba(255,240,120,0.9)',
-            tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:     ['#ffa860','#ffb870','#ffc880'],
-            skyNight:   ['#3a1a0a','#4a2a1a','#5a3a2a'],
-            groundDay:  ['#d8a850','#c89840','#b88830'],
-            groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:        'rgba(255,230,160,0.85)',
-            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#8b5cf6',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:     ['#d8e8f5','#e0e8fa','#e8f0ff'],
-            skyNight:   ['#2a3a4a','#3a4a5a','#4a5a6a'],
-            groundDay:  ['#e8f0f5','#d8e0e8','#c8d0d8'],
-            groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:        'rgba(230,240,255,0.75)',
-            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#ff5722',
-            cactus:     '#00e5ff',
-            skyStars:   'rgba(220,235,255,0.5)'
-        }
-    },
-
-    cyberpunk: {
-        spring: {
-            skyDay:     ['#4a1a4a','#5a2a5a','#6a3a6a'],
-            skyNight:   ['#1a0a2a','#2a0a3a','#3a0a4a'],
-            groundDay:  ['#2a1a3a','#1a0a2a','#0a001a'],
-            groundNight:['#0a001a','#05000a','#000000'],
-            sun:        'rgba(255,100,200,0.4)',
-            tree:       { trunk:'#2a1a3a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
-            rock:       '#00ff88',
-            cactus:     '#00ffff',
-            skyStars:   'rgba(255,100,200,0.5)'
-        },
-        summer: {
-            skyDay:     ['#2a1a4a','#3a2a5a','#4a3a6a'],
-            skyNight:   ['#0a001a','#1a0a2a','#2a0a3a'],
-            groundDay:  ['#1a1a2a','#2a2a3a','#3a3a4a'],
-            groundNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
-            sun:        'rgba(255,0,200,0.4)',
-            tree:       { trunk:'#2a1a3a', main:'#ff00ff', light:'#ff66ff', dark:'#cc00cc' },
-            rock:       '#00ff88',
-            cactus:     '#ffff00',
-            skyStars:   'rgba(255,0,255,0.6)'
-        },
-        autumn: {
-            skyDay:     ['#4a1a2a','#5a2a3a','#6a3a4a'],
-            skyNight:   ['#1a0a0a','#2a0a1a','#3a0a2a'],
-            groundDay:  ['#2a1a2a','#1a0a1a','#0a000a'],
-            groundNight:['#0a000a','#050005','#000000'],
-            sun:        'rgba(255,100,100,0.4)',
-            tree:       { trunk:'#2a1a3a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
-            rock:       '#00ff88',
-            cactus:     '#ffff00',
-            skyStars:   'rgba(255,100,150,0.5)'
-        },
-        winter: {
-            skyDay:     ['#2a3a4a','#3a4a5a','#4a5a6a'],
-            skyNight:   ['#0a0a1a','#1a0a2a','#2a0a3a'],
-            groundDay:  ['#2a2a3a','#1a1a2a','#0a0a1a'],
-            groundNight:['#0a0a1a','#05000a','#000000'],
-            sun:        'rgba(100,200,255,0.4)',
-            tree:       { trunk:'#2a1a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
-            rock:       '#00ff88',
-            cactus:     '#00ffff',
-            skyStars:   'rgba(100,200,255,0.6)'
-        }
-    }
-};
-
-// ============================================================
-// بخش ۵: توابع کمکی پالت
-// ============================================================
-
-function getThemePalette(themeId, season) {
-    const theme = THEME_PALETTES[themeId] || THEME_PALETTES.classic;
-    return theme[season] || theme.autumn;
-}
-
-function getTheme() {
-    return getThemePalette(currentTheme, currentSeason);
-}
-
-function getSkyColors(isNight) {
-    const p = getTheme();
-    return isNight ? p.skyNight : p.skyDay;
-}
-
-function getGroundColors(isNight) {
-    const p = getTheme();
-    return isNight ? p.groundNight : p.groundDay;
-}
-
-function getTreeColors() {
-    return getTheme().tree;
-}
-
-function getRockColor() {
-    return getTheme().rock;
-}
-
-function getCactusColor() {
-    return getTheme().cactus;
-}
-
-function getSunColor() {
-    return getTheme().sun;
-}
-
-function getSkyStarsColor() {
-    return getTheme().skyStars || 'rgba(255,255,255,0.2)';
+// آیا حالت event فعاله (نه فصل عادی)؟
+function isEventActive() {
+    return ['christmas', 'nowruz', 'birthday', 'anniversary'].includes(currentSeason);
 }
 
 // ============================================================
-// بخش ۶: نام‌ها و آیکون‌های فصلی تم‌ها
+// بخش ۴: آرایه نام تم‌ها
+// ============================================================
+
+const THEME_IDS = [
+    'classic', 'city', 'beach', 'forest',
+    'space', 'night', 'volcano', 'ocean',
+    'desert', 'magic', 'toon', 'cyberpunk'
+];
+
+// ============================================================
+// بخش ۵: نام‌ها و آیکون‌های تم‌ها (ثابت - بر اساس تم، نه فصل)
 // ============================================================
 
 const THEME_NAMES = {
@@ -1807,122 +1263,186 @@ const THEME_NAMES = {
         spring:{fa:'بهار',en:'Spring',icon:'🌷'},
         summer:{fa:'تابستان',en:'Summer',icon:'🌻'},
         autumn:{fa:'پاییز',en:'Autumn',icon:'🍂'},
-        winter:{fa:'زمستان',en:'Winter',icon:'⛄'}
+        winter:{fa:'زمستان',en:'Winter',icon:'⛄'},
+        christmas:{fa:'کریسمس',en:'Christmas',icon:'🎄'},
+        nowruz:{fa:'نوروز',en:'Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد',en:'Birthday',icon:'🎂'},
+        anniversary:{fa:'سالگرد',en:'Anniversary',icon:'🎉'}
     },
     city: {
         spring:{fa:'شهر بهاری',en:'Urban Spring',icon:'🏡'},
         summer:{fa:'شهر تابستانی',en:'Urban Summer',icon:'🏙️'},
         autumn:{fa:'پاییز شهری',en:'Urban Autumn',icon:'🏢'},
-        winter:{fa:'شهر زمستانی',en:'Urban Winter',icon:'🌃'}
+        winter:{fa:'شهر زمستانی',en:'Urban Winter',icon:'🌃'},
+        christmas:{fa:'شهر کریسمس',en:'Christmas City',icon:'🎄'},
+        nowruz:{fa:'شهر نوروز',en:'Nowruz City',icon:'🏡'},
+        birthday:{fa:'شهر تولد',en:'Birthday City',icon:'🎂'},
+        anniversary:{fa:'شهر سالگرد',en:'Anniversary City',icon:'🎉'}
     },
     beach: {
         spring:{fa:'ساحل بهاری',en:'Spring Shore',icon:'⛵'},
         summer:{fa:'ساحل تابستانی',en:'Summer Shore',icon:'🏖️'},
         autumn:{fa:'ساحل پاییزی',en:'Autumn Shore',icon:'🌅'},
-        winter:{fa:'ساحل زمستانی',en:'Winter Shore',icon:'🏝️'}
+        winter:{fa:'ساحل زمستانی',en:'Winter Shore',icon:'🏝️'},
+        christmas:{fa:'ساحل کریسمس',en:'Christmas Shore',icon:'🎄'},
+        nowruz:{fa:'ساحل نوروز',en:'Nowruz Shore',icon:'🌷'},
+        birthday:{fa:'ساحل تولد',en:'Birthday Shore',icon:'🎂'},
+        anniversary:{fa:'ساحل سالگرد',en:'Anniversary Shore',icon:'🎉'}
     },
     forest: {
         spring:{fa:'جنگل شکوفا',en:'Blooming Forest',icon:'🌱'},
         summer:{fa:'جنگل سبز',en:'Green Forest',icon:'🌳'},
         autumn:{fa:'جنگل خزان',en:'Falling Forest',icon:'🍁'},
-        winter:{fa:'جنگل برفی',en:'Snowy Forest',icon:'🌲'}
+        winter:{fa:'جنگل برفی',en:'Snowy Forest',icon:'🌲'},
+        christmas:{fa:'جنگل کریسمس',en:'Christmas Forest',icon:'🎄'},
+        nowruz:{fa:'جنگل نوروز',en:'Nowruz Forest',icon:'🌷'},
+        birthday:{fa:'جنگل تولد',en:'Birthday Forest',icon:'🎂'},
+        anniversary:{fa:'جنگل سالگرد',en:'Anniversary Forest',icon:'🎉'}
     },
     space: {
         spring:{fa:'بهار کیهانی',en:'Cosmic Spring',icon:'🪐'},
         summer:{fa:'تابستان کیهانی',en:'Cosmic Summer',icon:'🌌'},
         autumn:{fa:'پاییز کیهانی',en:'Cosmic Fall',icon:'☄️'},
-        winter:{fa:'زمستان کیهانی',en:'Cosmic Winter',icon:'🌠'}
+        winter:{fa:'زمستان کیهانی',en:'Cosmic Winter',icon:'🌠'},
+        christmas:{fa:'کریسمس کیهانی',en:'Cosmic Christmas',icon:'🎄'},
+        nowruz:{fa:'نوروز کیهانی',en:'Cosmic Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد کیهانی',en:'Cosmic Birthday',icon:'🎂'},
+        anniversary:{fa:'سالگرد کیهانی',en:'Cosmic Anniversary',icon:'🎉'}
     },
     night: {
         spring:{fa:'شب بهاری',en:'Spring Night',icon:'🌙'},
         summer:{fa:'شب تابستانی',en:'Summer Night',icon:'🌆'},
         autumn:{fa:'شب پاییزی',en:'Autumn Night',icon:'🌃'},
-        winter:{fa:'شب زمستانی',en:'Winter Night',icon:'✨'}
+        winter:{fa:'شب زمستانی',en:'Winter Night',icon:'✨'},
+        christmas:{fa:'شب کریسمس',en:'Christmas Night',icon:'🎄'},
+        nowruz:{fa:'شب نوروز',en:'Nowruz Night',icon:'🌙'},
+        birthday:{fa:'شب تولد',en:'Birthday Night',icon:'🎂'},
+        anniversary:{fa:'شب سالگرد',en:'Anniversary Night',icon:'🎉'}
     },
     volcano: {
         spring:{fa:'بهار آتشفشانی',en:'Ember Spring',icon:'♨️'},
         summer:{fa:'تابستان آتشفشانی',en:'Ember Summer',icon:'🌋'},
         autumn:{fa:'پاییز آتشفشانی',en:'Ember Fall',icon:'🔥'},
-        winter:{fa:'زمستان آتشفشانی',en:'Ember Winter',icon:'🗻'}
+        winter:{fa:'زمستان آتشفشانی',en:'Ember Winter',icon:'🗻'},
+        christmas:{fa:'کریسمس آتشفشانی',en:'Ember Christmas',icon:'🎄'},
+        nowruz:{fa:'نوروز آتشفشانی',en:'Ember Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد آتشفشانی',en:'Ember Birthday',icon:'🎂'},
+        anniversary:{fa:'سالگرد آتشفشانی',en:'Ember Anniversary',icon:'🎉'}
     },
     ocean: {
         spring:{fa:'موج بهاری',en:'Spring Tide',icon:'🐚'},
         summer:{fa:'موج تابستانی',en:'Summer Tide',icon:'🌊'},
         autumn:{fa:'موج پاییزی',en:'Autumn Tide',icon:'⚓'},
-        winter:{fa:'موج زمستانی',en:'Winter Tide',icon:'🧊'}
+        winter:{fa:'موج زمستانی',en:'Winter Tide',icon:'🧊'},
+        christmas:{fa:'موج کریسمس',en:'Christmas Tide',icon:'🎄'},
+        nowruz:{fa:'موج نوروز',en:'Nowruz Tide',icon:'🌷'},
+        birthday:{fa:'موج تولد',en:'Birthday Tide',icon:'🎂'},
+        anniversary:{fa:'موج سالگرد',en:'Anniversary Tide',icon:'🎉'}
     },
     desert: {
         spring:{fa:'صحرای شکوفا',en:'Blooming Desert',icon:'🌵'},
         summer:{fa:'صحرای طلایی',en:'Golden Desert',icon:'🏜️'},
         autumn:{fa:'خزان صحرا',en:'Golden Fall',icon:'🐪'},
-        winter:{fa:'صحرای یخی',en:'Frozen Desert',icon:'🏔️'}
+        winter:{fa:'صحرای یخی',en:'Frozen Desert',icon:'🏔️'},
+        christmas:{fa:'صحرای کریسمس',en:'Christmas Desert',icon:'🎄'},
+        nowruz:{fa:'صحرای نوروز',en:'Nowruz Desert',icon:'🌷'},
+        birthday:{fa:'صحرای تولد',en:'Birthday Desert',icon:'🎂'},
+        anniversary:{fa:'صحرای سالگرد',en:'Anniversary Desert',icon:'🎉'}
     },
     magic: {
         spring:{fa:'بهار جادویی',en:'Enchanted Spring',icon:'🦋'},
         summer:{fa:'تابستان جادویی',en:'Enchanted Summer',icon:'🪄'},
         autumn:{fa:'خزان جادویی',en:'Enchanted Fall',icon:'🔮'},
-        winter:{fa:'زمستان جادویی',en:'Enchanted Winter',icon:'❄️'}
+        winter:{fa:'زمستان جادویی',en:'Enchanted Winter',icon:'❄️'},
+        christmas:{fa:'کریسمس جادویی',en:'Enchanted Christmas',icon:'🎄'},
+        nowruz:{fa:'نوروز جادویی',en:'Enchanted Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد جادویی',en:'Enchanted Birthday',icon:'🎂'},
+        anniversary:{fa:'سالگرد جادویی',en:'Enchanted Anniversary',icon:'🎉'}
     },
     toon: {
         spring:{fa:'بهار کارتونی',en:'Toon Spring',icon:'🎈'},
         summer:{fa:'تابستان کارتونی',en:'Toon Summer',icon:'🎨'},
         autumn:{fa:'خزان کارتونی',en:'Toon Fall',icon:'🎭'},
-        winter:{fa:'زمستان کارتونی',en:'Toon Winter',icon:'🎪'}
+        winter:{fa:'زمستان کارتونی',en:'Toon Winter',icon:'🎪'},
+        christmas:{fa:'کریسمس کارتونی',en:'Toon Christmas',icon:'🎄'},
+        nowruz:{fa:'نوروز کارتونی',en:'Toon Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد کارتونی',en:'Toon Birthday',icon:'🎂'},
+        anniversary:{fa:'سالگرد کارتونی',en:'Toon Anniversary',icon:'🎉'}
     },
     cyberpunk: {
         spring:{fa:'بهار نئونی',en:'Neon Spring',icon:'💚'},
         summer:{fa:'تابستان نئونی',en:'Neon Summer',icon:'💜'},
         autumn:{fa:'خزان سایبری',en:'Neon Fall',icon:'🟣'},
-        winter:{fa:'زمستان نئونی',en:'Neon Winter',icon:'💙'}
+        winter:{fa:'زمستان نئونی',en:'Neon Winter',icon:'💙'},
+        christmas:{fa:'کریسمس نئونی',en:'Neon Christmas',icon:'🎄'},
+        nowruz:{fa:'نوروز نئونی',en:'Neon Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد نئونی',en:'Neon Birthday',icon:'🎂'},
+        anniversary:{fa:'سالگرد نئونی',en:'Neon Anniversary',icon:'🎉'}
     }
 };
 
 // ============================================================
-// بخش ۷: افکت‌های فصلی (ذرات شناور)
+// بخش ۶: اسکین‌های روباه
+// ============================================================
+
+const FOX_SKINS = [
+    { id:'classic',  name:'Classic Fox',  nameFa:'روباه کلاسیک',     color:'#f97316', price:0,          rarity:'common',    trailColor:'rgba(249,115,22,0.3)',  glowColor:'#f97316', eyeColor:'#1a1a2a', desc:'🔥 Orange trail' },
+    { id:'ember',    name:'Ember Fox',    nameFa:'روباه آتشین',      color:'#ef4444', price:250000,     rarity:'uncommon',  trailColor:'rgba(239,68,68,0.3)',   glowColor:'#ff6b35', eyeColor:'#fbbf24', desc:'💥 Fire sparks' },
+    { id:'frost',    name:'Frost Fox',    nameFa:'روباه یخی',        color:'#3b82f6', price:500000,     rarity:'uncommon',  trailColor:'rgba(59,130,246,0.3)',  glowColor:'#93c5fd', eyeColor:'#ffffff', desc:'❄️ Ice trail' },
+    { id:'shadow',   name:'Shadow Fox',   nameFa:'روباه شب',         color:'#7c3aed', price:1000000,    rarity:'rare',      trailColor:'rgba(124,58,237,0.3)',  glowColor:'#4ade80', eyeColor:'#4ade80', desc:'🌑 Purple shadow' },
+    { id:'golden',   name:'Golden Fox',   nameFa:'روباه طلایی',      color:'#fbbf24', price:1750000,    rarity:'rare',      trailColor:'rgba(251,191,36,0.3)',  glowColor:'#fcd34d', eyeColor:'#78350f', desc:'✨ Gold trail' },
+    { id:'neon',     name:'Neon Fox',     nameFa:'روباه نئونی',      color:'#ec4899', price:2500000,    rarity:'epic',      trailColor:'rgba(236,72,153,0.3)',  glowColor:'#f472b6', eyeColor:'#3b82f6', desc:'💜 Neon trail' },
+    { id:'crystal',  name:'Crystal Fox',  nameFa:'روباه کریستالی',   color:'#8b5cf6', price:4000000,    rarity:'epic',      trailColor:'rgba(139,92,246,0.3)',  glowColor:'#a78bfa', eyeColor:'#c4b5d4', desc:'💎 Crystal trail' },
+    { id:'galaxy',   name:'Galaxy Fox',   nameFa:'روباه کهکشانی',    color:'#1e1b4b', price:7500000,    rarity:'legendary', trailColor:'rgba(129,140,248,0.3)', glowColor:'#818cf8', eyeColor:'#c7d2fe', desc:'🌌 Galaxy trail' },
+    { id:'rainbow',  name:'Rainbow Fox',  nameFa:'روباه رنگین‌کمان', color:'rainbow', price:12500000,   rarity:'legendary', trailColor:'rgba(255,255,255,0.2)', glowColor:null,      eyeColor:'#ffffff', desc:'🌈 Rainbow trail' },
+    { id:'phoenix',  name:'Phoenix Fox',  nameFa:'روباه ققنوس',      color:'#dc2626', price:25000000,   rarity:'mythic',    trailColor:'rgba(220,38,38,0.3)',   glowColor:'#f97316', eyeColor:'#fcd34d', desc:'🔥 Phoenix trail' }
+];
+
+// ============================================================
+// بخش ۷: افکت‌های فصلی (ذرات شناور) - ۸ حالت
 // ============================================================
 
 let seasonalParticles = [];
 
 const SEASONAL_EFFECTS = {
     spring: {
-        enabled:true,
-        maxCount:8,
-        color:'#ffb8d8',
-        colorDark:'#ff8ab8',
-        size:3.5,
-        speedY:25,
-        speedXRange:[-15,-30],
-        rotation:true,
-        shape:'petal',
-        swayAmount:0.8
+        enabled:true, maxCount:8, color:'#ffb8d8', colorDark:'#ff8ab8',
+        size:3.5, speedY:25, speedXRange:[-15,-30],
+        rotation:true, shape:'petal', swayAmount:0.8
     },
     summer: {
-        enabled:false,
-        maxCount:0
+        enabled:false, maxCount:0
     },
     autumn: {
-        enabled:true,
-        maxCount:8,
-        color:'#ffb347',
-        colorDark:'#e08a20',
-        size:4,
-        speedY:20,
-        speedXRange:[-20,-40],
-        rotation:true,
-        shape:'leaf',
-        swayAmount:1.0
+        enabled:true, maxCount:8, color:'#ffb347', colorDark:'#e08a20',
+        size:4, speedY:20, speedXRange:[-20,-40],
+        rotation:true, shape:'leaf', swayAmount:1.0
     },
     winter: {
-        enabled:true,
-        maxCount:8,
-        color:'#ffffff',
-        colorDark:'#e0e8f0',
-        size:2.5,
-        speedY:30,
-        speedXRange:[-10,-20],
-        rotation:false,
-        shape:'snow',
-        swayAmount:0.6
+        enabled:true, maxCount:8, color:'#ffffff', colorDark:'#e0e8f0',
+        size:2.5, speedY:30, speedXRange:[-10,-20],
+        rotation:false, shape:'snow', swayAmount:0.6
+    },
+    // ========== Event ها ==========
+    christmas: {
+        enabled:true, maxCount:12, color:'#ffffff', colorDark:'#e0e8f0',
+        size:3, speedY:35, speedXRange:[-12,-25],
+        rotation:false, shape:'snow', swayAmount:0.7
+    },
+    nowruz: {
+        enabled:true, maxCount:10, color:'#ffd700', colorDark:'#ff69b4',
+        size:3.5, speedY:22, speedXRange:[-18,-35],
+        rotation:true, shape:'petal', swayAmount:0.9
+    },
+    birthday: {
+        enabled:true, maxCount:12, color:'#ff69b4', colorDark:'#ffd700',
+        size:3, speedY:28, speedXRange:[-15,-30],
+        rotation:true, shape:'confetti', swayAmount:1.2
+    },
+    anniversary: {
+        enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffed4e',
+        size:3, speedY:28, speedXRange:[-15,-30],
+        rotation:true, shape:'confetti', swayAmount:1.2
     }
 };
 
@@ -1947,7 +1467,8 @@ function spawnSeasonalParticle(isInitial) {
         rotationSpeed: (Math.random() - 0.5) * 2,
         swayOffset: Math.random() * Math.PI * 2,
         swaySpeed: 1 + Math.random() * 1.5,
-        color: Math.random() > 0.5 ? fx.color : fx.colorDark
+        color: Math.random() > 0.5 ? fx.color : fx.colorDark,
+        shape: fx.shape
     });
 }
 
@@ -1989,8 +1510,15 @@ function drawSeasonalParticles() {
         const p = seasonalParticles[i];
         ctx.fillStyle = p.color;
         ctx.beginPath();
-        if (fx.shape === 'snow') {
+        if (p.shape === 'snow') {
             ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        } else if (p.shape === 'confetti') {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rotation);
+            ctx.fillRect(-p.size, -p.size * 0.4, p.size * 2, p.size * 0.8);
+            ctx.restore();
+            continue;
         } else {
             ctx.ellipse(p.x, p.y, p.size * 1.2, p.size * 0.5, p.rotation, 0, Math.PI * 2);
         }
@@ -2000,24 +1528,7 @@ function drawSeasonalParticles() {
 }
 
 // ============================================================
-// بخش ۸: اسکین‌های روباه
-// ============================================================
-
-const FOX_SKINS = [
-    { id:'classic',  name:'Classic Fox',  nameFa:'روباه کلاسیک',     color:'#f97316', price:0,          rarity:'common',    trailColor:'rgba(249,115,22,0.3)',  glowColor:'#f97316', eyeColor:'#1a1a2a', desc:'🔥 Orange trail' },
-    { id:'ember',    name:'Ember Fox',    nameFa:'روباه آتشین',      color:'#ef4444', price:250000,     rarity:'uncommon',  trailColor:'rgba(239,68,68,0.3)',   glowColor:'#ff6b35', eyeColor:'#fbbf24', desc:'💥 Fire sparks' },
-    { id:'frost',    name:'Frost Fox',    nameFa:'روباه یخی',        color:'#3b82f6', price:500000,     rarity:'uncommon',  trailColor:'rgba(59,130,246,0.3)',  glowColor:'#93c5fd', eyeColor:'#ffffff', desc:'❄️ Ice trail' },
-    { id:'shadow',   name:'Shadow Fox',   nameFa:'روباه شب',         color:'#7c3aed', price:1000000,    rarity:'rare',      trailColor:'rgba(124,58,237,0.3)',  glowColor:'#4ade80', eyeColor:'#4ade80', desc:'🌑 Purple shadow' },
-    { id:'golden',   name:'Golden Fox',   nameFa:'روباه طلایی',      color:'#fbbf24', price:1750000,    rarity:'rare',      trailColor:'rgba(251,191,36,0.3)',  glowColor:'#fcd34d', eyeColor:'#78350f', desc:'✨ Gold trail' },
-    { id:'neon',     name:'Neon Fox',     nameFa:'روباه نئونی',      color:'#ec4899', price:2500000,    rarity:'epic',      trailColor:'rgba(236,72,153,0.3)',  glowColor:'#f472b6', eyeColor:'#3b82f6', desc:'💜 Neon trail' },
-    { id:'crystal',  name:'Crystal Fox',  nameFa:'روباه کریستالی',   color:'#8b5cf6', price:4000000,    rarity:'epic',      trailColor:'rgba(139,92,246,0.3)',  glowColor:'#a78bfa', eyeColor:'#c4b5d4', desc:'💎 Crystal trail' },
-    { id:'galaxy',   name:'Galaxy Fox',   nameFa:'روباه کهکشانی',    color:'#1e1b4b', price:7500000,    rarity:'legendary', trailColor:'rgba(129,140,248,0.3)', glowColor:'#818cf8', eyeColor:'#c7d2fe', desc:'🌌 Galaxy trail' },
-    { id:'rainbow',  name:'Rainbow Fox',  nameFa:'روباه رنگین‌کمان', color:'rainbow', price:12500000,   rarity:'legendary', trailColor:'rgba(255,255,255,0.2)', glowColor:null,      eyeColor:'#ffffff', desc:'🌈 Rainbow trail' },
-    { id:'phoenix',  name:'Phoenix Fox',  nameFa:'روباه ققنوس',      color:'#dc2626', price:25000000,   rarity:'mythic',    trailColor:'rgba(220,38,38,0.3)',   glowColor:'#f97316', eyeColor:'#fcd34d', desc:'🔥 Phoenix trail' }
-];
-
-// ============================================================
-// بخش ۹: متغیرهای اصلی
+// بخش ۸: متغیرهای اصلی
 // ============================================================
 
 let isOnline = true;
@@ -2081,19 +1592,13 @@ const POWERUP_CONFIG = {
 };
 
 const fox = {
-    x:100,
-    y:0,
-    w:62,
-    h:48,
-    vy:0,
-    gravity:2100,
-    jump:-780,
-    grounded:true,
-    animation:0
+    x:100, y:0, w:62, h:48,
+    vy:0, gravity:2100, jump:-780,
+    grounded:true, animation:0
 };
 
 // ============================================================
-// بخش ۱۰: توابع کمکی عمومی
+// بخش ۹: توابع کمکی عمومی
 // ============================================================
 
 function loadNumber(key, defaultValue = 0) {
@@ -2141,13 +1646,135 @@ function getThemeIcon(themeId) {
     return seasonal.icon;
 }
 
+const THEME_DESCS = {
+    classic: {
+        spring:{fa:'شکوفه‌های بهاری',    en:'Spring blossoms'},
+        summer:{fa:'آفتاب گرم',          en:'Warm sunshine'},
+        autumn:{fa:'برگ‌های خزانی',      en:'Falling leaves'},
+        winter:{fa:'دانه‌های برف',        en:'Snowflakes'},
+        christmas:{fa:'روح کریسمس',      en:'Christmas spirit'},
+        nowruz:{fa:'بهار نوروزی',        en:'Nowruz spring'},
+        birthday:{fa:'جشن تولد',         en:'Birthday party'},
+        anniversary:{fa:'جشن سالگرد',    en:'Anniversary joy'}
+    },
+    city: {
+        spring:{fa:'خیابان‌های شکوفا',   en:'Blooming streets'},
+        summer:{fa:'شهر آفتابی',         en:'Sunny city'},
+        autumn:{fa:'پاییز شهری',         en:'Urban autumn'},
+        winter:{fa:'شهر برفی',            en:'Snowy city'},
+        christmas:{fa:'شهر کریسمس',      en:'Christmas city'},
+        nowruz:{fa:'شهر عیدانه',         en:'Nowruz city'},
+        birthday:{fa:'شهر جشن',          en:'Party city'},
+        anniversary:{fa:'شهر سالگرد',    en:'Anniversary city'}
+    },
+    beach: {
+        spring:{fa:'ساحل آرام',           en:'Calm shore'},
+        summer:{fa:'ساحل آفتابی',         en:'Sunny beach'},
+        autumn:{fa:'ساحل غروب',           en:'Sunset shore'},
+        winter:{fa:'ساحل یخی',            en:'Icy shore'},
+        christmas:{fa:'ساحل کریسمس',      en:'Christmas shore'},
+        nowruz:{fa:'ساحل بهاری',          en:'Spring shore'},
+        birthday:{fa:'ساحل جشن',          en:'Birthday shore'},
+        anniversary:{fa:'ساحل سالگرد',    en:'Anniversary shore'}
+    },
+    forest: {
+        spring:{fa:'جنگل شکوفا',          en:'Blooming forest'},
+        summer:{fa:'جنگل سبز',            en:'Green forest'},
+        autumn:{fa:'جنگل خزانی',          en:'Autumn forest'},
+        winter:{fa:'جنگل برفی',           en:'Snowy forest'},
+        christmas:{fa:'جنگل کریسمس',      en:'Christmas forest'},
+        nowruz:{fa:'جنگل بهاری',          en:'Spring forest'},
+        birthday:{fa:'جنگل جشن',          en:'Party forest'},
+        anniversary:{fa:'جنگل سالگرد',    en:'Anniversary forest'}
+    },
+    space: {
+        spring:{fa:'کهکشان شکوفا',        en:'Blooming galaxy'},
+        summer:{fa:'کهکشان درخشان',       en:'Bright galaxy'},
+        autumn:{fa:'کهکشان خزانی',        en:'Autumn galaxy'},
+        winter:{fa:'کهکشان یخی',          en:'Frozen galaxy'},
+        christmas:{fa:'کهکشان کریسمس',    en:'Christmas galaxy'},
+        nowruz:{fa:'کهکشان نوروزی',       en:'Nowruz galaxy'},
+        birthday:{fa:'کهکشان جشن',        en:'Party galaxy'},
+        anniversary:{fa:'کهکشان سالگرد',  en:'Anniversary galaxy'}
+    },
+    night: {
+        spring:{fa:'شب شکوفا',            en:'Blooming night'},
+        summer:{fa:'شب گرم',              en:'Warm night'},
+        autumn:{fa:'شب خزانی',            en:'Autumn night'},
+        winter:{fa:'شب برفی',             en:'Snowy night'},
+        christmas:{fa:'شب کریسمس',        en:'Christmas night'},
+        nowruz:{fa:'شب نوروزی',           en:'Nowruz night'},
+        birthday:{fa:'شب جشن',            en:'Party night'},
+        anniversary:{fa:'شب سالگرد',      en:'Anniversary night'}
+    },
+    volcano: {
+        spring:{fa:'آتشفشان شکوفا',       en:'Blooming volcano'},
+        summer:{fa:'آتشفشان سوزان',       en:'Burning volcano'},
+        autumn:{fa:'آتشفشان خزانی',       en:'Autumn volcano'},
+        winter:{fa:'آتشفشان یخی',         en:'Frozen volcano'},
+        christmas:{fa:'آتشفشان کریسمس',   en:'Christmas volcano'},
+        nowruz:{fa:'آتشفشان نوروزی',      en:'Nowruz volcano'},
+        birthday:{fa:'آتشفشان جشن',       en:'Party volcano'},
+        anniversary:{fa:'آتشفشان سالگرد', en:'Anniversary volcano'}
+    },
+    ocean: {
+        spring:{fa:'موج بهاری',           en:'Spring waves'},
+        summer:{fa:'موج تابستانی',        en:'Summer waves'},
+        autumn:{fa:'موج خزانی',           en:'Autumn waves'},
+        winter:{fa:'موج یخی',             en:'Icy waves'},
+        christmas:{fa:'موج کریسمس',       en:'Christmas waves'},
+        nowruz:{fa:'موج نوروزی',          en:'Nowruz waves'},
+        birthday:{fa:'موج جشن',           en:'Party waves'},
+        anniversary:{fa:'موج سالگرد',     en:'Anniversary waves'}
+    },
+    desert: {
+        spring:{fa:'صحرای شکوفا',         en:'Blooming desert'},
+        summer:{fa:'صحرای سوزان',         en:'Burning desert'},
+        autumn:{fa:'صحرای خزانی',         en:'Autumn desert'},
+        winter:{fa:'صحرای یخی',           en:'Frozen desert'},
+        christmas:{fa:'صحرای کریسمس',     en:'Christmas desert'},
+        nowruz:{fa:'صحرای نوروزی',        en:'Nowruz desert'},
+        birthday:{fa:'صحرای جشن',         en:'Party desert'},
+        anniversary:{fa:'صحرای سالگرد',   en:'Anniversary desert'}
+    },
+    magic: {
+        spring:{fa:'جادوی شکوفا',         en:'Blooming magic'},
+        summer:{fa:'جادوی درخشان',        en:'Bright magic'},
+        autumn:{fa:'جادوی خزانی',         en:'Autumn magic'},
+        winter:{fa:'جادوی یخی',           en:'Frozen magic'},
+        christmas:{fa:'جادوی کریسمس',     en:'Christmas magic'},
+        nowruz:{fa:'جادوی نوروزی',        en:'Nowruz magic'},
+        birthday:{fa:'جادوی جشن',         en:'Party magic'},
+        anniversary:{fa:'جادوی سالگرد',   en:'Anniversary magic'}
+    },
+    toon: {
+        spring:{fa:'بهار کارتونی',        en:'Toon spring'},
+        summer:{fa:'تابستان کارتونی',     en:'Toon summer'},
+        autumn:{fa:'پاییز کارتونی',       en:'Toon autumn'},
+        winter:{fa:'زمستان کارتونی',      en:'Toon winter'},
+        christmas:{fa:'کریسمس کارتونی',   en:'Toon Christmas'},
+        nowruz:{fa:'نوروز کارتونی',       en:'Toon Nowruz'},
+        birthday:{fa:'تولد کارتونی',      en:'Toon birthday'},
+        anniversary:{fa:'سالگرد کارتونی', en:'Toon anniversary'}
+    },
+    cyberpunk: {
+        spring:{fa:'نئون بهاری',          en:'Neon spring'},
+        summer:{fa:'نئون تابستانی',       en:'Neon summer'},
+        autumn:{fa:'نئون خزانی',          en:'Neon autumn'},
+        winter:{fa:'نئون یخی',            en:'Neon winter'},
+        christmas:{fa:'نئون کریسمس',      en:'Neon Christmas'},
+        nowruz:{fa:'نئون نوروزی',         en:'Neon Nowruz'},
+        birthday:{fa:'نئون تولد',         en:'Neon birthday'},
+        anniversary:{fa:'نئون سالگرد',    en:'Neon anniversary'}
+    }
+};
+
 function getThemeDesc(themeId) {
-    const icons = { spring:'🌸', summer:'☀️', autumn:'🍂', winter:'❄️' };
-    const fa = { spring:'بهاری', summer:'تابستانی', autumn:'پاییزی', winter:'زمستانی' };
-    const en = { spring:'Spring', summer:'Summer', autumn:'Autumn', winter:'Winter' };
-    return language === 'fa'
-        ? icons[currentSeason] + ' تم ' + fa[currentSeason]
-        : icons[currentSeason] + ' ' + en[currentSeason] + ' Theme';
+    const descs = THEME_DESCS[themeId];
+    if (!descs) return '';
+    const d = descs[currentSeason];
+    if (!d) return '';
+    return language === 'fa' ? d.fa : d.en;
 }
 
 function getSkin(id) {
@@ -2242,7 +1869,1199 @@ function showToast(msg) {
 }
 
 // ============================================================
-// بخش ۱۱: سیستم صدا
+// پایان پیام ۳
+// ============================================================
+// ============================================================
+// بخش ۱۰: پالت‌های Classic + City (۱۶ پالت)
+// ============================================================
+
+const THEME_PALETTES = {
+
+    // ============================================================
+    // CLASSIC - ۸ پالت
+    // ============================================================
+    classic: {
+        spring: {
+            skyDay:     ['#ffd6e8','#ffe0ec','#ffeaf2'],
+            skyNight:   ['#2a1a2e','#3a1a3e','#4a2a4e'],
+            groundDay:  ['#a8d8a0','#98c890','#88b880'],
+            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+            sun:        'rgba(255,220,235,0.75)',
+            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.2)'
+        },
+        summer: {
+            skyDay:     ['#87CEEB','#a8d8f0','#c8e8f5'],
+            skyNight:   ['#0a1525','#152535','#1a2a40'],
+            groundDay:  ['#7dbb4b','#6aaa3a','#55963b'],
+            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+            sun:        'rgba(255,240,150,0.8)',
+            tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.2)'
+        },
+        autumn: {
+            skyDay:     ['#ffb060','#ffc080','#ffd0a0'],
+            skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
+            groundDay:  ['#c8a060','#b89050','#a88040'],
+            groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
+            sun:        'rgba(255,230,180,0.7)',
+            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.2)'
+        },
+        winter: {
+            skyDay:     ['#c8e0f0','#d8e8f5','#e8f0fa'],
+            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+            groundDay:  ['#e0e8f0','#d0d8e0','#c0c8d0'],
+            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+            sun:        'rgba(220,235,255,0.6)',
+            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.4)'
+        },
+        // ========== Event ها ==========
+        christmas: {
+            skyDay:     ['#1a2a3a','#2a3a4a','#3a4a5a'],
+            skyNight:   ['#0a1a2a','#1a2a3a','#2a3a4a'],
+            groundDay:  ['#f0f5fa','#e8f0f8','#dce8f0'],
+            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+            sun:        'rgba(255,220,180,0.5)',
+            tree:       { trunk:'#3a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+            rock:       '#dc2626',
+            cactus:     '#22c55e',
+            skyStars:   'rgba(255,255,255,0.6)'
+        },
+        nowruz: {
+            skyDay:     ['#a8d8f0','#c0e0f5','#d8e8fa'],
+            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+            groundDay:  ['#8ad870','#7ac860','#6ab850'],
+            groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+            sun:        'rgba(255,240,180,0.85)',
+            tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,255,255,0.3)'
+        },
+        birthday: {
+            skyDay:     ['#ffd6e8','#ffc0d8','#ffa8c8'],
+            skyNight:   ['#3a1a3a','#4a2a4a','#5a3a5a'],
+            groundDay:  ['#ffb8d8','#ffa8c8','#ff98b8'],
+            groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
+            sun:        'rgba(255,180,220,0.8)',
+            tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+            rock:       '#a855f7',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,200,220,0.5)'
+        },
+        anniversary: {
+            skyDay:     ['#ffed4e','#fff59d','#fff9c4'],
+            skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+            groundDay:  ['#ffd700','#ffed4e','#fff59d'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,215,0,0.9)',
+            tree:       { trunk:'#a855f7', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,215,0,0.5)'
+        }
+    },
+
+    // ============================================================
+    // CITY - ۸ پالت
+    // ============================================================
+    city: {
+        spring: {
+            skyDay:     ['#d8d0d8','#e0d8e0','#e8e0e8'],
+            skyNight:   ['#1a1a2e','#2a2a3e','#3a3a4e'],
+            groundDay:  ['#a8a898','#989888','#888878'],
+            groundNight:['#3a3a4a','#2a2a3a','#1a1a2a'],
+            sun:        'rgba(255,220,235,0.7)',
+            tree:       { trunk:'#5a4a3a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+            rock:       '#22c55e',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.15)'
+        },
+        summer: {
+            skyDay:     ['#b8c8d8','#d0dce8','#e0e8f0'],
+            skyNight:   ['#0a1520','#15202a','#1a2a3a'],
+            groundDay:  ['#8a9aa8','#7a8a98','#6a7a88'],
+            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+            sun:        'rgba(255,240,150,0.7)',
+            tree:       { trunk:'#5a4a3a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.15)'
+        },
+        autumn: {
+            skyDay:     ['#c8b0a0','#d0b8a8','#d8c0b0'],
+            skyNight:   ['#2a1a1a','#3a2a2a','#4a3a3a'],
+            groundDay:  ['#8a8a78','#7a7a68','#6a6a58'],
+            groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
+            sun:        'rgba(255,230,180,0.6)',
+            tree:       { trunk:'#5a4a3a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.15)'
+        },
+        winter: {
+            skyDay:     ['#d8e0e8','#e0e8f0','#e8f0f8'],
+            skyNight:   ['#2a3a4a','#3a4a5a','#4a5a6a'],
+            groundDay:  ['#b8c0c8','#a8b0b8','#98a0a8'],
+            groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+            sun:        'rgba(220,235,255,0.55)',
+            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.3)'
+        },
+        // ========== Event ها ==========
+        christmas: {
+            skyDay:     ['#2a3a4a','#3a4a5a','#4a5a6a'],
+            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+            groundDay:  ['#e8f0f8','#dce8f0','#d0dce8'],
+            groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+            sun:        'rgba(255,220,180,0.5)',
+            tree:       { trunk:'#3a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+            rock:       '#dc2626',
+            cactus:     '#22c55e',
+            skyStars:   'rgba(255,255,255,0.5)'
+        },
+        nowruz: {
+            skyDay:     ['#c8e0d8','#d8e8e0','#e8f0e8'],
+            skyNight:   ['#1a2a2a','#2a3a3a','#3a4a4a'],
+            groundDay:  ['#a8b898','#98a888','#889878'],
+            groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
+            sun:        'rgba(255,240,180,0.75)',
+            tree:       { trunk:'#5a4a3a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,255,255,0.2)'
+        },
+        birthday: {
+            skyDay:     ['#d8c0d8','#e0c8e0','#e8d0e8'],
+            skyNight:   ['#2a1a2a','#3a2a3a','#4a3a4a'],
+            groundDay:  ['#d8b8d8','#d8a8d8','#d898d8'],
+            groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
+            sun:        'rgba(255,180,220,0.7)',
+            tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+            rock:       '#a855f7',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,200,220,0.4)'
+        },
+        anniversary: {
+            skyDay:     ['#ffd700','#ffed4e','#fff59d'],
+            skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+            groundDay:  ['#c8a850','#b89840','#a88830'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,215,0,0.85)',
+            tree:       { trunk:'#a855f7', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,215,0,0.4)'
+        }
+    },
+
+// ============================================================
+// پایان پیام ۴
+// ============================================================
+// ============================================================
+// BEACH - ۸ پالت
+// ============================================================
+beach: {
+    spring: {
+        skyDay:     ['#a8d8f0','#c0e0f5','#d8e8fa'],
+        skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:  ['#f5e0b0','#f0d8a0','#e8d090'],
+        groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
+        sun:        'rgba(255,220,200,0.75)',
+        tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:     ['#87CEEB','#b0d8f0','#d0e8f5'],
+        skyNight:   ['#0a1a2a','#152535','#1a2a40'],
+        groundDay:  ['#f0d8a0','#e8c888','#d4b070'],
+        groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
+        sun:        'rgba(255,245,180,0.85)',
+        tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:     ['#f0b090','#f5c0a0','#fad0b0'],
+        skyNight:   ['#2a1a1a','#3a2a1a','#4a3a2a'],
+        groundDay:  ['#e8c880','#d8b870','#c8a860'],
+        groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
+        sun:        'rgba(255,220,180,0.7)',
+        tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    winter: {
+        skyDay:     ['#b0d8f0','#c8e0f5','#e0e8fa'],
+        skyNight:   ['#2a3a4a','#3a4a5a','#4a5a6a'],
+        groundDay:  ['#f0f0f0','#e8e8e8','#dcdcdc'],
+        groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:        'rgba(220,235,255,0.6)',
+        tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.35)'
+    },
+    // ========== Event ها ==========
+    christmas: {
+        skyDay:     ['#2a3a4a','#3a4a5a','#4a5a6a'],
+        skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:  ['#f5f5f5','#ebebeb','#e0e0e0'],
+        groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:        'rgba(255,220,180,0.5)',
+        tree:       { trunk:'#3a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+        rock:       '#dc2626',
+        cactus:     '#22c55e',
+        skyStars:   'rgba(255,255,255,0.55)'
+    },
+    nowruz: {
+        skyDay:     ['#b8e0f0','#c8e8f5','#d8f0fa'],
+        skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:  ['#a8e070','#98d060','#88c050'],
+        groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:        'rgba(255,240,180,0.85)',
+        tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:     ['#ffd6e8','#ffc8dc','#ffb8d0'],
+        skyNight:   ['#3a1a2a','#4a2a3a','#5a3a4a'],
+        groundDay:  ['#f5d0c0','#f5c0b0','#f5b0a0'],
+        groundNight:['#3a2a2a','#2a1a1a','#1a0a0a'],
+        sun:        'rgba(255,180,220,0.8)',
+        tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+        rock:       '#a855f7',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:     ['#ffed4e','#fff59d','#fff9c4'],
+        skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:  ['#ffd700','#ffed4e','#fff59d'],
+        groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:        'rgba(255,215,0,0.9)',
+        tree:       { trunk:'#a855f7', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,215,0,0.5)'
+    }
+},
+
+// ============================================================
+// FOREST - ۸ پالت
+// ============================================================
+forest: {
+    spring: {
+        skyDay:     ['#c8e0c8','#d8e8d8','#e8f0e8'],
+        skyNight:   ['#1a2a1a','#2a3a2a','#3a4a3a'],
+        groundDay:  ['#5a7a3a','#4a6a2a','#3a5a1a'],
+        groundNight:['#1a2a0a','#0a1a0a','#050a00'],
+        sun:        'rgba(240,220,240,0.7)',
+        tree:       { trunk:'#5a3a1a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:     ['#6a9a6a','#7aaa7a','#8aba8a'],
+        skyNight:   ['#0a1a0a','#152a15','#1a3a1a'],
+        groundDay:  ['#3a5a2a','#2a4a1a','#1a3a0a'],
+        groundNight:['#1a2a0a','#0a1a0a','#050a00'],
+        sun:        'rgba(255,240,150,0.75)',
+        tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:     ['#d8a070','#e0b080','#e8c090'],
+        skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
+        groundDay:  ['#8a6a3a','#7a5a2a','#6a4a1a'],
+        groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:        'rgba(255,220,160,0.7)',
+        tree:       { trunk:'#5a3a1a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    winter: {
+        skyDay:     ['#c8d8e0','#d8e0e8','#e8f0f5'],
+        skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:  ['#b0c0c8','#a0b0b8','#90a0a8'],
+        groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:        'rgba(220,235,255,0.55)',
+        tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.4)'
+    },
+    // ========== Event ها ==========
+    christmas: {
+        skyDay:     ['#1a2a2a','#2a3a3a','#3a4a4a'],
+        skyNight:   ['#0a1a1a','#1a2a2a','#2a3a3a'],
+        groundDay:  ['#e8f0e8','#dce8dc','#d0e0d0'],
+        groundNight:['#3a4a3a','#2a3a2a','#1a2a1a'],
+        sun:        'rgba(255,220,180,0.5)',
+        tree:       { trunk:'#3a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+        rock:       '#dc2626',
+        cactus:     '#22c55e',
+        skyStars:   'rgba(255,255,255,0.6)'
+    },
+    nowruz: {
+        skyDay:     ['#b8e0c0','#c8e8d0','#d8f0e0'],
+        skyNight:   ['#1a2a1a','#2a3a2a','#3a4a3a'],
+        groundDay:  ['#5aa040','#4a9030','#3a8020'],
+        groundNight:['#1a2a0a','#0a1a0a','#050a00'],
+        sun:        'rgba(255,240,180,0.85)',
+        tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:     ['#d8c0d0','#e0c8d8','#e8d0e0'],
+        skyNight:   ['#2a1a2a','#3a2a3a','#4a3a4a'],
+        groundDay:  ['#6a8a5a','#5a7a4a','#4a6a3a'],
+        groundNight:['#1a2a1a','#0a1a0a','#050a00'],
+        sun:        'rgba(255,180,220,0.7)',
+        tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+        rock:       '#a855f7',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,200,220,0.4)'
+    },
+    anniversary: {
+        skyDay:     ['#ffd700','#ffed4e','#fff59d'],
+        skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:  ['#8a7a3a','#7a6a2a','#6a5a1a'],
+        groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:        'rgba(255,215,0,0.85)',
+        tree:       { trunk:'#a855f7', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,215,0,0.4)'
+    }
+},
+// ============================================================
+// SPACE - ۸ پالت
+// ============================================================
+space: {
+    spring: {
+        skyDay:     ['#3a1a5a','#4a2a6a','#5a3a7a'],
+        skyNight:   ['#0a0a1a','#1a0a2a','#2a0a3a'],
+        groundDay:  ['#4a2a6a','#5a3a7a','#6a4a8a'],
+        groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(255,180,220,0.4)',
+        tree:       { trunk:'#3a2a4a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+        rock:       '#00e5ff',
+        cactus:     '#ff9ec7',
+        skyStars:   'rgba(200,180,255,0.4)'
+    },
+    summer: {
+        skyDay:     ['#1a0a3a','#2a1a4a','#3a2a5a'],
+        skyNight:   ['#0a0a1a','#0a0a2a','#1a0a2a'],
+        groundDay:  ['#3a2a4a','#4a3a5a','#5a4a6a'],
+        groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(200,180,255,0.35)',
+        tree:       { trunk:'#3a2a4a', main:'#818cf8', light:'#a5b4fc', dark:'#6366f1' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.5)'
+    },
+    autumn: {
+        skyDay:     ['#4a1a2a','#5a2a3a','#6a3a4a'],
+        skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:  ['#4a2a3a','#5a3a4a','#6a4a5a'],
+        groundNight:['#1a0a1a','#0a0a1a','#05000a'],
+        sun:        'rgba(255,200,180,0.4)',
+        tree:       { trunk:'#3a2a4a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+        rock:       '#00e5ff',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,220,180,0.4)'
+    },
+    winter: {
+        skyDay:     ['#1a2a4a','#2a3a5a','#3a4a6a'],
+        skyNight:   ['#0a0a1a','#1a1a2a','#2a2a3a'],
+        groundDay:  ['#2a3a5a','#3a4a6a','#4a5a7a'],
+        groundNight:['#1a1a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(200,220,255,0.4)',
+        tree:       { trunk:'#3a2a4a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(200,220,255,0.5)'
+    },
+    // ========== Event ها ==========
+    christmas: {
+        skyDay:     ['#1a0a3a','#2a1a4a','#3a2a5a'],
+        skyNight:   ['#0a0a1a','#0a0a2a','#1a0a2a'],
+        groundDay:  ['#2a1a4a','#3a2a5a','#4a3a6a'],
+        groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(255,220,180,0.4)',
+        tree:       { trunk:'#1a1a3a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+        rock:       '#dc2626',
+        cactus:     '#22c55e',
+        skyStars:   'rgba(255,220,255,0.6)'
+    },
+    nowruz: {
+        skyDay:     ['#4a3a6a','#5a4a7a','#6a5a8a'],
+        skyNight:   ['#1a0a2a','#2a0a3a','#3a0a4a'],
+        groundDay:  ['#4a3a6a','#5a4a7a','#6a5a8a'],
+        groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(255,240,180,0.6)',
+        tree:       { trunk:'#3a2a4a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(220,255,220,0.5)'
+    },
+    birthday: {
+        skyDay:     ['#4a1a4a','#5a2a5a','#6a3a6a'],
+        skyNight:   ['#1a0a1a','#2a0a2a','#3a0a3a'],
+        groundDay:  ['#5a2a5a','#6a3a6a','#7a4a7a'],
+        groundNight:['#2a0a2a','#1a001a','#0a000a'],
+        sun:        'rgba(255,180,255,0.5)',
+        tree:       { trunk:'#3a2a4a', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+        rock:       '#a855f7',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,200,255,0.6)'
+    },
+    anniversary: {
+        skyDay:     ['#4a3a0a','#5a4a1a','#6a5a2a'],
+        skyNight:   ['#1a0a0a','#2a1a0a','#3a2a0a'],
+        groundDay:  ['#5a4a1a','#6a5a2a','#7a6a3a'],
+        groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:        'rgba(255,215,0,0.6)',
+        tree:       { trunk:'#3a2a4a', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,215,0,0.6)'
+    }
+},
+
+// ============================================================
+// NIGHT - ۸ پالت
+// ============================================================
+night: {
+    spring: {
+        skyDay:     ['#3a2a4e','#4a3a5e','#5a4a6e'],
+        skyNight:   ['#0a0a1a','#1a0a2a','#2a1a3a'],
+        groundDay:  ['#3a2a4a','#2a1a3a','#1a0a2a'],
+        groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(255,180,220,0.3)',
+        tree:       { trunk:'#3a2a3a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+        rock:       '#00e5ff',
+        cactus:     '#ff9ec7',
+        skyStars:   'rgba(255,255,255,0.4)'
+    },
+    summer: {
+        skyDay:     ['#1a1a2e','#16213e','#0f3460'],
+        skyNight:   ['#0a0a1a','#0a0a2a','#1a0a2a'],
+        groundDay:  ['#2a2a3a','#1a1a2a','#0a0a1a'],
+        groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(200,180,255,0.25)',
+        tree:       { trunk:'#3a2a3a', main:'#818cf8', light:'#a5b4fc', dark:'#6366f1' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.5)'
+    },
+    autumn: {
+        skyDay:     ['#3a1a1a','#4a2a2a','#5a3a3a'],
+        skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:  ['#3a2a2a','#2a1a1a','#1a0a0a'],
+        groundNight:['#1a0a0a','#0a0000','#050000'],
+        sun:        'rgba(255,200,180,0.3)',
+        tree:       { trunk:'#3a2a3a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,220,180,0.4)'
+    },
+    winter: {
+        skyDay:     ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        skyNight:   ['#0a1a2a','#1a2a3a','#2a3a4a'],
+        groundDay:  ['#2a3a4a','#1a2a3a','#0a1a2a'],
+        groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
+        sun:        'rgba(220,235,255,0.3)',
+        tree:       { trunk:'#3a2a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(220,235,255,0.5)'
+    },
+    // ========== Event ها ==========
+    christmas: {
+        skyDay:     ['#0a1a2a','#1a2a3a','#2a3a4a'],
+        skyNight:   ['#050a1a','#0a1a2a','#1a2a3a'],
+        groundDay:  ['#2a3a4a','#1a2a3a','#0a1a2a'],
+        groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
+        sun:        'rgba(220,235,255,0.3)',
+        tree:       { trunk:'#0a1a0a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+        rock:       '#dc2626',
+        cactus:     '#22c55e',
+        skyStars:   'rgba(255,220,255,0.7)'
+    },
+    nowruz: {
+        skyDay:     ['#2a3a2a','#3a4a3a','#4a5a4a'],
+        skyNight:   ['#0a1a0a','#1a2a1a','#2a3a2a'],
+        groundDay:  ['#2a3a2a','#1a2a1a','#0a1a0a'],
+        groundNight:['#1a2a1a','#0a1a0a','#050a05'],
+        sun:        'rgba(255,240,180,0.4)',
+        tree:       { trunk:'#2a3a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,240,200,0.5)'
+    },
+    birthday: {
+        skyDay:     ['#3a1a3a','#4a2a4a','#5a3a5a'],
+        skyNight:   ['#1a0a1a','#2a0a2a','#3a0a3a'],
+        groundDay:  ['#3a1a3a','#2a0a2a','#1a001a'],
+        groundNight:['#2a0a2a','#1a001a','#0a000a'],
+        sun:        'rgba(255,180,255,0.4)',
+        tree:       { trunk:'#3a2a4a', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+        rock:       '#a855f7',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,200,255,0.6)'
+    },
+    anniversary: {
+        skyDay:     ['#2a2a0a','#3a3a1a','#4a4a2a'],
+        skyNight:   ['#1a1a0a','#2a2a1a','#3a3a2a'],
+        groundDay:  ['#2a2a0a','#1a1a00','#0a0a00'],
+        groundNight:['#1a1a0a','#0a0a00','#050500'],
+        sun:        'rgba(255,215,0,0.4)',
+        tree:       { trunk:'#2a2a0a', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,215,0,0.6)'
+    }
+},
+// ============================================================
+// VOLCANO - ۸ پالت
+// ============================================================
+volcano: {
+    spring: {
+        skyDay:     ['#6a3a2a','#7a4a3a','#8a5a4a'],
+        skyNight:   ['#2a0a0a','#3a0a0a','#4a0a0a'],
+        groundDay:  ['#3a1a0a','#2a0a0a','#1a0a0a'],
+        groundNight:['#1a0a0a','#0a0a0a','#050000'],
+        sun:        'rgba(255,180,200,0.5)',
+        tree:       { trunk:'#3a1a0a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+        rock:       '#00e5ff',
+        cactus:     '#ff9ec7',
+        skyStars:   'rgba(255,220,180,0.3)'
+    },
+    summer: {
+        skyDay:     ['#4a1a0a','#6a2a0a','#8a3a0a'],
+        skyNight:   ['#2a0a0a','#3a0a0a','#4a0a0a'],
+        groundDay:  ['#2a1a0a','#1a0a0a','#0a0a0a'],
+        groundNight:['#1a0a0a','#0a0a0a','#050000'],
+        sun:        'rgba(255,150,100,0.6)',
+        tree:       { trunk:'#3a1a0a', main:'#dc2626', light:'#ef4444', dark:'#991b1b' },
+        rock:       '#00e5ff',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,200,150,0.3)'
+    },
+    autumn: {
+        skyDay:     ['#3a1a0a','#4a2a0a','#5a3a1a'],
+        skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:  ['#2a1a0a','#1a0a0a','#0a0a0a'],
+        groundNight:['#1a0a0a','#0a0a0a','#050000'],
+        sun:        'rgba(255,160,100,0.5)',
+        tree:       { trunk:'#3a1a0a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+        rock:       '#00e5ff',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,220,180,0.3)'
+    },
+    winter: {
+        skyDay:     ['#4a4a5a','#5a5a6a','#6a6a7a'],
+        skyNight:   ['#1a1a2a','#2a2a3a','#3a3a4a'],
+        groundDay:  ['#3a3a4a','#2a2a3a','#1a1a2a'],
+        groundNight:['#1a1a2a','#0a0a1a','#05000a'],
+        sun:        'rgba(220,235,255,0.4)',
+        tree:       { trunk:'#3a2a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(220,235,255,0.4)'
+    },
+    // ========== Event ها ==========
+    christmas: {
+        skyDay:     ['#2a1a1a','#3a2a2a','#4a3a3a'],
+        skyNight:   ['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:  ['#3a2a2a','#2a1a1a','#1a0a0a'],
+        groundNight:['#2a0a0a','#1a0000','#0a0000'],
+        sun:        'rgba(255,220,180,0.4)',
+        tree:       { trunk:'#1a0a0a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+        rock:       '#dc2626',
+        cactus:     '#22c55e',
+        skyStars:   'rgba(255,220,180,0.5)'
+    },
+    nowruz: {
+        skyDay:     ['#5a4a2a','#6a5a3a','#7a6a4a'],
+        skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
+        groundDay:  ['#4a3a1a','#3a2a0a','#2a1a00'],
+        groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:        'rgba(255,240,180,0.6)',
+        tree:       { trunk:'#3a1a0a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,240,180,0.4)'
+    },
+    birthday: {
+        skyDay:     ['#4a1a2a','#5a2a3a','#6a3a4a'],
+        skyNight:   ['#2a0a1a','#3a0a2a','#4a0a3a'],
+        groundDay:  ['#3a1a2a','#2a0a1a','#1a000a'],
+        groundNight:['#2a0a1a','#1a000a','#0a0000'],
+        sun:        'rgba(255,180,220,0.5)',
+        tree:       { trunk:'#3a1a2a', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+        rock:       '#a855f7',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:     ['#4a2a0a','#5a3a1a','#6a4a2a'],
+        skyNight:   ['#2a1a00','#3a2a0a','#4a3a1a'],
+        groundDay:  ['#3a2a0a','#2a1a00','#1a0a00'],
+        groundNight:['#2a1a00','#1a0a00','#0a0000'],
+        sun:        'rgba(255,215,0,0.5)',
+        tree:       { trunk:'#3a1a0a', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,215,0,0.5)'
+    }
+},
+
+// ============================================================
+// OCEAN - ۸ پالت
+// ============================================================
+ocean: {
+    spring: {
+        skyDay:     ['#6ac8d8','#8ad0e0','#aad8e8'],
+        skyNight:   ['#0a2a3a','#1a3a4a','#2a4a5a'],
+        groundDay:  ['#f5e0a0','#f0d090','#e8c880'],
+        groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:        'rgba(255,220,220,0.7)',
+        tree:       { trunk:'#4a3a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:     ['#4aa8c8','#6ab8d8','#8ac8e8'],
+        skyNight:   ['#0a1a30','#0a2a40','#0a3a50'],
+        groundDay:  ['#f4d090','#e8c880','#dcc070'],
+        groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:        'rgba(255,250,200,0.85)',
+        tree:       { trunk:'#4a3a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:     ['#d8a888','#e0b898','#e8c8a8'],
+        skyNight:   ['#2a1a1a','#3a2a2a','#4a3a3a'],
+        groundDay:  ['#e8c880','#d8b870','#c8a860'],
+        groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
+        sun:        'rgba(255,200,160,0.7)',
+        tree:       { trunk:'#4a3a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+        rock:       '#8b5cf6',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(255,220,180,0.3)'
+    },
+    winter: {
+        skyDay:     ['#a8d8f0','#c0e0f5','#d8e8fa'],
+        skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:  ['#e8f0f5','#d8e0e8','#c8d0d8'],
+        groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:        'rgba(220,240,255,0.6)',
+        tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+        rock:       '#ff5722',
+        cactus:     '#00e5ff',
+        skyStars:   'rgba(220,235,255,0.4)'
+    },
+    // ========== Event ها ==========
+    christmas: {
+        skyDay:     ['#1a2a3a','#2a3a4a','#3a4a5a'],
+        skyNight:   ['#0a1a2a','#1a2a3a','#2a3a4a'],
+        groundDay:  ['#e8f0f5','#dce8f0','#d0dce8'],
+        groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:        'rgba(255,220,180,0.5)',
+        tree:       { trunk:'#1a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+        rock:       '#dc2626',
+        cactus:     '#22c55e',
+        skyStars:   'rgba(255,255,255,0.6)'
+    },
+    nowruz: {
+        skyDay:     ['#6ae0e0','#8ae8e8','#aaf0f0'],
+        skyNight:   ['#0a2a2a','#1a3a3a','#2a4a4a'],
+        groundDay:  ['#a8e070','#98d060','#88c050'],
+        groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:        'rgba(255,240,180,0.85)',
+        tree:       { trunk:'#4a3a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:     ['#ffc8e0','#ffd0e8','#ffd8f0'],
+        skyNight:   ['#3a1a2a','#4a2a3a','#5a3a4a'],
+        groundDay:  ['#ffd0e0','#ffc0d0','#ffb0c0'],
+        groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
+        sun:        'rgba(255,180,220,0.8)',
+        tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+        rock:       '#a855f7',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:     ['#ffed4e','#fff59d','#fff9c4'],
+        skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:  ['#ffd700','#ffed4e','#fff59d'],
+        groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:        'rgba(255,215,0,0.9)',
+        tree:       { trunk:'#4a3a2a', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+        rock:       '#ffd700',
+        cactus:     '#ff69b4',
+        skyStars:   'rgba(255,215,0,0.5)'
+    }
+},
+    // ============================================================
+    // DESERT - ۸ پالت
+    // ============================================================
+    desert: {
+        spring: {
+            skyDay:     ['#f5c090','#f8d0a8','#fbe0c0'],
+            skyNight:   ['#2a1a0a','#3a2a0a','#4a3a0a'],
+            groundDay:  ['#e0c080','#d0b070','#c0a060'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,230,200,0.75)',
+            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,220,180,0.2)'
+        },
+        summer: {
+            skyDay:     ['#e8a050','#f0b060','#f8c070'],
+            skyNight:   ['#2a1a0a','#3a2a0a','#4a3a0a'],
+            groundDay:  ['#d8b060','#c8a050','#b89040'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,245,180,0.85)',
+            tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,200,150,0.2)'
+        },
+        autumn: {
+            skyDay:     ['#e88850','#f09860','#f8a870'],
+            skyNight:   ['#2a1a0a','#3a2a1a','#4a3a2a'],
+            groundDay:  ['#c8a050','#b89040','#a88030'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,200,160,0.75)',
+            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,220,180,0.3)'
+        },
+        winter: {
+            skyDay:     ['#d8d8e0','#e0e0e8','#e8e8f0'],
+            skyNight:   ['#2a2a3a','#3a3a4a','#4a4a5a'],
+            groundDay:  ['#e8e8f0','#d8d8e0','#c8c8d0'],
+            groundNight:['#4a4a5a','#3a3a4a','#2a2a3a'],
+            sun:        'rgba(230,240,255,0.6)',
+            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(220,235,255,0.45)'
+        },
+        christmas: {
+            skyDay:     ['#2a1a0a','#3a2a0a','#4a3a0a'],
+            skyNight:   ['#1a0a00','#2a1a00','#3a2a0a'],
+            groundDay:  ['#f5f5f5','#ebebeb','#e0e0e0'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,220,180,0.4)',
+            tree:       { trunk:'#3a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+            rock:       '#dc2626',
+            cactus:     '#22c55e',
+            skyStars:   'rgba(255,255,255,0.5)'
+        },
+        nowruz: {
+            skyDay:     ['#f8e8b0','#faf0c0','#fcf5d0'],
+            skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+            groundDay:  ['#c8d870','#b8c860','#a8b850'],
+            groundNight:['#2a2a0a','#1a1a00','#0a0a00'],
+            sun:        'rgba(255,240,180,0.85)',
+            tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,240,200,0.3)'
+        },
+        birthday: {
+            skyDay:     ['#ffd0e0','#ffd8e8','#ffe0f0'],
+            skyNight:   ['#3a2a0a','#4a3a0a','#5a4a1a'],
+            groundDay:  ['#f5c8d0','#f5b8c0','#f5a8b0'],
+            groundNight:['#3a1a1a','#2a0a0a','#1a0000'],
+            sun:        'rgba(255,180,220,0.75)',
+            tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+            rock:       '#a855f7',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,200,220,0.5)'
+        },
+        anniversary: {
+            skyDay:     ['#ffed4e','#fff59d','#fff9c4'],
+            skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+            groundDay:  ['#ffd700','#ffed4e','#fff59d'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,215,0,0.9)',
+            tree:       { trunk:'#a855f7', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,215,0,0.4)'
+        }
+    },
+
+    // ============================================================
+    // MAGIC - ۸ پالت
+    // ============================================================
+    magic: {
+        spring: {
+            skyDay:     ['#d8a8c8','#e0b8d8','#e8c8e8'],
+            skyNight:   ['#2a1a3a','#3a2a4a','#4a3a5a'],
+            groundDay:  ['#5a3a5a','#4a2a4a','#3a1a3a'],
+            groundNight:['#1a0a1a','#0a000a','#050005'],
+            sun:        'rgba(255,200,240,0.7)',
+            tree:       { trunk:'#4a2a4a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+            rock:       '#00e5ff',
+            cactus:     '#ffd700',
+            skyStars:   'rgba(255,220,255,0.4)'
+        },
+        summer: {
+            skyDay:     ['#b888d8','#c898e0','#d8a8e8'],
+            skyNight:   ['#1a0a2a','#2a0a3a','#3a0a4a'],
+            groundDay:  ['#4a2a5a','#3a1a4a','#2a0a3a'],
+            groundNight:['#1a0a1a','#0a000a','#050005'],
+            sun:        'rgba(220,180,255,0.75)',
+            tree:       { trunk:'#4a2a4a', main:'#818cf8', light:'#a5b4fc', dark:'#6366f1' },
+            rock:       '#ffd700',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(220,180,255,0.5)'
+        },
+        autumn: {
+            skyDay:     ['#c888a8','#d898b8','#e8a8c8'],
+            skyNight:   ['#2a0a1a','#3a0a2a','#4a0a3a'],
+            groundDay:  ['#4a2a4a','#3a1a3a','#2a0a2a'],
+            groundNight:['#1a0a1a','#0a000a','#050005'],
+            sun:        'rgba(255,180,220,0.7)',
+            tree:       { trunk:'#4a2a4a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+            rock:       '#00e5ff',
+            cactus:     '#ffd700',
+            skyStars:   'rgba(255,200,220,0.4)'
+        },
+        winter: {
+            skyDay:     ['#b8c8e8','#c8d8f0','#d8e8f8'],
+            skyNight:   ['#1a1a3a','#2a2a4a','#3a3a5a'],
+            groundDay:  ['#4a4a6a','#3a3a5a','#2a2a4a'],
+            groundNight:['#1a1a2a','#0a0a1a','#050005'],
+            sun:        'rgba(220,230,255,0.65)',
+            tree:       { trunk:'#4a3a5a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+            rock:       '#ffd700',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(220,230,255,0.5)'
+        },
+        christmas: {
+            skyDay:     ['#1a1a3a','#2a2a4a','#3a3a5a'],
+            skyNight:   ['#0a0a2a','#1a1a3a','#2a2a4a'],
+            groundDay:  ['#3a3a5a','#2a2a4a','#1a1a3a'],
+            groundNight:['#1a1a2a','#0a0a1a','#050005'],
+            sun:        'rgba(220,230,255,0.5)',
+            tree:       { trunk:'#2a1a3a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+            rock:       '#dc2626',
+            cactus:     '#22c55e',
+            skyStars:   'rgba(255,220,255,0.6)'
+        },
+        nowruz: {
+            skyDay:     ['#d8e8c8','#e0f0d0','#e8f8d8'],
+            skyNight:   ['#2a3a2a','#3a4a3a','#4a5a4a'],
+            groundDay:  ['#6a5a6a','#5a4a5a','#4a3a4a'],
+            groundNight:['#1a2a1a','#0a1a0a','#050005'],
+            sun:        'rgba(255,240,180,0.8)',
+            tree:       { trunk:'#4a2a4a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(220,255,220,0.5)'
+        },
+        birthday: {
+            skyDay:     ['#e8a8d8','#f0b8e0','#f8c8e8'],
+            skyNight:   ['#3a1a3a','#4a2a4a','#5a3a5a'],
+            groundDay:  ['#6a4a6a','#5a3a5a','#4a2a4a'],
+            groundNight:['#2a0a2a','#1a001a','#0a000a'],
+            sun:        'rgba(255,180,255,0.75)',
+            tree:       { trunk:'#4a2a4a', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+            rock:       '#a855f7',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,200,255,0.6)'
+        },
+        anniversary: {
+            skyDay:     ['#ffed4e','#fff59d','#fff9c4'],
+            skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+            groundDay:  ['#6a5a3a','#5a4a2a','#4a3a1a'],
+            groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+            sun:        'rgba(255,215,0,0.85)',
+            tree:       { trunk:'#4a2a4a', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,215,0,0.6)'
+        }
+    },
+
+    // ============================================================
+    // TOON - ۸ پالت
+    // ============================================================
+    toon: {
+        spring: {
+            skyDay:     ['#ffd6e8','#ffe0ec','#ffeaf2'],
+            skyNight:   ['#3a2a4a','#4a3a5a','#5a4a6a'],
+            groundDay:  ['#8ad870','#7ac860','#6ab850'],
+            groundNight:['#2a1a3a','#1a0a2a','#0a001a'],
+            sun:        'rgba(255,240,200,0.9)',
+            tree:       { trunk:'#6a4a2a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.2)'
+        },
+        summer: {
+            skyDay:     ['#87CEEB','#a0d8f0','#b8e0f5'],
+            skyNight:   ['#1a1a3a','#2a2a4a','#3a3a5a'],
+            groundDay:  ['#4ade80','#3ab870','#2aa060'],
+            groundNight:['#1a2a1a','#0a1a0a','#050a05'],
+            sun:        'rgba(255,240,120,0.9)',
+            tree:       { trunk:'#5a3a1a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,255,255,0.2)'
+        },
+        autumn: {
+            skyDay:     ['#ffa860','#ffb870','#ffc880'],
+            skyNight:   ['#3a1a0a','#4a2a1a','#5a3a2a'],
+            groundDay:  ['#d8a850','#c89840','#b88830'],
+            groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+            sun:        'rgba(255,230,160,0.85)',
+            tree:       { trunk:'#6a4a2a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+            rock:       '#8b5cf6',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(255,220,180,0.3)'
+        },
+        winter: {
+            skyDay:     ['#d8e8f5','#e0e8fa','#e8f0ff'],
+            skyNight:   ['#2a3a4a','#3a4a5a','#4a5a6a'],
+            groundDay:  ['#e8f0f5','#d8e0e8','#c8d0d8'],
+            groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+            sun:        'rgba(230,240,255,0.75)',
+            tree:       { trunk:'#5a4a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+            rock:       '#ff5722',
+            cactus:     '#00e5ff',
+            skyStars:   'rgba(220,235,255,0.5)'
+        },
+        christmas: {
+            skyDay:     ['#3a4a5a','#4a5a6a','#5a6a7a'],
+            skyNight:   ['#1a2a3a','#2a3a4a','#3a4a5a'],
+            groundDay:  ['#f0f5fa','#e8f0f8','#dce8f0'],
+            groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+            sun:        'rgba(255,220,180,0.5)',
+            tree:       { trunk:'#3a2a1a', main:'#1a5a1a', light:'#2a7a2a', dark:'#0a3a0a' },
+            rock:       '#dc2626',
+            cactus:     '#22c55e',
+            skyStars:   'rgba(255,255,255,0.55)'
+        },
+        nowruz: {
+            skyDay:     ['#c8f0d0','#d8f8e0','#e8fff0'],
+            skyNight:   ['#2a3a2a','#3a4a3a','#4a5a4a'],
+            groundDay:  ['#8ad870','#7ac860','#6ab850'],
+            groundNight:['#1a2a1a','#0a1a0a','#050a05'],
+            sun:        'rgba(255,240,180,0.9)',
+            tree:       { trunk:'#6a4a2a', main:'#22c55e', light:'#4ade80', dark:'#15803d' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,255,255,0.3)'
+        },
+        birthday: {
+            skyDay:     ['#ffb8d8','#ffc8e0','#ffd8e8'],
+            skyNight:   ['#4a2a4a','#5a3a5a','#6a4a6a'],
+            groundDay:  ['#ffd0e0','#ffc0d0','#ffb0c0'],
+            groundNight:['#3a1a3a','#2a0a2a','#1a001a'],
+            sun:        'rgba(255,180,220,0.9)',
+            tree:       { trunk:'#a855f7', main:'#ff69b4', light:'#ffd700', dark:'#ec4899' },
+            rock:       '#a855f7',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,200,220,0.5)'
+        },
+        anniversary: {
+            skyDay:     ['#ffed4e','#fff59d','#fff9c4'],
+            skyNight:   ['#3a2a0a','#4a3a1a','#5a4a2a'],
+            groundDay:  ['#ffd700','#ffed4e','#fff59d'],
+            groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+            sun:        'rgba(255,215,0,0.95)',
+            tree:       { trunk:'#a855f7', main:'#ffd700', light:'#fff59d', dark:'#f59e0b' },
+            rock:       '#ffd700',
+            cactus:     '#ff69b4',
+            skyStars:   'rgba(255,215,0,0.5)'
+        }
+    },
+
+    // ============================================================
+    // CYBERPUNK - ۸ پالت
+    // ============================================================
+    cyberpunk: {
+        spring: {
+            skyDay:     ['#4a1a4a','#5a2a5a','#6a3a6a'],
+            skyNight:   ['#1a0a2a','#2a0a3a','#3a0a4a'],
+            groundDay:  ['#2a1a3a','#1a0a2a','#0a001a'],
+            groundNight:['#0a001a','#05000a','#000000'],
+            sun:        'rgba(255,100,200,0.4)',
+            tree:       { trunk:'#2a1a3a', main:'#ff9ec7', light:'#ffc4dd', dark:'#e87aa8' },
+            rock:       '#00ff88',
+            cactus:     '#00ffff',
+            skyStars:   'rgba(255,100,200,0.5)'
+        },
+        summer: {
+            skyDay:     ['#2a1a4a','#3a2a5a','#4a3a6a'],
+            skyNight:   ['#0a001a','#1a0a2a','#2a0a3a'],
+            groundDay:  ['#1a1a2a','#2a2a3a','#3a3a4a'],
+            groundNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
+            sun:        'rgba(255,0,200,0.4)',
+            tree:       { trunk:'#2a1a3a', main:'#ff00ff', light:'#ff66ff', dark:'#cc00cc' },
+            rock:       '#00ff88',
+            cactus:     '#ffff00',
+            skyStars:   'rgba(255,0,255,0.6)'
+        },
+        autumn: {
+            skyDay:     ['#4a1a2a','#5a2a3a','#6a3a4a'],
+            skyNight:   ['#1a0a0a','#2a0a1a','#3a0a2a'],
+            groundDay:  ['#2a1a2a','#1a0a1a','#0a000a'],
+            groundNight:['#0a000a','#050005','#000000'],
+            sun:        'rgba(255,100,100,0.4)',
+            tree:       { trunk:'#2a1a3a', main:'#f97316', light:'#fb923c', dark:'#c2410c' },
+            rock:       '#00ff88',
+            cactus:     '#ffff00',
+            skyStars:   'rgba(255,100,150,0.5)'
+        },
+        winter: {
+            skyDay:     ['#2a3a4a','#3a4a5a','#4a5a6a'],
+            skyNight:   ['#0a0a1a','#1a0a2a','#2a0a3a'],
+            groundDay:  ['#2a2a3a','#1a1a2a','#0a0a1a'],
+            groundNight:['#0a0a1a','#05000a','#000000'],
+            sun:        'rgba(100,200,255,0.4)',
+            tree:       { trunk:'#2a1a3a', main:'#e0f2fe', light:'#ffffff', dark:'#bae6fd' },
+            rock:       '#00ff88',
+            cactus:     '#00ffff',
+            skyStars:   'rgba(100,200,255,0.6)'
+        },
+        christmas: {
+            skyDay:     ['#1a0a2a','#2a0a3a','#3a0a4a'],
+            skyNight:   ['#0a001a','#1a0a2a','#2a0a3a'],
+            groundDay:  ['#0a0a1a','#1a0a2a','#2a0a3a'],
+            groundNight:['#0a001a','#05000a','#000000'],
+            sun:        'rgba(255,100,150,0.4)',
+            tree:       { trunk:'#0a001a', main:'#00ff88', light:'#66ffaa', dark:'#00cc66' },
+            rock:       '#ff0044',
+            cactus:     '#00ffff',
+            skyStars:   'rgba(255,0,100,0.7)'
+        },
+        nowruz: {
+            skyDay:     ['#1a3a2a','#2a4a3a','#3a5a4a'],
+            skyNight:   ['#0a1a0a','#1a2a1a','#2a3a2a'],
+            groundDay:  ['#0a1a0a','#1a2a1a','#2a3a2a'],
+            groundNight:['#0a0a0a','#050505','#000000'],
+            sun:        'rgba(100,255,150,0.5)',
+            tree:       { trunk:'#0a1a0a', main:'#00ff88', light:'#66ffaa', dark:'#00cc66' },
+            rock:       '#ffd700',
+            cactus:     '#ff00ff',
+            skyStars:   'rgba(100,255,150,0.6)'
+        },
+        birthday: {
+            skyDay:     ['#4a0a4a','#5a1a5a','#6a2a6a'],
+            skyNight:   ['#2a002a','#3a0a3a','#4a1a4a'],
+            groundDay:  ['#2a0a2a','#1a001a','#0a000a'],
+            groundNight:['#1a001a','#0a000a','#000000'],
+            sun:        'rgba(255,0,255,0.5)',
+            tree:       { trunk:'#2a0a2a', main:'#ff00ff', light:'#ff66ff', dark:'#cc00cc' },
+            rock:       '#ff00aa',
+            cactus:     '#00ffff',
+            skyStars:   'rgba(255,0,255,0.7)'
+        },
+        anniversary: {
+            skyDay:     ['#4a4a0a','#5a5a1a','#6a6a2a'],
+            skyNight:   ['#2a2a00','#3a3a0a','#4a4a1a'],
+            groundDay:  ['#1a1a00','#2a2a0a','#3a3a1a'],
+            groundNight:['#0a0a00','#050500','#000000'],
+            sun:        'rgba(255,255,0,0.5)',
+            tree:       { trunk:'#2a2a0a', main:'#ffff00', light:'#ffff66', dark:'#cccc00' },
+            rock:       '#ffff00',
+            cactus:     '#ff00ff',
+            skyStars:   'rgba(255,255,0,0.7)'
+        }
+    }
+};
+
+// ============================================================
+// بخش ۱۱: توابع کمکی پالت
+// ============================================================
+
+function getThemePalette(themeId, season) {
+    const theme = THEME_PALETTES[themeId] || THEME_PALETTES.classic;
+    return theme[season] || theme.autumn;
+}
+
+function getTheme() {
+    return getThemePalette(currentTheme, currentSeason);
+}
+
+function getSkyColors(isNight) {
+    const p = getTheme();
+    return isNight ? p.skyNight : p.skyDay;
+}
+
+function getGroundColors(isNight) {
+    const p = getTheme();
+    return isNight ? p.groundNight : p.groundDay;
+}
+
+function getTreeColors() {
+    return getTheme().tree;
+}
+
+function getRockColor() {
+    return getTheme().rock;
+}
+
+function getCactusColor() {
+    return getTheme().cactus;
+}
+
+function getSunColor() {
+    return getTheme().sun;
+}
+
+function getSkyStarsColor() {
+    return getTheme().skyStars || 'rgba(255,255,255,0.2)';
+}
+
+// ============================================================
+// پایان پیام ۸
+// ============================================================
+// ============================================================
+// بخش ۱۲: سیستم صدا (با موسیقی مخصوص هر فصل/event)
 // ============================================================
 
 function initAudio() {
@@ -2301,16 +3120,62 @@ function playHat() {
     s.start();
 }
 
-const melody = [
-    523.25, 659.25, 783.99, 659.25,
-    587.33, 698.46, 880.00, 698.46,
-    523.25, 659.25, 783.99, 987.77,
-    880.00, 783.99, 659.25, 587.33
-];
+// ملودی‌های مخصوص هر فصل/event
+const MELODIES = {
+    spring: {
+        notes: [523.25, 659.25, 783.99, 659.25, 587.33, 698.46, 880.00, 698.46,
+                523.25, 659.25, 783.99, 987.77, 880.00, 783.99, 659.25, 587.33],
+        tempo: 190
+    },
+    summer: {
+        notes: [523.25, 587.33, 659.25, 783.99, 880.00, 783.99, 659.25, 587.33,
+                523.25, 659.25, 783.99, 880.00, 987.77, 880.00, 783.99, 659.25],
+        tempo: 200
+    },
+    autumn: {
+        notes: [440.00, 493.88, 523.25, 587.33, 659.25, 587.33, 523.25, 493.88,
+                440.00, 523.25, 587.33, 659.25, 698.46, 659.25, 587.33, 523.25],
+        tempo: 210
+    },
+    winter: {
+        notes: [659.25, 783.99, 880.00, 987.77, 880.00, 783.99, 659.25, 587.33,
+                659.25, 783.99, 987.77, 1046.50, 987.77, 880.00, 783.99, 659.25],
+        tempo: 220
+    },
+    // ملودی Jingle Bells برای کریسمس
+    christmas: {
+        notes: [659.25, 659.25, 659.25, 659.25, 659.25, 659.25, 659.25, 523.25,
+                659.25, 659.25, 659.25, 659.25, 659.25, 659.25, 659.25, 523.25],
+        tempo: 180
+    },
+    // ملودی شاد عیدانه برای نوروز
+    nowruz: {
+        notes: [587.33, 659.25, 698.46, 783.99, 880.00, 987.77, 880.00, 783.99,
+                698.46, 783.99, 880.00, 987.77, 1046.50, 987.77, 880.00, 783.99],
+        tempo: 175
+    },
+    // ملودی Happy Birthday
+    birthday: {
+        notes: [523.25, 523.25, 587.33, 523.25, 698.46, 659.25, 523.25, 523.25,
+                587.33, 523.25, 783.99, 698.46, 523.25, 523.25, 1046.50, 880.00],
+        tempo: 185
+    },
+    // ملودی جشن برای سالگرد
+    anniversary: {
+        notes: [523.25, 659.25, 783.99, 1046.50, 783.99, 659.25, 523.25, 659.25,
+                587.33, 698.46, 880.00, 1046.50, 880.00, 698.46, 587.33, 698.46],
+        tempo: 170
+    }
+};
+
+function getCurrentMelody() {
+    return MELODIES[currentSeason] || MELODIES.spring;
+}
 
 function musicTick() {
     if (!playing || !soundEnabled) return;
-    const note = melody[musicStep % melody.length];
+    const melody = getCurrentMelody();
+    const note = melody.notes[musicStep % melody.notes.length];
     playTone(note, .17, "square", .055);
     if (musicStep % 2 === 0) playHat();
     if (musicStep % 4 === 0) playKick();
@@ -2327,7 +3192,8 @@ function startMusic() {
     stopMusicTimer();
     musicStep = 0;
     if (soundEnabled) musicTick();
-    musicTimer = setInterval(musicTick, 190);
+    const melody = getCurrentMelody();
+    musicTimer = setInterval(musicTick, melody.tempo);
 }
 
 function stopMusicTimer() {
@@ -2374,302 +3240,6 @@ function updateSoundButtons() {
         onB.textContent = soundEnabled ? "🔊 On ✓" : "🔊 On";
         offB.textContent = !soundEnabled ? "🔇 Off ✓" : "🔇 Off";
     }
-}
-
-// ============================================================
-// بخش ۱۲: مدیریت اینترنت و کد دعوت
-// ============================================================
-
-function checkInternet() {
-    if (navigator.onLine) {
-        if (noInternetOverlay.style.display === 'flex') {
-            noInternetOverlay.style.display = 'none';
-            isOnline = true;
-            showReferralDataFromCache();
-            setTimeout(() => {
-                syncReferralsWithServer().then(() => {
-                    showReferralDataFromCache();
-                });
-            }, 500);
-        }
-        return true;
-    } else {
-        showNoInternet();
-        return false;
-    }
-}
-
-function showNoInternet() {
-    isOnline = false;
-    const fa = language === 'fa';
-    document.getElementById('noInternetTitle').textContent = fa
-        ? '❌ اتصال اینترنت برقرار نیست'
-        : '❌ No Internet Connection';
-    document.getElementById('noInternetMessage').textContent = fa
-        ? 'لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.'
-        : 'Please check your internet connection and try again.';
-    noInternetOverlay.style.display = 'flex';
-}
-
-function getUserId() {
-    try {
-        if (window.Telegram && window.Telegram.WebApp) {
-            const tg = window.Telegram.WebApp;
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                return String(tg.initDataUnsafe.user.id);
-            }
-        }
-        let userId = localStorage.getItem("foxUserId");
-        if (!userId) {
-            userId = "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
-            localStorage.setItem("foxUserId", userId);
-        }
-        return userId;
-    } catch(e) {
-        return "user_" + Date.now();
-    }
-}
-
-function generateReferralCode(userId) {
-    let code = userId.toString().slice(-6).toUpperCase();
-    while (code.length < 6) {
-        code += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
-    }
-    return code;
-}
-
-function getReferralsFromLocalStorage(refCode) {
-    try {
-        const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
-        return stored[refCode] || [];
-    } catch(e) {
-        return [];
-    }
-}
-
-async function syncReferralsWithServer() {
-    if (!navigator.onLine) {
-        return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
-    }
-    const userId = getUserId();
-    const code = generateReferralCode(userId);
-    const local = getReferralsFromLocalStorage(code);
-
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
-        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.referrals) {
-                const all = [...new Set([...local, ...data.referrals])];
-                const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
-                stored[code] = all;
-                localStorage.setItem('fox_referrals', JSON.stringify(stored));
-                return all;
-            }
-        }
-    } catch(e) {
-        console.warn('Sync failed:', e);
-    }
-    return local;
-}
-
-function showReferralDataFromCache() {
-    const userId = getUserId();
-    const code = generateReferralCode(userId);
-    myReferralCode.textContent = code;
-    const referrals = getReferralsFromLocalStorage(code);
-    referralCount.textContent = referrals.length;
-    return referrals;
-}
-
-async function registerReferralWithRetry(referralCodeInput, overlayElement, inputElement, errorElement, submitBtn) {
-    if (!navigator.onLine) {
-        const fa = language === 'fa';
-        errorElement.textContent = fa ? '❌ اتصال اینترنت برقرار نیست!' : '❌ No internet connection!';
-        errorElement.style.color = '#f87171';
-        inputElement.classList.add('error');
-        setTimeout(() => inputElement.classList.remove('error'), 500);
-        return false;
-    }
-
-    const userId = getUserId();
-
-    if (!referralCodeInput || referralCodeInput.trim() === '') {
-        const fa = language === 'fa';
-        errorElement.textContent = fa ? '⚠️ لطفاً کد دعوت را وارد کنید.' : '⚠️ Please enter an invite code.';
-        errorElement.style.color = '#fbbf24';
-        inputElement.classList.add('error');
-        setTimeout(() => inputElement.classList.remove('error'), 500);
-        return false;
-    }
-
-    const code = referralCodeInput.trim().toUpperCase();
-
-    if (!/^[A-Z0-9]{4,10}$/.test(code)) {
-        const fa = language === 'fa';
-        errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر!' : '⚠️ Invalid code format!';
-        errorElement.style.color = '#fbbf24';
-        inputElement.classList.add('error');
-        setTimeout(() => inputElement.classList.remove('error'), 500);
-        return false;
-    }
-
-    submitBtn.disabled = true;
-    submitBtn.classList.add('loading');
-    const fa = language === 'fa';
-    submitBtn.textContent = fa ? '⏳ در حال ارسال...' : '⏳ Sending...';
-    errorElement.textContent = '';
-
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
-        const response = await fetch(`${WEBHOOK_URL}/api/register`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ userId: userId, refCode: code, timestamp: Date.now() }),
-            signal: controller.signal
-        });
-        clearTimeout(timeoutId);
-        const data = await response.json();
-
-        if (data.success) {
-            errorElement.textContent = fa ? '✅ کد تایید شد!' : '✅ Code verified!';
-            errorElement.style.color = '#34d399';
-            inputElement.style.borderColor = '#34d399';
-            localStorage.setItem("foxRegistered", "true");
-            localStorage.setItem("foxReferralCode", code);
-
-            setTimeout(() => {
-                if (overlayElement && overlayElement.parentNode) overlayElement.remove();
-                showReferralDataFromCache();
-                syncReferralsWithServer().then(() => {
-                    showReferralDataFromCache();
-                });
-            }, 1000);
-            return true;
-        } else {
-            errorElement.textContent = fa ? '❌ کد اشتباه!' : '❌ Wrong code!';
-            errorElement.style.color = '#f87171';
-            inputElement.classList.add('error');
-            setTimeout(() => inputElement.classList.remove('error'), 500);
-            inputElement.value = '';
-            inputElement.focus();
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('loading');
-            submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
-            return false;
-        }
-    } catch(e) {
-        const fa = language === 'fa';
-        errorElement.textContent = fa ? '❌ خطا در ارتباط با سرور!' : '❌ Server connection error!';
-        errorElement.style.color = '#f87171';
-        inputElement.classList.add('error');
-        setTimeout(() => inputElement.classList.remove('error'), 500);
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('loading');
-        submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
-        return false;
-    }
-}
-
-function showReferralPrompt() {
-    if (localStorage.getItem("foxRegistered") === "true") return;
-    const existing = document.getElementById('referralPrompt');
-    if (existing) existing.remove();
-
-    const overlay = document.createElement('div');
-    overlay.id = 'referralPrompt';
-    const fa = language === 'fa';
-
-    const title = fa ? 'خوش اومدی!' : 'Welcome!';
-    const subtitle = fa ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here';
-    const placeholder = fa ? 'مثلاً: FOX123' : 'e.g. FOX123';
-    const submitText = fa ? '✅ تایید کد' : '✅ Verify Code';
-    const skipText = fa ? '⏭ رد کردن' : '⏭ Skip';
-    const hint = fa ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later';
-
-    overlay.innerHTML = `<div class="box">
-        <div style="font-size:60px;margin-bottom:10px;">🦊</div>
-        <h2 style="margin-bottom:5px;">${title}</h2>
-        <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${subtitle}</p>
-        <span class="error-msg" id="refErrorMsg"></span>
-        <input type="text" id="refCodeInput" placeholder="${placeholder}" maxlength="10" autofocus>
-        <button class="btn-submit" id="refSubmitBtn">${submitText}</button>
-        <button class="btn-skip" id="refSkipBtn">${skipText}</button>
-        <p class="hint">${hint}</p>
-    </div>`;
-
-    document.body.appendChild(overlay);
-
-    const input = document.getElementById('refCodeInput');
-    const submitBtn = document.getElementById('refSubmitBtn');
-    const skipBtn = document.getElementById('refSkipBtn');
-    const errorMsg = document.getElementById('refErrorMsg');
-
-    async function handleSubmit() {
-        await registerReferralWithRetry(input.value, overlay, input, errorMsg, submitBtn);
-    }
-
-    function handleSkip() {
-        localStorage.setItem("foxRegistered", "true");
-        overlay.remove();
-        showReferralDataFromCache();
-    }
-
-    submitBtn.addEventListener('click', handleSubmit);
-    skipBtn.addEventListener('click', handleSkip);
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            submitBtn.click();
-        }
-    });
-    input.addEventListener('input', function() {
-        errorMsg.textContent = '';
-        errorMsg.style.color = '';
-        this.classList.remove('error');
-        this.style.borderColor = '#f97316';
-    });
-
-    setTimeout(() => input.focus(), 200);
-}
-
-function copyReferralCode() {
-    const code = myReferralCode.textContent;
-    if (code === "---" || !code) {
-        alert(language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!');
-        return;
-    }
-
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(code).then(() => {
-            const originalText = copyBtn.textContent;
-            copyBtn.textContent = language === 'fa' ? '✅ کپی شد!' : '✅ Copied!';
-            setTimeout(() => { copyBtn.textContent = originalText; }, 2000);
-        }).catch(() => fallbackCopy(code));
-    } else {
-        fallbackCopy(code);
-    }
-}
-
-function fallbackCopy(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    textarea.style.position = 'fixed';
-    textarea.style.opacity = '0';
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-        document.execCommand('copy');
-        alert(language === 'fa' ? 'کد کپی شد!' : 'Code copied!');
-    } catch(e) {
-        alert((language === 'fa' ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ') + text);
-    }
-    document.body.removeChild(textarea);
 }
 
 // ============================================================
@@ -2738,7 +3308,6 @@ function drawParticles() {
 // ============================================================
 
 function drawBackground() {
-    const palette = getTheme();
     const gy = ground();
     const skyColors = getSkyColors(isNight);
     const isSpace = currentTheme === 'space';
@@ -2828,23 +3397,6 @@ function drawBackground() {
 
     ctx.fillStyle = isNight ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
     ctx.fillRect(0, gy, W, 3);
-
-    if (isSpace) {
-        for (let i = 0; i < 3; i++) {
-            const x = (i * 87 + 23) % W;
-            const y = gy + 20 + (i * 43) % (H - gy - 30);
-
-            ctx.fillStyle = "rgba(0,0,0,0.08)";
-            ctx.beginPath();
-            ctx.ellipse(x, y, 15 + i * 5, 8 + i * 3, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            ctx.fillStyle = "rgba(255,255,255,0.05)";
-            ctx.beginPath();
-            ctx.ellipse(x - 4, y - 2, 8 + i * 3, 4 + i * 2, 0, 0, Math.PI * 2);
-            ctx.fill();
-        }
-    }
 }
 
 function drawCloud(x, y, s) {
@@ -2883,9 +3435,6 @@ function drawPowerup(p) {
     ctx.fillText(p.icon, cx, cy + 1);
 }
 
-// ============================================================
-// پایان پیام ۳
-// ============================================================
 // ============================================================
 // بخش ۱۶: رسم روباه
 // ============================================================
@@ -3061,7 +3610,7 @@ function drawObstacle(o) {
         ctx.arc(o.x + 20, o.y + 12, 5, 0, Math.PI * 2);
         ctx.fill();
 
-        if (currentSeason === 'winter') {
+        if (currentSeason === 'winter' || currentSeason === 'christmas') {
             ctx.fillStyle = isNight ? 'rgba(200,220,240,0.85)' : 'rgba(255,255,255,0.95)';
             ctx.beginPath();
             ctx.arc(o.x + 23, o.y + 5, 22, Math.PI, 0);
@@ -3079,7 +3628,7 @@ function drawObstacle(o) {
             ctx.fill();
         }
 
-        if (currentSeason === 'spring' && !isSpace) {
+        if (currentSeason === 'spring' || currentSeason === 'nowruz') {
             ctx.fillStyle = '#ffeb3b';
             ctx.beginPath();
             ctx.arc(o.x + 15, o.y + 18, 2.5, 0, Math.PI * 2);
@@ -3135,7 +3684,7 @@ function drawObstacle(o) {
         ctx.fillRect(o.x + 10, o.y + 20, 3, 11);
         ctx.fillRect(o.x + 30, o.y + 38, 3, 11);
 
-        if (currentSeason === 'spring') {
+        if (currentSeason === 'spring' || currentSeason === 'nowruz') {
             ctx.fillStyle = '#ff6fa8';
             ctx.beginPath();
             ctx.arc(o.x + 16, o.y - 2, 4, 0, Math.PI * 2);
@@ -3518,7 +4067,482 @@ function handleInput() {
 }
 
 // ============================================================
-// بخش ۲۱: UI و زبان
+// پایان پیام ۹
+// ============================================================
+// ============================================================
+// بخش ۲۱: مدیریت اینترنت و کد دعوت
+// ============================================================
+
+function checkInternet() {
+    if (navigator.onLine) {
+        if (noInternetOverlay.style.display === 'flex') {
+            noInternetOverlay.style.display = 'none';
+            isOnline = true;
+            showReferralDataFromCache();
+            setTimeout(() => {
+                syncReferralsWithServer().then(() => {
+                    showReferralDataFromCache();
+                });
+            }, 500);
+        }
+        return true;
+    } else {
+        showNoInternet();
+        return false;
+    }
+}
+
+function showNoInternet() {
+    isOnline = false;
+    const fa = language === 'fa';
+    document.getElementById('noInternetTitle').textContent = fa
+        ? '❌ اتصال اینترنت برقرار نیست'
+        : '❌ No Internet Connection';
+    document.getElementById('noInternetMessage').textContent = fa
+        ? 'لطفاً اتصال اینترنت خود را بررسی کنید و دوباره تلاش کنید.'
+        : 'Please check your internet connection and try again.';
+    noInternetOverlay.style.display = 'flex';
+}
+
+function getUserId() {
+    try {
+        if (window.Telegram && window.Telegram.WebApp) {
+            const tg = window.Telegram.WebApp;
+            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                return String(tg.initDataUnsafe.user.id);
+            }
+        }
+        let userId = localStorage.getItem("foxUserId");
+        if (!userId) {
+            userId = "user_" + Date.now() + "_" + Math.random().toString(36).substr(2, 6);
+            localStorage.setItem("foxUserId", userId);
+        }
+        return userId;
+    } catch(e) {
+        return "user_" + Date.now();
+    }
+}
+
+function generateReferralCode(userId) {
+    let code = userId.toString().slice(-6).toUpperCase();
+    while (code.length < 6) {
+        code += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[Math.floor(Math.random() * 26)];
+    }
+    return code;
+}
+
+function getReferralsFromLocalStorage(refCode) {
+    try {
+        const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
+        return stored[refCode] || [];
+    } catch(e) {
+        return [];
+    }
+}
+
+async function syncReferralsWithServer() {
+    if (!navigator.onLine) {
+        return getReferralsFromLocalStorage(generateReferralCode(getUserId()));
+    }
+    const userId = getUserId();
+    const code = generateReferralCode(userId);
+    const local = getReferralsFromLocalStorage(code);
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success && data.referrals) {
+                const all = [...new Set([...local, ...data.referrals])];
+                const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
+                stored[code] = all;
+                localStorage.setItem('fox_referrals', JSON.stringify(stored));
+                return all;
+            }
+        }
+    } catch(e) {
+        console.warn('Sync failed:', e);
+    }
+    return local;
+}
+
+function showReferralDataFromCache() {
+    const userId = getUserId();
+    const code = generateReferralCode(userId);
+    myReferralCode.textContent = code;
+    const referrals = getReferralsFromLocalStorage(code);
+    referralCount.textContent = referrals.length;
+    return referrals;
+}
+
+async function registerReferralWithRetry(referralCodeInput, overlayElement, inputElement, errorElement, submitBtn) {
+    if (!navigator.onLine) {
+        const fa = language === 'fa';
+        errorElement.textContent = fa ? '❌ اتصال اینترنت برقرار نیست!' : '❌ No internet connection!';
+        errorElement.style.color = '#f87171';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        return false;
+    }
+
+    const userId = getUserId();
+
+    if (!referralCodeInput || referralCodeInput.trim() === '') {
+        const fa = language === 'fa';
+        errorElement.textContent = fa ? '⚠️ لطفاً کد دعوت را وارد کنید.' : '⚠️ Please enter an invite code.';
+        errorElement.style.color = '#fbbf24';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        return false;
+    }
+
+    const code = referralCodeInput.trim().toUpperCase();
+
+    if (!/^[A-Z0-9]{4,10}$/.test(code)) {
+        const fa = language === 'fa';
+        errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر!' : '⚠️ Invalid code format!';
+        errorElement.style.color = '#fbbf24';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        return false;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.classList.add('loading');
+    const fa = language === 'fa';
+    submitBtn.textContent = fa ? '⏳ در حال ارسال...' : '⏳ Sending...';
+    errorElement.textContent = '';
+
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const response = await fetch(`${WEBHOOK_URL}/api/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userId, refCode: code, timestamp: Date.now() }),
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        const data = await response.json();
+
+        if (data.success) {
+            errorElement.textContent = fa ? '✅ کد تایید شد!' : '✅ Code verified!';
+            errorElement.style.color = '#34d399';
+            inputElement.style.borderColor = '#34d399';
+            localStorage.setItem("foxRegistered", "true");
+            localStorage.setItem("foxReferralCode", code);
+
+            setTimeout(() => {
+                if (overlayElement && overlayElement.parentNode) overlayElement.remove();
+                showReferralDataFromCache();
+                syncReferralsWithServer().then(() => {
+                    showReferralDataFromCache();
+                });
+            }, 1000);
+            return true;
+        } else {
+            errorElement.textContent = fa ? '❌ کد اشتباه!' : '❌ Wrong code!';
+            errorElement.style.color = '#f87171';
+            inputElement.classList.add('error');
+            setTimeout(() => inputElement.classList.remove('error'), 500);
+            inputElement.value = '';
+            inputElement.focus();
+            submitBtn.disabled = false;
+            submitBtn.classList.remove('loading');
+            submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
+            return false;
+        }
+    } catch(e) {
+        const fa = language === 'fa';
+        errorElement.textContent = fa ? '❌ خطا در ارتباط با سرور!' : '❌ Server connection error!';
+        errorElement.style.color = '#f87171';
+        inputElement.classList.add('error');
+        setTimeout(() => inputElement.classList.remove('error'), 500);
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('loading');
+        submitBtn.textContent = fa ? '✅ تایید کد' : '✅ Verify Code';
+        return false;
+    }
+}
+
+function showReferralPrompt() {
+    if (localStorage.getItem("foxRegistered") === "true") return;
+    const existing = document.getElementById('referralPrompt');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'referralPrompt';
+    const fa = language === 'fa';
+
+    const title = fa ? 'خوش اومدی!' : 'Welcome!';
+    const subtitle = fa ? 'اگر کد دعوت داری، اینجا وارد کن' : 'If you have an invite code, enter it here';
+    const placeholder = fa ? 'مثلاً: FOX123' : 'e.g. FOX123';
+    const submitText = fa ? '✅ تایید کد' : '✅ Verify Code';
+    const skipText = fa ? '⏭ رد کردن' : '⏭ Skip';
+    const hint = fa ? 'می‌تونی بعداً از منو کد دعوت رو ببینی' : 'You can see your invite code in the menu later';
+
+    overlay.innerHTML = `<div class="box">
+        <div style="font-size:60px;margin-bottom:10px;">🦊</div>
+        <h2 style="margin-bottom:5px;">${title}</h2>
+        <p style="color:#aaa;margin-bottom:15px;font-size:14px;">${subtitle}</p>
+        <span class="error-msg" id="refErrorMsg"></span>
+        <input type="text" id="refCodeInput" placeholder="${placeholder}" maxlength="10" autofocus>
+        <button class="btn-submit" id="refSubmitBtn">${submitText}</button>
+        <button class="btn-skip" id="refSkipBtn">${skipText}</button>
+        <p class="hint">${hint}</p>
+    </div>`;
+
+    document.body.appendChild(overlay);
+
+    const input = document.getElementById('refCodeInput');
+    const submitBtn = document.getElementById('refSubmitBtn');
+    const skipBtn = document.getElementById('refSkipBtn');
+    const errorMsg = document.getElementById('refErrorMsg');
+
+    async function handleSubmit() {
+        await registerReferralWithRetry(input.value, overlay, input, errorMsg, submitBtn);
+    }
+
+    function handleSkip() {
+        localStorage.setItem("foxRegistered", "true");
+        overlay.remove();
+        showReferralDataFromCache();
+    }
+
+    submitBtn.addEventListener('click', handleSubmit);
+    skipBtn.addEventListener('click', handleSkip);
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            submitBtn.click();
+        }
+    });
+    input.addEventListener('input', function() {
+        errorMsg.textContent = '';
+        errorMsg.style.color = '';
+        this.classList.remove('error');
+        this.style.borderColor = '#f97316';
+    });
+
+    setTimeout(() => input.focus(), 200);
+}
+
+function copyReferralCode() {
+    const code = myReferralCode.textContent;
+    if (code === "---" || !code) {
+        alert(language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!');
+        return;
+    }
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(code).then(() => {
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = language === 'fa' ? '✅ کپی شد!' : '✅ Copied!';
+            setTimeout(() => { copyBtn.textContent = originalText; }, 2000);
+        }).catch(() => fallbackCopy(code));
+    } else {
+        fallbackCopy(code);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        alert(language === 'fa' ? 'کد کپی شد!' : 'Code copied!');
+    } catch(e) {
+        alert((language === 'fa' ? 'لطفاً کد را دستی کپی کنید: ' : 'Please copy manually: ') + text);
+    }
+    document.body.removeChild(textarea);
+}
+
+// ============================================================
+// بخش ۲۲: پاپ‌آپ کانال تلگرام
+// ============================================================
+
+let channelPopupShown = false;
+
+function getChannelTexts() {
+    const fa = language === 'fa';
+    return {
+        title: fa ? '🦊 به کانال تلگرام بپیوندید!' : '🦊 Join our Telegram Channel!',
+        subtitle: fa
+            ? 'برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان'
+            : 'Get special rewards, updates, and connect with other players!',
+        feature1: fa ? '🎁 جوایز' : '🎁 Rewards',
+        feature2: fa ? '🔄 بروزرسانی' : '🔄 Updates',
+        feature3: fa ? '👥 جامعه' : '👥 Community',
+        btnText: fa ? '✈️ عضویت در کانال' : '✈️ Join Channel',
+        closeText: '✕'
+    };
+}
+
+function showChannelPopup() {
+    if (channelPopupShown || playing) return;
+    if (startScreen.style.display === 'none') return;
+
+    const popup = document.getElementById('channelPopup');
+    if (!popup) return;
+
+    const texts = getChannelTexts();
+    const season = getSeasonConfig();
+
+    document.getElementById('channelTitle').textContent = texts.title;
+    document.getElementById('channelSub').textContent = texts.subtitle;
+    document.getElementById('feature1').textContent = texts.feature1;
+    document.getElementById('feature2').textContent = texts.feature2;
+    document.getElementById('feature3').textContent = texts.feature3;
+    document.getElementById('channelBtnText').textContent = texts.btnText;
+    document.getElementById('closeChannelBtn').textContent = texts.closeText;
+    document.getElementById('channelIcon').textContent = season.logo;
+
+    const channelLink = document.getElementById('channelLink');
+    if (channelLink) channelLink.href = getChannelUrl();
+
+    const box = document.querySelector('#channelPopup .box');
+    box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
+    box.style.textAlign = 'center';
+
+    popup.style.display = 'flex';
+    channelPopupShown = true;
+}
+
+function closeChannelPopup() {
+    const popup = document.getElementById('channelPopup');
+    if (popup) popup.style.display = 'none';
+}
+
+function updateChannelPopup() {
+    const popup = document.getElementById('channelPopup');
+    if (!popup || popup.style.display !== 'flex') return;
+
+    const texts = getChannelTexts();
+    const season = getSeasonConfig();
+
+    document.getElementById('channelTitle').textContent = texts.title;
+    document.getElementById('channelSub').textContent = texts.subtitle;
+    document.getElementById('feature1').textContent = texts.feature1;
+    document.getElementById('feature2').textContent = texts.feature2;
+    document.getElementById('feature3').textContent = texts.feature3;
+    document.getElementById('channelBtnText').textContent = texts.btnText;
+    document.getElementById('closeChannelBtn').textContent = texts.closeText;
+    document.getElementById('channelIcon').textContent = season.logo;
+
+    const channelLink = document.getElementById('channelLink');
+    if (channelLink) channelLink.href = getChannelUrl();
+
+    const box = document.querySelector('#channelPopup .box');
+    box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
+}
+
+// ============================================================
+// بخش ۲۳: NFT Modal
+// ============================================================
+
+const NFT_CONTENT = {
+    fa: {
+        title: '🎁 درباره NFTهای Fox Eggs',
+        channelText: '✈️ عضویت در کانال تلگرام',
+        content: `
+            <p style="margin-bottom:16px;">توی Fox Eggs، به کاربرانی که به دستاوردهای مشخصی می‌رسند، یک NFT یادبود به عنوان نشان افتخار اهدا می‌شود.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💎 NFT چیه؟</p>
+            <p style="margin-bottom:16px;">NFT یه نوع دارایی دیجیتال منحصربه‌فرده که نشون می‌ده شما به یه دستاورد خاص توی بازی رسیدید.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">🎯 چطور دریافتش کنم؟</p>
+            <p style="margin-bottom:16px;">شرایط دریافت NFT به‌صورت دوره‌ای و بر اساس رویدادهای فصلی اعلام می‌شود. برای اطلاع از شرایط فعلی، به کانال تلگرام Fox Eggs مراجعه کنید.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💰 آیا هزینه‌ای داره؟</p>
+            <p style="margin-bottom:16px;">خیر — کاملاً رایگانه و هیچ پرداخت مالی درون بازی وجود نداره.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">📊 آیا ارزش مالی داره؟</p>
+            <p style="margin-bottom:0;">NFTها صرفاً جنبه‌ی یادبودی و کلکسیونی دارند و هیچ ارزش مالی تضمین‌شده‌ای ندارند.</p>
+        `
+    },
+    en: {
+        title: '🎁 About Fox Eggs NFTs',
+        channelText: '✈️ Join Telegram Channel',
+        content: `
+            <p style="margin-bottom:16px;">In Fox Eggs, users who reach certain achievements are awarded a commemorative NFT as a badge of honor.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💎 What is an NFT?</p>
+            <p style="margin-bottom:16px;">An NFT is a unique digital asset that proves you reached a specific achievement in the game.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">🎯 How do I get one?</p>
+            <p style="margin-bottom:16px;">NFT distribution conditions are announced periodically based on seasonal events. To learn about current conditions, visit the Fox Eggs Telegram channel.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💰 Does it cost anything?</p>
+            <p style="margin-bottom:16px;">No — it's completely free and there are no in-game payments.</p>
+
+            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">📊 Does it have monetary value?</p>
+            <p style="margin-bottom:0;">NFTs are purely commemorative and collectible, with no guaranteed monetary value.</p>
+        `
+    }
+};
+
+function updateNftUI() {
+    const fa = language === 'fa';
+    const data = fa ? NFT_CONTENT.fa : NFT_CONTENT.en;
+
+    if (nftTitle) nftTitle.textContent = data.title;
+    if (nftContent) nftContent.innerHTML = data.content;
+    if (nftChannelText) nftChannelText.textContent = data.channelText;
+    if (nftButtonText) nftButtonText.textContent = 'NFT';
+
+    const nftLink = document.getElementById('nftChannelLink');
+    if (nftLink) nftLink.href = getChannelUrl();
+
+    if (nftContent) {
+        nftContent.style.direction = fa ? 'rtl' : 'ltr';
+        nftContent.style.textAlign = fa ? 'right' : 'left';
+    }
+    const modalBox = document.querySelector('#nftModal > div');
+    if (modalBox) modalBox.style.direction = fa ? 'rtl' : 'ltr';
+}
+
+function openNftModal() {
+    if (!nftModal) return;
+    updateNftUI();
+    nftModal.style.display = 'flex';
+}
+
+function closeNftModalFn() {
+    if (nftModal) nftModal.style.display = 'none';
+}
+
+function initNftEvents() {
+    if (nftButton) {
+        nftButton.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openNftModal();
+        });
+    }
+    if (closeNftModal) {
+        closeNftModal.addEventListener('click', closeNftModalFn);
+    }
+    if (nftModal) {
+        nftModal.addEventListener('click', function(e) {
+            if (e.target === nftModal) closeNftModalFn();
+        });
+    }
+
+    updateNftUI();
+}
+
+// ============================================================
+// پایان پیام ۱۰
+// ============================================================
+// ============================================================
+// بخش ۲۴: UI و زبان
 // ============================================================
 
 function updateUI() {
@@ -3719,23 +4743,23 @@ function openThemeSelector() {
         gameOver.style.display = 'none';
         gameOver.dataset.wasVisible = 'true';
     }
-    menuButton.style.display = "none";   // ← مخفی کردن منو ☰
-    nftButton.style.display = "none";    // ← مخفی کردن دکمه NFT
+    menuButton.style.display = "none";
+    nftButton.style.display = "none";
     themeSelectorOverlay.style.display = 'flex';
     updateThemeUI();
 }
 
 function closeThemeSelectorFn() {
     themeSelectorOverlay.style.display = 'none';
-    menuButton.style.display = "block";  // ← نمایش دکمه منو ☰
-    nftButton.style.display = "flex";    // ← نمایش دکمه NFT
+    menuButton.style.display = "block";
+    nftButton.style.display = "flex";
 
-    // اگه از گیم اور اومده بودیم، گیم اور برگرده
     if (gameOver.dataset.wasVisible === 'true') {
         gameOver.style.display = 'flex';
         gameOver.dataset.wasVisible = 'false';
     }
 }
+
 function applySeasonToUI() {
     const season = getSeasonConfig();
     const fa = language === 'fa';
@@ -3760,7 +4784,7 @@ function applySeasonToUI() {
 function refreshSeason() {
     const newSeason = getCurrentSeason();
     if (newSeason === currentSeason) return;
-    console.log(`🍂 Season changed: ${currentSeason} → ${newSeason}`);
+    console.log(`🎉 Season changed: ${currentSeason} → ${newSeason}`);
     currentSeason = newSeason;
     seasonalParticles.length = 0;
     applySeasonToUI();
@@ -3769,6 +4793,10 @@ function refreshSeason() {
     if (!playing) {
         drawBackground();
         drawFox();
+    }
+    // اگه موسیقی در حال پخشه، با ملودی جدید شروع کن
+    if (playing && soundEnabled) {
+        startMusic();
     }
 }
 
@@ -3839,183 +4867,7 @@ function setLanguage(lang) {
 }
 
 // ============================================================
-// بخش ۲۲: پاپ‌آپ کانال
-// ============================================================
-
-let channelPopupShown = false;
-
-function getChannelTexts() {
-    const fa = language === 'fa';
-    return {
-        title: fa ? '🦊 به کانال تلگرام بپیوندید!' : '🦊 Join our Telegram Channel!',
-        subtitle: fa
-            ? 'برای دریافت جوایز ویژه، اطلاع از بروزرسانی‌ها و ارتباط با سایر بازیکنان'
-            : 'Get special rewards, updates, and connect with other players!',
-        feature1: fa ? '🎁 جوایز' : '🎁 Rewards',
-        feature2: fa ? '🔄 بروزرسانی' : '🔄 Updates',
-        feature3: fa ? '👥 جامعه' : '👥 Community',
-        btnText: fa ? '✈️ عضویت در کانال' : '✈️ Join Channel',
-        closeText: '✕'
-    };
-}
-
-function showChannelPopup() {
-    if (channelPopupShown || playing) return;
-    if (startScreen.style.display === 'none') return;
-
-    const popup = document.getElementById('channelPopup');
-    if (!popup) return;
-
-    const texts = getChannelTexts();
-    const season = getSeasonConfig();
-
-    document.getElementById('channelTitle').textContent = texts.title;
-    document.getElementById('channelSub').textContent = texts.subtitle;
-    document.getElementById('feature1').textContent = texts.feature1;
-    document.getElementById('feature2').textContent = texts.feature2;
-    document.getElementById('feature3').textContent = texts.feature3;
-    document.getElementById('channelBtnText').textContent = texts.btnText;
-    document.getElementById('closeChannelBtn').textContent = texts.closeText;
-    document.getElementById('channelIcon').textContent = season.logo;
-
-    // لینک کانال بر اساس زبان
-    const channelLink = document.getElementById('channelLink');
-    if (channelLink) channelLink.href = getChannelUrl();
-
-    const box = document.querySelector('#channelPopup .box');
-    box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
-    box.style.textAlign = 'center';
-
-    popup.style.display = 'flex';
-    channelPopupShown = true;
-}
-
-function closeChannelPopup() {
-    const popup = document.getElementById('channelPopup');
-    if (popup) popup.style.display = 'none';
-}
-
-function updateChannelPopup() {
-    const popup = document.getElementById('channelPopup');
-    if (!popup || popup.style.display !== 'flex') return;
-
-    const texts = getChannelTexts();
-    const season = getSeasonConfig();
-
-    document.getElementById('channelTitle').textContent = texts.title;
-    document.getElementById('channelSub').textContent = texts.subtitle;
-    document.getElementById('feature1').textContent = texts.feature1;
-    document.getElementById('feature2').textContent = texts.feature2;
-    document.getElementById('feature3').textContent = texts.feature3;
-    document.getElementById('channelBtnText').textContent = texts.btnText;
-    document.getElementById('closeChannelBtn').textContent = texts.closeText;
-    document.getElementById('channelIcon').textContent = season.logo;
-
-    // لینک کانال بر اساس زبان
-    const channelLink = document.getElementById('channelLink');
-    if (channelLink) channelLink.href = getChannelUrl();
-
-    const box = document.querySelector('#channelPopup .box');
-    box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
-}
-
-// ============================================================
-// بخش ۲۳: NFT Modal
-// ============================================================
-
-const NFT_CONTENT = {
-    fa: {
-        title: '🎁 درباره NFTهای Fox Eggs',
-        channelText: '✈️ عضویت در کانال تلگرام',
-        content: `
-            <p style="margin-bottom:16px;">توی Fox Eggs، به کاربرانی که به دستاوردهای مشخصی می‌رسند، یک NFT یادبود به عنوان نشان افتخار اهدا می‌شود.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💎 NFT چیه؟</p>
-            <p style="margin-bottom:16px;">NFT یه نوع دارایی دیجیتال منحصربه‌فرده که نشون می‌ده شما به یه دستاورد خاص توی بازی رسیدید.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">🎯 چطور دریافتش کنم؟</p>
-            <p style="margin-bottom:16px;">شرایط دریافت NFT به‌صورت دوره‌ای و بر اساس رویدادهای فصلی اعلام می‌شود. برای اطلاع از شرایط فعلی، به کانال تلگرام Fox Eggs مراجعه کنید.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💰 آیا هزینه‌ای داره؟</p>
-            <p style="margin-bottom:16px;">خیر — کاملاً رایگانه و هیچ پرداخت مالی درون بازی وجود نداره.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">📊 آیا ارزش مالی داره؟</p>
-            <p style="margin-bottom:0;">NFTها صرفاً جنبه‌ی یادبودی و کلکسیونی دارند و هیچ ارزش مالی تضمین‌شده‌ای ندارند.</p>
-        `
-    },
-    en: {
-        title: '🎁 About Fox Eggs NFTs',
-        channelText: '✈️ Join Telegram Channel',
-        content: `
-            <p style="margin-bottom:16px;">In Fox Eggs, users who reach certain achievements are awarded a commemorative NFT as a badge of honor.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💎 What is an NFT?</p>
-            <p style="margin-bottom:16px;">An NFT is a unique digital asset that proves you reached a specific achievement in the game.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">🎯 How do I get one?</p>
-            <p style="margin-bottom:16px;">NFT distribution conditions are announced periodically based on seasonal events. To learn about current conditions, visit the Fox Eggs Telegram channel.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">💰 Does it cost anything?</p>
-            <p style="margin-bottom:16px;">No — it's completely free and there are no in-game payments.</p>
-
-            <p style="margin-bottom:6px;font-weight:bold;color:#ec4899;">📊 Does it have monetary value?</p>
-            <p style="margin-bottom:0;">NFTs are purely commemorative and collectible, with no guaranteed monetary value.</p>
-        `
-    }
-};
-
-function updateNftUI() {
-    const fa = language === 'fa';
-    const data = fa ? NFT_CONTENT.fa : NFT_CONTENT.en;
-
-    if (nftTitle) nftTitle.textContent = data.title;
-    if (nftContent) nftContent.innerHTML = data.content;
-    if (nftChannelText) nftChannelText.textContent = data.channelText;
-    if (nftButtonText) nftButtonText.textContent = 'NFT';
-
-    // لینک کانال NFT بر اساس زبان
-    const nftLink = document.getElementById('nftChannelLink');
-    if (nftLink) nftLink.href = getChannelUrl();
-
-    if (nftContent) {
-        nftContent.style.direction = fa ? 'rtl' : 'ltr';
-        nftContent.style.textAlign = fa ? 'right' : 'left';
-    }
-    const modalBox = document.querySelector('#nftModal > div');
-    if (modalBox) modalBox.style.direction = fa ? 'rtl' : 'ltr';
-}
-
-function openNftModal() {
-    if (!nftModal) return;
-    updateNftUI();
-    nftModal.style.display = 'flex';
-}
-
-function closeNftModalFn() {
-    if (nftModal) nftModal.style.display = 'none';
-}
-
-function initNftEvents() {
-    if (nftButton) {
-        nftButton.addEventListener('click', function(e) {
-            e.stopPropagation();
-            openNftModal();
-        });
-    }
-    if (closeNftModal) {
-        closeNftModal.addEventListener('click', closeNftModalFn);
-    }
-    if (nftModal) {
-        nftModal.addEventListener('click', function(e) {
-            if (e.target === nftModal) closeNftModalFn();
-        });
-    }
-
-    updateNftUI();
-}
-
-// ============================================================
-// بخش ۲۴: رویدادها
+// بخش ۲۵: رویدادها
 // ============================================================
 
 window.addEventListener("online", function() { checkInternet(); });
@@ -4078,10 +4930,10 @@ menuButton.addEventListener("click", function(e) {
     if (playing) return;
     if (menuPanel.style.display === "block") {
         menuPanel.style.display = "none";
-        nftButton.style.display = "flex";   // نمایش دکمه NFT وقتی منو بسته شد
+        nftButton.style.display = "flex";
     } else {
         menuPanel.style.display = "block";
-        nftButton.style.display = "none";   // مخفی کردن دکمه NFT وقتی منو باز شد
+        nftButton.style.display = "none";
         updateUI();
         renderSkinShop();
         syncReferralsWithServer().then(() => {
@@ -4122,7 +4974,7 @@ openThemeStartBtn.addEventListener("click", function(e) {
 openThemeFromMenu.addEventListener("click", function(e) {
     e.stopPropagation();
     menuPanel.style.display = "none";
-    nftButton.style.display = "flex";   // نمایش دکمه NFT وقتی منو بسته شد
+    nftButton.style.display = "flex";
     openThemeSelector();
 });
 
@@ -4145,7 +4997,7 @@ document.getElementById('channelPopup').addEventListener('click', function(e) {
 });
 
 // ============================================================
-// بخش ۲۵: راه‌اندازی اولیه
+// بخش ۲۶: راه‌اندازی اولیه
 // ============================================================
 
 currentSeason = getCurrentSeason();
@@ -4174,7 +5026,7 @@ powerupTimer.classList.add('hidden');
 initNftEvents();
 
 // ============================================================
-// بخش ۲۶: تایمرها و راه‌اندازی تعاملی
+// بخش ۲۷: تایمرها و راه‌اندازی تعاملی
 // ============================================================
 
 setTimeout(() => {
@@ -4217,7 +5069,7 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 // ============================================================
-// پایان کد
+// پایان کد کامل
 // ============================================================
 </script>
 </body>
