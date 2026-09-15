@@ -42,6 +42,17 @@ jobs:
 
 
       # =========================================
+      # Clean old Android SDK
+      # =========================================
+
+      - name: Clean old Android SDK
+        run: |
+          rm -rf /usr/local/lib/android/sdk/cmdline-tools/latest
+          rm -rf /usr/local/lib/android/sdk/cmdline-tools/12.0
+          echo "Old cmdline-tools removed."
+
+
+      # =========================================
       # Android SDK
       # =========================================
 
@@ -712,4 +723,4 @@ jobs:
 
           rm -f FoxEggs.keystore
 
-          rm -f android/app/FoxEggs.KEYSTORE_PASSWORD
+          rm -f android/app/FoxEggs.keystore
