@@ -192,7 +192,7 @@ jobs:
 
           cat >> android/gradle.properties <<EOF
 
-          FOXEGGS_KEYSTORE_FILE=app/FoxEggs.keystore
+          FOXEGGS_KEYSTORE_FILE=FoxEggs.keystore
           FOXEGGS_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
           FOXEGGS_KEY_ALIAS=foxeggs
           FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
