@@ -45,10 +45,13 @@ jobs:
       # Android SDK
       # =========================================
 
-      - name: Setup Android SDK
+            - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+          packages: |
+            platform-tools
+            platforms;android-35
+            build-tools;35.0.0
 
 
       # =========================================
@@ -557,7 +560,7 @@ jobs:
       # =========================================
 
       - name: Remove adaptive icon defaults
-      run: |
+        run: |
 
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
 
@@ -662,8 +665,8 @@ jobs:
       # =========================================
 
       - name: Build Release AAB
-      working-directory: android
-      run: |
+        working-directory: android
+        run: |
 
           ./gradlew bundleRelease --no-daemon
 
