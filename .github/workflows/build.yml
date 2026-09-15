@@ -12,25 +12,28 @@ jobs:
 
     steps:
 
-      # ==========================================
-      # CHECKOUT
-      # ==========================================
+      # =========================================
+      # Checkout
+      # =========================================
+
       - name: Checkout
         uses: actions/checkout@v5
 
 
-      # ==========================================
-      # NODE.JS
-      # ==========================================
+      # =========================================
+      # Node.js
+      # =========================================
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
           node-version: 24
 
 
-      # ==========================================
-      # JAVA
-      # ==========================================
+      # =========================================
+      # Java
+      # =========================================
+
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -38,36 +41,20 @@ jobs:
           java-version: 21
 
 
-      # ==========================================
-      # ANDROID SDK
-      # ==========================================
-      # مهم:
-      # packages خالی است تا setup-android سعی نکند
-      # پکیج قدیمی "tools" را نصب کند.
+      # =========================================
+      # Android SDK
+      # =========================================
+
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
-          packages: ''
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
 
 
-      # ==========================================
-      # INSTALL REQUIRED ANDROID PACKAGES
-      # ==========================================
-      - name: Install Android SDK packages
-        run: |
-          yes | sdkmanager --licenses || true
+      # =========================================
+      # Prepare game
+      # =========================================
 
-          sdkmanager \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
-
-          echo "Android SDK packages installed successfully."
-
-
-      # ==========================================
-      # PREPARE GAME
-      # ==========================================
       - name: Prepare game
         run: |
           test -f index.html
@@ -77,12 +64,11 @@ jobs:
 
           cp index.html www/index.html
 
-          echo "Game prepared successfully."
 
+      # =========================================
+      # package.json
+      # =========================================
 
-      # ==========================================
-      # CREATE PACKAGE.JSON
-      # ==========================================
       - name: Create package.json
         run: |
           cat > package.json <<'EOF'
@@ -101,17 +87,19 @@ jobs:
           EOF
 
 
-      # ==========================================
-      # INSTALL DEPENDENCIES
-      # ==========================================
+      # =========================================
+      # Install Capacitor
+      # =========================================
+
       - name: Install dependencies
         run: |
           npm install
 
 
-      # ==========================================
-      # CREATE CAPACITOR CONFIG
-      # ==========================================
+      # =========================================
+      # Capacitor configuration
+      # =========================================
+
       - name: Create Capacitor config
         run: |
           cat > capacitor.config.json <<'EOF'
@@ -123,90 +111,85 @@ jobs:
           EOF
 
 
-      # ==========================================
-      # ADD ANDROID
-      # ==========================================
+      # =========================================
+      # Create Android project
+      # =========================================
+
       - name: Add Android
         run: |
           npx cap add android
 
 
-      # ==========================================
-      # SYNC ANDROID
-      # ==========================================
       - name: Sync Android
         run: |
           npx cap sync android
 
 
-      # ==========================================
-      # VERSION
-      # ==========================================
+      # =========================================
+      # Version
+      # =========================================
+
       - name: Set version
         env:
           RUN_NUMBER: ${{ github.run_number }}
         run: |
+
           VERSION_CODE=$((RUN_NUMBER + 100))
           VERSION_NAME="1.0.${RUN_NUMBER}"
 
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
 
-          echo "=========================================="
-          echo "VERSION"
-          echo "=========================================="
           echo "Version Code: $VERSION_CODE"
           echo "Version Name: $VERSION_NAME"
 
 
-      # ==========================================
-      # LOAD EXISTING KEYSTORE
-      # ==========================================
-      # همان keystore قبلی را استفاده می‌کنیم.
-      # این برای آپدیت بدون حذف نسخه قبلی بسیار مهم است.
+      # =========================================
+      # Load SAME KEYSTORE
+      # =========================================
+
       - name: Load existing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
-          test -n "$KEYSTORE_BASE64"
 
           echo "$KEYSTORE_BASE64" | base64 --decode > FoxEggs.keystore
 
           test -s FoxEggs.keystore
-
-          mkdir -p android/app
 
           cp FoxEggs.keystore android/app/FoxEggs.keystore
 
           echo "Keystore loaded successfully."
 
 
-      # ==========================================
-      # CONFIGURE SIGNING PROPERTIES
-      # ==========================================
+      # =========================================
+      # Configure signing properties
+      # =========================================
+
       - name: Configure signing properties
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
-          test -n "$KEYSTORE_PASSWORD"
 
           cat >> android/gradle.properties <<EOF
 
-          FOXEGGS_KEYSTORE_FILE=app/FoxEggs.keystore
+          FOXEGGS_KEYSTORE_FILE=FoxEggs.keystore
           FOXEGGS_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
           FOXEGGS_KEY_ALIAS=foxeggs
           FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
+
           EOF
 
-          echo "Signing properties configured."
 
+      # =========================================
+      # Configure Capacitor generated Gradle
+      # =========================================
 
-      # ==========================================
-      # CONFIGURE ANDROID GRADLE
-      # ==========================================
       - name: Configure Android Gradle
         run: |
+
           python3 - <<'PY'
+
           import re
           import os
 
@@ -215,9 +198,11 @@ jobs:
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          # ------------------------------------------
-          # APPLICATION ID
-          # ------------------------------------------
+
+          # -----------------------------------------
+          # Application ID
+          # -----------------------------------------
+
           text = re.sub(
               r'applicationId\s+"[^"]+"',
               'applicationId "com.foxeggs.game"',
@@ -225,19 +210,23 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # COMPILE SDK
-          # ------------------------------------------
+
+          # -----------------------------------------
+          # Compile SDK
+          # -----------------------------------------
+
           text = re.sub(
-              r'compileSdk\s+\d+',
+              r'compileSdk\s+[^\n]+',
               'compileSdk 35',
               text,
               count=1
           )
 
-          # ------------------------------------------
-          # VERSION CODE
-          # ------------------------------------------
+
+          # -----------------------------------------
+          # Version Code
+          # -----------------------------------------
+
           text = re.sub(
               r'versionCode\s+\d+',
               'versionCode ' + os.environ["VERSION_CODE"],
@@ -245,9 +234,11 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # VERSION NAME
-          # ------------------------------------------
+
+          # -----------------------------------------
+          # Version Name
+          # -----------------------------------------
+
           text = re.sub(
               r'versionName\s+"[^"]+"',
               'versionName "' + os.environ["VERSION_NAME"] + '"',
@@ -255,20 +246,23 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # REMOVE EXISTING SIGNING CONFIG
-          # ------------------------------------------
+
+          # -----------------------------------------
+          # Remove old signingConfigs if present
+          # -----------------------------------------
+
           text = re.sub(
               r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)',
               '',
               text,
-              count=1,
               flags=re.S
           )
 
-          # ------------------------------------------
-          # SIGNING CONFIG
-          # ------------------------------------------
+
+          # -----------------------------------------
+          # Add signingConfigs BEFORE buildTypes
+          # -----------------------------------------
+
           signing_block = '''
               signingConfigs {
                   release {
@@ -283,76 +277,80 @@ jobs:
 
           '''
 
+
           if "signingConfigs {" not in text:
+
               text = text.replace(
                   "    buildTypes {",
                   signing_block + "    buildTypes {",
                   1
               )
 
-          # ------------------------------------------
-          # RELEASE BUILD TYPE
-          # ------------------------------------------
-          release_pattern = (
+
+          # -----------------------------------------
+          # Add signingConfig ONLY inside
+          # buildTypes -> release
+          # -----------------------------------------
+
+          pattern = (
               r'(buildTypes\s*\{\s*'
               r'release\s*\{)'
           )
 
+          replacement = (
+              r'\1\n'
+              r'            signingConfig signingConfigs.release'
+          )
+
           if "signingConfig signingConfigs.release" not in text:
+
               text = re.sub(
-                  release_pattern,
-                  r'\1\n            signingConfig signingConfigs.release',
+                  pattern,
+                  replacement,
                   text,
                   count=1,
                   flags=re.S
               )
 
-          # ------------------------------------------
-          # MINIFY
-          # ------------------------------------------
-          if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
 
-              release_match = re.search(
-                  r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})',
+          # -----------------------------------------
+          # Disable minification
+          # -----------------------------------------
+
+          if "minifyEnabled" in text:
+
+              text = re.sub(
+                  r'minifyEnabled\s+\w+',
+                  'minifyEnabled false',
                   text,
-                  re.S
+                  count=1
               )
 
-              if release_match:
+          else:
 
-                  release_body = release_match.group(2)
+              text = text.replace(
+                  "release {",
+                  "release {\n            minifyEnabled false",
+                  1
+              )
 
-                  if "minifyEnabled" in release_body:
-                      release_body = re.sub(
-                          r'minifyEnabled\s+\w+',
-                          'minifyEnabled false',
-                          release_body,
-                          count=1
-                      )
-                  else:
-                      release_body = (
-                          "\n            minifyEnabled false"
-                          + release_body
-                      )
-
-                  text = (
-                      text[:release_match.start(2)]
-                      + release_body
-                      + text[release_match.end(2):]
-                  )
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
+
           print("Android Gradle configured successfully.")
+
           PY
 
 
-      # ==========================================
-      # SHOW GRADLE CONFIG
-      # ==========================================
+      # =========================================
+      # Show final Gradle file
+      # =========================================
+
       - name: Show Gradle configuration
         run: |
+
           echo "=========================================="
           echo "FINAL ANDROID BUILD.GRADLE"
           echo "=========================================="
@@ -360,18 +358,22 @@ jobs:
           cat android/app/build.gradle
 
 
-      # ==========================================
-      # CLEAN UNNECESSARY PERMISSIONS
-      # ==========================================
+      # =========================================
+      # Remove unnecessary permissions
+      # =========================================
+
       - name: Clean unnecessary permissions
         run: |
+
           python3 - <<'PY'
+
           import re
 
           path = "android/app/src/main/AndroidManifest.xml"
 
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
+
 
           permissions = [
               "READ_CONTACTS",
@@ -393,6 +395,7 @@ jobs:
               "BIND_ACCESSIBILITY_SERVICE"
           ]
 
+
           for permission in permissions:
 
               pattern = (
@@ -402,29 +405,40 @@ jobs:
                   r'"\s*/>'
               )
 
-              text = re.sub(pattern, '', text)
+              text = re.sub(
+                  pattern,
+                  '',
+                  text
+              )
+
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
+
           print("Unnecessary permissions removed.")
+
           PY
 
 
-      # ==========================================
-      # INSTALL PILLOW
-      # ==========================================
+      # =========================================
+      # Pillow
+      # =========================================
+
       - name: Install Pillow
         run: |
           python3 -m pip install pillow
 
 
-      # ==========================================
-      # FIND CUSTOM GAME ICON
-      # ==========================================
+      # =========================================
+      # Find custom game icon automatically
+      # =========================================
+
       - name: Find custom game icon
         run: |
+
           python3 - <<'PY'
+
           import os
 
           extensions = (
@@ -435,18 +449,21 @@ jobs:
           )
 
           files = [
-              f for f in os.listdir(".")
+              f
+              for f in os.listdir(".")
               if os.path.isfile(f)
               and f.lower().endswith(extensions)
           ]
 
+          # Ignore known generated/release files
           ignored = {
               "fox-eggs-icon.png",
               "game-logo.png"
           }
 
           files = [
-              f for f in files
+              f
+              for f in files
               if f.lower() not in ignored
           ]
 
@@ -464,24 +481,34 @@ jobs:
 
           with open("CUSTOM_ICON", "w") as f:
               f.write(logo)
+
           PY
 
 
-      # ==========================================
-      # GENERATE ANDROID ICONS
-      # ==========================================
+      # =========================================
+      # Generate Android icon sizes
+      # =========================================
+
       - name: Generate Android icons
         run: |
+
           python3 - <<'PY'
+
           from PIL import Image
           import os
+
 
           with open("CUSTOM_ICON", "r") as f:
               filename = f.read().strip()
 
+
           print("Loading custom icon:", filename)
 
-          source = Image.open(filename).convert("RGBA")
+
+          source = Image.open(
+              filename
+          ).convert("RGBA")
+
 
           sizes = {
               "mdpi": 48,
@@ -491,6 +518,7 @@ jobs:
               "xxxhdpi": 192
           }
 
+
           for density, size in sizes.items():
 
               folder = (
@@ -498,12 +526,17 @@ jobs:
                   + density
               )
 
-              os.makedirs(folder, exist_ok=True)
+              os.makedirs(
+                  folder,
+                  exist_ok=True
+              )
+
 
               icon = source.resize(
                   (size, size),
                   Image.Resampling.LANCZOS
               )
+
 
               icon.save(
                   folder + "/ic_launcher.png"
@@ -513,24 +546,31 @@ jobs:
                   folder + "/ic_launcher_round.png"
               )
 
+
           print("Android icons generated successfully.")
+
           PY
 
 
-      # ==========================================
-      # REMOVE ADAPTIVE ICON DEFAULTS
-      # ==========================================
+      # =========================================
+      # Remove adaptive icon XML
+      # =========================================
+
       - name: Remove adaptive icon defaults
-        run: |
+      run: |
+
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
+
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
 
-      # ==========================================
-      # VERIFY CONFIGURATION
-      # ==========================================
+      # =========================================
+      # Verify package and signing
+      # =========================================
+
       - name: Verify configuration
         run: |
+
           echo "=========================================="
           echo "FOX EGGS CONFIGURATION"
           echo "=========================================="
@@ -553,12 +593,14 @@ jobs:
           grep -A10 "signingConfigs" android/app/build.gradle
 
 
-      # ==========================================
-      # BUILD RELEASE APK
-      # ==========================================
+      # =========================================
+      # Build APK
+      # =========================================
+
       - name: Build Release APK
         working-directory: android
         run: |
+
           chmod +x gradlew
 
           ./gradlew clean
@@ -566,39 +608,46 @@ jobs:
           ./gradlew assembleRelease --no-daemon
 
 
-      # ==========================================
-      # INSPECT APK
-      # ==========================================
+      # =========================================
+      # Inspect APK
+      # =========================================
+
       - name: Inspect APK
         run: |
-          APK="android/app/build/outputs/apk/release/app-release.apk"
 
-          test -f "$APK"
+          APK="android/app/build/outputs/apk/release/app-release.apk"
 
           BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
 
           AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
+
           APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
+
 
           echo "=========================================="
           echo "FOX EGGS APK"
           echo "=========================================="
 
+
           echo ""
           echo "APK FILE:"
           ls -lh "$APK"
+
 
           echo ""
           echo "SHA256:"
           sha256sum "$APK"
 
+
           echo ""
           echo "PACKAGE / VERSION:"
           "$AAPT" dump badging "$APK" | head -n 20
 
+
           echo ""
           echo "PERMISSIONS:"
           "$AAPT" dump permissions "$APK"
+
 
           echo ""
           echo "SIGNATURE:"
@@ -608,20 +657,24 @@ jobs:
             "$APK"
 
 
-      # ==========================================
-      # BUILD RELEASE AAB
-      # ==========================================
+      # =========================================
+      # Build AAB
+      # =========================================
+
       - name: Build Release AAB
-        working-directory: android
-        run: |
+      working-directory: android
+      run: |
+
           ./gradlew bundleRelease --no-daemon
 
 
-      # ==========================================
-      # PREPARE RELEASE
-      # ==========================================
+      # =========================================
+      # Prepare release files
+      # =========================================
+
       - name: Prepare release
         run: |
+
           mkdir -p release
 
           cp \
@@ -638,12 +691,11 @@ jobs:
             "$CUSTOM_ICON" \
             release/FoxEggs-Icon.png
 
-          echo "Release files prepared."
 
+      # =========================================
+      # Upload
+      # =========================================
 
-      # ==========================================
-      # UPLOAD ARTIFACT
-      # ==========================================
       - name: Upload Fox Eggs Release
         uses: actions/upload-artifact@v6
         with:
@@ -652,11 +704,14 @@ jobs:
           if-no-files-found: error
 
 
-      # ==========================================
-      # CLEANUP
-      # ==========================================
+      # =========================================
+      # Cleanup
+      # =========================================
+
       - name: Cleanup
         if: always()
         run: |
+
           rm -f FoxEggs.keystore
+
           rm -f android/app/FoxEggs.keystore
