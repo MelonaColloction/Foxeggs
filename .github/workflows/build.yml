@@ -132,6 +132,89 @@ jobs:
 
 
       # ==========================================
+      # ENABLE IMMERSIVE FULLSCREEN
+      # ==========================================
+      - name: Enable Fullscreen
+        run: |
+          python3 - <<'PY'
+          import os
+          import re
+
+          base = "android/app/src/main/java"
+
+          main_activity = None
+
+          for root, dirs, files in os.walk(base):
+              if "MainActivity.java" in files:
+                  main_activity = os.path.join(root, "MainActivity.java")
+                  break
+
+          if not main_activity:
+              raise SystemExit("MainActivity.java not found.")
+
+          print("Found MainActivity:", main_activity)
+
+          with open(main_activity, "r", encoding="utf-8") as f:
+              text = f.read()
+
+          # Add Android fullscreen imports
+          if "android.view.WindowManager" not in text:
+              text = text.replace(
+                  "import",
+                  "import android.view.WindowManager;\nimport android.view.View;\n\nimport",
+                  1
+              )
+
+          # Add fullscreen code inside onCreate
+          fullscreen_code = '''
+                  getWindow().setFlags(
+                      WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                      WindowManager.LayoutParams.FLAG_FULLSCREEN
+                  );
+
+                  getWindow().getDecorView().setSystemUiVisibility(
+                      View.SYSTEM_UI_FLAG_FULLSCREEN
+                      | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                      | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                      | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                      | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                  );
+          '''
+
+          if "FLAG_FULLSCREEN" not in text:
+
+              if "protected void onCreate" in text:
+
+                  text = re.sub(
+                      r'(protected void onCreate\s*\([^)]*\)\s*\{)',
+                      r'\1\n' + fullscreen_code,
+                      text,
+                      count=1
+                  )
+
+              elif "public void onCreate" in text:
+
+                  text = re.sub(
+                      r'(public void onCreate\s*\([^)]*\)\s*\{)',
+                      r'\1\n' + fullscreen_code,
+                      text,
+                      count=1
+                  )
+
+              else:
+                  raise SystemExit(
+                      "onCreate() not found in MainActivity.java"
+                  )
+
+          with open(main_activity, "w", encoding="utf-8") as f:
+              f.write(text)
+
+          print("Fullscreen mode enabled successfully.")
+          PY
+
+
+      # ==========================================
       # SYNC ANDROID
       # ==========================================
       - name: Sync Android
