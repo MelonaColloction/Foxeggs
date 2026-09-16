@@ -155,18 +155,43 @@ jobs:
           print("Found MainActivity:", main_activity)
 
           with open(main_activity, "r", encoding="utf-8") as f:
-              text = f.read()
+              original = f.read()
 
-          # Add Android fullscreen imports
-          if "android.view.WindowManager" not in text:
-              text = text.replace(
-                  "import",
-                  "import android.view.WindowManager;\nimport android.view.View;\n\nimport",
-                  1
+          # ------------------------------------------
+          # GET PACKAGE NAME FROM EXISTING FILE
+          # ------------------------------------------
+          package_match = re.search(
+              r'^\s*package\s+([^;]+);',
+              original,
+              re.MULTILINE
+          )
+
+          if not package_match:
+              raise SystemExit(
+                  "Package name not found in MainActivity.java"
               )
 
-          # Add fullscreen code inside onCreate
-          fullscreen_code = '''
+          package_name = package_match.group(1)
+
+          print("Package:", package_name)
+
+          # ------------------------------------------
+          # CREATE FULLSCREEN MAIN ACTIVITY
+          # ------------------------------------------
+          fullscreen_activity = f'''package {package_name};
+
+          import android.os.Bundle;
+          import android.view.View;
+          import android.view.WindowManager;
+
+          import com.getcapacitor.BridgeActivity;
+
+          public class MainActivity extends BridgeActivity {{
+
+              @Override
+              public void onCreate(Bundle savedInstanceState) {{
+                  super.onCreate(savedInstanceState);
+
                   getWindow().setFlags(
                       WindowManager.LayoutParams.FLAG_FULLSCREEN,
                       WindowManager.LayoutParams.FLAG_FULLSCREEN
@@ -180,37 +205,20 @@ jobs:
                       | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                       | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                   );
+              }}
+          }}
           '''
 
-          if "FLAG_FULLSCREEN" not in text:
-
-              if "protected void onCreate" in text:
-
-                  text = re.sub(
-                      r'(protected void onCreate\s*\([^)]*\)\s*\{)',
-                      r'\1\n' + fullscreen_code,
-                      text,
-                      count=1
-                  )
-
-              elif "public void onCreate" in text:
-
-                  text = re.sub(
-                      r'(public void onCreate\s*\([^)]*\)\s*\{)',
-                      r'\1\n' + fullscreen_code,
-                      text,
-                      count=1
-                  )
-
-              else:
-                  raise SystemExit(
-                      "onCreate() not found in MainActivity.java"
-                  )
-
           with open(main_activity, "w", encoding="utf-8") as f:
-              f.write(text)
+              f.write(fullscreen_activity)
 
-          print("Fullscreen mode enabled successfully.")
+          print("Fullscreen MainActivity created successfully.")
+
+          print("==========================================")
+          print("FINAL MAIN ACTIVITY")
+          print("==========================================")
+
+          print(fullscreen_activity)
           PY
 
 
