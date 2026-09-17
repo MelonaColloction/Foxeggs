@@ -41,9 +41,6 @@ jobs:
       # ==========================================
       # ANDROID SDK
       # ==========================================
-      # مهم:
-      # packages خالی است تا setup-android سعی نکند
-      # پکیج قدیمی "tools" را نصب کند.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
@@ -78,6 +75,313 @@ jobs:
           cp index.html www/index.html
 
           echo "Game prepared successfully."
+
+
+      # ==========================================
+      # OBFUSCATE + ANTI-DEBUG
+      # ==========================================
+      - name: Obfuscate and inject anti-debug
+        run: |
+          npm install -g javascript-obfuscator
+
+          python3 - <<'PY'
+          import re
+          import subprocess
+          import os
+
+          HTML_FILE = "www/index.html"
+
+          # ==========================================
+          # ANTI-DEBUG CODE (injected before obfuscation)
+          # ==========================================
+          ANTI_DEBUG = r"""
+          (function() {
+              'use strict';
+
+              var _0xad = {};
+
+              // ---------- 1. Detect DevTools ----------
+              _0xad.devtools = function() {
+                  var threshold = 160;
+                  var start = performance.now();
+                  debugger;
+                  var end = performance.now();
+                  if (end - start > threshold) return true;
+
+                  var w = window.outerWidth - window.innerWidth;
+                  var h = window.outerHeight - window.innerHeight;
+                  if (w > threshold || h > threshold) return true;
+
+                  var el = new Image();
+                  Object.defineProperty(el, 'id', {
+                      get: function() {
+                          _0xad.triggered = true;
+                          return 'x';
+                      }
+                  });
+                  try { console.log(el); } catch(e) {}
+                  if (_0xad.triggered) return true;
+
+                  return false;
+              };
+
+              // ---------- 2. Detect Console ----------
+              _0xad.console = function() {
+                  var check = /./;
+                  check.toString = function() {
+                      _0xad.triggered = true;
+                      return '';
+                  };
+                  try {
+                      console.log('%c', check);
+                  } catch(e) {}
+                  return _0xad.triggered === true;
+              };
+
+              // ---------- 3. Detect Frida ----------
+              _0xad.frida = function() {
+                  var keys = [
+                      'frida', 'Frida', '__frida', '_frida',
+                      'FRIDA', 'fridaHook', 'frida-helper'
+                  ];
+                  for (var i = 0; i < keys.length; i++) {
+                      if (keys[i] in window) return true;
+                  }
+                  if (typeof window.Frida !== 'undefined') return true;
+                  if (typeof window.frida !== 'undefined') return true;
+                  return false;
+              };
+
+              // ---------- 4. Detect Debugger Timing ----------
+              _0xad.timing = function() {
+                  var t1 = performance.now();
+                  debugger;
+                  var t2 = performance.now();
+                  return (t2 - t1) > 100;
+              };
+
+              // ---------- 5. Detect Function.toString tamper ----------
+              _0xad.tamper = function() {
+                  try {
+                      var fn = function(){};
+                      var src = fn.toString();
+                      if (src.indexOf('[native code]') === -1 &&
+                          src.indexOf('function') === -1) {
+                          return true;
+                      }
+                  } catch(e) {}
+                  return false;
+              };
+
+              // ---------- 6. Kill switch ----------
+              _0xad.react = function() {
+                  try {
+                      localStorage.clear();
+                      sessionStorage.clear();
+                  } catch(e) {}
+
+                  var _0xdead = function() {
+                      while (true) {
+                          debugger;
+                          var _ = 0;
+                          for (var i = 0; i < 1000; i++) { _ += i; }
+                      }
+                  };
+
+                  _0xdead();
+              };
+
+              // ---------- 7. Main loop ----------
+              function _0xcheck() {
+                  try {
+                      if (_0xad.devtools() ||
+                          _0xad.console() ||
+                          _0xad.frida() ||
+                          _0xad.timing() ||
+                          _0xad.tamper()) {
+                          _0xad.react();
+                      }
+                  } catch(e) {
+                      _0xad.react();
+                  }
+
+                  setTimeout(_0xcheck, 1000);
+              }
+
+              setTimeout(_0xcheck, 1000);
+
+              // ---------- 8. Disable console ----------
+              var _noop = function(){};
+              try {
+                  window.console.log = _noop;
+                  window.console.warn = _noop;
+                  window.console.error = _noop;
+                  window.console.debug = _noop;
+                  window.console.info = _noop;
+                  window.console.table = _noop;
+                  window.console.trace = _noop;
+                  window.console.dir = _noop;
+                  window.console.clear = _noop;
+              } catch(e) {}
+
+              // ---------- 9. Block common shortcuts ----------
+              document.addEventListener('keydown', function(e) {
+                  if (e.key === 'F12') { e.preventDefault(); return false; }
+                  if (e.ctrlKey && e.shiftKey) {
+                      if (e.key === 'I' || e.key === 'J' || e.key === 'C') {
+                          e.preventDefault();
+                          return false;
+                      }
+                  }
+                  if (e.ctrlKey && e.key === 'u') {
+                      e.preventDefault();
+                      return false;
+                  }
+              }, true);
+
+              // ---------- 10. Block right click ----------
+              document.addEventListener('contextmenu', function(e) {
+                  e.preventDefault();
+                  return false;
+              }, true);
+
+              // ---------- 11. Detect console open via toString ----------
+              setInterval(function() {
+                  try {
+                      var _0xe = new Error();
+                      Object.defineProperty(_0xe, 'message', {
+                          get: function() {
+                              _0xad.triggered = true;
+                              return '';
+                          }
+                      });
+                      console.log(_0xe);
+                      if (_0xad.triggered) {
+                          _0xad.react();
+                      }
+                  } catch(e) {}
+              }, 2000);
+
+          })();
+          """
+
+          with open(HTML_FILE, "r", encoding="utf-8") as f:
+              html = f.read()
+
+          # ==========================================
+          # INJECT ANTI-DEBUG INTO <head>
+          # ==========================================
+          if '<head>' in html:
+              html = html.replace(
+                  '<head>',
+                  '<head>\n<script>\n' + ANTI_DEBUG + '\n</script>\n',
+                  1
+              )
+          elif '<html' in html:
+              html = re.sub(
+                  r'(<html[^>]*>)',
+                  r'\1\n<head>\n<script>\n' + ANTI_DEBUG + '\n</script>\n</head>\n',
+                  html,
+                  count=1
+              )
+          else:
+              html = '<script>\n' + ANTI_DEBUG + '\n</script>\n' + html
+
+          print("Anti-debug code injected.")
+
+          # ==========================================
+          # FIND ALL INLINE SCRIPTS
+          # ==========================================
+          pattern = r'<script(?![^>]*\bsrc=)[^>]*>(.*?)</script>'
+          scripts = list(re.finditer(pattern, html, re.S | re.I))
+
+          print("=" * 50)
+          print(f"FOUND {len(scripts)} INLINE SCRIPT(S) TO OBFUSCATE")
+          print("=" * 50)
+
+          # ==========================================
+          # OBFUSCATE EACH SCRIPT
+          # ==========================================
+          for i, match in reversed(list(enumerate(scripts))):
+
+              original_js = match.group(1).strip()
+              if not original_js:
+                  continue
+
+              tmp_in = f"_tmp_{i}.js"
+              tmp_out = f"_tmp_{i}_obf.js"
+
+              with open(tmp_in, "w", encoding="utf-8") as f:
+                  f.write(original_js)
+
+              print(f"\nObfuscating script #{i} ({len(original_js)} bytes)...")
+
+              result = subprocess.run([
+                  "javascript-obfuscator",
+                  tmp_in,
+                  "--output", tmp_out,
+                  "--compact", "true",
+                  "--simplify", "true",
+                  "--control-flow-flattening", "true",
+                  "--control-flow-flattening-threshold", "1",
+                  "--dead-code-injection", "true",
+                  "--dead-code-injection-threshold", "0.5",
+                  "--string-array", "true",
+                  "--string-array-encoding", "rc4",
+                  "--string-array-threshold", "1",
+                  "--string-array-rotate", "true",
+                  "--string-array-shuffle", "true",
+                  "--string-array-wrappers-count", "2",
+                  "--string-array-wrappers-chained-calls", "true",
+                  "--split-strings", "true",
+                  "--split-strings-chunk-length", "5",
+                  "--identifier-names-generator", "hexadecimal",
+                  "--identifiers-prefix", "_0x",
+                  "--self-defending", "true",
+                  "--debug-protection", "true",
+                  "--debug-protection-interval", "1000",
+                  "--disable-console-output", "true",
+                  "--numbers-to-expressions", "true",
+                  "--seed", "0"
+              ], capture_output=True, text=True)
+
+              if result.returncode != 0:
+                  print("STDERR:", result.stderr)
+                  raise SystemExit(f"Obfuscation failed for script #{i}")
+
+              with open(tmp_out, "r", encoding="utf-8") as f:
+                  obfuscated = f.read()
+
+              print(f"  -> obfuscated: {len(obfuscated)} bytes")
+
+              html = (
+                  html[:match.start(1)]
+                  + "\n" + obfuscated + "\n"
+                  + html[match.end(1):]
+              )
+
+              os.remove(tmp_in)
+              os.remove(tmp_out)
+
+          # ==========================================
+          # FINAL CLEANUP
+          # ==========================================
+          html = re.sub(r'<!--(?!\[if).*?-->', '', html, flags=re.S)
+          html = re.sub(r'\n\s*\n', '\n', html)
+          html = html.replace('\t', ' ')
+
+          with open(HTML_FILE, "w", encoding="utf-8") as f:
+              f.write(html)
+
+          print("\n" + "=" * 50)
+          print("OBFUSCATION + ANTI-DEBUG COMPLETE")
+          print("=" * 50)
+          print(f"Final size: {len(html)} bytes")
+          PY
+
+          echo ""
+          echo "Final index.html:"
+          ls -lh www/index.html
 
 
       # ==========================================
@@ -157,9 +461,6 @@ jobs:
           with open(main_activity, "r", encoding="utf-8") as f:
               original = f.read()
 
-          # ------------------------------------------
-          # GET PACKAGE NAME FROM EXISTING FILE
-          # ------------------------------------------
           package_match = re.search(
               r'^\s*package\s+([^;]+);',
               original,
@@ -175,9 +476,6 @@ jobs:
 
           print("Package:", package_name)
 
-          # ------------------------------------------
-          # CREATE FULLSCREEN MAIN ACTIVITY
-          # ------------------------------------------
           fullscreen_activity = f'''package {package_name};
 
           import android.os.Bundle;
@@ -213,12 +511,6 @@ jobs:
               f.write(fullscreen_activity)
 
           print("Fullscreen MainActivity created successfully.")
-
-          print("==========================================")
-          print("FINAL MAIN ACTIVITY")
-          print("==========================================")
-
-          print(fullscreen_activity)
           PY
 
 
@@ -253,8 +545,6 @@ jobs:
       # ==========================================
       # LOAD EXISTING KEYSTORE
       # ==========================================
-      # همان keystore قبلی را استفاده می‌کنیم.
-      # این برای آپدیت بدون حذف نسخه قبلی بسیار مهم است.
       - name: Load existing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -306,9 +596,6 @@ jobs:
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          # ------------------------------------------
-          # APPLICATION ID
-          # ------------------------------------------
           text = re.sub(
               r'applicationId\s+"[^"]+"',
               'applicationId "com.foxeggs.game"',
@@ -316,9 +603,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # COMPILE SDK
-          # ------------------------------------------
           text = re.sub(
               r'compileSdk\s+\d+',
               'compileSdk 35',
@@ -326,9 +610,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # VERSION CODE
-          # ------------------------------------------
           text = re.sub(
               r'versionCode\s+\d+',
               'versionCode ' + os.environ["VERSION_CODE"],
@@ -336,9 +617,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # VERSION NAME
-          # ------------------------------------------
           text = re.sub(
               r'versionName\s+"[^"]+"',
               'versionName "' + os.environ["VERSION_NAME"] + '"',
@@ -346,9 +624,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # REMOVE EXISTING SIGNING CONFIG
-          # ------------------------------------------
           text = re.sub(
               r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)',
               '',
@@ -357,9 +632,6 @@ jobs:
               flags=re.S
           )
 
-          # ------------------------------------------
-          # SIGNING CONFIG
-          # ------------------------------------------
           signing_block = '''
               signingConfigs {
                   release {
@@ -381,9 +653,6 @@ jobs:
                   1
               )
 
-          # ------------------------------------------
-          # RELEASE BUILD TYPE
-          # ------------------------------------------
           release_pattern = (
               r'(buildTypes\s*\{\s*'
               r'release\s*\{)'
@@ -398,9 +667,6 @@ jobs:
                   flags=re.S
               )
 
-          # ------------------------------------------
-          # MINIFY
-          # ------------------------------------------
           if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
 
               release_match = re.search(
