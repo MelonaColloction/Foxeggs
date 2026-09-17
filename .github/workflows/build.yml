@@ -78,9 +78,9 @@ jobs:
 
 
       # ==========================================
-      # OBFUSCATE + ANTI-DEBUG
+      # OBFUSCATE + LIGHT ANTI-DEBUG
       # ==========================================
-      - name: Obfuscate and inject anti-debug
+      - name: Obfuscate and inject light anti-debug
         run: |
           npm install -g javascript-obfuscator
 
@@ -92,175 +92,61 @@ jobs:
           HTML_FILE = "www/index.html"
 
           # ==========================================
-          # ANTI-DEBUG CODE (injected before obfuscation)
+          # LIGHT ANTI-DEBUG (no lag)
           # ==========================================
           ANTI_DEBUG = r"""
           (function() {
               'use strict';
 
-              var _0xad = {};
-
-              // ---------- 1. Detect DevTools ----------
-              _0xad.devtools = function() {
-                  var threshold = 160;
-                  var start = performance.now();
-                  debugger;
-                  var end = performance.now();
-                  if (end - start > threshold) return true;
-
-                  var w = window.outerWidth - window.innerWidth;
-                  var h = window.outerHeight - window.innerHeight;
-                  if (w > threshold || h > threshold) return true;
-
-                  var el = new Image();
-                  Object.defineProperty(el, 'id', {
-                      get: function() {
-                          _0xad.triggered = true;
-                          return 'x';
-                      }
-                  });
-                  try { console.log(el); } catch(e) {}
-                  if (_0xad.triggered) return true;
-
-                  return false;
-              };
-
-              // ---------- 2. Detect Console ----------
-              _0xad.console = function() {
-                  var check = /./;
-                  check.toString = function() {
-                      _0xad.triggered = true;
-                      return '';
-                  };
-                  try {
-                      console.log('%c', check);
-                  } catch(e) {}
-                  return _0xad.triggered === true;
-              };
-
-              // ---------- 3. Detect Frida ----------
-              _0xad.frida = function() {
-                  var keys = [
-                      'frida', 'Frida', '__frida', '_frida',
-                      'FRIDA', 'fridaHook', 'frida-helper'
-                  ];
-                  for (var i = 0; i < keys.length; i++) {
-                      if (keys[i] in window) return true;
-                  }
-                  if (typeof window.Frida !== 'undefined') return true;
-                  if (typeof window.frida !== 'undefined') return true;
-                  return false;
-              };
-
-              // ---------- 4. Detect Debugger Timing ----------
-              _0xad.timing = function() {
-                  var t1 = performance.now();
-                  debugger;
-                  var t2 = performance.now();
-                  return (t2 - t1) > 100;
-              };
-
-              // ---------- 5. Detect Function.toString tamper ----------
-              _0xad.tamper = function() {
-                  try {
-                      var fn = function(){};
-                      var src = fn.toString();
-                      if (src.indexOf('[native code]') === -1 &&
-                          src.indexOf('function') === -1) {
-                          return true;
-                      }
-                  } catch(e) {}
-                  return false;
-              };
-
-              // ---------- 6. Kill switch ----------
-              _0xad.react = function() {
-                  try {
-                      localStorage.clear();
-                      sessionStorage.clear();
-                  } catch(e) {}
-
-                  var _0xdead = function() {
-                      while (true) {
-                          debugger;
-                          var _ = 0;
-                          for (var i = 0; i < 1000; i++) { _ += i; }
-                      }
-                  };
-
-                  _0xdead();
-              };
-
-              // ---------- 7. Main loop ----------
-              function _0xcheck() {
-                  try {
-                      if (_0xad.devtools() ||
-                          _0xad.console() ||
-                          _0xad.frida() ||
-                          _0xad.timing() ||
-                          _0xad.tamper()) {
-                          _0xad.react();
-                      }
-                  } catch(e) {
-                      _0xad.react();
-                  }
-
-                  setTimeout(_0xcheck, 1000);
-              }
-
-              setTimeout(_0xcheck, 1000);
-
-              // ---------- 8. Disable console ----------
+              // ---------- 1. Disable console (fast) ----------
               var _noop = function(){};
               try {
                   window.console.log = _noop;
                   window.console.warn = _noop;
-                  window.console.error = _noop;
-                  window.console.debug = _noop;
                   window.console.info = _noop;
+                  window.console.debug = _noop;
+                  window.console.error = _noop;
                   window.console.table = _noop;
                   window.console.trace = _noop;
                   window.console.dir = _noop;
-                  window.console.clear = _noop;
               } catch(e) {}
 
-              // ---------- 9. Block common shortcuts ----------
+              // ---------- 2. Block DevTools keys ----------
               document.addEventListener('keydown', function(e) {
-                  if (e.key === 'F12') { e.preventDefault(); return false; }
+                  if (e.key === 'F12') {
+                      e.preventDefault();
+                      return false;
+                  }
                   if (e.ctrlKey && e.shiftKey) {
-                      if (e.key === 'I' || e.key === 'J' || e.key === 'C') {
+                      var k = e.key.toLowerCase();
+                      if (k === 'i' || k === 'j' || k === 'c') {
                           e.preventDefault();
                           return false;
                       }
                   }
-                  if (e.ctrlKey && e.key === 'u') {
+                  if (e.ctrlKey && e.key.toLowerCase() === 'u') {
                       e.preventDefault();
                       return false;
                   }
               }, true);
 
-              // ---------- 10. Block right click ----------
+              // ---------- 3. Block right click ----------
               document.addEventListener('contextmenu', function(e) {
                   e.preventDefault();
                   return false;
               }, true);
 
-              // ---------- 11. Detect console open via toString ----------
-              setInterval(function() {
-                  try {
-                      var _0xe = new Error();
-                      Object.defineProperty(_0xe, 'message', {
-                          get: function() {
-                              _0xad.triggered = true;
-                              return '';
-                          }
-                      });
-                      console.log(_0xe);
-                      if (_0xad.triggered) {
-                          _0xad.react();
-                      }
-                  } catch(e) {}
-              }, 2000);
+              // ---------- 4. Frida detection (once at start) ----------
+              try {
+                  if (typeof window.Frida !== 'undefined' ||
+                      typeof window.frida !== 'undefined' ||
+                      '__frida' in window) {
+                      try {
+                          localStorage.clear();
+                          sessionStorage.clear();
+                      } catch(e) {}
+                  }
+              } catch(e) {}
 
           })();
           """
@@ -287,7 +173,7 @@ jobs:
           else:
               html = '<script>\n' + ANTI_DEBUG + '\n</script>\n' + html
 
-          print("Anti-debug code injected.")
+          print("Light anti-debug injected (no lag).")
 
           # ==========================================
           # FIND ALL INLINE SCRIPTS
@@ -323,23 +209,19 @@ jobs:
                   "--compact", "true",
                   "--simplify", "true",
                   "--control-flow-flattening", "true",
-                  "--control-flow-flattening-threshold", "1",
+                  "--control-flow-flattening-threshold", "0.75",
                   "--dead-code-injection", "true",
-                  "--dead-code-injection-threshold", "0.5",
+                  "--dead-code-injection-threshold", "0.4",
                   "--string-array", "true",
                   "--string-array-encoding", "rc4",
-                  "--string-array-threshold", "1",
+                  "--string-array-threshold", "0.75",
                   "--string-array-rotate", "true",
                   "--string-array-shuffle", "true",
-                  "--string-array-wrappers-count", "2",
-                  "--string-array-wrappers-chained-calls", "true",
                   "--split-strings", "true",
                   "--split-strings-chunk-length", "5",
                   "--identifier-names-generator", "hexadecimal",
                   "--identifiers-prefix", "_0x",
                   "--self-defending", "true",
-                  "--debug-protection", "true",
-                  "--debug-protection-interval", "1000",
                   "--disable-console-output", "true",
                   "--numbers-to-expressions", "true",
                   "--seed", "0"
@@ -374,7 +256,7 @@ jobs:
               f.write(html)
 
           print("\n" + "=" * 50)
-          print("OBFUSCATION + ANTI-DEBUG COMPLETE")
+          print("OBFUSCATION + LIGHT ANTI-DEBUG COMPLETE")
           print("=" * 50)
           print(f"Final size: {len(html)} bytes")
           PY
