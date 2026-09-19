@@ -1189,8 +1189,8 @@ const THEME_NAMES = {
         birthday:{fa:'شب تولد سازنده',en:"Developer's Birthday Night",icon:'🎆'},
         anniversary:{fa:'شب سالگرد',en:'Anniversary Night',icon:'🍾'},
         eidFitr:{fa:'شب عید فطر',en:'Eid Night',icon:'🌜'},
-        eidAdha:{fa:'شب عید قربان',en:'Adha Night',icon:'✨'},
-        yalda:{fa:'شب یلدا',en:'Yalda Night',icon:'🍉'},
+        eidAdha:{fa:'شب عید قربان',en:'Adha Night',icon:'🌙'},
+        yalda:{fa:'شب یلدا',en:'Yalda Night',icon:'🕯️'},
         valentine:{fa:'شب ولنتاین',en:"Valentine's Night",icon:'🕊️'}
     },
     volcano: {
@@ -1244,9 +1244,9 @@ const THEME_NAMES = {
         nowruz:{fa:'نوروز جادویی',en:'Enchanted Nowruz',icon:'🧚'},
         birthday:{fa:'تولد جادویی سازنده',en:"Developer's Magic Birthday",icon:'🌟'},
         anniversary:{fa:'سالگرد جادویی',en:'Enchanted Anniversary',icon:'🪅'},
-        eidFitr:{fa:'جادوی عید فطر',en:'Eid Magic',icon:'🌙'},
+        eidFitr:{fa:'جادوی عید فطر',en:'Eid Magic',icon:'✨'},
         eidAdha:{fa:'جادوی عید قربان',en:'Adha Magic',icon:'✨'},
-        yalda:{fa:'یلدای جادویی',en:'Enchanted Yalda',icon:'🍉'},
+        yalda:{fa:'یلدای جادویی',en:'Enchanted Yalda',icon:'✨'},
         valentine:{fa:'ولنتاین جادویی',en:'Enchanted Valentine',icon:'💕'}
     },
     toon: {
@@ -4177,6 +4177,7 @@ function refreshSeason() {
     currentSeason = newSeason;
     seasonalParticles.length = 0;
 
+    applySeasonToUI(); 
     applySeasonToUI();
     updateThemeUI();
     renderSkinShop();
@@ -5077,9 +5078,10 @@ document.getElementById('channelPopup').addEventListener('click', function(e) {
 // بخش ۲۹: راه‌اندازی اولیه
 // ============================================================
 
+language = localStorage.getItem("foxLanguage") || "en";  // ← این خط رو اضافه کن
 currentSeason = getCurrentSeason();
-applySeasonToUI();
-applyLanguage();
+applyLanguage();      // ← این اول
+applySeasonToUI();    // ← این دوم (زبان تازه آپدیت شده)
 updateUI();
 resetFox();
 
@@ -5159,4 +5161,4 @@ setTimeout(() => {
 // ============================================================
 </script>
 </body>
-        </html>
+                </html>
