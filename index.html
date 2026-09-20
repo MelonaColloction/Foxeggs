@@ -12,6 +12,7 @@ html,body {
     width:100%; height:100%; overflow:hidden;
     background:#87ceeb; touch-action:none; user-select:none;
     font-family:Arial,sans-serif;
+    -webkit-tap-highlight-color:transparent;
 }
 
 #game { position:fixed; inset:0; overflow:hidden; }
@@ -41,10 +42,8 @@ canvas {
     pointer-events:none; display:flex; gap:20px;
     justify-content:center; align-items:center;
     background:rgba(0,0,0,0.5);
-    backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px);
     padding:6px 18px; border-radius:30px;
-    border:1px solid rgba(255,255,255,0.1);
-    transition:all 0.3s ease;
+    transition:opacity 0.2s ease, transform 0.2s ease;
 }
 
 #powerupTimer.hidden {
@@ -81,7 +80,7 @@ canvas {
     border-radius:12px; display:flex;
     align-items:center; justify-content:center;
     cursor:pointer; color:white; border:none;
-    pointer-events:auto; transition:all 0.2s ease;
+    pointer-events:auto; transition:transform 0.15s ease;
 }
 
 #nftButton:hover {transform:scale(1.05);}
@@ -159,7 +158,6 @@ button:active {
     position:fixed; inset:0; z-index:100000;
     display:none; justify-content:center; align-items:center;
     background:rgba(0,0,0,0.85);
-    backdrop-filter:blur(12px);
     color:white; padding:20px;
 }
 
@@ -253,7 +251,6 @@ button:active {
     position:fixed; inset:0; z-index:99997;
     display:none; justify-content:center; align-items:center;
     background:rgba(0,0,0,0.7);
-    backdrop-filter:blur(8px);
 }
 
 .theme-selector-panel {
@@ -273,7 +270,8 @@ button:active {
     border:2px solid rgba(255,255,255,0.08);
     border-radius:14px; padding:14px 10px;
     text-align:center; cursor:pointer;
-    transition:all 0.25s ease; color:white;
+    transition:transform 0.15s ease, border-color 0.15s ease;
+    color:white;
 }
 
 .theme-option.active {
@@ -314,7 +312,7 @@ button:active {
 #shieldIndicator {background:rgba(79,195,247,0.4);border:2px solid #4fc3f7;}
 #speedIndicator {background:rgba(255,213,79,0.4);border:2px solid #ffd54f;}
 
-#skinShopGrid .skin-option {transition:all 0.2s ease;}
+#skinShopGrid .skin-option {transition:transform 0.15s ease;}
 #skinShopGrid .skin-option.active {box-shadow:0 0 20px rgba(249,115,22,0.2);}
 #skinShopGrid .skin-option.locked {opacity:0.5;cursor:not-allowed;}
 
@@ -342,8 +340,7 @@ button:active {
     position:fixed; inset:0; z-index:99999;
     display:none; justify-content:center; align-items:center;
     background:rgba(0,0,0,0.85);
-    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
-    animation:fadeInUp 0.4s ease;
+    animation:fadeInUp 0.3s ease;
 }
 
 #channelPopup .box {
@@ -360,36 +357,16 @@ button:active {
     position:absolute; top:12px; right:16px;
     background:none; border:none;
     color:rgba(255,255,255,0.3); font-size:24px;
-    cursor:pointer; transition:all 0.3s ease;
-    z-index:2; padding:4px 8px; line-height:1;
+    cursor:pointer; z-index:2; padding:4px 8px; line-height:1;
 }
 
 #closeChannelBtn:hover {
     color:rgba(255,255,255,0.8);
-    transform:rotate(90deg);
-}
-
-#channelPopup .box::before {
-    content:''; position:absolute;
-    top:-50%; left:-50%;
-    width:200%; height:200%;
-    background:radial-gradient(circle at center, rgba(249,115,22,0.05) 0%, transparent 70%);
-    animation:rotateGlow 20s linear infinite;
-}
-
-@keyframes rotateGlow {
-    0% { transform:rotate(0deg); }
-    100% { transform:rotate(360deg); }
 }
 
 #channelPopup .icon-big {
     font-size:72px; margin-bottom:10px;
-    display:block; animation:bounce 2s ease infinite;
-}
-
-@keyframes bounce {
-    0%,100% { transform:translateY(0); }
-    50% { transform:translateY(-10px); }
+    display:block;
 }
 
 #channelPopup h2 {
@@ -410,7 +387,7 @@ button:active {
     border:2px solid #f97316;
     border-radius:14px; padding:12px 20px;
     color:white; font-size:16px; font-weight:bold;
-    text-decoration:none; transition:all 0.3s ease;
+    text-decoration:none; transition:background 0.2s ease, transform 0.15s ease;
     position:relative; z-index:1; width:100%;
     justify-content:center; box-sizing:border-box;
 }
@@ -418,7 +395,6 @@ button:active {
 #channelPopup .channel-link:hover {
     background:#f97316;
     transform:scale(1.02);
-    box-shadow:0 0 30px rgba(249,115,22,0.3);
 }
 
 #channelPopup .channel-link .telegram-icon {font-size:28px;}
@@ -443,7 +419,6 @@ button:active {
     position:fixed; inset:0; z-index:100003;
     display:none; justify-content:center; align-items:center;
     background:rgba(0,0,0,0.85);
-    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
     padding:20px; animation:fadeInUp 0.3s ease;
 }
 
@@ -462,12 +437,10 @@ button:active {
     background:none; border:none;
     color:rgba(255,255,255,0.4); font-size:24px;
     cursor:pointer; padding:4px 8px; line-height:1;
-    transition:all 0.3s ease;
 }
 
 #closeNftModal:hover {
     color:rgba(255,255,255,0.9);
-    transform:rotate(90deg);
 }
 
 #nftChannelLink {
@@ -478,7 +451,7 @@ button:active {
     border-radius:14px; padding:12px 20px;
     color:white; font-size:15px; font-weight:bold;
     text-decoration:none; margin-top:20px;
-    transition:all 0.3s ease;
+    transition:background 0.2s ease, transform 0.15s ease;
 }
 
 #nftChannelLink:hover {
@@ -493,13 +466,12 @@ button:active {
     z-index:100004;
     display:flex; align-items:center; gap:12px;
     background:linear-gradient(135deg, rgba(20,20,30,0.97), rgba(30,20,40,0.97));
-    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
     padding:12px 18px 12px 14px;
     border-radius:50px;
     border:2px solid var(--season-color, #f97316);
     box-shadow:0 8px 30px rgba(0,0,0,0.5), 0 0 30px var(--season-glow, rgba(249,115,22,0.3));
     max-width:calc(100vw - 30px);
-    transition:transform 0.55s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+    transition:transform 0.4s ease, opacity 0.3s ease;
     opacity:0;
     pointer-events:none;
 }
@@ -519,12 +491,6 @@ button:active {
     font-size:32px;
     line-height:1;
     flex-shrink:0;
-    animation:seasonBounce 1.5s ease infinite;
-}
-
-@keyframes seasonBounce {
-    0%,100% { transform:translateY(0) scale(1); }
-    50% { transform:translateY(-5px) scale(1.1); }
 }
 
 #seasonAnnouncement .season-text {
@@ -871,7 +837,7 @@ button:active {
 
 <div id="toast" style="display:none;"></div>
 <script>
-  // ============================================================
+// ============================================================
 // بخش ۱: راه‌اندازی Canvas
 // ============================================================
 
@@ -881,6 +847,8 @@ const ctx = canvas.getContext("2d", { alpha:false, desynchronized:true });
 let W = 0;
 let H = 0;
 let scale = 1;
+let cachedGround = 0;
+let lastH = 0;
 
 function resize() {
     const vw = window.visualViewport ? window.visualViewport.width : window.innerWidth;
@@ -893,6 +861,16 @@ function resize() {
     canvas.style.width = W + 'px';
     canvas.style.height = H + 'px';
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    lastH = 0;
+}
+
+// ✅ بهینه‌شده: ground() با کش
+function ground() {
+    if (H !== lastH) {
+        cachedGround = Math.max(H * 0.72, 200);
+        lastH = H;
+    }
+    return cachedGround;
 }
 
 resize();
@@ -957,6 +935,7 @@ const TELEGRAM_CHANNELS = {
 function getChannelUrl() {
     return language === 'fa' ? TELEGRAM_CHANNELS.fa : TELEGRAM_CHANNELS.en;
 }
+
 // ============================================================
 // بخش ۳: سیستم فصل‌ها و Event ها
 // ============================================================
@@ -993,10 +972,10 @@ const SEASONS = {
         editionEn:'🌷 HAPPY NOWRUZ 🌷', badgeColor:'#00d96a'
     },
     birthday: {
-    id:'birthday', nameFa:'تولد سازنده', nameEn:"Developer's Birthday", icon:'🎂',
-    logo:'🎂🦊🎈', editionFa:'🎂 تولد سازنده Fox Eggs 🎂',
-    editionEn:"🎂 FOX EGGS DEVELOPER'S BIRTHDAY 🎂", badgeColor:'#ff69b4'
-   },
+        id:'birthday', nameFa:'تولد سازنده', nameEn:"Developer's Birthday", icon:'🎂',
+        logo:'🎂🦊🎈', editionFa:'🎂 تولد سازنده Fox Eggs 🎂',
+        editionEn:"🎂 FOX EGGS DEVELOPER'S BIRTHDAY 🎂", badgeColor:'#ff69b4'
+    },
     anniversary: {
         id:'anniversary', nameFa:'سالگرد', nameEn:'Anniversary', icon:'🎉',
         logo:'🎉🦊🎊', editionFa:'🎉 سالگرد Fox Eggs 🎉',
@@ -1012,8 +991,6 @@ const SEASONS = {
         logo: '🐑🦊🌙', editionFa: '🐑 عید سعید قربان مبارک 🐑',
         editionEn: '🐑 HAPPY EID AL-ADHA 🐑', badgeColor: '#ffd700'
     },
-
-    // 🆕 رویدادهای جدید
     yalda: {
         id:'yalda', nameFa:'یلدا', nameEn:'Yalda Night', icon:'🍉',
         logo:'🍉🦊🕯️', editionFa:'🍉 شب یلدا مبارک 🍉',
@@ -1059,30 +1036,34 @@ function checkEidEvent() {
     return null;
 }
 
+let _cachedSeason = null;
+let _cachedSeasonDate = null;
+
 function getCurrentSeason() {
     const now = new Date();
+    const dateKey = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+    if (_cachedSeasonDate === dateKey && _cachedSeason) return _cachedSeason;
+
     const month = now.getMonth() + 1;
     const day = now.getDate();
+    let result;
 
     const eid = checkEidEvent();
-    if (eid) return eid;
+    if (eid) result = eid;
+    else if (month === 12 && day === 21) result = 'yalda';
+    else if (month === 2 && day === 14) result = 'valentine';
+    else if (month === 12 && day === 9) result = 'birthday';
+    else if (month === 8 && day >= 15 && day <= 21) result = 'anniversary';
+    else if ((month === 3 && day >= 21) || (month === 4 && day <= 2)) result = 'nowruz';
+    else if (month === 12 && day >= 24 && day <= 26) result = 'christmas';
+    else if ((month === 3 && day >= 21) || month === 4 || month === 5 || (month === 6 && day <= 20)) result = 'spring';
+    else if ((month === 6 && day >= 21) || month === 7 || month === 8 || (month === 9 && day <= 22)) result = 'summer';
+    else if ((month === 9 && day >= 23) || month === 10 || month === 11 || (month === 12 && day <= 20)) result = 'autumn';
+    else result = 'winter';
 
-    // 🍉 Yalda Night: 21 December only
-if (month === 12 && day === 21) return 'yalda';
-
-// 💕 Valentine's Day: 14 February only
-if (month === 2 && day === 14) return 'valentine';
-
-    if (month === 12 && day === 9) return 'birthday';
-    if (month === 8 && day >= 15 && day <= 21) return 'anniversary';
-
-    if ((month === 3 && day >= 21) || (month === 4 && day <= 2)) return 'nowruz';
-    if (month === 12 && day >= 24 && day <= 26) return 'christmas';
-
-    if ((month === 3 && day >= 21) || month === 4 || month === 5 || (month === 6 && day <= 20)) return 'spring';
-    if ((month === 6 && day >= 21) || month === 7 || month === 8 || (month === 9 && day <= 22)) return 'summer';
-    if ((month === 9 && day >= 23) || month === 10 || month === 11 || (month === 12 && day <= 20)) return 'autumn';
-    return 'winter';
+    _cachedSeason = result;
+    _cachedSeasonDate = dateKey;
+    return result;
 }
 
 let currentSeason = getCurrentSeason();
@@ -1104,6 +1085,7 @@ const THEME_IDS = [
     'space', 'night', 'volcano', 'ocean',
     'desert', 'magic', 'toon', 'cyberpunk'
 ];
+
 // ============================================================
 // بخش ۵: نام‌ها و آیکون‌های تم‌ها
 // ============================================================
@@ -1453,6 +1435,7 @@ const THEME_DESCS = {
         valentine:{fa:'عشق نئونی',en:'Neon love'}
     }
 };
+
 // ============================================================
 // بخش ۷: اسکین‌های روباه (۲۰ اسکین)
 // ============================================================
@@ -1485,63 +1468,62 @@ const FOX_SKINS = [
 // ============================================================
 
 let seasonalParticles = [];
+let _nowSeconds = 0;
 
 const SEASONAL_EFFECTS = {
     spring: {
-        enabled:true, maxCount:12, color:'#ffb8d8', colorDark:'#ff8ab8',
+        enabled:true, maxCount:8, color:'#ffb8d8', colorDark:'#ff8ab8',
         size:3.5, speedY:25, speedXRange:[-15,-30],
         rotation:true, shape:'petal', swayAmount:0.8
     },
     summer: { enabled:false, maxCount:0 },
     autumn: {
-        enabled:true, maxCount:12, color:'#ffb347', colorDark:'#e08a20',
+        enabled:true, maxCount:8, color:'#ffb347', colorDark:'#e08a20',
         size:4, speedY:20, speedXRange:[-20,-40],
         rotation:true, shape:'leaf', swayAmount:1.0
     },
     winter: {
-        enabled:true, maxCount:12, color:'#ffffff', colorDark:'#e0e8f0',
+        enabled:true, maxCount:8, color:'#ffffff', colorDark:'#e0e8f0',
         size:2.5, speedY:30, speedXRange:[-10,-20],
         rotation:false, shape:'snow', swayAmount:0.6
     },
     christmas: {
-        enabled:true, maxCount:12, color:'#ffffff', colorDark:'#e0e8f0',
+        enabled:true, maxCount:8, color:'#ffffff', colorDark:'#e0e8f0',
         size:3, speedY:35, speedXRange:[-12,-25],
         rotation:false, shape:'snow', swayAmount:0.7
     },
     nowruz: {
-        enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ff69b4',
+        enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ff69b4',
         size:3.5, speedY:22, speedXRange:[-18,-35],
         rotation:true, shape:'petal', swayAmount:0.9
     },
     birthday: {
-        enabled:true, maxCount:12, color:'#ff69b4', colorDark:'#ffd700',
+        enabled:true, maxCount:8, color:'#ff69b4', colorDark:'#ffd700',
         size:3, speedY:28, speedXRange:[-15,-30],
         rotation:true, shape:'confetti', swayAmount:1.2
     },
     anniversary: {
-        enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffed4e',
+        enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ffed4e',
         size:3, speedY:28, speedXRange:[-15,-30],
         rotation:true, shape:'confetti', swayAmount:1.2
     },
     eidFitr: {
-        enabled:true, maxCount:12, color:'#00d96a', colorDark:'#00a050',
+        enabled:true, maxCount:8, color:'#00d96a', colorDark:'#00a050',
         size:3, speedY:20, speedXRange:[-12,-25],
         rotation:true, shape:'star', swayAmount:0.9
     },
     eidAdha: {
-        enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffed4e',
+        enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ffed4e',
         size:3.2, speedY:22, speedXRange:[-14,-28],
         rotation:true, shape:'confetti', swayAmount:1.1
     },
-
-    // 🆕 رویدادهای جدید
     yalda: {
-        enabled:true, maxCount:12, color:'#ff2d55', colorDark:'#b91c1c',
+        enabled:true, maxCount:8, color:'#ff2d55', colorDark:'#b91c1c',
         size:4, speedY:22, speedXRange:[-15,-30],
         rotation:true, shape:'confetti', swayAmount:1.0
     },
     valentine: {
-        enabled:true, maxCount:12, color:'#ec4899', colorDark:'#f472b6',
+        enabled:true, maxCount:8, color:'#ec4899', colorDark:'#f472b6',
         size:5, speedY:25, speedXRange:[-12,-25],
         rotation:true, shape:'heart', swayAmount:1.1
     }
@@ -1580,14 +1562,15 @@ function updateSeasonalParticles(dt) {
         return;
     }
 
-    const t = Date.now() / 1000;
+    const t = _nowSeconds;
     const arr = seasonalParticles;
+    const swayActive = fx.swayAmount > 0;
 
     for (let i = arr.length - 1; i >= 0; i--) {
         const p = arr[i];
         p.x += p.vx * dt;
         p.y += p.vy * dt;
-        if (fx.swayAmount > 0) {
+        if (swayActive) {
             p.x += Math.sin(t * p.swaySpeed + p.swayOffset) * fx.swayAmount * dt * 30;
         }
         if (fx.rotation) p.rotation += p.rotationSpeed * dt;
@@ -1643,8 +1626,7 @@ function drawSeasonalParticles() {
             drawStarShape(ctx, 0, 0, 5, p.size, p.size * 0.45);
             ctx.fill();
             ctx.restore();
-
-        } else if (p.shape === 'heart') {          // 🆕 قلب برای ولنتاین
+        } else if (p.shape === 'heart') {
             ctx.save();
             ctx.translate(p.x, p.y);
             ctx.rotate(p.rotation);
@@ -1655,7 +1637,6 @@ function drawSeasonalParticles() {
             ctx.bezierCurveTo(s * 0.5, -s * 1.2, s, -s * 0.5, 0, s * 0.3);
             ctx.fill();
             ctx.restore();
-
         } else {
             ctx.beginPath();
             ctx.ellipse(p.x, p.y, p.size * 1.2, p.size * 0.5, p.rotation, 0, Math.PI * 2);
@@ -1664,6 +1645,7 @@ function drawSeasonalParticles() {
     }
     ctx.globalAlpha = 1;
 }
+
 // ============================================================
 // بخش ۹: متغیرهای اصلی
 // ============================================================
@@ -1716,7 +1698,7 @@ let powerupTimerValue = 0;
 let gameTime = 0;
 let isNight = false;
 let lastDayCycle = -1;
-let MAX_PARTICLES = 12;
+let MAX_PARTICLES = 8;
 
 const POWERUP_CONFIG = {
     shield: {
@@ -1736,7 +1718,7 @@ const fox = {
 };
 
 // ============================================================
-// بخش ۱۰: پالت‌های تم‌ها (قسمت اول - classic, city, beach, forest)
+// بخش ۱۰: پالت‌های تم‌ها - classic, city, beach, forest, space, night
 // ============================================================
 
 const THEME_PALETTES = {
@@ -1972,7 +1954,7 @@ const THEME_PALETTES = {
             rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
         }
     },
-        space: {
+    space: {
         spring: {
             skyDay:['#3a1a5a','#4a2a6a','#5a3a7a'], skyNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
             groundDay:['#4a2a6a','#5a3a7a','#6a4a8a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
@@ -2437,6 +2419,7 @@ const THEME_PALETTES = {
         }
     }
 };
+
 // ============================================================
 // بخش ۱۱: پالت‌های رویدادهای خاص (عید فطر، عید قربان، یلدا، ولنتاین)
 // ============================================================
@@ -2614,10 +2597,6 @@ const EID_PALETTES = {
             rock:'#ff0044', cactus:'#ffff00', skyStars:'rgba(255,200,0,0.8)'
         }
     },
-
-    // ============================================================
-    // 🍉 یلدا (Yalda Night)
-    // ============================================================
     yalda: {
         classic: {
             skyDay:['#2a0a0a','#3a1a1a','#4a2a2a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
@@ -2704,10 +2683,6 @@ const EID_PALETTES = {
             rock:'#ff2d55', cactus:'#ff00ff', skyStars:'rgba(255,0,100,0.7)'
         }
     },
-
-    // ============================================================
-    // 💕 ولنتاین (Valentine's Day)
-    // ============================================================
     valentine: {
         classic: {
             skyDay:['#ffd0e8','#ffdcef','#ffe8f5'], skyNight:['#3a1a2a','#4a2a3a','#5a3a4a'],
@@ -2795,24 +2770,22 @@ const EID_PALETTES = {
         }
     }
 };
+
 // ============================================================
 // بخش ۱۲: توابع کمکی پالت
 // ============================================================
 
 function getThemePalette(themeId, season) {
-    // 🆕 رویدادهای جدید (یلدا و ولنتاین)
     if (season === 'yalda' || season === 'valentine') {
         const p = EID_PALETTES[season];
         if (p && p[themeId]) return p[themeId];
         if (p && p.classic) return p.classic;
     }
-    // رویدادهای عید
     if (season === 'eidFitr' || season === 'eidAdha') {
         const eidTheme = EID_PALETTES[season];
         if (eidTheme && eidTheme[themeId]) return eidTheme[themeId];
         return EID_PALETTES[season].classic;
     }
-    // فصل‌های عادی
     const theme = THEME_PALETTES[themeId] || THEME_PALETTES.classic;
     return theme[season] || theme.autumn;
 }
@@ -2827,7 +2800,7 @@ function getSunColor() { return getTheme().sun; }
 function getSkyStarsColor() { return getTheme().skyStars || 'rgba(255,255,255,0.2)'; }
 
 // ============================================================
-// توابع کمکی عمومی
+// بخش ۱۳: توابع کمکی عمومی
 // ============================================================
 
 function loadNumber(key, defaultValue = 0) {
@@ -2852,8 +2825,6 @@ function saveWallet() {
         localStorage.setItem("foxTotalScore", String(totalScore));
     } catch(error) {}
 }
-
-function ground() { return Math.max(H * 0.72, 200); }
 
 function getThemeName(themeId) {
     const names = THEME_NAMES[themeId];
@@ -2945,7 +2916,6 @@ function showToast(msg) {
     const toast = document.getElementById('toast');
     toast.textContent = msg;
     toast.style.display = 'block';
-    toast.className = '';
     void toast.offsetWidth;
     toast.style.animation = 'fadeInUp 0.3s ease';
     clearTimeout(toast._timeout);
@@ -2956,7 +2926,7 @@ function showToast(msg) {
 }
 
 // ============================================================
-// بخش ۱۳: سیستم صدا
+// بخش ۱۴: سیستم صدا
 // ============================================================
 
 function initAudio() {
@@ -3026,8 +2996,6 @@ const MELODIES = {
     anniversary: { notes:[523.25,659.25,783.99,1046.50,783.99,659.25,523.25,659.25,587.33,698.46,880.00,1046.50,880.00,698.46,587.33,698.46], tempo:170 },
     eidFitr: { notes:[523.25,659.25,783.99,1046.50,987.77,783.99,659.25,523.25,587.33,698.46,880.00,1046.50,987.77,880.00,698.46,587.33], tempo:180 },
     eidAdha: { notes:[587.33,698.46,880.00,1046.50,1174.66,1046.50,880.00,698.46,659.25,783.99,987.77,1174.66,1046.50,987.77,783.99,659.25], tempo:175 },
-
-    // 🆕 رویدادهای جدید
     yalda: { notes:[440.00,523.25,659.25,783.99,880.00,783.99,659.25,523.25,493.88,587.33,698.46,783.99,880.00,783.99,698.46,587.33], tempo:195 },
     valentine: { notes:[587.33,698.46,880.00,987.77,880.00,698.46,587.33,523.25,659.25,783.99,987.77,1046.50,987.77,783.99,659.25,523.25], tempo:185 }
 };
@@ -3102,7 +3070,7 @@ function updateSoundButtons() {
 }
 
 // ============================================================
-// بخش ۱۴: پارتیکل‌های روباه
+// بخش ۱۵: پارتیکل‌های روباه
 // ============================================================
 
 function createTrailParticle(x, y, color) {
@@ -3125,12 +3093,12 @@ function createBurstParticles(x, y, color, count = 6) {
     for (let i = 0; i < maxBurst; i++) {
         if (particles.length >= MAX_PARTICLES) break;
         const angle = Math.random() * Math.PI * 2;
-        const speed = 30 + Math.random() * 50;
+        const speedVal = 30 + Math.random() * 50;
         particles.push({
             x: x + (Math.random() - 0.5) * 8,
             y: y + (Math.random() - 0.5) * 8,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed - 15,
+            vx: Math.cos(angle) * speedVal,
+            vy: Math.sin(angle) * speedVal - 15,
             life: 1,
             maxLife: 0.25 + Math.random() * 0.25,
             size: 2 + Math.random() * 2,
@@ -3160,20 +3128,29 @@ function drawParticles() {
     }
     ctx.globalAlpha = 1;
 }
+
 // ============================================================
-// بخش ۱۵: رسم پس‌زمینه
+// بخش ۱۶: رسم پس‌زمینه (بهینه‌شده با کش گرادیان)
 // ============================================================
+
+let bgGradientCache = null;
+let bgCacheKey = '';
 
 function drawBackground() {
     const gy = ground();
     const skyColors = getSkyColors(isNight);
     const isSpace = currentTheme === 'space';
 
-    const gradient = ctx.createLinearGradient(0, 0, 0, gy);
-    gradient.addColorStop(0, skyColors[0]);
-    gradient.addColorStop(0.5, skyColors[1]);
-    gradient.addColorStop(1, skyColors[2]);
-    ctx.fillStyle = gradient;
+    const key = skyColors[0] + skyColors[2] + gy + currentTheme + currentSeason + isNight;
+    if (bgCacheKey !== key || !bgGradientCache) {
+        const gradient = ctx.createLinearGradient(0, 0, 0, gy);
+        gradient.addColorStop(0, skyColors[0]);
+        gradient.addColorStop(0.5, skyColors[1]);
+        gradient.addColorStop(1, skyColors[2]);
+        bgGradientCache = gradient;
+        bgCacheKey = key;
+    }
+    ctx.fillStyle = bgGradientCache;
     ctx.fillRect(0, 0, W, gy);
 
     if (isSpace) {
@@ -3219,7 +3196,7 @@ function drawBackground() {
         }
 
         if (isSpace) {
-            const t = Date.now() / 1000;
+            const t = _nowSeconds;
             for (let i = 0; i < 5; i++) {
                 const x = (i * 73 + 17 + t * 5) % W;
                 const y = 30 + (i * 53 + 11 + t * 3) % (gy * 0.4);
@@ -3265,7 +3242,7 @@ function drawCloud(x, y, s) {
 }
 
 // ============================================================
-// بخش ۱۶: رسم پاورآپ
+// بخش ۱۷: رسم پاورآپ
 // ============================================================
 
 function drawPowerup(p) {
@@ -3273,15 +3250,15 @@ function drawPowerup(p) {
     const cy = p.y + p.h / 2;
 
     p.pulse += 0.05;
-    const scale = 1 + Math.sin(p.pulse) * 0.08;
+    const scaleVal = 1 + Math.sin(p.pulse) * 0.08;
 
     ctx.beginPath();
-    ctx.arc(cx, cy, 18 * scale, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 18 * scaleVal, 0, Math.PI * 2);
     ctx.fillStyle = p.color + '30';
     ctx.fill();
 
     ctx.beginPath();
-    ctx.arc(cx, cy, 14 * scale, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 14 * scaleVal, 0, Math.PI * 2);
     ctx.fillStyle = p.color;
     ctx.fill();
 
@@ -3293,7 +3270,7 @@ function drawPowerup(p) {
 }
 
 // ============================================================
-// بخش ۱۷: رسم روباه
+// بخش ۱۸: رسم روباه
 // ============================================================
 
 function drawFox() {
@@ -3312,7 +3289,7 @@ function drawFox() {
     let trailColor = skin.trailColor || 'rgba(249,115,22,0.25)';
 
     if (skin.id === 'rainbow') {
-        const hue = (Date.now() / 50) % 360;
+        const hue = (_nowSeconds * 20) % 360;
         foxColor = `hsl(${hue}, 80%, 60%)`;
         trailColor = `hsla(${hue}, 80%, 60%, 0.2)`;
     }
@@ -3403,7 +3380,7 @@ function drawFox() {
 }
 
 // ============================================================
-// بخش ۱۸: رسم تخم
+// بخش ۱۹: رسم تخم
 // ============================================================
 
 function drawEgg(e) {
@@ -3429,8 +3406,9 @@ function drawEgg(e) {
     ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
 }
+
 // ============================================================
-// بخش ۱۹: رسم موانع
+// بخش ۲۰: رسم موانع
 // ============================================================
 
 function drawObstacle(o) {
@@ -3552,7 +3530,7 @@ function drawObstacle(o) {
 }
 
 // ============================================================
-// بخش ۲۰: تابع رسم اصلی
+// بخش ۲۱: تابع رسم اصلی
 // ============================================================
 
 function draw() {
@@ -3566,7 +3544,7 @@ function draw() {
 }
 
 // ============================================================
-// بخش ۲۱: منطق بازی
+// بخش ۲۲: منطق بازی
 // ============================================================
 
 function createEgg() {
@@ -3669,7 +3647,7 @@ function collectEgg(e) {
     const skin = getSkin(currentSkinId);
     let burstColor = skin.color;
     if (skin.id === 'rainbow') {
-        const hue = (Date.now() / 30) % 360;
+        const hue = (_nowSeconds * 12) % 360;
         burstColor = `hsl(${hue}, 80%, 60%)`;
     }
     if (skin.id === 'galaxy') burstColor = '#818cf8';
@@ -3735,6 +3713,7 @@ function updatePowerupTimers() {
 function update(dt) {
     gameTime += dt;
     updateSpeed();
+    _nowSeconds = performance.now() * 0.001;
 
     fox.vy += fox.gravity * dt;
     fox.y += fox.vy * dt;
@@ -3835,14 +3814,24 @@ function update(dt) {
     updateSeasonalParticles(dt);
 }
 
+let _rafId = null;
+
 function loop(time) {
-    if (!playing) return;
+    if (!playing) { _rafId = null; return; }
+
     let dt = (time - lastTime) / 1000;
     lastTime = time;
-    if (dt > .033) dt = .033;
+    if (dt > 0.033) dt = 0.033;
+    if (dt < 0) dt = 0.016;
+
     update(dt);
     draw();
-    if (playing) requestAnimationFrame(loop);
+
+    if (playing) {
+        _rafId = requestAnimationFrame(loop);
+    } else {
+        _rafId = null;
+    }
 }
 
 function startGame() {
@@ -3898,12 +3887,14 @@ function startGame() {
 
     startMusic();
     lastTime = performance.now();
-    requestAnimationFrame(loop);
+    _rafId = requestAnimationFrame(loop);
 }
 
 function endGame() {
     playing = false;
     stopMusic();
+
+    if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
 
     finalScore.textContent = score;
 
@@ -3928,8 +3919,9 @@ function handleInput() {
     if (!playing) startGame();
     else jump();
 }
+
 // ============================================================
-// بخش ۲۲: UI و زبان
+// بخش ۲۳: UI و زبان
 // ============================================================
 
 function updateUI() {
@@ -3948,6 +3940,8 @@ function setTheme(themeId) {
     if (!THEME_PALETTES[themeId]) return;
     currentTheme = themeId;
     localStorage.setItem("foxTheme", themeId);
+    bgCacheKey = '';
+    bgGradientCache = null;
     updateThemeUI();
     if (!playing) {
         drawBackground();
@@ -4169,6 +4163,7 @@ function applySeasonToUI() {
 }
 
 function refreshSeason() {
+    _cachedSeasonDate = null;
     const newSeason = getCurrentSeason();
     if (newSeason === currentSeason) return;
 
@@ -4176,8 +4171,9 @@ function refreshSeason() {
 
     currentSeason = newSeason;
     seasonalParticles.length = 0;
+    bgCacheKey = '';
+    bgGradientCache = null;
 
-    applySeasonToUI(); 
     applySeasonToUI();
     updateThemeUI();
     renderSkinShop();
@@ -4264,7 +4260,7 @@ function setLanguage(lang) {
 }
 
 // ============================================================
-// بخش ۲۳: مدیریت اینترنت و کد دعوت
+// بخش ۲۴: مدیریت اینترنت و کد دعوت
 // ============================================================
 
 function checkInternet() {
@@ -4560,7 +4556,7 @@ function fallbackCopy(text) {
 }
 
 // ============================================================
-// بخش ۲۴: پاپ‌آپ کانال تلگرام
+// بخش ۲۵: پاپ‌آپ کانال تلگرام
 // ============================================================
 
 let channelPopupShown = false;
@@ -4639,7 +4635,7 @@ function updateChannelPopup() {
 }
 
 // ============================================================
-// بخش ۲۵: NFT Modal
+// بخش ۲۶: NFT Modal
 // ============================================================
 
 const NFT_CONTENT = {
@@ -4733,7 +4729,7 @@ function initNftEvents() {
 }
 
 // ============================================================
-// بخش ۲۶: باز و بسته کردن بخش اسکین‌ها (آکاردئون)
+// بخش ۲۷: آکاردئون اسکین‌ها
 // ============================================================
 
 let skinShopOpen = false;
@@ -4759,73 +4755,24 @@ function initSkinShopToggle() {
         }
     });
 }
+
 // ============================================================
-// بخش ۲۷: سیستم اعلان فصل جدید (سالانه)
+// بخش ۲۸: سیستم اعلان فصل جدید
 // ============================================================
 
 const SEASON_ANNOUNCEMENTS = {
-    spring: {
-        labelFa:'فصل جدید', labelEn:'NEW SEASON',
-        nameFa:'🌸 بهار آمد!', nameEn:'🌸 Spring is here!',
-        color:'#ff6fa8', glow:'rgba(255,111,168,0.4)'
-    },
-    summer: {
-        labelFa:'فصل جدید', labelEn:'NEW SEASON',
-        nameFa:'☀️ تابستان آمد!', nameEn:'☀️ Summer is here!',
-        color:'#ffb030', glow:'rgba(255,176,48,0.4)'
-    },
-    autumn: {
-        labelFa:'فصل جدید', labelEn:'NEW SEASON',
-        nameFa:'🍂 پاییز آمد!', nameEn:'🍂 Autumn is here!',
-        color:'#f97316', glow:'rgba(249,115,22,0.4)'
-    },
-    winter: {
-        labelFa:'فصل جدید', labelEn:'NEW SEASON',
-        nameFa:'❄️ زمستان آمد!', nameEn:'❄️ Winter is here!',
-        color:'#a8d8ff', glow:'rgba(168,216,255,0.4)'
-    },
-    christmas: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'🎄 کریسمس آمد!', nameEn:'🎄 Christmas is here!',
-        color:'#ff4444', glow:'rgba(255,68,68,0.4)'
-    },
-    nowruz: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'🌷 نوروز آمد!', nameEn:'🌷 Nowruz is here!',
-        color:'#00d96a', glow:'rgba(0,217,106,0.4)'
-    },
-    birthday: {
-    labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-    nameFa:'🎂 تولد سازنده Fox Eggs!', nameEn:"🎂 Fox Eggs Developer's Birthday!",
-    color:'#ff69b4', glow:'rgba(255,105,180,0.4)'
-   },
-    anniversary: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'🎉 سالگرد Fox Eggs!', nameEn:'🎉 Fox Eggs Anniversary!',
-        color:'#ffd700', glow:'rgba(255,215,0,0.4)'
-    },
-    eidFitr: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'🌙 عید فطر مبارک!', nameEn:'🌙 Happy Eid al-Fitr!',
-        color:'#00d96a', glow:'rgba(0,217,106,0.4)'
-    },
-    eidAdha: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'🐑 عید قربان مبارک!', nameEn:'🐑 Happy Eid al-Adha!',
-        color:'#ffd700', glow:'rgba(255,215,0,0.4)'
-    },
-
-    // 🆕 رویدادهای جدید
-    yalda: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'🍉 شب یلدا مبارک!', nameEn:'🍉 Happy Yalda Night!',
-        color:'#b91c1c', glow:'rgba(185,28,28,0.4)'
-    },
-    valentine: {
-        labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT',
-        nameFa:'💕 روز عشق مبارک!', nameEn:"💕 Happy Valentine's!",
-        color:'#ec4899', glow:'rgba(236,72,153,0.4)'
-    }
+    spring: { labelFa:'فصل جدید', labelEn:'NEW SEASON', nameFa:'🌸 بهار آمد!', nameEn:'🌸 Spring is here!', color:'#ff6fa8', glow:'rgba(255,111,168,0.4)' },
+    summer: { labelFa:'فصل جدید', labelEn:'NEW SEASON', nameFa:'☀️ تابستان آمد!', nameEn:'☀️ Summer is here!', color:'#ffb030', glow:'rgba(255,176,48,0.4)' },
+    autumn: { labelFa:'فصل جدید', labelEn:'NEW SEASON', nameFa:'🍂 پاییز آمد!', nameEn:'🍂 Autumn is here!', color:'#f97316', glow:'rgba(249,115,22,0.4)' },
+    winter: { labelFa:'فصل جدید', labelEn:'NEW SEASON', nameFa:'❄️ زمستان آمد!', nameEn:'❄️ Winter is here!', color:'#a8d8ff', glow:'rgba(168,216,255,0.4)' },
+    christmas: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🎄 کریسمس آمد!', nameEn:'🎄 Christmas is here!', color:'#ff4444', glow:'rgba(255,68,68,0.4)' },
+    nowruz: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🌷 نوروز آمد!', nameEn:'🌷 Nowruz is here!', color:'#00d96a', glow:'rgba(0,217,106,0.4)' },
+    birthday: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🎂 تولد سازنده Fox Eggs!', nameEn:"🎂 Fox Eggs Developer's Birthday!", color:'#ff69b4', glow:'rgba(255,105,180,0.4)' },
+    anniversary: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🎉 سالگرد Fox Eggs!', nameEn:'🎉 Fox Eggs Anniversary!', color:'#ffd700', glow:'rgba(255,215,0,0.4)' },
+    eidFitr: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🌙 عید فطر مبارک!', nameEn:'🌙 Happy Eid al-Fitr!', color:'#00d96a', glow:'rgba(0,217,106,0.4)' },
+    eidAdha: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🐑 عید قربان مبارک!', nameEn:'🐑 Happy Eid al-Adha!', color:'#ffd700', glow:'rgba(255,215,0,0.4)' },
+    yalda: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'🍉 شب یلدا مبارک!', nameEn:'🍉 Happy Yalda Night!', color:'#b91c1c', glow:'rgba(185,28,28,0.4)' },
+    valentine: { labelFa:'رویداد ویژه', labelEn:'SPECIAL EVENT', nameFa:'💕 روز عشق مبارک!', nameEn:"💕 Happy Valentine's!", color:'#ec4899', glow:'rgba(236,72,153,0.4)' }
 };
 
 function getAnnouncedSeasonsThisYear() {
@@ -4923,8 +4870,6 @@ function playSeasonSound(seasonId) {
         anniversary: [523.25, 659.25, 783.99],
         eidFitr: [523.25, 659.25, 783.99],
         eidAdha: [587.33, 698.46, 880.00],
-
-        // 🆕 رویدادهای جدید
         yalda: [523.25, 659.25, 783.99],
         valentine: [659.25, 830.61, 987.77]
     };
@@ -4945,7 +4890,7 @@ function checkAndAnnounceSeason() {
 }
 
 // ============================================================
-// بخش ۲۸: رویدادها
+// بخش ۲۹: رویدادها
 // ============================================================
 
 window.addEventListener("online", function() { checkInternet(); });
@@ -5075,13 +5020,13 @@ document.getElementById('channelPopup').addEventListener('click', function(e) {
 });
 
 // ============================================================
-// بخش ۲۹: راه‌اندازی اولیه
+// بخش ۳۰: راه‌اندازی اولیه
 // ============================================================
 
-language = localStorage.getItem("foxLanguage") || "en";  // ← این خط رو اضافه کن
+language = localStorage.getItem("foxLanguage") || "en";
 currentSeason = getCurrentSeason();
-applyLanguage();      // ← این اول
-applySeasonToUI();    // ← این دوم (زبان تازه آپدیت شده)
+applyLanguage();
+applySeasonToUI();
 updateUI();
 resetFox();
 
@@ -5106,7 +5051,7 @@ initNftEvents();
 initSkinShopToggle();
 
 // ============================================================
-// بخش ۳۰: تایمرها و راه‌اندازی تعاملی
+// بخش ۳۱: تایمرها و راه‌اندازی تعاملی
 // ============================================================
 
 setTimeout(() => {
@@ -5138,20 +5083,25 @@ setInterval(() => {
     } else if (!navigator.onLine) {
         showNoInternet();
     }
-}, 10000);
+}, 15000);
 
 setInterval(() => {
     refreshSeason();
 }, 60 * 1000);
 
-
 // ============================================================
-// بخش ۳۱: راه‌اندازی اعلان فصل
+// بخش ۳۲: راه‌اندازی اعلان فصل
 // ============================================================
 
 setTimeout(() => {
     checkAndAnnounceSeason();
 }, 1500);
+
+// ✅ پاک‌سازی هنگام بستن صفحه
+window.addEventListener('beforeunload', function() {
+    if (_rafId) cancelAnimationFrame(_rafId);
+    stopMusicTimer();
+});
 
 // ============================================================
 // پایان کد کامل 🎉
