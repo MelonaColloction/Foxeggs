@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#87ceeb">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Fox Eggs</title>
 
 <style>
@@ -30,7 +32,7 @@ canvas {
     pointer-events:none; z-index:5;
 }
 
-#score {font-size:22px;}
+#score {font-size:clamp(16px,4vw,22px);}
 #best {font-size:14px;margin-top:4px;}
 
 #combo {opacity:0;font-size:20px;transition:opacity .1s;}
@@ -294,7 +296,6 @@ button:active {
     box-shadow:none; font-size:15px;
     padding:12px 25px; margin-top:8px;
 }
-
 #powerupStatus {
     position:absolute; bottom:20px; left:50%;
     transform:translateX(-50%);
@@ -747,7 +748,6 @@ button:active {
         <button class="btn-close-theme" id="closeThemeSelector">✓ <span id="applyThemeText">Apply Theme</span></button>
     </div>
 </div>
-
 <div id="startScreen" class="screen">
     <div class="logo" id="startLogo">🌸🦊🌷</div>
     <h1 id="gameTitle">Fox Eggs</h1>
@@ -836,8 +836,9 @@ button:active {
 </div>
 
 <div id="toast" style="display:none;"></div>
+
 <script>
-// ============================================================
+  // ============================================================
 // بخش ۱: راه‌اندازی Canvas
 // ============================================================
 
@@ -864,7 +865,6 @@ function resize() {
     lastH = 0;
 }
 
-// ✅ بهینه‌شده: ground() با کش
 function ground() {
     if (H !== lastH) {
         cachedGround = Math.max(H * 0.72, 200);
@@ -1260,7 +1260,6 @@ const THEME_NAMES = {
         valentine:{fa:'ولنتاین نئونی',en:'Neon Valentine',icon:'💔'}
     }
 };
-
 // ============================================================
 // بخش ۶: توضیحات تم‌ها
 // ============================================================
@@ -1529,8 +1528,12 @@ const SEASONAL_EFFECTS = {
     }
 };
 
+let _cachedEffect = null;
+
 function getSeasonalEffect() {
-    return SEASONAL_EFFECTS[currentSeason] || { enabled:false, maxCount:0 };
+    if (_cachedEffect) return _cachedEffect;
+    _cachedEffect = SEASONAL_EFFECTS[currentSeason] || { enabled:false, maxCount:0 };
+    return _cachedEffect;
 }
 
 function spawnSeasonalParticle(isInitial) {
@@ -1698,7 +1701,7 @@ let powerupTimerValue = 0;
 let gameTime = 0;
 let isNight = false;
 let lastDayCycle = -1;
-let MAX_PARTICLES = 8;
+let MAX_PARTICLES = 40;
 
 const POWERUP_CONFIG = {
     shield: {
@@ -1718,7 +1721,7 @@ const fox = {
 };
 
 // ============================================================
-// بخش ۱۰: پالت‌های تم‌ها - classic, city, beach, forest, space, night
+// بخش ۱۰: پالت تم‌ها - classic
 // ============================================================
 
 const THEME_PALETTES = {
@@ -1780,648 +1783,647 @@ const THEME_PALETTES = {
             rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
         }
     },
-    city: {
-        spring: {
-            skyDay:['#d8d0d8','#e0d8e0','#e8e0e8'], skyNight:['#1a1a2e','#2a2a3e','#3a3a4e'],
-            groundDay:['#a8a898','#989888','#888878'], groundNight:['#3a3a4a','#2a2a3a','#1a1a2a'],
-            sun:'rgba(255,220,235,0.7)',
-            tree:{trunk:'#5a4a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#22c55e', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)'
-        },
-        summer: {
-            skyDay:['#b8c8d8','#d0dce8','#e0e8f0'], skyNight:['#0a1520','#15202a','#1a2a3a'],
-            groundDay:['#8a9aa8','#7a8a98','#6a7a88'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:'rgba(255,240,150,0.7)',
-            tree:{trunk:'#5a4a3a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)'
-        },
-        autumn: {
-            skyDay:['#c8b0a0','#d0b8a8','#d8c0b0'], skyNight:['#2a1a1a','#3a2a2a','#4a3a3a'],
-            groundDay:['#8a8a78','#7a7a68','#6a6a58'], groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
-            sun:'rgba(255,230,180,0.6)',
-            tree:{trunk:'#5a4a3a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)'
-        },
-        winter: {
-            skyDay:['#d8e0e8','#e0e8f0','#e8f0f8'], skyNight:['#2a3a4a','#3a4a5a','#4a5a6a'],
-            groundDay:['#b8c0c8','#a8b0b8','#98a0a8'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:'rgba(220,235,255,0.55)',
-            tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.3)'
-        },
-        christmas: {
-            skyDay:['#2a3a4a','#3a4a5a','#4a5a6a'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#e8f0f8','#dce8f0','#d0dce8'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:'rgba(255,220,180,0.5)',
-            tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.5)'
-        },
-        nowruz: {
-            skyDay:['#c8e0d8','#d8e8e0','#e8f0e8'], skyNight:['#1a2a2a','#2a3a3a','#3a4a4a'],
-            groundDay:['#a8b898','#98a888','#889878'], groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
-            sun:'rgba(255,240,180,0.75)',
-            tree:{trunk:'#5a4a3a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.2)'
-        },
-        birthday: {
-            skyDay:['#d8c0d8','#e0c8e0','#e8d0e8'], skyNight:['#2a1a2a','#3a2a3a','#4a3a4a'],
-            groundDay:['#d8b8d8','#d8a8d8','#d898d8'], groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
-            sun:'rgba(255,180,220,0.7)',
-            tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.4)'
-        },
-        anniversary: {
-            skyDay:['#ffd700','#ffed4e','#fff59d'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#c8a850','#b89840','#a88830'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,215,0,0.85)',
-            tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
-        }
+        city: {
+    spring: {
+        skyDay:['#d8d0d8','#e0d8e0','#e8e0e8'], skyNight:['#1a1a2e','#2a2a3e','#3a3a4e'],
+        groundDay:['#a8a898','#989888','#888878'], groundNight:['#3a3a4a','#2a2a3a','#1a1a2a'],
+        sun:'rgba(255,220,235,0.7)',
+        tree:{trunk:'#5a4a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#22c55e', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)'
     },
-    beach: {
-        spring: {
-            skyDay:['#a8d8f0','#c0e0f5','#d8e8fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#f5e0b0','#f0d8a0','#e8d090'], groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
-            sun:'rgba(255,220,200,0.75)',
-            tree:{trunk:'#6a4a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:['#87CEEB','#b0d8f0','#d0e8f5'], skyNight:['#0a1a2a','#152535','#1a2a40'],
-            groundDay:['#f0d8a0','#e8c888','#d4b070'], groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
-            sun:'rgba(255,245,180,0.85)',
-            tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:['#f0b090','#f5c0a0','#fad0b0'], skyNight:['#2a1a1a','#3a2a1a','#4a3a2a'],
-            groundDay:['#e8c880','#d8b870','#c8a860'], groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
-            sun:'rgba(255,220,180,0.7)',
-            tree:{trunk:'#6a4a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        winter: {
-            skyDay:['#b0d8f0','#c8e0f5','#e0e8fa'], skyNight:['#2a3a4a','#3a4a5a','#4a5a6a'],
-            groundDay:['#f0f0f0','#e8e8e8','#dcdcdc'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:'rgba(220,235,255,0.6)',
-            tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.35)'
-        },
-        christmas: {
-            skyDay:['#2a3a4a','#3a4a5a','#4a5a6a'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#f5f5f5','#ebebeb','#e0e0e0'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:'rgba(255,220,180,0.5)',
-            tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.55)'
-        },
-        nowruz: {
-            skyDay:['#b8e0f0','#c8e8f5','#d8f0fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#a8e070','#98d060','#88c050'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:'rgba(255,240,180,0.85)',
-            tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
-        },
-        birthday: {
-            skyDay:['#ffd6e8','#ffc8dc','#ffb8d0'], skyNight:['#3a1a2a','#4a2a3a','#5a3a4a'],
-            groundDay:['#f5d0c0','#f5c0b0','#f5b0a0'], groundNight:['#3a2a2a','#2a1a1a','#1a0a0a'],
-            sun:'rgba(255,180,220,0.8)',
-            tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
-        },
-        anniversary: {
-            skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,215,0,0.9)',
-            tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
-        }
+    summer: {
+        skyDay:['#b8c8d8','#d0dce8','#e0e8f0'], skyNight:['#0a1520','#15202a','#1a2a3a'],
+        groundDay:['#8a9aa8','#7a8a98','#6a7a88'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:'rgba(255,240,150,0.7)',
+        tree:{trunk:'#5a4a3a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)'
     },
-    forest: {
-        spring: {
-            skyDay:['#c8e0c8','#d8e8d8','#e8f0e8'], skyNight:['#1a2a1a','#2a3a2a','#3a4a3a'],
-            groundDay:['#5a7a3a','#4a6a2a','#3a5a1a'], groundNight:['#1a2a0a','#0a1a0a','#050a00'],
-            sun:'rgba(240,220,240,0.7)',
-            tree:{trunk:'#5a3a1a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:['#6a9a6a','#7aaa7a','#8aba8a'], skyNight:['#0a1a0a','#152a15','#1a3a1a'],
-            groundDay:['#3a5a2a','#2a4a1a','#1a3a0a'], groundNight:['#1a2a0a','#0a1a0a','#050a00'],
-            sun:'rgba(255,240,150,0.75)',
-            tree:{trunk:'#5a3a1a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:['#d8a070','#e0b080','#e8c090'], skyNight:['#2a1a0a','#3a2a1a','#4a3a2a'],
-            groundDay:['#8a6a3a','#7a5a2a','#6a4a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:'rgba(255,220,160,0.7)',
-            tree:{trunk:'#5a3a1a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        winter: {
-            skyDay:['#c8d8e0','#d8e0e8','#e8f0f5'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#b0c0c8','#a0b0b8','#90a0a8'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:'rgba(220,235,255,0.55)',
-            tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.4)'
-        },
-        christmas: {
-            skyDay:['#1a2a2a','#2a3a3a','#3a4a4a'], skyNight:['#0a1a1a','#1a2a2a','#2a3a3a'],
-            groundDay:['#e8f0e8','#dce8dc','#d0e0d0'], groundNight:['#3a4a3a','#2a3a2a','#1a2a1a'],
-            sun:'rgba(255,220,180,0.5)',
-            tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.6)'
-        },
-        nowruz: {
-            skyDay:['#b8e0c0','#c8e8d0','#d8f0e0'], skyNight:['#1a2a1a','#2a3a2a','#3a4a3a'],
-            groundDay:['#5aa040','#4a9030','#3a8020'], groundNight:['#1a2a0a','#0a1a0a','#050a00'],
-            sun:'rgba(255,240,180,0.85)',
-            tree:{trunk:'#5a3a1a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
-        },
-        birthday: {
-            skyDay:['#d8c0d0','#e0c8d8','#e8d0e0'], skyNight:['#2a1a2a','#3a2a3a','#4a3a4a'],
-            groundDay:['#6a8a5a','#5a7a4a','#4a6a3a'], groundNight:['#1a2a1a','#0a1a0a','#050a00'],
-            sun:'rgba(255,180,220,0.7)',
-            tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.4)'
-        },
-        anniversary: {
-            skyDay:['#ffd700','#ffed4e','#fff59d'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#8a7a3a','#7a6a2a','#6a5a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:'rgba(255,215,0,0.85)',
-            tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
-        }
+    autumn: {
+        skyDay:['#c8b0a0','#d0b8a8','#d8c0b0'], skyNight:['#2a1a1a','#3a2a2a','#4a3a3a'],
+        groundDay:['#8a8a78','#7a7a68','#6a6a58'], groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
+        sun:'rgba(255,230,180,0.6)',
+        tree:{trunk:'#5a4a3a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)'
     },
-    space: {
-        spring: {
-            skyDay:['#3a1a5a','#4a2a6a','#5a3a7a'], skyNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
-            groundDay:['#4a2a6a','#5a3a7a','#6a4a8a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:'rgba(255,180,220,0.4)',
-            tree:{trunk:'#3a2a4a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#00e5ff', cactus:'#ff9ec7', skyStars:'rgba(200,180,255,0.4)'
-        },
-        summer: {
-            skyDay:['#1a0a3a','#2a1a4a','#3a2a5a'], skyNight:['#0a0a1a','#0a0a2a','#1a0a2a'],
-            groundDay:['#3a2a4a','#4a3a5a','#5a4a6a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:'rgba(200,180,255,0.35)',
-            tree:{trunk:'#3a2a4a',main:'#818cf8',light:'#a5b4fc',dark:'#6366f1'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.5)'
-        },
-        autumn: {
-            skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:['#4a2a3a','#5a3a4a','#6a4a5a'], groundNight:['#1a0a1a','#0a0a1a','#05000a'],
-            sun:'rgba(255,200,180,0.4)',
-            tree:{trunk:'#3a2a4a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#00e5ff', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.4)'
-        },
-        winter: {
-            skyDay:['#1a2a4a','#2a3a5a','#3a4a6a'], skyNight:['#0a0a1a','#1a1a2a','#2a2a3a'],
-            groundDay:['#2a3a5a','#3a4a6a','#4a5a7a'], groundNight:['#1a1a2a','#0a0a1a','#05000a'],
-            sun:'rgba(200,220,255,0.4)',
-            tree:{trunk:'#3a2a4a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(200,220,255,0.5)'
-        },
-        christmas: {
-            skyDay:['#1a0a3a','#2a1a4a','#3a2a5a'], skyNight:['#0a0a1a','#0a0a2a','#1a0a2a'],
-            groundDay:['#2a1a4a','#3a2a5a','#4a3a6a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:'rgba(255,220,180,0.4)',
-            tree:{trunk:'#1a1a3a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,255,0.6)'
-        },
-        nowruz: {
-            skyDay:['#4a3a6a','#5a4a7a','#6a5a8a'], skyNight:['#1a0a2a','#2a0a3a','#3a0a4a'],
-            groundDay:['#4a3a6a','#5a4a7a','#6a5a8a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:'rgba(255,240,180,0.6)',
-            tree:{trunk:'#3a2a4a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(220,255,220,0.5)'
-        },
-        birthday: {
-            skyDay:['#4a1a4a','#5a2a5a','#6a3a6a'], skyNight:['#1a0a1a','#2a0a2a','#3a0a3a'],
-            groundDay:['#5a2a5a','#6a3a6a','#7a4a7a'], groundNight:['#2a0a2a','#1a001a','#0a000a'],
-            sun:'rgba(255,180,255,0.5)',
-            tree:{trunk:'#3a2a4a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,255,0.6)'
-        },
-        anniversary: {
-            skyDay:['#4a3a0a','#5a4a1a','#6a5a2a'], skyNight:['#1a0a0a','#2a1a0a','#3a2a0a'],
-            groundDay:['#5a4a1a','#6a5a2a','#7a6a3a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:'rgba(255,215,0,0.6)',
-            tree:{trunk:'#3a2a4a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.6)'
-        }
+    winter: {
+        skyDay:['#d8e0e8','#e0e8f0','#e8f0f8'], skyNight:['#2a3a4a','#3a4a5a','#4a5a6a'],
+        groundDay:['#b8c0c8','#a8b0b8','#98a0a8'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:'rgba(220,235,255,0.55)',
+        tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.3)'
     },
-    night: {
-        spring: {
-            skyDay:['#3a2a4e','#4a3a5e','#5a4a6e'], skyNight:['#0a0a1a','#1a0a2a','#2a1a3a'],
-            groundDay:['#3a2a4a','#2a1a3a','#1a0a2a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:'rgba(255,180,220,0.3)',
-            tree:{trunk:'#3a2a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#00e5ff', cactus:'#ff9ec7', skyStars:'rgba(255,255,255,0.4)'
-        },
-        summer: {
-            skyDay:['#1a1a2e','#16213e','#0f3460'], skyNight:['#0a0a1a','#0a0a2a','#1a0a2a'],
-            groundDay:['#2a2a3a','#1a1a2a','#0a0a1a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
-            sun:'rgba(200,180,255,0.25)',
-            tree:{trunk:'#3a2a3a',main:'#818cf8',light:'#a5b4fc',dark:'#6366f1'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.5)'
-        },
-        autumn: {
-            skyDay:['#3a1a1a','#4a2a2a','#5a3a3a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:['#3a2a2a','#2a1a1a','#1a0a0a'], groundNight:['#1a0a0a','#0a0000','#050000'],
-            sun:'rgba(255,200,180,0.3)',
-            tree:{trunk:'#3a2a3a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.4)'
-        },
-        winter: {
-            skyDay:['#1a2a3a','#2a3a4a','#3a4a5a'], skyNight:['#0a1a2a','#1a2a3a','#2a3a4a'],
-            groundDay:['#2a3a4a','#1a2a3a','#0a1a2a'], groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
-            sun:'rgba(220,235,255,0.3)',
-            tree:{trunk:'#3a2a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.5)'
-        },
-        christmas: {
-            skyDay:['#0a1a2a','#1a2a3a','#2a3a4a'], skyNight:['#050a1a','#0a1a2a','#1a2a3a'],
-            groundDay:['#2a3a4a','#1a2a3a','#0a1a2a'], groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
-            sun:'rgba(220,235,255,0.3)',
-            tree:{trunk:'#0a1a0a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,255,0.7)'
-        },
-        nowruz: {
-            skyDay:['#2a3a2a','#3a4a3a','#4a5a4a'], skyNight:['#0a1a0a','#1a2a1a','#2a3a2a'],
-            groundDay:['#2a3a2a','#1a2a1a','#0a1a0a'], groundNight:['#1a2a1a','#0a1a0a','#050a05'],
-            sun:'rgba(255,240,180,0.4)',
-            tree:{trunk:'#2a3a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,240,200,0.5)'
-        },
-        birthday: {
-            skyDay:['#3a1a3a','#4a2a4a','#5a3a5a'], skyNight:['#1a0a1a','#2a0a2a','#3a0a3a'],
-            groundDay:['#3a1a3a','#2a0a2a','#1a001a'], groundNight:['#2a0a2a','#1a001a','#0a000a'],
-            sun:'rgba(255,180,255,0.4)',
-            tree:{trunk:'#3a2a4a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,255,0.6)'
-        },
-        anniversary: {
-            skyDay:['#2a2a0a','#3a3a1a','#4a4a2a'], skyNight:['#1a1a0a','#2a2a1a','#3a3a2a'],
-            groundDay:['#2a2a0a','#1a1a00','#0a0a00'], groundNight:['#1a1a0a','#0a0a00','#050500'],
-            sun:'rgba(255,215,0,0.4)',
-            tree:{trunk:'#2a2a0a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.6)'
-        }
+    christmas: {
+        skyDay:['#2a3a4a','#3a4a5a','#4a5a6a'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#e8f0f8','#dce8f0','#d0dce8'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:'rgba(255,220,180,0.5)',
+        tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.5)'
     },
-    volcano: {
-        spring: {
-            skyDay:['#6a3a2a','#7a4a3a','#8a5a4a'], skyNight:['#2a0a0a','#3a0a0a','#4a0a0a'],
-            groundDay:['#3a1a0a','#2a0a0a','#1a0a0a'], groundNight:['#1a0a0a','#0a0a0a','#050000'],
-            sun:'rgba(255,180,200,0.5)',
-            tree:{trunk:'#3a1a0a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#00e5ff', cactus:'#ff9ec7', skyStars:'rgba(255,220,180,0.3)'
-        },
-        summer: {
-            skyDay:['#4a1a0a','#6a2a0a','#8a3a0a'], skyNight:['#2a0a0a','#3a0a0a','#4a0a0a'],
-            groundDay:['#2a1a0a','#1a0a0a','#0a0a0a'], groundNight:['#1a0a0a','#0a0a0a','#050000'],
-            sun:'rgba(255,150,100,0.6)',
-            tree:{trunk:'#3a1a0a',main:'#dc2626',light:'#ef4444',dark:'#991b1b'},
-            rock:'#00e5ff', cactus:'#00e5ff', skyStars:'rgba(255,200,150,0.3)'
-        },
-        autumn: {
-            skyDay:['#3a1a0a','#4a2a0a','#5a3a1a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:['#2a1a0a','#1a0a0a','#0a0a0a'], groundNight:['#1a0a0a','#0a0a0a','#050000'],
-            sun:'rgba(255,160,100,0.5)',
-            tree:{trunk:'#3a1a0a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#00e5ff', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:['#4a4a5a','#5a5a6a','#6a6a7a'], skyNight:['#1a1a2a','#2a2a3a','#3a3a4a'],
-            groundDay:['#3a3a4a','#2a2a3a','#1a1a2a'], groundNight:['#1a1a2a','#0a0a1a','#05000a'],
-            sun:'rgba(220,235,255,0.4)',
-            tree:{trunk:'#3a2a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.4)'
-        },
-        christmas: {
-            skyDay:['#2a1a1a','#3a2a2a','#4a3a3a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
-            groundDay:['#3a2a2a','#2a1a1a','#1a0a0a'], groundNight:['#2a0a0a','#1a0000','#0a0000'],
-            sun:'rgba(255,220,180,0.4)',
-            tree:{trunk:'#1a0a0a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,180,0.5)'
-        },
-        nowruz: {
-            skyDay:['#5a4a2a','#6a5a3a','#7a6a4a'], skyNight:['#2a1a0a','#3a2a1a','#4a3a2a'],
-            groundDay:['#4a3a1a','#3a2a0a','#2a1a00'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:'rgba(255,240,180,0.6)',
-            tree:{trunk:'#3a1a0a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,240,180,0.4)'
-        },
-        birthday: {
-            skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#2a0a1a','#3a0a2a','#4a0a3a'],
-            groundDay:['#3a1a2a','#2a0a1a','#1a000a'], groundNight:['#2a0a1a','#1a000a','#0a0000'],
-            sun:'rgba(255,180,220,0.5)',
-            tree:{trunk:'#3a1a2a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
-        },
-        anniversary: {
-            skyDay:['#4a2a0a','#5a3a1a','#6a4a2a'], skyNight:['#2a1a00','#3a2a0a','#4a3a1a'],
-            groundDay:['#3a2a0a','#2a1a00','#1a0a00'], groundNight:['#2a1a00','#1a0a00','#0a0000'],
-            sun:'rgba(255,215,0,0.5)',
-            tree:{trunk:'#3a1a0a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
-        }
+    nowruz: {
+        skyDay:['#c8e0d8','#d8e8e0','#e8f0e8'], skyNight:['#1a2a2a','#2a3a3a','#3a4a4a'],
+        groundDay:['#a8b898','#98a888','#889878'], groundNight:['#3a3a2a','#2a2a1a','#1a1a0a'],
+        sun:'rgba(255,240,180,0.75)',
+        tree:{trunk:'#5a4a3a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.2)'
     },
-    ocean: {
-        spring: {
-            skyDay:['#6ac8d8','#8ad0e0','#aad8e8'], skyNight:['#0a2a3a','#1a3a4a','#2a4a5a'],
-            groundDay:['#f5e0a0','#f0d090','#e8c880'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:'rgba(255,220,220,0.7)',
-            tree:{trunk:'#4a3a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:['#4aa8c8','#6ab8d8','#8ac8e8'], skyNight:['#0a1a30','#0a2a40','#0a3a50'],
-            groundDay:['#f4d090','#e8c880','#dcc070'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:'rgba(255,250,200,0.85)',
-            tree:{trunk:'#4a3a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:['#d8a888','#e0b898','#e8c8a8'], skyNight:['#2a1a1a','#3a2a2a','#4a3a3a'],
-            groundDay:['#e8c880','#d8b870','#c8a860'], groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
-            sun:'rgba(255,200,160,0.7)',
-            tree:{trunk:'#4a3a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:['#a8d8f0','#c0e0f5','#d8e8fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#e8f0f5','#d8e0e8','#c8d0d8'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:'rgba(220,240,255,0.6)',
-            tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.4)'
-        },
-        christmas: {
-            skyDay:['#1a2a3a','#2a3a4a','#3a4a5a'], skyNight:['#0a1a2a','#1a2a3a','#2a3a4a'],
-            groundDay:['#e8f0f5','#dce8f0','#d0dce8'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:'rgba(255,220,180,0.5)',
-            tree:{trunk:'#1a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.6)'
-        },
-        nowruz: {
-            skyDay:['#6ae0e0','#8ae8e8','#aaf0f0'], skyNight:['#0a2a2a','#1a3a3a','#2a4a4a'],
-            groundDay:['#a8e070','#98d060','#88c050'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
-            sun:'rgba(255,240,180,0.85)',
-            tree:{trunk:'#4a3a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
-        },
-        birthday: {
-            skyDay:['#ffc8e0','#ffd0e8','#ffd8f0'], skyNight:['#3a1a2a','#4a2a3a','#5a3a4a'],
-            groundDay:['#ffd0e0','#ffc0d0','#ffb0c0'], groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
-            sun:'rgba(255,180,220,0.8)',
-            tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
-        },
-        anniversary: {
-            skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,215,0,0.9)',
-            tree:{trunk:'#4a3a2a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
-        }
+    birthday: {
+        skyDay:['#d8c0d8','#e0c8e0','#e8d0e8'], skyNight:['#2a1a2a','#3a2a3a','#4a3a4a'],
+        groundDay:['#d8b8d8','#d8a8d8','#d898d8'], groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
+        sun:'rgba(255,180,220,0.7)',
+        tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.4)'
     },
-    desert: {
-        spring: {
-            skyDay:['#f5c090','#f8d0a8','#fbe0c0'], skyNight:['#2a1a0a','#3a2a0a','#4a3a0a'],
-            groundDay:['#e0c080','#d0b070','#c0a060'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,230,200,0.75)',
-            tree:{trunk:'#6a4a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.2)'
-        },
-        summer: {
-            skyDay:['#e8a050','#f0b060','#f8c070'], skyNight:['#2a1a0a','#3a2a0a','#4a3a0a'],
-            groundDay:['#d8b060','#c8a050','#b89040'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,245,180,0.85)',
-            tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,200,150,0.2)'
-        },
-        autumn: {
-            skyDay:['#e88850','#f09860','#f8a870'], skyNight:['#2a1a0a','#3a2a1a','#4a3a2a'],
-            groundDay:['#c8a050','#b89040','#a88030'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,200,160,0.75)',
-            tree:{trunk:'#6a4a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:['#d8d8e0','#e0e0e8','#e8e8f0'], skyNight:['#2a2a3a','#3a3a4a','#4a4a5a'],
-            groundDay:['#e8e8f0','#d8d8e0','#c8c8d0'], groundNight:['#4a4a5a','#3a3a4a','#2a2a3a'],
-            sun:'rgba(230,240,255,0.6)',
-            tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.45)'
-        },
-        christmas: {
-            skyDay:['#2a1a0a','#3a2a0a','#4a3a0a'], skyNight:['#1a0a00','#2a1a00','#3a2a0a'],
-            groundDay:['#f5f5f5','#ebebeb','#e0e0e0'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,220,180,0.4)',
-            tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.5)'
-        },
-        nowruz: {
-            skyDay:['#f8e8b0','#faf0c0','#fcf5d0'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#c8d870','#b8c860','#a8b850'], groundNight:['#2a2a0a','#1a1a00','#0a0a00'],
-            sun:'rgba(255,240,180,0.85)',
-            tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,240,200,0.3)'
-        },
-        birthday: {
-            skyDay:['#ffd0e0','#ffd8e8','#ffe0f0'], skyNight:['#3a2a0a','#4a3a0a','#5a4a1a'],
-            groundDay:['#f5c8d0','#f5b8c0','#f5a8b0'], groundNight:['#3a1a1a','#2a0a0a','#1a0000'],
-            sun:'rgba(255,180,220,0.75)',
-            tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
-        },
-        anniversary: {
-            skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,215,0,0.9)',
-            tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
-        }
-    },
-    magic: {
-        spring: {
-            skyDay:['#d8a8c8','#e0b8d8','#e8c8e8'], skyNight:['#2a1a3a','#3a2a4a','#4a3a5a'],
-            groundDay:['#5a3a5a','#4a2a4a','#3a1a3a'], groundNight:['#1a0a1a','#0a000a','#050005'],
-            sun:'rgba(255,200,240,0.7)',
-            tree:{trunk:'#4a2a4a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#00e5ff', cactus:'#ffd700', skyStars:'rgba(255,220,255,0.4)'
-        },
-        summer: {
-            skyDay:['#b888d8','#c898e0','#d8a8e8'], skyNight:['#1a0a2a','#2a0a3a','#3a0a4a'],
-            groundDay:['#4a2a5a','#3a1a4a','#2a0a3a'], groundNight:['#1a0a1a','#0a000a','#050005'],
-            sun:'rgba(220,180,255,0.75)',
-            tree:{trunk:'#4a2a4a',main:'#818cf8',light:'#a5b4fc',dark:'#6366f1'},
-            rock:'#ffd700', cactus:'#00e5ff', skyStars:'rgba(220,180,255,0.5)'
-        },
-        autumn: {
-            skyDay:['#c888a8','#d898b8','#e8a8c8'], skyNight:['#2a0a1a','#3a0a2a','#4a0a3a'],
-            groundDay:['#4a2a4a','#3a1a3a','#2a0a2a'], groundNight:['#1a0a1a','#0a000a','#050005'],
-            sun:'rgba(255,180,220,0.7)',
-            tree:{trunk:'#4a2a4a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#00e5ff', cactus:'#ffd700', skyStars:'rgba(255,200,220,0.4)'
-        },
-        winter: {
-            skyDay:['#b8c8e8','#c8d8f0','#d8e8f8'], skyNight:['#1a1a3a','#2a2a4a','#3a3a5a'],
-            groundDay:['#4a4a6a','#3a3a5a','#2a2a4a'], groundNight:['#1a1a2a','#0a0a1a','#050005'],
-            sun:'rgba(220,230,255,0.65)',
-            tree:{trunk:'#4a3a5a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ffd700', cactus:'#00e5ff', skyStars:'rgba(220,230,255,0.5)'
-        },
-        christmas: {
-            skyDay:['#1a1a3a','#2a2a4a','#3a3a5a'], skyNight:['#0a0a2a','#1a1a3a','#2a2a4a'],
-            groundDay:['#3a3a5a','#2a2a4a','#1a1a3a'], groundNight:['#1a1a2a','#0a0a1a','#050005'],
-            sun:'rgba(220,230,255,0.5)',
-            tree:{trunk:'#2a1a3a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,255,0.6)'
-        },
-        nowruz: {
-            skyDay:['#d8e8c8','#e0f0d0','#e8f8d8'], skyNight:['#2a3a2a','#3a4a3a','#4a5a4a'],
-            groundDay:['#6a5a6a','#5a4a5a','#4a3a4a'], groundNight:['#1a2a1a','#0a1a0a','#050005'],
-            sun:'rgba(255,240,180,0.8)',
-            tree:{trunk:'#4a2a4a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(220,255,220,0.5)'
-        },
-        birthday: {
-            skyDay:['#e8a8d8','#f0b8e0','#f8c8e8'], skyNight:['#3a1a3a','#4a2a4a','#5a3a5a'],
-            groundDay:['#6a4a6a','#5a3a5a','#4a2a4a'], groundNight:['#2a0a2a','#1a001a','#0a000a'],
-            sun:'rgba(255,180,255,0.75)',
-            tree:{trunk:'#4a2a4a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,255,0.6)'
-        },
-        anniversary: {
-            skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#6a5a3a','#5a4a2a','#4a3a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:'rgba(255,215,0,0.85)',
-            tree:{trunk:'#4a2a4a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.6)'
-        }
-    },
-    toon: {
-        spring: {
-            skyDay:['#ffd6e8','#ffe0ec','#ffeaf2'], skyNight:['#3a2a4a','#4a3a5a','#5a4a6a'],
-            groundDay:['#8ad870','#7ac860','#6ab850'], groundNight:['#2a1a3a','#1a0a2a','#0a001a'],
-            sun:'rgba(255,240,200,0.9)',
-            tree:{trunk:'#6a4a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        summer: {
-            skyDay:['#87CEEB','#a0d8f0','#b8e0f5'], skyNight:['#1a1a3a','#2a2a4a','#3a3a5a'],
-            groundDay:['#4ade80','#3ab870','#2aa060'], groundNight:['#1a2a1a','#0a1a0a','#050a05'],
-            sun:'rgba(255,240,120,0.9)',
-            tree:{trunk:'#5a3a1a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
-        },
-        autumn: {
-            skyDay:['#ffa860','#ffb870','#ffc880'], skyNight:['#3a1a0a','#4a2a1a','#5a3a2a'],
-            groundDay:['#d8a850','#c89840','#b88830'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
-            sun:'rgba(255,230,160,0.85)',
-            tree:{trunk:'#6a4a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
-        },
-        winter: {
-            skyDay:['#d8e8f5','#e0e8fa','#e8f0ff'], skyNight:['#2a3a4a','#3a4a5a','#4a5a6a'],
-            groundDay:['#e8f0f5','#d8e0e8','#c8d0d8'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
-            sun:'rgba(230,240,255,0.75)',
-            tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.5)'
-        },
-        christmas: {
-            skyDay:['#3a4a5a','#4a5a6a','#5a6a7a'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
-            groundDay:['#f0f5fa','#e8f0f8','#dce8f0'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
-            sun:'rgba(255,220,180,0.5)',
-            tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
-            rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.55)'
-        },
-        nowruz: {
-            skyDay:['#c8f0d0','#d8f8e0','#e8fff0'], skyNight:['#2a3a2a','#3a4a3a','#4a5a4a'],
-            groundDay:['#8ad870','#7ac860','#6ab850'], groundNight:['#1a2a1a','#0a1a0a','#050a05'],
-            sun:'rgba(255,240,180,0.9)',
-            tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
-        },
-        birthday: {
-            skyDay:['#ffb8d8','#ffc8e0','#ffd8e8'], skyNight:['#4a2a4a','#5a3a5a','#6a4a6a'],
-            groundDay:['#ffd0e0','#ffc0d0','#ffb0c0'], groundNight:['#3a1a3a','#2a0a2a','#1a001a'],
-            sun:'rgba(255,180,220,0.9)',
-            tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
-            rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
-        },
-        anniversary: {
-            skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,215,0,0.95)',
-            tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
-            rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
-        }
-    },
-    cyberpunk: {
-        spring: {
-            skyDay:['#4a1a4a','#5a2a5a','#6a3a6a'], skyNight:['#1a0a2a','#2a0a3a','#3a0a4a'],
-            groundDay:['#2a1a3a','#1a0a2a','#0a001a'], groundNight:['#0a001a','#05000a','#000000'],
-            sun:'rgba(255,100,200,0.4)',
-            tree:{trunk:'#2a1a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
-            rock:'#00ff88', cactus:'#00ffff', skyStars:'rgba(255,100,200,0.5)'
-        },
-        summer: {
-            skyDay:['#2a1a4a','#3a2a5a','#4a3a6a'], skyNight:['#0a001a','#1a0a2a','#2a0a3a'],
-            groundDay:['#1a1a2a','#2a2a3a','#3a3a4a'], groundNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
-            sun:'rgba(255,0,200,0.4)',
-            tree:{trunk:'#2a1a3a',main:'#ff00ff',light:'#ff66ff',dark:'#cc00cc'},
-            rock:'#00ff88', cactus:'#ffff00', skyStars:'rgba(255,0,255,0.6)'
-        },
-        autumn: {
-            skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#1a0a0a','#2a0a1a','#3a0a2a'],
-            groundDay:['#2a1a2a','#1a0a1a','#0a000a'], groundNight:['#0a000a','#050005','#000000'],
-            sun:'rgba(255,100,100,0.4)',
-            tree:{trunk:'#2a1a3a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
-            rock:'#00ff88', cactus:'#ffff00', skyStars:'rgba(255,100,150,0.5)'
-        },
-        winter: {
-            skyDay:['#2a3a4a','#3a4a5a','#4a5a6a'], skyNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
-            groundDay:['#2a2a3a','#1a1a2a','#0a0a1a'], groundNight:['#0a0a1a','#05000a','#000000'],
-            sun:'rgba(100,200,255,0.4)',
-            tree:{trunk:'#2a1a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
-            rock:'#00ff88', cactus:'#00ffff', skyStars:'rgba(100,200,255,0.6)'
-        },
-        christmas: {
-            skyDay:['#1a0a2a','#2a0a3a','#3a0a4a'], skyNight:['#0a001a','#1a0a2a','#2a0a3a'],
-            groundDay:['#0a0a1a','#1a0a2a','#2a0a3a'], groundNight:['#0a001a','#05000a','#000000'],
-            sun:'rgba(255,100,150,0.4)',
-            tree:{trunk:'#0a001a',main:'#00ff88',light:'#66ffaa',dark:'#00cc66'},
-            rock:'#ff0044', cactus:'#00ffff', skyStars:'rgba(255,0,100,0.7)'
-        },
-        nowruz: {
-            skyDay:['#1a3a2a','#2a4a3a','#3a5a4a'], skyNight:['#0a1a0a','#1a2a1a','#2a3a2a'],
-            groundDay:['#0a1a0a','#1a2a1a','#2a3a2a'], groundNight:['#0a0a0a','#050505','#000000'],
-            sun:'rgba(100,255,150,0.5)',
-            tree:{trunk:'#0a1a0a',main:'#00ff88',light:'#66ffaa',dark:'#00cc66'},
-            rock:'#ffd700', cactus:'#ff00ff', skyStars:'rgba(100,255,150,0.6)'
-        },
-        birthday: {
-            skyDay:['#4a0a4a','#5a1a5a','#6a2a6a'], skyNight:['#2a002a','#3a0a3a','#4a1a4a'],
-            groundDay:['#2a0a2a','#1a001a','#0a000a'], groundNight:['#1a001a','#0a000a','#000000'],
-            sun:'rgba(255,0,255,0.5)',
-            tree:{trunk:'#2a0a2a',main:'#ff00ff',light:'#ff66ff',dark:'#cc00cc'},
-            rock:'#ff00aa', cactus:'#00ffff', skyStars:'rgba(255,0,255,0.7)'
-        },
-        anniversary: {
-            skyDay:['#4a4a0a','#5a5a1a','#6a6a2a'], skyNight:['#2a2a00','#3a3a0a','#4a4a1a'],
-            groundDay:['#1a1a00','#2a2a0a','#3a3a1a'], groundNight:['#0a0a00','#050500','#000000'],
-            sun:'rgba(255,255,0,0.5)',
-            tree:{trunk:'#2a2a0a',main:'#ffff00',light:'#ffff66',dark:'#cccc00'},
-            rock:'#ffff00', cactus:'#ff00ff', skyStars:'rgba(255,255,0,0.7)'
-        }
+    anniversary: {
+        skyDay:['#ffd700','#ffed4e','#fff59d'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#c8a850','#b89840','#a88830'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,215,0,0.85)',
+        tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
     }
+},
+beach: {
+    spring: {
+        skyDay:['#a8d8f0','#c0e0f5','#d8e8fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#f5e0b0','#f0d8a0','#e8d090'], groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
+        sun:'rgba(255,220,200,0.75)',
+        tree:{trunk:'#6a4a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:['#87CEEB','#b0d8f0','#d0e8f5'], skyNight:['#0a1a2a','#152535','#1a2a40'],
+        groundDay:['#f0d8a0','#e8c888','#d4b070'], groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
+        sun:'rgba(255,245,180,0.85)',
+        tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:['#f0b090','#f5c0a0','#fad0b0'], skyNight:['#2a1a1a','#3a2a1a','#4a3a2a'],
+        groundDay:['#e8c880','#d8b870','#c8a860'], groundNight:['#5a4a2a','#4a3a1a','#3a2a10'],
+        sun:'rgba(255,220,180,0.7)',
+        tree:{trunk:'#6a4a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    winter: {
+        skyDay:['#b0d8f0','#c8e0f5','#e0e8fa'], skyNight:['#2a3a4a','#3a4a5a','#4a5a6a'],
+        groundDay:['#f0f0f0','#e8e8e8','#dcdcdc'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:'rgba(220,235,255,0.6)',
+        tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.35)'
+    },
+    christmas: {
+        skyDay:['#2a3a4a','#3a4a5a','#4a5a6a'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#f5f5f5','#ebebeb','#e0e0e0'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:'rgba(255,220,180,0.5)',
+        tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.55)'
+    },
+    nowruz: {
+        skyDay:['#b8e0f0','#c8e8f5','#d8f0fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#a8e070','#98d060','#88c050'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:'rgba(255,240,180,0.85)',
+        tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:['#ffd6e8','#ffc8dc','#ffb8d0'], skyNight:['#3a1a2a','#4a2a3a','#5a3a4a'],
+        groundDay:['#f5d0c0','#f5c0b0','#f5b0a0'], groundNight:['#3a2a2a','#2a1a1a','#1a0a0a'],
+        sun:'rgba(255,180,220,0.8)',
+        tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,215,0,0.9)',
+        tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
+    }
+},
+forest: {
+    spring: {
+        skyDay:['#c8e0c8','#d8e8d8','#e8f0e8'], skyNight:['#1a2a1a','#2a3a2a','#3a4a3a'],
+        groundDay:['#5a7a3a','#4a6a2a','#3a5a1a'], groundNight:['#1a2a0a','#0a1a0a','#050a00'],
+        sun:'rgba(240,220,240,0.7)',
+        tree:{trunk:'#5a3a1a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:['#6a9a6a','#7aaa7a','#8aba8a'], skyNight:['#0a1a0a','#152a15','#1a3a1a'],
+        groundDay:['#3a5a2a','#2a4a1a','#1a3a0a'], groundNight:['#1a2a0a','#0a1a0a','#050a00'],
+        sun:'rgba(255,240,150,0.75)',
+        tree:{trunk:'#5a3a1a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:['#d8a070','#e0b080','#e8c090'], skyNight:['#2a1a0a','#3a2a1a','#4a3a2a'],
+        groundDay:['#8a6a3a','#7a5a2a','#6a4a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:'rgba(255,220,160,0.7)',
+        tree:{trunk:'#5a3a1a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    winter: {
+        skyDay:['#c8d8e0','#d8e0e8','#e8f0f5'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#b0c0c8','#a0b0b8','#90a0a8'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:'rgba(220,235,255,0.55)',
+        tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.4)'
+    },
+    christmas: {
+        skyDay:['#1a2a2a','#2a3a3a','#3a4a4a'], skyNight:['#0a1a1a','#1a2a2a','#2a3a3a'],
+        groundDay:['#e8f0e8','#dce8dc','#d0e0d0'], groundNight:['#3a4a3a','#2a3a2a','#1a2a1a'],
+        sun:'rgba(255,220,180,0.5)',
+        tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.6)'
+    },
+    nowruz: {
+        skyDay:['#b8e0c0','#c8e8d0','#d8f0e0'], skyNight:['#1a2a1a','#2a3a2a','#3a4a3a'],
+        groundDay:['#5aa040','#4a9030','#3a8020'], groundNight:['#1a2a0a','#0a1a0a','#050a00'],
+        sun:'rgba(255,240,180,0.85)',
+        tree:{trunk:'#5a3a1a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:['#d8c0d0','#e0c8d8','#e8d0e0'], skyNight:['#2a1a2a','#3a2a3a','#4a3a4a'],
+        groundDay:['#6a8a5a','#5a7a4a','#4a6a3a'], groundNight:['#1a2a1a','#0a1a0a','#050a00'],
+        sun:'rgba(255,180,220,0.7)',
+        tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.4)'
+    },
+    anniversary: {
+        skyDay:['#ffd700','#ffed4e','#fff59d'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#8a7a3a','#7a6a2a','#6a5a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:'rgba(255,215,0,0.85)',
+        tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
+    }
+},
+space: {
+    spring: {
+        skyDay:['#3a1a5a','#4a2a6a','#5a3a7a'], skyNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
+        groundDay:['#4a2a6a','#5a3a7a','#6a4a8a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:'rgba(255,180,220,0.4)',
+        tree:{trunk:'#3a2a4a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#00e5ff', cactus:'#ff9ec7', skyStars:'rgba(200,180,255,0.4)'
+    },
+    summer: {
+        skyDay:['#1a0a3a','#2a1a4a','#3a2a5a'], skyNight:['#0a0a1a','#0a0a2a','#1a0a2a'],
+        groundDay:['#3a2a4a','#4a3a5a','#5a4a6a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:'rgba(200,180,255,0.35)',
+        tree:{trunk:'#3a2a4a',main:'#818cf8',light:'#a5b4fc',dark:'#6366f1'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.5)'
+    },
+    autumn: {
+        skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:['#4a2a3a','#5a3a4a','#6a4a5a'], groundNight:['#1a0a1a','#0a0a1a','#05000a'],
+        sun:'rgba(255,200,180,0.4)',
+        tree:{trunk:'#3a2a4a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#00e5ff', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.4)'
+    },
+    winter: {
+        skyDay:['#1a2a4a','#2a3a5a','#3a4a6a'], skyNight:['#0a0a1a','#1a1a2a','#2a2a3a'],
+        groundDay:['#2a3a5a','#3a4a6a','#4a5a7a'], groundNight:['#1a1a2a','#0a0a1a','#05000a'],
+        sun:'rgba(200,220,255,0.4)',
+        tree:{trunk:'#3a2a4a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(200,220,255,0.5)'
+    },
+    christmas: {
+        skyDay:['#1a0a3a','#2a1a4a','#3a2a5a'], skyNight:['#0a0a1a','#0a0a2a','#1a0a2a'],
+        groundDay:['#2a1a4a','#3a2a5a','#4a3a6a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:'rgba(255,220,180,0.4)',
+        tree:{trunk:'#1a1a3a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,255,0.6)'
+    },
+    nowruz: {
+        skyDay:['#4a3a6a','#5a4a7a','#6a5a8a'], skyNight:['#1a0a2a','#2a0a3a','#3a0a4a'],
+        groundDay:['#4a3a6a','#5a4a7a','#6a5a8a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:'rgba(255,240,180,0.6)',
+        tree:{trunk:'#3a2a4a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(220,255,220,0.5)'
+    },
+    birthday: {
+        skyDay:['#4a1a4a','#5a2a5a','#6a3a6a'], skyNight:['#1a0a1a','#2a0a2a','#3a0a3a'],
+        groundDay:['#5a2a5a','#6a3a6a','#7a4a7a'], groundNight:['#2a0a2a','#1a001a','#0a000a'],
+        sun:'rgba(255,180,255,0.5)',
+        tree:{trunk:'#3a2a4a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,255,0.6)'
+    },
+    anniversary: {
+        skyDay:['#4a3a0a','#5a4a1a','#6a5a2a'], skyNight:['#1a0a0a','#2a1a0a','#3a2a0a'],
+        groundDay:['#5a4a1a','#6a5a2a','#7a6a3a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:'rgba(255,215,0,0.6)',
+        tree:{trunk:'#3a2a4a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.6)'
+    }
+},
+night: {
+    spring: {
+        skyDay:['#3a2a4e','#4a3a5e','#5a4a6e'], skyNight:['#0a0a1a','#1a0a2a','#2a1a3a'],
+        groundDay:['#3a2a4a','#2a1a3a','#1a0a2a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:'rgba(255,180,220,0.3)',
+        tree:{trunk:'#3a2a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#00e5ff', cactus:'#ff9ec7', skyStars:'rgba(255,255,255,0.4)'
+    },
+    summer: {
+        skyDay:['#1a1a2e','#16213e','#0f3460'], skyNight:['#0a0a1a','#0a0a2a','#1a0a2a'],
+        groundDay:['#2a2a3a','#1a1a2a','#0a0a1a'], groundNight:['#1a0a2a','#0a0a1a','#05000a'],
+        sun:'rgba(200,180,255,0.25)',
+        tree:{trunk:'#3a2a3a',main:'#818cf8',light:'#a5b4fc',dark:'#6366f1'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.5)'
+    },
+    autumn: {
+        skyDay:['#3a1a1a','#4a2a2a','#5a3a3a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:['#3a2a2a','#2a1a1a','#1a0a0a'], groundNight:['#1a0a0a','#0a0000','#050000'],
+        sun:'rgba(255,200,180,0.3)',
+        tree:{trunk:'#3a2a3a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.4)'
+    },
+    winter: {
+        skyDay:['#1a2a3a','#2a3a4a','#3a4a5a'], skyNight:['#0a1a2a','#1a2a3a','#2a3a4a'],
+        groundDay:['#2a3a4a','#1a2a3a','#0a1a2a'], groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
+        sun:'rgba(220,235,255,0.3)',
+        tree:{trunk:'#3a2a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.5)'
+    },
+    christmas: {
+        skyDay:['#0a1a2a','#1a2a3a','#2a3a4a'], skyNight:['#050a1a','#0a1a2a','#1a2a3a'],
+        groundDay:['#2a3a4a','#1a2a3a','#0a1a2a'], groundNight:['#1a2a3a','#0a1a2a','#050a1a'],
+        sun:'rgba(220,235,255,0.3)',
+        tree:{trunk:'#0a1a0a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,255,0.7)'
+    },
+    nowruz: {
+        skyDay:['#2a3a2a','#3a4a3a','#4a5a4a'], skyNight:['#0a1a0a','#1a2a1a','#2a3a2a'],
+        groundDay:['#2a3a2a','#1a2a1a','#0a1a0a'], groundNight:['#1a2a1a','#0a1a0a','#050a05'],
+        sun:'rgba(255,240,180,0.4)',
+        tree:{trunk:'#2a3a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,240,200,0.5)'
+    },
+    birthday: {
+        skyDay:['#3a1a3a','#4a2a4a','#5a3a5a'], skyNight:['#1a0a1a','#2a0a2a','#3a0a3a'],
+        groundDay:['#3a1a3a','#2a0a2a','#1a001a'], groundNight:['#2a0a2a','#1a001a','#0a000a'],
+        sun:'rgba(255,180,255,0.4)',
+        tree:{trunk:'#3a2a4a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,255,0.6)'
+    },
+    anniversary: {
+        skyDay:['#2a2a0a','#3a3a1a','#4a4a2a'], skyNight:['#1a1a0a','#2a2a1a','#3a3a2a'],
+        groundDay:['#2a2a0a','#1a1a00','#0a0a00'], groundNight:['#1a1a0a','#0a0a00','#050500'],
+        sun:'rgba(255,215,0,0.4)',
+        tree:{trunk:'#2a2a0a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.6)'
+    }
+},
+volcano: {
+    spring: {
+        skyDay:['#6a3a2a','#7a4a3a','#8a5a4a'], skyNight:['#2a0a0a','#3a0a0a','#4a0a0a'],
+        groundDay:['#3a1a0a','#2a0a0a','#1a0a0a'], groundNight:['#1a0a0a','#0a0a0a','#050000'],
+        sun:'rgba(255,180,200,0.5)',
+        tree:{trunk:'#3a1a0a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#00e5ff', cactus:'#ff9ec7', skyStars:'rgba(255,220,180,0.3)'
+    },
+    summer: {
+        skyDay:['#4a1a0a','#6a2a0a','#8a3a0a'], skyNight:['#2a0a0a','#3a0a0a','#4a0a0a'],
+        groundDay:['#2a1a0a','#1a0a0a','#0a0a0a'], groundNight:['#1a0a0a','#0a0a0a','#050000'],
+        sun:'rgba(255,150,100,0.6)',
+        tree:{trunk:'#3a1a0a',main:'#dc2626',light:'#ef4444',dark:'#991b1b'},
+        rock:'#00e5ff', cactus:'#00e5ff', skyStars:'rgba(255,200,150,0.3)'
+    },
+    autumn: {
+        skyDay:['#3a1a0a','#4a2a0a','#5a3a1a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:['#2a1a0a','#1a0a0a','#0a0a0a'], groundNight:['#1a0a0a','#0a0a0a','#050000'],
+        sun:'rgba(255,160,100,0.5)',
+        tree:{trunk:'#3a1a0a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#00e5ff', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
+    },
+    winter: {
+        skyDay:['#4a4a5a','#5a5a6a','#6a6a7a'], skyNight:['#1a1a2a','#2a2a3a','#3a3a4a'],
+        groundDay:['#3a3a4a','#2a2a3a','#1a1a2a'], groundNight:['#1a1a2a','#0a0a1a','#05000a'],
+        sun:'rgba(220,235,255,0.4)',
+        tree:{trunk:'#3a2a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.4)'
+    },
+    christmas: {
+        skyDay:['#2a1a1a','#3a2a2a','#4a3a3a'], skyNight:['#1a0a0a','#2a0a0a','#3a0a0a'],
+        groundDay:['#3a2a2a','#2a1a1a','#1a0a0a'], groundNight:['#2a0a0a','#1a0000','#0a0000'],
+        sun:'rgba(255,220,180,0.4)',
+        tree:{trunk:'#1a0a0a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,180,0.5)'
+    },
+    nowruz: {
+        skyDay:['#5a4a2a','#6a5a3a','#7a6a4a'], skyNight:['#2a1a0a','#3a2a1a','#4a3a2a'],
+        groundDay:['#4a3a1a','#3a2a0a','#2a1a00'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:'rgba(255,240,180,0.6)',
+        tree:{trunk:'#3a1a0a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,240,180,0.4)'
+    },
+    birthday: {
+        skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#2a0a1a','#3a0a2a','#4a0a3a'],
+        groundDay:['#3a1a2a','#2a0a1a','#1a000a'], groundNight:['#2a0a1a','#1a000a','#0a0000'],
+        sun:'rgba(255,180,220,0.5)',
+        tree:{trunk:'#3a1a2a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:['#4a2a0a','#5a3a1a','#6a4a2a'], skyNight:['#2a1a00','#3a2a0a','#4a3a1a'],
+        groundDay:['#3a2a0a','#2a1a00','#1a0a00'], groundNight:['#2a1a00','#1a0a00','#0a0000'],
+        sun:'rgba(255,215,0,0.5)',
+        tree:{trunk:'#3a1a0a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
+    }
+},
+ocean: {
+    spring: {
+        skyDay:['#6ac8d8','#8ad0e0','#aad8e8'], skyNight:['#0a2a3a','#1a3a4a','#2a4a5a'],
+        groundDay:['#f5e0a0','#f0d090','#e8c880'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:'rgba(255,220,220,0.7)',
+        tree:{trunk:'#4a3a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:['#4aa8c8','#6ab8d8','#8ac8e8'], skyNight:['#0a1a30','#0a2a40','#0a3a50'],
+        groundDay:['#f4d090','#e8c880','#dcc070'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:'rgba(255,250,200,0.85)',
+        tree:{trunk:'#4a3a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:['#d8a888','#e0b898','#e8c8a8'], skyNight:['#2a1a1a','#3a2a2a','#4a3a3a'],
+        groundDay:['#e8c880','#d8b870','#c8a860'], groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
+        sun:'rgba(255,200,160,0.7)',
+        tree:{trunk:'#4a3a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
+    },
+    winter: {
+        skyDay:['#a8d8f0','#c0e0f5','#d8e8fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#e8f0f5','#d8e0e8','#c8d0d8'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:'rgba(220,240,255,0.6)',
+        tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.4)'
+    },
+    christmas: {
+        skyDay:['#1a2a3a','#2a3a4a','#3a4a5a'], skyNight:['#0a1a2a','#1a2a3a','#2a3a4a'],
+        groundDay:['#e8f0f5','#dce8f0','#d0dce8'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:'rgba(255,220,180,0.5)',
+        tree:{trunk:'#1a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.6)'
+    },
+    nowruz: {
+        skyDay:['#6ae0e0','#8ae8e8','#aaf0f0'], skyNight:['#0a2a2a','#1a3a3a','#2a4a4a'],
+        groundDay:['#a8e070','#98d060','#88c050'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'],
+        sun:'rgba(255,240,180,0.85)',
+        tree:{trunk:'#4a3a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:['#ffc8e0','#ffd0e8','#ffd8f0'], skyNight:['#3a1a2a','#4a2a3a','#5a3a4a'],
+        groundDay:['#ffd0e0','#ffc0d0','#ffb0c0'], groundNight:['#3a1a2a','#2a0a1a','#1a000a'],
+        sun:'rgba(255,180,220,0.8)',
+        tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,215,0,0.9)',
+        tree:{trunk:'#4a3a2a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
+    }
+},
+desert: {
+    spring: {
+        skyDay:['#f5c090','#f8d0a8','#fbe0c0'], skyNight:['#2a1a0a','#3a2a0a','#4a3a0a'],
+        groundDay:['#e0c080','#d0b070','#c0a060'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,230,200,0.75)',
+        tree:{trunk:'#6a4a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.2)'
+    },
+    summer: {
+        skyDay:['#e8a050','#f0b060','#f8c070'], skyNight:['#2a1a0a','#3a2a0a','#4a3a0a'],
+        groundDay:['#d8b060','#c8a050','#b89040'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,245,180,0.85)',
+        tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,200,150,0.2)'
+    },
+    autumn: {
+        skyDay:['#e88850','#f09860','#f8a870'], skyNight:['#2a1a0a','#3a2a1a','#4a3a2a'],
+        groundDay:['#c8a050','#b89040','#a88030'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,200,160,0.75)',
+        tree:{trunk:'#6a4a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
+    },
+    winter: {
+        skyDay:['#d8d8e0','#e0e0e8','#e8e8f0'], skyNight:['#2a2a3a','#3a3a4a','#4a4a5a'],
+        groundDay:['#e8e8f0','#d8d8e0','#c8c8d0'], groundNight:['#4a4a5a','#3a3a4a','#2a2a3a'],
+        sun:'rgba(230,240,255,0.6)',
+        tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.45)'
+    },
+    christmas: {
+        skyDay:['#2a1a0a','#3a2a0a','#4a3a0a'], skyNight:['#1a0a00','#2a1a00','#3a2a0a'],
+        groundDay:['#f5f5f5','#ebebeb','#e0e0e0'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,220,180,0.4)',
+        tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.5)'
+    },
+    nowruz: {
+        skyDay:['#f8e8b0','#faf0c0','#fcf5d0'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#c8d870','#b8c860','#a8b850'], groundNight:['#2a2a0a','#1a1a00','#0a0a00'],
+        sun:'rgba(255,240,180,0.85)',
+        tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,240,200,0.3)'
+    },
+    birthday: {
+        skyDay:['#ffd0e0','#ffd8e8','#ffe0f0'], skyNight:['#3a2a0a','#4a3a0a','#5a4a1a'],
+        groundDay:['#f5c8d0','#f5b8c0','#f5a8b0'], groundNight:['#3a1a1a','#2a0a0a','#1a0000'],
+        sun:'rgba(255,180,220,0.75)',
+        tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,215,0,0.9)',
+        tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.4)'
+    }
+},
+magic: {
+    spring: {
+        skyDay:['#d8a8c8','#e0b8d8','#e8c8e8'], skyNight:['#2a1a3a','#3a2a4a','#4a3a5a'],
+        groundDay:['#5a3a5a','#4a2a4a','#3a1a3a'], groundNight:['#1a0a1a','#0a000a','#050005'],
+        sun:'rgba(255,200,240,0.7)',
+        tree:{trunk:'#4a2a4a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#00e5ff', cactus:'#ffd700', skyStars:'rgba(255,220,255,0.4)'
+    },
+    summer: {
+        skyDay:['#b888d8','#c898e0','#d8a8e8'], skyNight:['#1a0a2a','#2a0a3a','#3a0a4a'],
+        groundDay:['#4a2a5a','#3a1a4a','#2a0a3a'], groundNight:['#1a0a1a','#0a000a','#050005'],
+        sun:'rgba(220,180,255,0.75)',
+        tree:{trunk:'#4a2a4a',main:'#818cf8',light:'#a5b4fc',dark:'#6366f1'},
+        rock:'#ffd700', cactus:'#00e5ff', skyStars:'rgba(220,180,255,0.5)'
+    },
+    autumn: {
+        skyDay:['#c888a8','#d898b8','#e8a8c8'], skyNight:['#2a0a1a','#3a0a2a','#4a0a3a'],
+        groundDay:['#4a2a4a','#3a1a3a','#2a0a2a'], groundNight:['#1a0a1a','#0a000a','#050005'],
+        sun:'rgba(255,180,220,0.7)',
+        tree:{trunk:'#4a2a4a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#00e5ff', cactus:'#ffd700', skyStars:'rgba(255,200,220,0.4)'
+    },
+    winter: {
+        skyDay:['#b8c8e8','#c8d8f0','#d8e8f8'], skyNight:['#1a1a3a','#2a2a4a','#3a3a5a'],
+        groundDay:['#4a4a6a','#3a3a5a','#2a2a4a'], groundNight:['#1a1a2a','#0a0a1a','#050005'],
+        sun:'rgba(220,230,255,0.65)',
+        tree:{trunk:'#4a3a5a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ffd700', cactus:'#00e5ff', skyStars:'rgba(220,230,255,0.5)'
+    },
+    christmas: {
+        skyDay:['#1a1a3a','#2a2a4a','#3a3a5a'], skyNight:['#0a0a2a','#1a1a3a','#2a2a4a'],
+        groundDay:['#3a3a5a','#2a2a4a','#1a1a3a'], groundNight:['#1a1a2a','#0a0a1a','#050005'],
+        sun:'rgba(220,230,255,0.5)',
+        tree:{trunk:'#2a1a3a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,220,255,0.6)'
+    },
+    nowruz: {
+        skyDay:['#d8e8c8','#e0f0d0','#e8f8d8'], skyNight:['#2a3a2a','#3a4a3a','#4a5a4a'],
+        groundDay:['#6a5a6a','#5a4a5a','#4a3a4a'], groundNight:['#1a2a1a','#0a1a0a','#050005'],
+        sun:'rgba(255,240,180,0.8)',
+        tree:{trunk:'#4a2a4a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(220,255,220,0.5)'
+    },
+    birthday: {
+        skyDay:['#e8a8d8','#f0b8e0','#f8c8e8'], skyNight:['#3a1a3a','#4a2a4a','#5a3a5a'],
+        groundDay:['#6a4a6a','#5a3a5a','#4a2a4a'], groundNight:['#2a0a2a','#1a001a','#0a000a'],
+        sun:'rgba(255,180,255,0.75)',
+        tree:{trunk:'#4a2a4a',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,255,0.6)'
+    },
+    anniversary: {
+        skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#6a5a3a','#5a4a2a','#4a3a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:'rgba(255,215,0,0.85)',
+        tree:{trunk:'#4a2a4a',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.6)'
+    }
+},
+toon: {
+    spring: {
+        skyDay:['#ffd6e8','#ffe0ec','#ffeaf2'], skyNight:['#3a2a4a','#4a3a5a','#5a4a6a'],
+        groundDay:['#8ad870','#7ac860','#6ab850'], groundNight:['#2a1a3a','#1a0a2a','#0a001a'],
+        sun:'rgba(255,240,200,0.9)',
+        tree:{trunk:'#6a4a2a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    summer: {
+        skyDay:['#87CEEB','#a0d8f0','#b8e0f5'], skyNight:['#1a1a3a','#2a2a4a','#3a3a5a'],
+        groundDay:['#4ade80','#3ab870','#2aa060'], groundNight:['#1a2a1a','#0a1a0a','#050a05'],
+        sun:'rgba(255,240,120,0.9)',
+        tree:{trunk:'#5a3a1a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.2)'
+    },
+    autumn: {
+        skyDay:['#ffa860','#ffb870','#ffc880'], skyNight:['#3a1a0a','#4a2a1a','#5a3a2a'],
+        groundDay:['#d8a850','#c89840','#b88830'], groundNight:['#2a1a0a','#1a0a00','#0a0000'],
+        sun:'rgba(255,230,160,0.85)',
+        tree:{trunk:'#6a4a2a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#8b5cf6', cactus:'#00e5ff', skyStars:'rgba(255,220,180,0.3)'
+    },
+    winter: {
+        skyDay:['#d8e8f5','#e0e8fa','#e8f0ff'], skyNight:['#2a3a4a','#3a4a5a','#4a5a6a'],
+        groundDay:['#e8f0f5','#d8e0e8','#c8d0d8'], groundNight:['#4a5a6a','#3a4a5a','#2a3a4a'],
+        sun:'rgba(230,240,255,0.75)',
+        tree:{trunk:'#5a4a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(220,235,255,0.5)'
+    },
+    christmas: {
+        skyDay:['#3a4a5a','#4a5a6a','#5a6a7a'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'],
+        groundDay:['#f0f5fa','#e8f0f8','#dce8f0'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'],
+        sun:'rgba(255,220,180,0.5)',
+        tree:{trunk:'#3a2a1a',main:'#1a5a1a',light:'#2a7a2a',dark:'#0a3a0a'},
+        rock:'#dc2626', cactus:'#22c55e', skyStars:'rgba(255,255,255,0.55)'
+    },
+    nowruz: {
+        skyDay:['#c8f0d0','#d8f8e0','#e8fff0'], skyNight:['#2a3a2a','#3a4a3a','#4a5a4a'],
+        groundDay:['#8ad870','#7ac860','#6ab850'], groundNight:['#1a2a1a','#0a1a0a','#050a05'],
+        sun:'rgba(255,240,180,0.9)',
+        tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)'
+    },
+    birthday: {
+        skyDay:['#ffb8d8','#ffc8e0','#ffd8e8'], skyNight:['#4a2a4a','#5a3a5a','#6a4a6a'],
+        groundDay:['#ffd0e0','#ffc0d0','#ffb0c0'], groundNight:['#3a1a3a','#2a0a2a','#1a001a'],
+        sun:'rgba(255,180,220,0.9)',
+        tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'},
+        rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)'
+    },
+    anniversary: {
+        skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,215,0,0.95)',
+        tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'},
+        rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)'
+    }
+},
+cyberpunk: {
+    spring: {
+        skyDay:['#4a1a4a','#5a2a5a','#6a3a6a'], skyNight:['#1a0a2a','#2a0a3a','#3a0a4a'],
+        groundDay:['#2a1a3a','#1a0a2a','#0a001a'], groundNight:['#0a001a','#05000a','#000000'],
+        sun:'rgba(255,100,200,0.4)',
+        tree:{trunk:'#2a1a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'},
+        rock:'#00ff88', cactus:'#00ffff', skyStars:'rgba(255,100,200,0.5)'
+    },
+    summer: {
+        skyDay:['#2a1a4a','#3a2a5a','#4a3a6a'], skyNight:['#0a001a','#1a0a2a','#2a0a3a'],
+        groundDay:['#1a1a2a','#2a2a3a','#3a3a4a'], groundNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
+        sun:'rgba(255,0,200,0.4)',
+        tree:{trunk:'#2a1a3a',main:'#ff00ff',light:'#ff66ff',dark:'#cc00cc'},
+        rock:'#00ff88', cactus:'#ffff00', skyStars:'rgba(255,0,255,0.6)'
+    },
+    autumn: {
+        skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#1a0a0a','#2a0a1a','#3a0a2a'],
+        groundDay:['#2a1a2a','#1a0a1a','#0a000a'], groundNight:['#0a000a','#050005','#000000'],
+        sun:'rgba(255,100,100,0.4)',
+        tree:{trunk:'#2a1a3a',main:'#f97316',light:'#fb923c',dark:'#c2410c'},
+        rock:'#00ff88', cactus:'#ffff00', skyStars:'rgba(255,100,150,0.5)'
+    },
+    winter: {
+        skyDay:['#2a3a4a','#3a4a5a','#4a5a6a'], skyNight:['#0a0a1a','#1a0a2a','#2a0a3a'],
+        groundDay:['#2a2a3a','#1a1a2a','#0a0a1a'], groundNight:['#0a0a1a','#05000a','#000000'],
+        sun:'rgba(100,200,255,0.4)',
+        tree:{trunk:'#2a1a3a',main:'#e0f2fe',light:'#ffffff',dark:'#bae6fd'},
+        rock:'#00ff88', cactus:'#00ffff', skyStars:'rgba(100,200,255,0.6)'
+    },
+    christmas: {
+        skyDay:['#1a0a2a','#2a0a3a','#3a0a4a'], skyNight:['#0a001a','#1a0a2a','#2a0a3a'],
+        groundDay:['#0a0a1a','#1a0a2a','#2a0a3a'], groundNight:['#0a001a','#05000a','#000000'],
+        sun:'rgba(255,100,150,0.4)',
+        tree:{trunk:'#0a001a',main:'#00ff88',light:'#66ffaa',dark:'#00cc66'},
+        rock:'#ff0044', cactus:'#00ffff', skyStars:'rgba(255,0,100,0.7)'
+    },
+    nowruz: {
+        skyDay:['#1a3a2a','#2a4a3a','#3a5a4a'], skyNight:['#0a1a0a','#1a2a1a','#2a3a2a'],
+        groundDay:['#0a1a0a','#1a2a1a','#2a3a2a'], groundNight:['#0a0a0a','#050505','#000000'],
+        sun:'rgba(100,255,150,0.5)',
+        tree:{trunk:'#0a1a0a',main:'#00ff88',light:'#66ffaa',dark:'#00cc66'},
+        rock:'#ffd700', cactus:'#ff00ff', skyStars:'rgba(100,255,150,0.6)'
+    },
+    birthday: {
+        skyDay:['#4a0a4a','#5a1a5a','#6a2a6a'], skyNight:['#2a002a','#3a0a3a','#4a1a4a'],
+        groundDay:['#2a0a2a','#1a001a','#0a000a'], groundNight:['#1a001a','#0a000a','#000000'],
+        sun:'rgba(255,0,255,0.5)',
+        tree:{trunk:'#2a0a2a',main:'#ff00ff',light:'#ff66ff',dark:'#cc00cc'},
+        rock:'#ff00aa', cactus:'#00ffff', skyStars:'rgba(255,0,255,0.7)'
+    },
+    anniversary: {
+        skyDay:['#4a4a0a','#5a5a1a','#6a6a2a'], skyNight:['#2a2a00','#3a3a0a','#4a4a1a'],
+        groundDay:['#1a1a00','#2a2a0a','#3a3a1a'], groundNight:['#0a0a00','#050500','#000000'],
+        sun:'rgba(255,255,0,0.5)',
+        tree:{trunk:'#2a2a0a',main:'#ffff00',light:'#ffff66',dark:'#cccc00'},
+        rock:'#ffff00', cactus:'#ff00ff', skyStars:'rgba(255,255,0,0.7)'
+    }
+}
 };
-
 // ============================================================
-// بخش ۱۱: پالت‌های رویدادهای خاص (عید فطر، عید قربان، یلدا، ولنتاین)
+// بخش ۱۱: پالت‌های رویدادهای خاص - عید فطر
 // ============================================================
 
 const EID_PALETTES = {
@@ -2512,177 +2514,177 @@ const EID_PALETTES = {
         }
     },
     eidAdha: {
-        classic: {
-            skyDay:['#ffe8b0','#fff0c8','#fff8e0'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#e8c878','#d8b868','#c8a858'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,215,0,0.9)',
-            tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        city: {
-            skyDay:['#e8d8b0','#f0e0c0','#f8e8d0'], skyNight:['#3a2a1a','#4a3a2a','#5a4a3a'],
-            groundDay:['#c8b898','#b8a888','#a89878'], groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
-            sun:'rgba(255,215,0,0.8)',
-            tree:{trunk:'#5a4a3a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.5)'
-        },
-        beach: {
-            skyDay:['#f0e0b0','#f5e8c8','#faf0e0'], skyNight:['#3a2a1a','#4a3a2a','#5a4a3a'],
-            groundDay:['#f5e0a8','#e8d090','#d8c078'], groundNight:['#4a3a2a','#3a2a1a','#2a1a0a'],
-            sun:'rgba(255,250,200,0.9)',
-            tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        forest: {
-            skyDay:['#d8e8b0','#e8f0c8','#f0f8e0'], skyNight:['#2a2a1a','#3a3a2a','#4a4a3a'],
-            groundDay:['#8a9a48','#7a8a38','#6a7a28'], groundNight:['#1a2a0a','#0a1a05','#050a02'],
-            sun:'rgba(255,240,180,0.85)',
-            tree:{trunk:'#4a3a1a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        space: {
-            skyDay:['#3a2a0a','#4a3a1a','#5a4a2a'], skyNight:['#1a0a00','#2a1a00','#3a2a0a'],
-            groundDay:['#4a3a1a','#5a4a2a','#6a5a3a'], groundNight:['#1a0a00','#0a0500','#050000'],
-            sun:'rgba(255,215,0,0.6)',
-            tree:{trunk:'#2a1a0a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.7)'
-        },
-        night: {
-            skyDay:['#3a2a1a','#4a3a2a','#5a4a3a'], skyNight:['#1a0a00','#2a1500','#3a2000'],
-            groundDay:['#2a1a0a','#1a0a00','#0a0500'], groundNight:['#1a0a00','#0a0500','#050000'],
-            sun:'rgba(255,215,0,0.4)',
-            tree:{trunk:'#2a1a0a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.7)'
-        },
-        volcano: {
-            skyDay:['#6a3a0a','#7a4a1a','#8a5a2a'], skyNight:['#2a0a00','#3a1a00','#4a2a0a'],
-            groundDay:['#3a1a00','#2a0a00','#1a0500'], groundNight:['#1a0500','#0a0000','#050000'],
-            sun:'rgba(255,200,100,0.7)',
-            tree:{trunk:'#3a1a00',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        ocean: {
-            skyDay:['#c8e0e0','#d8e8e8','#e8f0f0'], skyNight:['#1a2a2a','#2a3a3a','#3a4a4a'],
-            groundDay:['#f0e0a8','#e0d090','#d0c078'], groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
-            sun:'rgba(255,250,200,0.9)',
-            tree:{trunk:'#4a3a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        desert: {
-            skyDay:['#ffd870','#ffe090','#ffe8b0'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
-            groundDay:['#e8b850','#d8a840','#c89830'], groundNight:['#3a2a00','#2a1a00','#1a0a00'],
-            sun:'rgba(255,240,100,0.95)',
-            tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        magic: {
-            skyDay:['#f0d8a8','#f8e0b8','#ffe8c8'], skyNight:['#3a2a1a','#4a3a2a','#5a4a3a'],
-            groundDay:['#5a4a3a','#4a3a2a','#3a2a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0500'],
-            sun:'rgba(255,215,150,0.85)',
-            tree:{trunk:'#4a3a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,150,0.7)'
-        },
-        toon: {
-            skyDay:['#fff0a8','#fff5c8','#fffae0'], skyNight:['#4a3a1a','#5a4a2a','#6a5a3a'],
-            groundDay:['#f0c850','#e0b840','#d0a830'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
-            sun:'rgba(255,240,100,0.95)',
-            tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
-        },
-        cyberpunk: {
-            skyDay:['#4a3a0a','#5a4a1a','#6a5a2a'], skyNight:['#2a1a00','#3a2a00','#4a3a0a'],
-            groundDay:['#2a1a00','#1a0a00','#0a0500'], groundNight:['#0a0500','#050200','#000000'],
-            sun:'rgba(255,200,0,0.6)',
-            tree:{trunk:'#1a0a00',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
-            rock:'#ff0044', cactus:'#ffff00', skyStars:'rgba(255,200,0,0.8)'
-        }
+    classic: {
+        skyDay:['#ffe8b0','#fff0c8','#fff8e0'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#e8c878','#d8b868','#c8a858'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,215,0,0.9)',
+        tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
     },
-    yalda: {
-        classic: {
-            skyDay:['#2a0a0a','#3a1a1a','#4a2a2a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
-            groundDay:['#8a1a1a','#7a1010','#6a0808'], groundNight:['#3a0808','#2a0505','#1a0202'],
-            sun:'rgba(255,100,100,0.6)',
-            tree:{trunk:'#3a0a0a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.5)'
-        },
-        city: {
-            skyDay:['#3a1a1a','#4a2a2a','#5a3a3a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
-            groundDay:['#5a3a3a','#4a2a2a','#3a1a1a'], groundNight:['#2a0a0a','#1a0505','#0a0202'],
-            sun:'rgba(255,100,100,0.5)',
-            tree:{trunk:'#3a1a1a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.4)'
-        },
-        beach: {
-            skyDay:['#4a1a1a','#5a2a2a','#6a3a3a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
-            groundDay:['#d8a0a0','#c89090','#b88080'], groundNight:['#3a1a1a','#2a0a0a','#1a0505'],
-            sun:'rgba(255,150,150,0.7)',
-            tree:{trunk:'#5a2a2a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.5)'
-        },
-        forest: {
-            skyDay:['#2a1a0a','#3a2a1a','#4a3a2a'], skyNight:['#1a0a05','#2a0a0a','#3a1515'],
-            groundDay:['#5a3a2a','#4a2a1a','#3a1a0a'], groundNight:['#1a0a05','#0a0502','#050200'],
-            sun:'rgba(255,150,100,0.6)',
-            tree:{trunk:'#3a1a0a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.5)'
-        },
-        space: {
-            skyDay:['#2a0a1a','#3a1a2a','#4a2a3a'], skyNight:['#0a0205','#1a050a','#2a0a15'],
-            groundDay:['#3a1a2a','#4a2a3a','#5a3a4a'], groundNight:['#1a050a','#0a0205','#050002'],
-            sun:'rgba(255,100,150,0.4)',
-            tree:{trunk:'#2a0a1a',main:'#ff2d55',light:'#ff6b8a',dark:'#b91c1c'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,180,0.6)'
-        },
-        night: {
-            skyDay:['#1a0505','#2a0a0a','#3a1515'], skyNight:['#0a0202','#1a0505','#2a0a0a'],
-            groundDay:['#2a0a0a','#1a0505','#0a0202'], groundNight:['#0a0202','#050101','#000000'],
-            sun:'rgba(255,100,100,0.3)',
-            tree:{trunk:'#1a0505',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.7)'
-        },
-        volcano: {
-            skyDay:['#4a1a0a','#5a2a0a','#6a3a1a'], skyNight:['#2a0a05','#3a0a0a','#4a1a1a'],
-            groundDay:['#3a0a05','#2a0505','#1a0202'], groundNight:['#1a0202','#0a0101','#050000'],
-            sun:'rgba(255,100,50,0.7)',
-            tree:{trunk:'#2a0a05',main:'#dc2626',light:'#ef4444',dark:'#991b1b'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,100,0.5)'
-        },
-        ocean: {
-            skyDay:['#3a1a2a','#4a2a3a','#5a3a4a'], skyNight:['#1a050a','#2a0a15','#3a1520'],
-            groundDay:['#8a4a5a','#7a3a4a','#6a2a3a'], groundNight:['#2a0a15','#1a050a','#0a0205'],
-            sun:'rgba(255,150,180,0.6)',
-            tree:{trunk:'#3a1a2a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,180,0.5)'
-        },
-        desert: {
-            skyDay:['#5a2a0a','#6a3a1a','#7a4a2a'], skyNight:['#2a0a05','#3a1a0a','#4a2a1a'],
-            groundDay:['#8a4a2a','#7a3a1a','#6a2a0a'], groundNight:['#2a0a05','#1a0502','#0a0200'],
-            sun:'rgba(255,150,100,0.7)',
-            tree:{trunk:'#4a1a0a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,100,0.5)'
-        },
-        magic: {
-            skyDay:['#3a0a2a','#4a1a3a','#5a2a4a'], skyNight:['#1a020a','#2a0515','#3a0a20'],
-            groundDay:['#4a1a3a','#3a0a2a','#2a051a'], groundNight:['#1a020a','#0a0105','#050002'],
-            sun:'rgba(255,100,180,0.5)',
-            tree:{trunk:'#2a0a1a',main:'#ec4899',light:'#f472b6',dark:'#be185d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,200,0.6)'
-        },
-        toon: {
-            skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#2a0515','#3a0a20','#4a152a'],
-            groundDay:['#7a2a3a','#6a1a2a','#5a0a1a'], groundNight:['#2a0a15','#1a050a','#0a0205'],
-            sun:'rgba(255,150,180,0.8)',
-            tree:{trunk:'#3a1a2a',main:'#ec4899',light:'#f472b6',dark:'#be185d'},
-            rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,180,0.5)'
-        },
-        cyberpunk: {
-            skyDay:['#2a0a1a','#3a0a2a','#4a0a3a'], skyNight:['#0a0205','#1a050a','#2a0a15'],
-            groundDay:['#1a0205','#0a0102','#050001'], groundNight:['#050001','#020000','#000000'],
-            sun:'rgba(255,0,100,0.4)',
-            tree:{trunk:'#1a0205',main:'#ff2d55',light:'#ff6b8a',dark:'#b91c1c'},
-            rock:'#ff2d55', cactus:'#ff00ff', skyStars:'rgba(255,0,100,0.7)'
-        }
+    city: {
+        skyDay:['#e8d8b0','#f0e0c0','#f8e8d0'], skyNight:['#3a2a1a','#4a3a2a','#5a4a3a'],
+        groundDay:['#c8b898','#b8a888','#a89878'], groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
+        sun:'rgba(255,215,0,0.8)',
+        tree:{trunk:'#5a4a3a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.5)'
     },
+    beach: {
+        skyDay:['#f0e0b0','#f5e8c8','#faf0e0'], skyNight:['#3a2a1a','#4a3a2a','#5a4a3a'],
+        groundDay:['#f5e0a8','#e8d090','#d8c078'], groundNight:['#4a3a2a','#3a2a1a','#2a1a0a'],
+        sun:'rgba(255,250,200,0.9)',
+        tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
+    },
+    forest: {
+        skyDay:['#d8e8b0','#e8f0c8','#f0f8e0'], skyNight:['#2a2a1a','#3a3a2a','#4a4a3a'],
+        groundDay:['#8a9a48','#7a8a38','#6a7a28'], groundNight:['#1a2a0a','#0a1a05','#050a02'],
+        sun:'rgba(255,240,180,0.85)',
+        tree:{trunk:'#4a3a1a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
+    },
+    space: {
+        skyDay:['#3a2a0a','#4a3a1a','#5a4a2a'], skyNight:['#1a0a00','#2a1a00','#3a2a0a'],
+        groundDay:['#4a3a1a','#5a4a2a','#6a5a3a'], groundNight:['#1a0a00','#0a0500','#050000'],
+        sun:'rgba(255,215,0,0.6)',
+        tree:{trunk:'#2a1a0a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.7)'
+    },
+    night: {
+        skyDay:['#3a2a1a','#4a3a2a','#5a4a3a'], skyNight:['#1a0a00','#2a1500','#3a2000'],
+        groundDay:['#2a1a0a','#1a0a00','#0a0500'], groundNight:['#1a0a00','#0a0500','#050000'],
+        sun:'rgba(255,215,0,0.4)',
+        tree:{trunk:'#2a1a0a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.7)'
+    },
+    volcano: {
+        skyDay:['#6a3a0a','#7a4a1a','#8a5a2a'], skyNight:['#2a0a00','#3a1a00','#4a2a0a'],
+        groundDay:['#3a1a00','#2a0a00','#1a0500'], groundNight:['#1a0500','#0a0000','#050000'],
+        sun:'rgba(255,200,100,0.7)',
+        tree:{trunk:'#3a1a00',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
+    },
+    ocean: {
+        skyDay:['#c8e0e0','#d8e8e8','#e8f0f0'], skyNight:['#1a2a2a','#2a3a3a','#3a4a4a'],
+        groundDay:['#f0e0a8','#e0d090','#d0c078'], groundNight:['#3a2a1a','#2a1a0a','#1a0a00'],
+        sun:'rgba(255,250,200,0.9)',
+        tree:{trunk:'#4a3a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
+    },
+    desert: {
+        skyDay:['#ffd870','#ffe090','#ffe8b0'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'],
+        groundDay:['#e8b850','#d8a840','#c89830'], groundNight:['#3a2a00','#2a1a00','#1a0a00'],
+        sun:'rgba(255,240,100,0.95)',
+        tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
+    },
+    magic: {
+        skyDay:['#f0d8a8','#f8e0b8','#ffe8c8'], skyNight:['#3a2a1a','#4a3a2a','#5a4a3a'],
+        groundDay:['#5a4a3a','#4a3a2a','#3a2a1a'], groundNight:['#2a1a0a','#1a0a00','#0a0500'],
+        sun:'rgba(255,215,150,0.85)',
+        tree:{trunk:'#4a3a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,150,0.7)'
+    },
+    toon: {
+        skyDay:['#fff0a8','#fff5c8','#fffae0'], skyNight:['#4a3a1a','#5a4a2a','#6a5a3a'],
+        groundDay:['#f0c850','#e0b840','#d0a830'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'],
+        sun:'rgba(255,240,100,0.95)',
+        tree:{trunk:'#6a4a2a',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#dc2626', cactus:'#ffd700', skyStars:'rgba(255,215,0,0.6)'
+    },
+    cyberpunk: {
+        skyDay:['#4a3a0a','#5a4a1a','#6a5a2a'], skyNight:['#2a1a00','#3a2a00','#4a3a0a'],
+        groundDay:['#2a1a00','#1a0a00','#0a0500'], groundNight:['#0a0500','#050200','#000000'],
+        sun:'rgba(255,200,0,0.6)',
+        tree:{trunk:'#1a0a00',main:'#ffd700',light:'#ffed4e',dark:'#cc9900'},
+        rock:'#ff0044', cactus:'#ffff00', skyStars:'rgba(255,200,0,0.8)'
+    }
+},
+yalda: {
+    classic: {
+        skyDay:['#2a0a0a','#3a1a1a','#4a2a2a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
+        groundDay:['#8a1a1a','#7a1010','#6a0808'], groundNight:['#3a0808','#2a0505','#1a0202'],
+        sun:'rgba(255,100,100,0.6)',
+        tree:{trunk:'#3a0a0a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.5)'
+    },
+    city: {
+        skyDay:['#3a1a1a','#4a2a2a','#5a3a3a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
+        groundDay:['#5a3a3a','#4a2a2a','#3a1a1a'], groundNight:['#2a0a0a','#1a0505','#0a0202'],
+        sun:'rgba(255,100,100,0.5)',
+        tree:{trunk:'#3a1a1a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.4)'
+    },
+    beach: {
+        skyDay:['#4a1a1a','#5a2a2a','#6a3a3a'], skyNight:['#1a0505','#2a0a0a','#3a1515'],
+        groundDay:['#d8a0a0','#c89090','#b88080'], groundNight:['#3a1a1a','#2a0a0a','#1a0505'],
+        sun:'rgba(255,150,150,0.7)',
+        tree:{trunk:'#5a2a2a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.5)'
+    },
+    forest: {
+        skyDay:['#2a1a0a','#3a2a1a','#4a3a2a'], skyNight:['#1a0a05','#2a0a0a','#3a1515'],
+        groundDay:['#5a3a2a','#4a2a1a','#3a1a0a'], groundNight:['#1a0a05','#0a0502','#050200'],
+        sun:'rgba(255,150,100,0.6)',
+        tree:{trunk:'#3a1a0a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.5)'
+    },
+    space: {
+        skyDay:['#2a0a1a','#3a1a2a','#4a2a3a'], skyNight:['#0a0205','#1a050a','#2a0a15'],
+        groundDay:['#3a1a2a','#4a2a3a','#5a3a4a'], groundNight:['#1a050a','#0a0205','#050002'],
+        sun:'rgba(255,100,150,0.4)',
+        tree:{trunk:'#2a0a1a',main:'#ff2d55',light:'#ff6b8a',dark:'#b91c1c'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,180,0.6)'
+    },
+    night: {
+        skyDay:['#1a0505','#2a0a0a','#3a1515'], skyNight:['#0a0202','#1a0505','#2a0a0a'],
+        groundDay:['#2a0a0a','#1a0505','#0a0202'], groundNight:['#0a0202','#050101','#000000'],
+        sun:'rgba(255,100,100,0.3)',
+        tree:{trunk:'#1a0505',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,150,0.7)'
+    },
+    volcano: {
+        skyDay:['#4a1a0a','#5a2a0a','#6a3a1a'], skyNight:['#2a0a05','#3a0a0a','#4a1a1a'],
+        groundDay:['#3a0a05','#2a0505','#1a0202'], groundNight:['#1a0202','#0a0101','#050000'],
+        sun:'rgba(255,100,50,0.7)',
+        tree:{trunk:'#2a0a05',main:'#dc2626',light:'#ef4444',dark:'#991b1b'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,100,0.5)'
+    },
+    ocean: {
+        skyDay:['#3a1a2a','#4a2a3a','#5a3a4a'], skyNight:['#1a050a','#2a0a15','#3a1520'],
+        groundDay:['#8a4a5a','#7a3a4a','#6a2a3a'], groundNight:['#2a0a15','#1a050a','#0a0205'],
+        sun:'rgba(255,150,180,0.6)',
+        tree:{trunk:'#3a1a2a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,180,0.5)'
+    },
+    desert: {
+        skyDay:['#5a2a0a','#6a3a1a','#7a4a2a'], skyNight:['#2a0a05','#3a1a0a','#4a2a1a'],
+        groundDay:['#8a4a2a','#7a3a1a','#6a2a0a'], groundNight:['#2a0a05','#1a0502','#0a0200'],
+        sun:'rgba(255,150,100,0.7)',
+        tree:{trunk:'#4a1a0a',main:'#b91c1c',light:'#ef4444',dark:'#7f1d1d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,100,0.5)'
+    },
+    magic: {
+        skyDay:['#3a0a2a','#4a1a3a','#5a2a4a'], skyNight:['#1a020a','#2a0515','#3a0a20'],
+        groundDay:['#4a1a3a','#3a0a2a','#2a051a'], groundNight:['#1a020a','#0a0105','#050002'],
+        sun:'rgba(255,100,180,0.5)',
+        tree:{trunk:'#2a0a1a',main:'#ec4899',light:'#f472b6',dark:'#be185d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,200,0.6)'
+    },
+    toon: {
+        skyDay:['#4a1a2a','#5a2a3a','#6a3a4a'], skyNight:['#2a0515','#3a0a20','#4a152a'],
+        groundDay:['#7a2a3a','#6a1a2a','#5a0a1a'], groundNight:['#2a0a15','#1a050a','#0a0205'],
+        sun:'rgba(255,150,180,0.8)',
+        tree:{trunk:'#3a1a2a',main:'#ec4899',light:'#f472b6',dark:'#be185d'},
+        rock:'#ff2d55', cactus:'#ff6b6b', skyStars:'rgba(255,150,180,0.5)'
+    },
+    cyberpunk: {
+        skyDay:['#2a0a1a','#3a0a2a','#4a0a3a'], skyNight:['#0a0205','#1a050a','#2a0a15'],
+        groundDay:['#1a0205','#0a0102','#050001'], groundNight:['#050001','#020000','#000000'],
+        sun:'rgba(255,0,100,0.4)',
+        tree:{trunk:'#1a0205',main:'#ff2d55',light:'#ff6b8a',dark:'#b91c1c'},
+        rock:'#ff2d55', cactus:'#ff00ff', skyStars:'rgba(255,0,100,0.7)'
+    }
+},
     valentine: {
         classic: {
             skyDay:['#ffd0e8','#ffdcef','#ffe8f5'], skyNight:['#3a1a2a','#4a2a3a','#5a3a4a'],
@@ -2798,7 +2800,6 @@ function getRockColor() { return getTheme().rock; }
 function getCactusColor() { return getTheme().cactus; }
 function getSunColor() { return getTheme().sun; }
 function getSkyStarsColor() { return getTheme().skyStars || 'rgba(255,255,255,0.2)'; }
-
 // ============================================================
 // بخش ۱۳: توابع کمکی عمومی
 // ============================================================
@@ -2899,9 +2900,14 @@ function resetFox() {
     fox.animation = 0;
 }
 
-function collision(a, b) {
-    return a.x + 8 < b.x + b.w && a.x + a.w - 8 > b.x &&
-           a.y + 7 < b.y + b.h && a.y + a.h - 5 > b.y;
+function collision(a, b, padA, padB) {
+    if (padA === undefined) padA = 8;
+    if (padB === undefined) padB = padA;
+    
+    return a.x + padA < b.x + b.w - padB && 
+           a.x + a.w - padA > b.x + padB &&
+           a.y + padA < b.y + b.h - padB && 
+           a.y + a.h - padA > b.y + padB;
 }
 
 function jump() {
@@ -3130,7 +3136,7 @@ function drawParticles() {
 }
 
 // ============================================================
-// بخش ۱۶: رسم پس‌زمینه (بهینه‌شده با کش گرادیان)
+// بخش ۱۶: رسم پس‌زمینه
 // ============================================================
 
 let bgGradientCache = null;
@@ -3406,9 +3412,8 @@ function drawEgg(e) {
     ctx.quadraticCurveTo(cx, e.y + 12, e.x + e.w - 6, e.y + 18);
     ctx.stroke();
 }
-
 // ============================================================
-// بخش ۲۰: رسم موانع
+// بخش ۲۰: رسم موانع (۶ نوع - با کدو تنبل)
 // ============================================================
 
 function drawObstacle(o) {
@@ -3417,6 +3422,7 @@ function drawObstacle(o) {
     const rockColor = getRockColor();
     const cactusColor = getCactusColor();
 
+    // ============ درخت ============
     if (o.type === "tree") {
         ctx.fillStyle = treeColors.trunk;
         ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
@@ -3474,7 +3480,10 @@ function drawObstacle(o) {
             ctx.arc(o.x + 12, o.y + 28, 2, 0, Math.PI * 2);
             ctx.fill();
         }
-    } else if (o.type === "rock") {
+    }
+
+    // ============ سنگ ============
+    else if (o.type === "rock") {
         ctx.fillStyle = rockColor;
         ctx.beginPath();
         ctx.moveTo(o.x, o.y + o.h);
@@ -3500,7 +3509,10 @@ function drawObstacle(o) {
         ctx.lineTo(o.x + o.w - 15, o.y + o.h);
         ctx.closePath();
         ctx.fill();
-    } else {
+    }
+
+    // ============ کاکتوس ساده ============
+    else if (o.type === "cactus") {
         ctx.fillStyle = cactusColor;
         ctx.fillRect(o.x + 9, o.y, 14, o.h);
         ctx.fillRect(o.x, o.y + 20, 13, 11);
@@ -3527,8 +3539,236 @@ function drawObstacle(o) {
             ctx.fill();
         }
     }
-}
 
+    // ============ کاکتوس دوقلو ============
+    else if (o.type === "doubleCactus") {
+        const leftH = o.h;
+        const rightH = o.h * 0.88;
+        const rightY = o.y + (o.h - rightH);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.beginPath();
+        ctx.ellipse(o.x + o.w / 2, o.y + o.h + 2, o.w * 0.5, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = cactusColor;
+        ctx.fillRect(o.x + 8, o.y, 14, leftH);
+        ctx.fillRect(o.x, o.y + 18, 12, 11);
+        ctx.fillRect(o.x + 18, o.y + 32, 12, 10);
+
+        ctx.fillRect(o.x + 38, rightY, 14, rightH);
+        ctx.fillRect(o.x + 30, rightY + 22, 12, 11);
+        ctx.fillRect(o.x + 48, rightY + 36, 12, 10);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.25)';
+        ctx.fillRect(o.x + 22, o.y + 5, 2, leftH - 10);
+
+        ctx.fillStyle = 'rgba(255,255,255,0.5)';
+        ctx.fillRect(o.x + 9, o.y + 2, 4, leftH - 4);
+        ctx.fillRect(o.x + 2, o.y + 20, 3, 7);
+        ctx.fillRect(o.x + 20, o.y + 34, 3, 6);
+        ctx.fillRect(o.x + 39, rightY + 2, 4, rightH - 4);
+        ctx.fillRect(o.x + 32, rightY + 24, 3, 7);
+        ctx.fillRect(o.x + 50, rightY + 38, 3, 6);
+
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillRect(o.x + 18, o.y, 4, leftH);
+        ctx.fillRect(o.x + 48, rightY, 4, rightH);
+        ctx.fillRect(o.x + 9, o.y + 18, 3, 11);
+        ctx.fillRect(o.x + 39, rightY + 22, 3, 11);
+
+        if (currentSeason === 'spring' || currentSeason === 'nowruz') {
+            ctx.fillStyle = '#ff6fa8';
+            ctx.beginPath();
+            ctx.arc(o.x + 15, o.y - 2, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffeb3b';
+            ctx.beginPath();
+            ctx.arc(o.x + 15, o.y - 2, 2, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ff6fa8';
+            ctx.beginPath();
+            ctx.arc(o.x + 45, rightY - 2, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#ffeb3b';
+            ctx.beginPath();
+            ctx.arc(o.x + 45, rightY - 2, 2, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // ============ کنده درخت ============
+    else if (o.type === "stump") {
+        const cx = o.x + o.w / 2;
+        const topY = o.y;
+        const bottomY = o.y + o.h;
+
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.ellipse(cx, bottomY + 2, o.w * 0.55, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        const stumpGrad = ctx.createLinearGradient(o.x, 0, o.x + o.w, 0);
+        stumpGrad.addColorStop(0, '#5a3a1a');
+        stumpGrad.addColorStop(0.5, '#7a5230');
+        stumpGrad.addColorStop(1, '#4a2e14');
+        ctx.fillStyle = stumpGrad;
+        ctx.fillRect(o.x + 4, topY + 4, o.w - 8, o.h - 4);
+
+        ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 4; i++) {
+            const lx = o.x + 9 + i * 9;
+            ctx.beginPath();
+            ctx.moveTo(lx, topY + 8);
+            ctx.lineTo(lx + (Math.random() - 0.5) * 2, bottomY - 2);
+            ctx.stroke();
+        }
+
+        ctx.fillStyle = '#8a6040';
+        ctx.beginPath();
+        ctx.ellipse(cx, topY + 4, (o.w - 8) / 2, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(60,35,15,0.7)';
+        ctx.lineWidth = 1.2;
+        for (let r = 3; r < (o.w - 8) / 2 - 2; r += 3) {
+            ctx.beginPath();
+            ctx.ellipse(cx, topY + 4, r, r * 0.4, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'rgba(255,220,180,0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.ellipse(cx, topY + 4, (o.w - 8) / 2, 5, 0, Math.PI * 1.2, Math.PI * 1.9);
+        ctx.stroke();
+
+        if (o.h > 42) {
+            ctx.strokeStyle = 'rgba(30,15,5,0.6)';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(cx - 3, topY + 8);
+            ctx.lineTo(cx - 1, topY + 16);
+            ctx.lineTo(cx - 4, topY + 24);
+            ctx.stroke();
+        }
+
+        ctx.fillStyle = currentSeason === 'winter' || currentSeason === 'christmas'
+            ? 'rgba(240,248,255,0.7)'
+            : 'rgba(60,130,50,0.7)';
+        ctx.beginPath();
+        ctx.ellipse(o.x + 2, bottomY - 2, 5, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.ellipse(o.x + o.w - 2, bottomY - 2, 4, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // ============ کدو تنبل 🎃 ============
+    else if (o.type === "pumpkin") {
+        const cx = o.x + o.w / 2;
+        const cy = o.y + o.h / 2 + 2;
+        const rx = o.w / 2 - 2;
+        const ry = o.h / 2 - 2;
+
+        // سایه زیر کدو
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.beginPath();
+        ctx.ellipse(cx, o.y + o.h + 2, o.w * 0.45, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // ساقه سبز بالا
+        ctx.fillStyle = '#4a6a2a';
+        ctx.beginPath();
+        ctx.moveTo(cx - 4, o.y + 2);
+        ctx.lineTo(cx - 2, o.y - 8);
+        ctx.lineTo(cx + 3, o.y - 8);
+        ctx.lineTo(cx + 5, o.y + 2);
+        ctx.closePath();
+        ctx.fill();
+
+        // برگ کوچیک روی ساقه
+        ctx.fillStyle = '#5a8a3a';
+        ctx.beginPath();
+        ctx.ellipse(cx + 8, o.y - 4, 6, 3, -0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // بدنه کدو
+        ctx.fillStyle = '#f97316';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // خطوط عمودی کدو
+        ctx.strokeStyle = 'rgba(180,60,10,0.6)';
+        ctx.lineWidth = 1.5;
+        for (let i = -2; i <= 2; i++) {
+            const offsetX = (i / 2) * rx * 0.85;
+            ctx.beginPath();
+            ctx.moveTo(cx + offsetX, o.y + 4);
+            ctx.quadraticCurveTo(cx + offsetX * 1.1, cy, cx + offsetX, o.y + o.h - 2);
+            ctx.stroke();
+        }
+
+        // بخش چپ و راست کدو (رنگ تیره‌تر)
+        ctx.fillStyle = 'rgba(194,65,12,0.5)';
+        ctx.beginPath();
+        ctx.ellipse(cx - rx * 0.55, cy, rx * 0.28, ry * 0.85, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.ellipse(cx + rx * 0.55, cy, rx * 0.28, ry * 0.85, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // هایلایت بالا چپ
+        ctx.fillStyle = 'rgba(255,220,180,0.35)';
+        ctx.beginPath();
+        ctx.ellipse(cx - rx * 0.4, cy - ry * 0.45, rx * 0.25, ry * 0.18, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // چشم‌های کدو (سه‌گوش)
+        ctx.fillStyle = '#1a0a00';
+        ctx.beginPath();
+        ctx.moveTo(cx - 12, cy - 4);
+        ctx.lineTo(cx - 6, cy - 4);
+        ctx.lineTo(cx - 9, cy + 3);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(cx + 6, cy - 4);
+        ctx.lineTo(cx + 12, cy - 4);
+        ctx.lineTo(cx + 9, cy + 3);
+        ctx.closePath();
+        ctx.fill();
+
+        // دهان دندون‌دار
+        ctx.fillStyle = '#1a0a00';
+        ctx.beginPath();
+        ctx.moveTo(cx - 10, cy + 8);
+        ctx.lineTo(cx + 10, cy + 8);
+        ctx.lineTo(cx + 8, cy + 14);
+        ctx.lineTo(cx + 4, cy + 10);
+        ctx.lineTo(cx, cy + 15);
+        ctx.lineTo(cx - 4, cy + 10);
+        ctx.lineTo(cx - 8, cy + 14);
+        ctx.closePath();
+        ctx.fill();
+
+        // درخشش نارنجی داخل چشم‌ها (اگه شب باشه)
+        if (isNight) {
+            ctx.fillStyle = 'rgba(255,200,50,0.7)';
+            ctx.beginPath();
+            ctx.arc(cx - 9, cy - 1, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(cx + 9, cy - 1, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+}
 // ============================================================
 // بخش ۲۱: تابع رسم اصلی
 // ============================================================
@@ -3570,20 +3810,39 @@ function createEgg() {
 function createObstacle() {
     const r = Math.random();
     let type;
-    if (r < .45) type = "tree";
-    else if (r < .75) type = "rock";
-    else type = "cactus";
+
+    // ۶ نوع مانع شامل کدو 🎃
+    if (r < 0.28) type = "tree";
+    else if (r < 0.48) type = "rock";
+    else if (r < 0.65) type = "cactus";
+    else if (r < 0.78) type = "doubleCactus";
+    else if (r < 0.89) type = "stump";
+    else type = "pumpkin";
 
     let w = 45, h = 65;
+
     if (type === "rock") { w = 55; h = 40; }
-    if (type === "cactus") { w = 32; h = 62; }
+    else if (type === "cactus") { w = 32; h = 62; }
+    else if (type === "doubleCactus") {
+        w = 58;
+        h = 60 + Math.random() * 12;
+    }
+    else if (type === "stump") {
+        w = 46;
+        h = 38 + Math.random() * 8;
+    }
+    else if (type === "pumpkin") {
+        w = 50;
+        h = 44 + Math.random() * 6;
+    }
 
     obstacles.push({
         x: W + 40,
         y: ground() - h,
         w: w,
         h: h,
-        type: type
+        type: type,
+        combo: false
     });
 }
 
@@ -3735,7 +3994,7 @@ function update(dt) {
     for (let i = eggs.length - 1; i >= 0; i--) {
         const e = eggs[i];
         e.x -= speed * dt;
-        if (collision(fox, e)) {
+        if (collision(fox, e, 6, 3)) {
             collectEgg(e);
             eggs.splice(i, 1);
             continue;
@@ -3752,7 +4011,7 @@ function update(dt) {
     for (let i = obstacles.length - 1; i >= 0; i--) {
         const o = obstacles[i];
         o.x -= speed * dt;
-        if (collision(fox, o)) {
+        if (collision(fox, o, 10, 8)) {
             if (shieldActive && shieldHits > 0) {
                 shieldHits--;
                 if (shieldHits === 0) shieldActive = false;
@@ -3775,7 +4034,7 @@ function update(dt) {
     for (let i = powerups.length - 1; i >= 0; i--) {
         const p = powerups[i];
         p.x -= speed * dt;
-        if (collision(fox, p)) {
+        if (collision(fox, p, 6, 4)) {
             applyPowerup(p.type);
             powerups.splice(i, 1);
             continue;
@@ -4164,6 +4423,7 @@ function applySeasonToUI() {
 
 function refreshSeason() {
     _cachedSeasonDate = null;
+    _cachedEffect = null;
     const newSeason = getCurrentSeason();
     if (newSeason === currentSeason) return;
 
@@ -4173,6 +4433,7 @@ function refreshSeason() {
     seasonalParticles.length = 0;
     bgCacheKey = '';
     bgGradientCache = null;
+    _cachedEffect = null;
 
     applySeasonToUI();
     updateThemeUI();
@@ -4258,9 +4519,8 @@ function setLanguage(lang) {
         }
     }
 }
-
 // ============================================================
-// بخش ۲۴: مدیریت اینترنت و کد دعوت
+// بخش ۲۴: اینترنت و referral
 // ============================================================
 
 function checkInternet() {
@@ -4898,8 +5158,11 @@ window.addEventListener("offline", function() { showNoInternet(); });
 
 retryBtn.addEventListener("click", function() {
     checkInternet();
-    fetch(WEBHOOK_URL, { signal: AbortSignal.timeout(5000) })
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    fetch(WEBHOOK_URL, { signal: ctrl.signal })
         .then(() => {
+            clearTimeout(t);
             if (navigator.onLine) {
                 noInternetOverlay.style.display = 'none';
                 isOnline = true;
@@ -4909,7 +5172,7 @@ retryBtn.addEventListener("click", function() {
                 });
             }
         })
-        .catch(() => { showNoInternet(); });
+        .catch(() => { clearTimeout(t); showNoInternet(); });
 });
 
 window.addEventListener("keydown", function(e) {
@@ -5019,6 +5282,10 @@ document.getElementById('channelPopup').addEventListener('click', function(e) {
     if (e.target === this) closeChannelPopup();
 });
 
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) refreshSeason();
+});
+
 // ============================================================
 // بخش ۳۰: راه‌اندازی اولیه
 // ============================================================
@@ -5085,10 +5352,6 @@ setInterval(() => {
     }
 }, 15000);
 
-setInterval(() => {
-    refreshSeason();
-}, 60 * 1000);
-
 // ============================================================
 // بخش ۳۲: راه‌اندازی اعلان فصل
 // ============================================================
@@ -5097,7 +5360,6 @@ setTimeout(() => {
     checkAndAnnounceSeason();
 }, 1500);
 
-// ✅ پاک‌سازی هنگام بستن صفحه
 window.addEventListener('beforeunload', function() {
     if (_rafId) cancelAnimationFrame(_rafId);
     stopMusicTimer();
