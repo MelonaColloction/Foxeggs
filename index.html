@@ -1476,121 +1476,121 @@ let _nowSeconds = 0;
 const SEASONAL_EFFECTS = {
     spring: [
         // گلبرگ‌های بهاری (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffb8d8', colorDark:'#ff8ab8',
+        { enabled:true, maxCount:12, color:'#ffb8d8', colorDark:'#ff8ab8',
           size:3.5, speedY:25, speedXRange:[-15,-30],
           rotation:true, shape:'petal', swayAmount:0.8 },
         // جرقه‌های صورتی (جدید)
-        { enabled:true, maxCount:8, color:'#ffe4f0', colorDark:'#ffd0e0',
+        { enabled:true, maxCount:12, color:'#ffe4f0', colorDark:'#ffd0e0',
           size:3, speedY:12, speedXRange:[-10,-20],
           rotation:true, shape:'sparkle', swayAmount:1.2, sparkle:true }
     ],
     summer: [
         // جرقه‌های آفتابی (قدیمی - چون تابستان قبلاً چیزی نداشت، این می‌شه گروه ۰)
-        { enabled:true, maxCount:8, color:'#ffe066', colorDark:'#ffcc33',
+        { enabled:true, maxCount:12, color:'#ffe066', colorDark:'#ffcc33',
           size:3, speedY:15, speedXRange:[-8,-15],
           rotation:true, shape:'sparkle', swayAmount:0.6, sparkle:true },
         // پروانه‌های طلایی (جدید)
-        { enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ffb030',
+        { enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffb030',
           size:10, speedY:2, speedXRange:[-50,-80],
           rotation:false, shape:'butterfly', swayAmount:1.5, flyHorizontal:true }
     ],
     autumn: [
         // برگ‌های خزانی (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffb347', colorDark:'#e08a20',
+        { enabled:true, maxCount:12, color:'#ffb347', colorDark:'#e08a20',
           size:4, speedY:20, speedXRange:[-20,-40],
           rotation:true, shape:'leaf', swayAmount:1.0 },
         // جرقه‌های طلایی (جدید)
-        { enabled:true, maxCount:8, color:'#ffed4e', colorDark:'#f59e0b',
+        { enabled:true, maxCount:12, color:'#ffed4e', colorDark:'#f59e0b',
           size:3, speedY:10, speedXRange:[-8,-18],
           rotation:true, shape:'sparkle', swayAmount:1.0, sparkle:true }
     ],
     winter: [
         // دانه‌های برف (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffffff', colorDark:'#e0e8f0',
+        { enabled:true, maxCount:12, color:'#ffffff', colorDark:'#e0e8f0',
           size:2.5, speedY:30, speedXRange:[-10,-20],
           rotation:false, shape:'snow', swayAmount:0.6 },
         // ستاره‌های یخی (جدید)
-        { enabled:true, maxCount:8, color:'#a8d8ff', colorDark:'#ffffff',
+        { enabled:true, maxCount:12, color:'#a8d8ff', colorDark:'#ffffff',
           size:4, speedY:8, speedXRange:[-6,-15],
           rotation:true, shape:'sparkle', swayAmount:0.8, sparkle:true }
     ],
     christmas: [
         // برف (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffffff', colorDark:'#e0e8f0',
+        { enabled:true, maxCount:12, color:'#ffffff', colorDark:'#e0e8f0',
           size:3, speedY:35, speedXRange:[-12,-25],
           rotation:false, shape:'snow', swayAmount:0.7 },
         // کاغذ رنگی قرمز/سبز (جدید)
-        { enabled:true, maxCount:8, color:'#dc2626', colorDark:'#16a34a',
+        { enabled:true, maxCount:12, color:'#dc2626', colorDark:'#16a34a',
           size:3.5, speedY:22, speedXRange:[-15,-30],
           rotation:true, shape:'confetti', swayAmount:1.1 }
     ],
     nowruz: [
         // گلبرگ‌های نوروزی (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ff69b4',
+        { enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ff69b4',
           size:3.5, speedY:22, speedXRange:[-18,-35],
           rotation:true, shape:'petal', swayAmount:0.9 },
         // جوانه‌های سبز (جدید)
-        { enabled:true, maxCount:8, color:'#4ade80', colorDark:'#22c55e',
+        { enabled:true, maxCount:12, color:'#4ade80', colorDark:'#22c55e',
           size:4, speedY:15, speedXRange:[-10,-20],
           rotation:true, shape:'sprout', swayAmount:1.2 }
     ],
     birthday: [
         // کاغذ رنگی (قدیمی)
-        { enabled:true, maxCount:8, color:'#ff69b4', colorDark:'#ffd700',
+        { enabled:true, maxCount:12, color:'#ff69b4', colorDark:'#ffd700',
           size:3, speedY:28, speedXRange:[-15,-30],
           rotation:true, shape:'confetti', swayAmount:1.2 },
         // بالون‌های شناور (جدید - از پایین به بالا)
-        { enabled:true, maxCount:8, color:'#ff6b9d', colorDark:'#ffd700',
+        { enabled:true, maxCount:12, color:'#ff6b9d', colorDark:'#ffd700',
           size:6, speedY:-25, speedXRange:[-5,-15],
           rotation:false, shape:'balloon', swayAmount:0.8, rise:true }
     ],
     anniversary: [
         // کاغذ رنگی طلایی (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ffed4e',
+        { enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffed4e',
           size:3, speedY:28, speedXRange:[-15,-30],
           rotation:true, shape:'confetti', swayAmount:1.2 },
         // جرقه‌های طلایی درخشان (جدید)
-        { enabled:true, maxCount:8, color:'#fbbf24', colorDark:'#f59e0b',
+        { enabled:true, maxCount:12, color:'#fbbf24', colorDark:'#f59e0b',
           size:4, speedY:12, speedXRange:[-10,-20],
           rotation:true, shape:'sparkle', swayAmount:0.7, sparkle:true }
     ],
     eidFitr: [
         // ستاره‌های سبز (قدیمی)
-        { enabled:true, maxCount:8, color:'#00d96a', colorDark:'#00a050',
+        { enabled:true, maxCount:12, color:'#00d96a', colorDark:'#00a050',
           size:3, speedY:20, speedXRange:[-12,-25],
           rotation:true, shape:'star', swayAmount:0.9 },
         // هلال‌های طلایی (جدید)
-        { enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ffed4e',
+        { enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffed4e',
           size:6, speedY:10, speedXRange:[-6,-15],
           rotation:false, shape:'crescent', swayAmount:0.6, sparkle:true }
     ],
     eidAdha: [
         // کاغذ رنگی طلایی (قدیمی)
-        { enabled:true, maxCount:8, color:'#ffd700', colorDark:'#ffed4e',
+        { enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffed4e',
           size:3.2, speedY:22, speedXRange:[-14,-28],
           rotation:true, shape:'confetti', swayAmount:1.1 },
         // جرقه‌های طلایی (جدید)
-        { enabled:true, maxCount:8, color:'#fbbf24', colorDark:'#f59e0b',
+        { enabled:true, maxCount:12, color:'#fbbf24', colorDark:'#f59e0b',
           size:3.5, speedY:12, speedXRange:[-10,-20],
           rotation:true, shape:'sparkle', swayAmount:0.9, sparkle:true }
     ],
     yalda: [
         // کاغذ رنگی قرمز (قدیمی)
-        { enabled:true, maxCount:8, color:'#ff2d55', colorDark:'#b91c1c',
+        { enabled:true, maxCount:12, color:'#ff2d55', colorDark:'#b91c1c',
           size:4, speedY:22, speedXRange:[-15,-30],
           rotation:true, shape:'confetti', swayAmount:1.0 },
         // انارهای شناور (جدید)
-        { enabled:true, maxCount:8, color:'#b91c1c', colorDark:'#7f1d1d',
+        { enabled:true, maxCount:12, color:'#b91c1c', colorDark:'#7f1d1d',
           size:5, speedY:15, speedXRange:[-10,-20],
           rotation:true, shape:'pomegranate', swayAmount:1.0 }
     ],
     valentine: [
         // قلب‌ها (قدیمی)
-        { enabled:true, maxCount:8, color:'#ec4899', colorDark:'#f472b6',
+        { enabled:true, maxCount:12, color:'#ec4899', colorDark:'#f472b6',
           size:5, speedY:25, speedXRange:[-12,-25],
           rotation:true, shape:'heart', swayAmount:1.1 },
         // جرقه‌های صورتی (جدید)
-        { enabled:true, maxCount:8, color:'#fbcfe8', colorDark:'#f9a8d4',
+        { enabled:true, maxCount:12, color:'#fbcfe8', colorDark:'#f9a8d4',
           size:5, speedY:12, speedXRange:[-8,-15],
           rotation:true, shape:'sparkle', swayAmount:1.3, sparkle:true }
     ]
@@ -1609,17 +1609,26 @@ function spawnSeasonalParticle(isInitial, groupIndex) {
     const fx = effects[groupIndex];
     if (!fx || !fx.enabled) return;
 
-    let count = 0;
-    for (let i = 0; i < seasonalParticles.length; i++) {
-        if (seasonalParticles[i].group === groupIndex) count++;
-    }
-    if (count >= fx.maxCount) return;
+    const speedX = (Math.random() - 0.5) * 20;
 
-    const speedX = fx.speedXRange[0] + Math.random() * (fx.speedXRange[1] - fx.speedXRange[0]);
+    let startX, startY;
+
+    if (isInitial) {
+        startX = Math.random() * W;
+        startY = Math.random() * H;
+    } else {
+        startX = Math.random() * W;
+        
+        if (fx.rise) {
+            startY = H + 20 + Math.random() * 50;
+        } else {
+            startY = -20 - Math.random() * 50;
+        }
+    }
 
     seasonalParticles.push({
-        x: Math.random() * (W + 50),
-        y: isInitial ? Math.random() * H : (fx.rise ? H + 10 : -10 - Math.random() * 30),
+        x: startX,
+        y: startY,
         vx: speedX,
         vy: fx.speedY * (0.8 + Math.random() * 0.4),
         size: fx.size * (0.7 + Math.random() * 0.6),
@@ -1632,7 +1641,8 @@ function spawnSeasonalParticle(isInitial, groupIndex) {
         group: groupIndex,
         sparkle: fx.sparkle || false,
         rise: fx.rise || false,
-        flyHorizontal: fx.flyHorizontal || false
+        flyHorizontal: fx.flyHorizontal || false,
+        edgeOpacity: 1
     });
 }
 
@@ -1650,37 +1660,57 @@ function updateSeasonalParticles(dt) {
         const fx = effects[p.group] || effects[0];
         if (!fx || !fx.enabled) { seasonalParticles.splice(i, 1); continue; }
 
-        p.x += p.vx * dt;
+        // حرکت
         p.y += p.vy * dt;
+        p.x += p.vx * dt;
         
+        // نوسان افقی ملایم
         if (fx.swayAmount > 0) {
-            p.x += Math.sin(t * p.swaySpeed + p.swayOffset) * fx.swayAmount * dt * 30;
+            const sway = Math.sin(t * p.swaySpeed + p.swayOffset) * fx.swayAmount * dt * 15;
+            p.x += sway;
         }
-        if (fx.rotation) p.rotation += p.rotationSpeed * dt;
-        if (fx.flyHorizontal) {
-            p.vx += Math.sin(t * 2 + p.swayOffset) * 20 * dt;
-            if (p.vx < fx.speedXRange[1]) p.vx = fx.speedXRange[1];
-            if (p.vx > fx.speedXRange[0]) p.vx = fx.speedXRange[0];
-        }
-
-        // 🔄 Wrap با fade — ذره آروم محو میشه و از طرف دیگه ظاهر میشه
-        // اگه خیلی از صفحه خارج شد، به طرف مقابل منتقل کن
-        if (p.x < -100) p.x = W + 100;
-        if (p.x > W + 100) p.x = -100;
-        if (p.y < -100) p.y = H + 100;
-        if (p.y > H + 100) p.y = -100;
-
-        // محاسبه opacity بر اساس فاصله از لبه
-        let edgeOpacity = 1;
-        const edgeDist = 60;
-        if (p.x < edgeDist) edgeOpacity = Math.min(edgeOpacity, p.x / edgeDist);
-        if (p.x > W - edgeDist) edgeOpacity = Math.min(edgeOpacity, (W - p.x) / edgeDist);
-        if (p.y < edgeDist) edgeOpacity = Math.min(edgeOpacity, p.y / edgeDist);
-        if (p.y > H - edgeDist) edgeOpacity = Math.min(edgeOpacity, (H - p.y) / edgeDist);
         
-        p.edgeOpacity = Math.max(0, edgeOpacity);
+        if (fx.rotation) p.rotation += p.rotationSpeed * dt;
+        
+        if (fx.flyHorizontal) {
+            p.vx += Math.sin(t * 2 + p.swayOffset) * 10 * dt;
+            if (p.vx < -30) p.vx = -30;
+            if (p.vx > 30) p.vx = 30;
+        }
+
+        // ✅ چک خروج از صفحه
+        const margin = 50;
+        let out = false;
+        
+        if (fx.rise) {
+            if (p.y < -margin) out = true;
+        } else {
+            if (p.y > H + margin) out = true;
+        }
+        if (p.x < -200 || p.x > W + 200) out = true;
+
+        if (out) {
+            // 🎯 اول حذفش کن
+            seasonalParticles.splice(i, 1);
+            // 🎯 بعد فوراً جاش یکی جدید از بالا بساز
+            spawnSeasonalParticle(false, p.group);
+            continue;
+        }
+
+        // محو شدن نرم نزدیک لبه‌ی خروجی
+        let edgeOpacity = 1;
+        const fadeDist = 80;
+        
+        if (fx.rise) {
+            if (p.y < fadeDist) edgeOpacity = Math.min(edgeOpacity, p.y / fadeDist);
+        } else {
+            if (p.y > H - fadeDist) edgeOpacity = Math.min(edgeOpacity, (H - p.y) / fadeDist);
+        }
+        
+        p.edgeOpacity = Math.max(0, Math.min(1, edgeOpacity));
     }
 
+    // ✅ مرحله‌ی نهایی: هر گروه رو چک کن و اگه کم بود پر کن
     for (let g = 0; g < effects.length; g++) {
         const fx = effects[g];
         if (!fx.enabled) continue;
@@ -1690,8 +1720,11 @@ function updateSeasonalParticles(dt) {
             if (seasonalParticles[i].group === g) count++;
         }
         
+        // اگه به هر دلیلی کم بود، پر کن
         const needed = fx.maxCount - count;
-        for (let i = 0; i < needed; i++) spawnSeasonalParticle(false, g);
+        for (let i = 0; i < needed; i++) {
+            spawnSeasonalParticle(false, g);
+        }
     }
 }
 
@@ -5647,7 +5680,11 @@ setInterval(() => {
 
 setTimeout(() => {
     checkAndAnnounceSeason();
-}, 1500);
+}, 1500); 
+
+setInterval(() => {
+    if (playing) refreshSeason();
+}, 60000);
 
 window.addEventListener('beforeunload', function() {
     if (_rafId) cancelAnimationFrame(_rafId);
@@ -5659,4 +5696,4 @@ window.addEventListener('beforeunload', function() {
 // ============================================================
 </script>
 </body>
-                </html>
+            </html>
