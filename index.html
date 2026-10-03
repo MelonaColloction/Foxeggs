@@ -1638,9 +1638,7 @@ function spawnSeasonalParticle(isInitial, groupIndex) {
 
 function updateSeasonalParticles(dt) {
     const effects = getSeasonalEffect();
-    const anyEnabled = effects.some(e => e.enabled);
-    
-    if (!anyEnabled) {
+    if (!effects.some(e => e.enabled)) {
         if (seasonalParticles.length > 0) seasonalParticles.length = 0;
         return;
     }
@@ -1650,10 +1648,7 @@ function updateSeasonalParticles(dt) {
     for (let i = seasonalParticles.length - 1; i >= 0; i--) {
         const p = seasonalParticles[i];
         const fx = effects[p.group] || effects[0];
-        if (!fx || !fx.enabled) {
-            seasonalParticles.splice(i, 1);
-            continue;
-        }
+        if (!fx || !fx.enabled) { seasonalParticles.splice(i, 1); continue; }
 
         p.x += p.vx * dt;
         p.y += p.vy * dt;
@@ -1662,21 +1657,28 @@ function updateSeasonalParticles(dt) {
             p.x += Math.sin(t * p.swaySpeed + p.swayOffset) * fx.swayAmount * dt * 30;
         }
         if (fx.rotation) p.rotation += p.rotationSpeed * dt;
-
         if (fx.flyHorizontal) {
             p.vx += Math.sin(t * 2 + p.swayOffset) * 20 * dt;
-            // محدود کردن سرعت
             if (p.vx < fx.speedXRange[1]) p.vx = fx.speedXRange[1];
             if (p.vx > fx.speedXRange[0]) p.vx = fx.speedXRange[0];
         }
 
-        const outOfBounds = fx.rise 
-            ? (p.y < -50 || p.x < -30) 
-            : (p.y > H + 20 || p.x < -30);
+        // 🔄 Wrap با fade — ذره آروم محو میشه و از طرف دیگه ظاهر میشه
+        // اگه خیلی از صفحه خارج شد، به طرف مقابل منتقل کن
+        if (p.x < -100) p.x = W + 100;
+        if (p.x > W + 100) p.x = -100;
+        if (p.y < -100) p.y = H + 100;
+        if (p.y > H + 100) p.y = -100;
+
+        // محاسبه opacity بر اساس فاصله از لبه
+        let edgeOpacity = 1;
+        const edgeDist = 60;
+        if (p.x < edgeDist) edgeOpacity = Math.min(edgeOpacity, p.x / edgeDist);
+        if (p.x > W - edgeDist) edgeOpacity = Math.min(edgeOpacity, (W - p.x) / edgeDist);
+        if (p.y < edgeDist) edgeOpacity = Math.min(edgeOpacity, p.y / edgeDist);
+        if (p.y > H - edgeDist) edgeOpacity = Math.min(edgeOpacity, (H - p.y) / edgeDist);
         
-        if (outOfBounds) {
-            seasonalParticles.splice(i, 1);
-        }
+        p.edgeOpacity = Math.max(0, edgeOpacity);
     }
 
     for (let g = 0; g < effects.length; g++) {
@@ -1850,7 +1852,7 @@ function drawSeasonalParticles() {
             const pulse = 0.5 + Math.sin(t * 6 + p.swayOffset) * 0.5;
             ctx.globalAlpha = 0.5 + pulse * 0.4;
         } else {
-            ctx.globalAlpha = 0.7;
+            ctx.globalAlpha = p.edgeOpacity !== undefined ? p.edgeOpacity : 1.0;
         }
 
         ctx.fillStyle = p.color;
@@ -5657,4 +5659,4 @@ window.addEventListener('beforeunload', function() {
 // ============================================================
 </script>
 </body>
-                                             </html>
+                </html>
