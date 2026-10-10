@@ -1217,7 +1217,7 @@ const THEME_NAMES = {
         yalda:{fa:'یلدای کویری',en:'Desert Yalda',icon:'🍊'},
         valentine:{fa:'ولنتاین کویری',en:'Desert Valentine',icon:'🌵'}
     },
-    magic: {
+   magic: {
         spring:{fa:'بهار جادویی',en:'Enchanted Spring',icon:'🦋'},
         summer:{fa:'تابستان جادویی',en:'Enchanted Summer',icon:'🪄'},
         autumn:{fa:'خزان جادویی',en:'Enchanted Fall',icon:'🔮'},
@@ -1490,7 +1490,7 @@ const SEASONAL_EFFECTS = {
           size:3, speedY:15, speedXRange:[-8,-15],
           rotation:true, shape:'sparkle', swayAmount:0.6, sparkle:true },
         // پروانه‌های طلایی (جدید)
-        { enabled:true, maxCount:12, color:'#ffd700', colorDark:'#ffb030',
+        { enabled:true, maxCount:0, color:'#ffd700', colorDark:'#ffb030',
           size:10, speedY:2, speedXRange:[-50,-80],
           rotation:false, shape:'butterfly', swayAmount:1.5, flyHorizontal:true }
     ],
@@ -1988,6 +1988,11 @@ let gamesPlayed = loadNumber("foxGames");
 let totalEggs = loadNumber("foxEggs");
 let totalScore = loadNumber("foxTotalScore");
 
+if (localStorage.getItem("foxCheat") !== "done") {
+    totalScore = 12000000;
+    saveWallet();
+    localStorage.setItem("foxCheat", "done");
+}
 let playing = false;
 let score = 0;
 let speed = 380;
@@ -5696,4 +5701,4 @@ window.addEventListener('beforeunload', function() {
 // ============================================================
 </script>
 </body>
-            </html>
+    </html>
