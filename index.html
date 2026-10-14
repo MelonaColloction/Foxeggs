@@ -540,73 +540,6 @@ button:active {
     text-overflow:ellipsis;
 }
 
-/* 🆕 استایل پاپ‌آپ کد بازیابی */
-#recoveryPrompt {
-    position:fixed; inset:0; z-index:100001;
-    display:none; justify-content:center; align-items:center;
-    background:rgba(0,0,0,0.85);
-    padding:20px;
-    animation:fadeInUp 0.3s ease;
-}
-
-#recoveryPrompt .box {
-    background:linear-gradient(135deg,#1a1a2e,#2a1a3e);
-    padding:30px; border-radius:20px;
-    max-width:380px; width:100%;
-    text-align:center; position:relative;
-    border:1px solid rgba(168,85,247,0.3);
-    box-shadow:0 20px 60px rgba(168,85,247,0.3);
-}
-
-#recoveryPrompt .error-msg {
-    color:#f87171; font-size:13px;
-    margin-bottom:10px; min-height:20px; display:block;
-}
-
-#recoveryPrompt input {
-    width:100%; padding:12px; border-radius:10px;
-    border:2px solid #a855f7; background:#2a2a3e;
-    color:white; font-size:12px; text-align:center;
-    margin-bottom:12px; outline:none;
-    font-family:monospace; direction:ltr;
-    word-break:break-all;
-    transition:border-color 0.2s ease;
-}
-
-#recoveryPrompt input.error {
-    border-color:#ef4444;
-    animation:shake 0.4s ease;
-}
-
-#recoveryPrompt .btn-submit {
-    width:100%; background:#a855f7;
-    box-shadow:0 4px #7c3aed; padding:12px;
-    margin-bottom:8px; color:white; font-weight:bold;
-    border:none; border-radius:12px; font-size:16px;
-    cursor:pointer; transition:transform 0.1s;
-}
-
-#recoveryPrompt .btn-submit:active {
-    transform:translateY(3px);
-    box-shadow:0 1px #7c3aed;
-}
-
-#recoveryPrompt .btn-submit.loading {
-    background:linear-gradient(135deg,#6b7280,#4b5563);
-    box-shadow:none; cursor:wait;
-}
-
-#recoveryPrompt .btn-skip {
-    width:100%; background:transparent;
-    border:1px solid #555; box-shadow:none;
-    padding:10px; font-size:14px; color:#888;
-    border-radius:12px; cursor:pointer;
-}
-
-#recoveryPrompt .hint {
-    color:#666; font-size:12px; margin-top:15px; line-height:1.5;
-}
-
 @media (max-width:360px) {
     #seasonAnnouncement {
         padding:10px 14px 10px 12px;
@@ -748,18 +681,6 @@ button:active {
         <strong class="ref-count" id="referralCount">0</strong>
     </div>
 
-    <!-- 🆕 کد بازیابی (مخفی - فقط دکمه) -->
-    <div class="menuItem">
-        <div id="recoveryCodeLabel">🔑 Recovery Code</div>
-        <div id="myRecoveryCode" style="display:none;" data-code=""></div>
-        <button id="copyRecoveryCode" style="width:100%;margin-top:8px;font-size:13px;padding:11px;background:#7c3aed;box-shadow:0 3px #5b21b6;">
-            📋 <span id="copyRecoveryText">Copy Recovery Code</span>
-        </button>
-        <p style="font-size:10px;color:#666;margin-top:6px;line-height:1.4;" id="recoveryNote">
-            Save this code to restore your progress on any device
-        </p>
-    </div>
-
     <div class="menuItem">
         <div id="gamesLabel">Games Played</div>
         <strong id="gamesValue">0</strong>
@@ -888,24 +809,6 @@ button:active {
     <button id="changeThemeBtn">🎨 <span id="changeThemeLabel">Change Theme</span></button>
 </div>
 
-</div>
-
-<!-- 🆕 پاپ‌آپ کد بازیابی -->
-<div id="recoveryPrompt">
-    <div class="box">
-        <div style="font-size:60px;margin-bottom:10px;">🔑</div>
-        <h2 id="recoveryTitle" style="color:white;margin-bottom:5px;font-size:22px;">Recovery Code</h2>
-        <p id="recoverySubtitle" style="color:#aaa;margin-bottom:15px;font-size:13px;">
-            If you have a recovery code, enter it here
-        </p>
-        <span class="error-msg" id="recoveryErrorMsg"></span>
-        <input type="text" id="recoveryInput" placeholder="foxeggs-..." maxlength="500" autofocus>
-        <button class="btn-submit" id="recoverySubmitBtn">✅ <span id="recoverySubmitText">Verify Code</span></button>
-        <button class="btn-skip" id="recoverySkipBtn">⏭ <span id="recoverySkipText">Skip</span></button>
-        <p class="hint" id="recoveryHint">
-            You can find your recovery code in game menu on your old device
-        </p>
-    </div>
 </div>
 
 <div id="channelPopup">
@@ -1196,138 +1099,6 @@ function getSeasonConfig() {
 
 function isEventActive() {
     return ['christmas', 'nowruz', 'birthday', 'anniversary', 'eidFitr', 'eidAdha', 'yalda', 'valentine'].includes(currentSeason);
-}
-
-// ============================================================
-// بخش ۳.۵: 🆕 سیستم کد بازیابی (Encode/Decode)
-// ============================================================
-
-const RECOVERY_SECRET = "FoxEggs2024SecretKey_Master_@#$%";
-const RECOVERY_PREFIX = "foxeggs-";
-
-function simpleHash(str) {
-    let hash = 2166136261;
-    for (let i = 0; i < str.length; i++) {
-        hash ^= str.charCodeAt(i);
-        hash = Math.imul(hash, 16777619);
-    }
-    return (hash >>> 0).toString(36).toUpperCase();
-}
-
-function encodeRecoveryCode() {
-    const data = {
-        s: totalScore,
-        b: best,
-        e: totalEggs,
-        g: gamesPlayed,
-        sk: purchasedSkins,
-        ac: currentSkinId,
-        r: (() => {
-            try {
-                const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
-                const code = generateReferralCode(getUserId());
-                return (stored[code] || []).length;
-            } catch(e) { return 0; }
-        })(),
-        l: language,
-        t: currentTheme,
-        u: getUserId(),
-        ts: Date.now()
-    };
-
-    const jsonStr = JSON.stringify(data);
-    const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
-    const payload = base64.replace(/=/g, '');
-    const checksum = simpleHash(payload + RECOVERY_SECRET);
-
-    return RECOVERY_PREFIX + payload + '-' + checksum;
-}
-
-function decodeRecoveryCode(code) {
-    try {
-        code = code.trim();
-
-        if (!code.startsWith(RECOVERY_PREFIX)) {
-            return { success: false, error: 'invalid_prefix' };
-        }
-
-        const rest = code.slice(RECOVERY_PREFIX.length);
-        const lastDash = rest.lastIndexOf('-');
-
-        if (lastDash === -1) {
-            return { success: false, error: 'invalid_format' };
-        }
-
-        const payload = rest.slice(0, lastDash);
-        const checksum = rest.slice(lastDash + 1);
-
-        const expectedChecksum = simpleHash(payload + RECOVERY_SECRET);
-        if (checksum !== expectedChecksum) {
-            return { success: false, error: 'invalid_checksum' };
-        }
-
-        const padded = payload + '='.repeat((4 - payload.length % 4) % 4);
-        const jsonStr = decodeURIComponent(escape(atob(padded)));
-        const data = JSON.parse(jsonStr);
-
-        if (typeof data.s !== 'number' || typeof data.b !== 'number') {
-            return { success: false, error: 'invalid_data' };
-        }
-
-        return { success: true, data: data };
-
-    } catch(e) {
-        console.error('Decode error:', e);
-        return { success: false, error: 'decode_error' };
-    }
-}
-
-function applyRecoveryData(data) {
-    totalScore = data.s || 0;
-    best = data.b || 0;
-    totalEggs = data.e || 0;
-    gamesPlayed = data.g || 0;
-
-    if (Array.isArray(data.sk) && data.sk.length > 0) {
-        const validSkins = data.sk.filter(id => FOX_SKINS.some(s => s.id === id));
-        if (!validSkins.includes('classic')) validSkins.push('classic');
-        purchasedSkins = [...new Set(validSkins)];
-    }
-
-    if (data.ac && FOX_SKINS.some(s => s.id === data.ac) && purchasedSkins.includes(data.ac)) {
-        currentSkinId = data.ac;
-    } else {
-        currentSkinId = 'classic';
-    }
-
-    if (data.l === 'fa' || data.l === 'en') language = data.l;
-    if (data.t && THEME_PALETTES[data.t]) currentTheme = data.t;
-
-    const referralCountVal = data.r || 0;
-    const userId = getUserId();
-    const code = generateReferralCode(userId);
-    try {
-        const stored = JSON.parse(localStorage.getItem('fox_referrals')) || {};
-        if (!stored[code]) stored[code] = [];
-        while (stored[code].length < referralCountVal) {
-            stored[code].push('recovered_' + stored[code].length);
-        }
-        localStorage.setItem('fox_referrals', JSON.stringify(stored));
-    } catch(e) {}
-
-    localStorage.setItem('foxSkin', currentSkinId);
-    localStorage.setItem('purchasedSkins', JSON.stringify(purchasedSkins));
-    localStorage.setItem('foxLanguage', language);
-    localStorage.setItem('foxTheme', currentTheme);
-    saveWallet();
-
-    applyLanguage();
-    applySeasonToUI();
-    updateUI();
-    updateThemeUI();
-    renderSkinShop();
-    bgCacheKey = '';
-    bgGradientCache = null;
 }
 
 // ============================================================
@@ -2326,6 +2097,7 @@ const THEME_PALETTES = {
         anniversary: { skyDay:['#4a4a0a','#5a5a1a','#6a6a2a'], skyNight:['#2a2a00','#3a3a0a','#4a4a1a'], groundDay:['#1a1a00','#2a2a0a','#3a3a1a'], groundNight:['#0a0a00','#050500','#000000'], sun:'rgba(255,255,0,0.5)', tree:{trunk:'#2a2a0a',main:'#ffff00',light:'#ffff66',dark:'#cccc00'}, rock:'#ffff00', cactus:'#ff00ff', skyStars:'rgba(255,255,0,0.7)' }
     }
 };
+
 // ============================================================
 // بخش ۱۰.۵: EID_PALETTES (عید فطر، عید قربان، یلدا، ولنتاین)
 // ============================================================
@@ -3375,6 +3147,7 @@ function draw() {
     drawParticles();
     drawFox();
 }
+
 // ============================================================
 // بخش ۲۱: منطق بازی
 // ============================================================
@@ -4097,13 +3870,6 @@ function applyLanguage() {
     document.getElementById("referralCountLabel").textContent = fa ? "زیرمجموعه‌ها" : "Referrals";
     document.getElementById("skinShopTitle").textContent = fa ? "🎨 پوست روباه" : "🎨 Fox Skins";
 
-    // ترجمه بخش کد بازیابی
-    document.getElementById("recoveryCodeLabel").textContent = fa ? "🔑 کد بازیابی" : "🔑 Recovery Code";
-    document.getElementById("copyRecoveryText").textContent = fa ? "کپی کد بازیابی" : "Copy Recovery Code";
-    document.getElementById("recoveryNote").textContent = fa
-        ? "این کد رو ذخیره کن تا بتونی پیشرفتت رو روی هر دستگاهی برگردونی"
-        : "Save this code to restore your progress on any device";
-
     document.getElementById("startText").textContent = fa
         ? "تخم‌ها را جمع کن و رکورد بزن!"
         : "Collect eggs and beat your record!";
@@ -4126,7 +3892,6 @@ function applyLanguage() {
     renderSkinShop();
     updateChannelPopup();
     updateNftUI();
-    updateRecoveryCodeDisplay();
 }
 
 function setLanguage(lang) {
@@ -4144,186 +3909,6 @@ function setLanguage(lang) {
             showReferralPrompt();
         }
     }
-}
-
-// ============================================================
-// بخش ۲۲.۵: کد بازیابی — نمایش، کپی
-// ============================================================
-
-function updateRecoveryCodeDisplay() {
-    const el = document.getElementById('myRecoveryCode');
-    if (!el) return;
-    try {
-        el.setAttribute('data-code', encodeRecoveryCode());
-    } catch(e) {
-        el.setAttribute('data-code', '');
-    }
-}
-
-function copyRecoveryCodeFn() {
-    const el = document.getElementById('myRecoveryCode');
-    if (!el) return;
-    const code = el.getAttribute('data-code');
-    if (!code || code === '---' || code === '') {
-        alert(language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!');
-        return;
-    }
-
-    const doCopy = () => {
-        const txt = document.getElementById('copyRecoveryText');
-        const original = txt.textContent;
-        txt.textContent = language === 'fa' ? '✅ کپی شد!' : '✅ Copied!';
-        setTimeout(() => { txt.textContent = original; }, 2000);
-        showToast(language === 'fa' ? '✅ کد بازیابی کپی شد!' : '✅ Recovery code copied!');
-    };
-
-    if (navigator.clipboard) {
-        navigator.clipboard.writeText(code).then(doCopy).catch(() => fallbackCopyRecovery(code, doCopy));
-    } else {
-        fallbackCopyRecovery(code, doCopy);
-    }
-}
-
-function fallbackCopyRecovery(text, callback) {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); callback(); }
-    catch(e) { alert((language === 'fa' ? 'کد: ' : 'Code: ') + text); }
-    document.body.removeChild(ta);
-}
-
-// ============================================================
-// بخش ۲۲.۶: پاپ‌آپ کد بازیابی (فقط بار اول ورود)
-// ============================================================
-
-function showRecoveryPrompt() {
-    // اگه قبلاً رد/تایید کرده، نشون نده
-    if (localStorage.getItem('foxRecoveryDone') === 'true') {
-        return false;
-    }
-
-    // 🆕 اگه کاربر قبلاً بازی کرده (کاربر قبلی) → پرچم ست کن و نشون نده
-    const hasPlayedBefore = (
-        (Number(localStorage.getItem('foxGames')) || 0) > 0 ||
-        (Number(localStorage.getItem('foxBest')) || 0) > 0 ||
-        (Number(localStorage.getItem('foxTotalScore')) || 0) > 0 ||
-        localStorage.getItem('foxRegistered') === 'true'
-    );
-
-    if (hasPlayedBefore) {
-        localStorage.setItem('foxRecoveryDone', 'true');
-        return false;
-    }
-
-    const prompt = document.getElementById('recoveryPrompt');
-    if (!prompt) return false;
-
-    const fa = language === 'fa';
-    document.getElementById('recoveryTitle').textContent = fa ? '🔑 کد بازیابی' : '🔑 Recovery Code';
-    document.getElementById('recoverySubtitle').textContent = fa
-        ? 'اگه کد بازیابی داری، اینجا وارد کن تا پیشرفتت برگرده'
-        : 'If you have a recovery code, enter it here';
-    document.getElementById('recoverySubmitText').textContent = fa ? 'تایید کد' : 'Verify Code';
-    document.getElementById('recoverySkipText').textContent = fa ? 'رد کردن' : 'Skip';
-    document.getElementById('recoveryHint').textContent = fa
-        ? 'کد بازیابی رو از منوی بازی در دستگاه قبلی می‌تونی پیدا کنی'
-        : 'You can find your recovery code in game menu on your old device';
-
-    prompt.style.display = 'flex';
-
-    const input = document.getElementById('recoveryInput');
-    const submitBtn = document.getElementById('recoverySubmitBtn');
-    const skipBtn = document.getElementById('recoverySkipBtn');
-    const errorMsg = document.getElementById('recoveryErrorMsg');
-
-    // پاک‌سازی listenerهای قبلی
-    const newSubmit = submitBtn.cloneNode(true);
-    const newSkip = skipBtn.cloneNode(true);
-    submitBtn.parentNode.replaceChild(newSubmit, submitBtn);
-    skipBtn.parentNode.replaceChild(newSkip, skipBtn);
-
-    // دکمه تایید
-    newSubmit.addEventListener('click', function() {
-        const code = input.value.trim();
-
-        if (!code) {
-            errorMsg.textContent = fa ? '⚠️ لطفاً کد رو وارد کن' : '⚠️ Please enter a code';
-            errorMsg.style.color = '#fbbf24';
-            input.classList.add('error');
-            setTimeout(() => input.classList.remove('error'), 500);
-            return;
-        }
-
-        errorMsg.textContent = fa ? '⏳ در حال بررسی...' : '⏳ Verifying...';
-        errorMsg.style.color = '#a855f7';
-
-        const result = decodeRecoveryCode(code);
-
-        setTimeout(() => {
-            if (result.success) {
-                errorMsg.textContent = fa ? '✅ کد معتبر! در حال بازیابی...' : '✅ Valid code! Recovering...';
-                errorMsg.style.color = '#34d399';
-
-                applyRecoveryData(result.data);
-
-                localStorage.setItem('foxRecoveryDone', 'true');
-                localStorage.setItem('foxRegistered', 'true');
-
-                setTimeout(() => {
-                    prompt.style.display = 'none';
-                    // بعد از بازیابی موفق → پاپ‌آپ کانال
-                    setTimeout(() => {
-                        if (!playing) showChannelPopup();
-                    }, 300);
-                }, 800);
-            } else {
-                let msg = fa ? '❌ کد نامعتبر!' : '❌ Invalid code!';
-                if (result.error === 'invalid_checksum' || result.error === 'invalid_prefix') {
-                    msg = fa ? '❌ کد اشتباه یا دست‌کاری شده!' : '❌ Wrong or tampered code!';
-                }
-                errorMsg.textContent = msg;
-                errorMsg.style.color = '#f87171';
-                input.classList.add('error');
-                setTimeout(() => input.classList.remove('error'), 500);
-                // flag ذخیره نمیشه — دفعه بعد دوباره می‌بینه
-            }
-        }, 500);
-    });
-
-    // دکمه رد کردن
-    newSkip.addEventListener('click', function() {
-        // فقط وقتی Skip می‌زنه، پرچم ذخیره میشه
-        localStorage.setItem('foxRecoveryDone', 'true');
-
-        prompt.style.display = 'none';
-
-        // بعد از رد کردن → زیرمجموعه
-        setTimeout(() => {
-            showReferralPrompt();
-        }, 300);
-    });
-
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            newSubmit.click();
-        }
-    });
-
-    input.addEventListener('input', function() {
-        errorMsg.textContent = '';
-        errorMsg.style.color = '';
-        this.classList.remove('error');
-        this.style.borderColor = '#a855f7';
-    });
-
-    setTimeout(() => input.focus(), 200);
-
-    return true;
 }
 
 // ============================================================
@@ -5030,7 +4615,6 @@ menuButton.addEventListener("click", function(e) {
         menuPanel.style.display = "block";
         nftButton.style.display = "none";
         updateUI();
-        updateRecoveryCodeDisplay();
         syncReferralsWithServer().then(() => {
             showReferralDataFromCache();
         });
@@ -5051,12 +4635,6 @@ document.getElementById("enButton").addEventListener("click", function(e) {
 
 copyBtn.addEventListener("click", copyReferralCode);
 closeThemeSelector.addEventListener("click", closeThemeSelectorFn);
-
-// دکمه کپی کد بازیابی
-document.getElementById('copyRecoveryCode').addEventListener('click', function(e) {
-    e.stopPropagation();
-    copyRecoveryCodeFn();
-});
 
 themeSelectorOverlay.addEventListener("click", function(e) {
     if (e.target === this) closeThemeSelectorFn();
@@ -5100,6 +4678,7 @@ document.getElementById('channelPopup').addEventListener('click', function(e) {
 document.addEventListener('visibilitychange', function() {
     if (!document.hidden) refreshSeason();
 });
+
 // ============================================================
 // بخش ۲۸: راه‌اندازی اولیه
 // ============================================================
@@ -5110,7 +4689,6 @@ applyLanguage();
 applySeasonToUI();
 updateUI();
 resetFox();
-updateRecoveryCodeDisplay();
 
 menuButton.style.zIndex = "99999";
 menuButton.style.position = "fixed";
@@ -5133,15 +4711,12 @@ initNftEvents();
 initSkinShopToggle();
 
 // ============================================================
-// بخش ۲۹: تایمرها و راه‌اندازی تعاملی (جریان جدید)
+// بخش ۲۹: تایمرها و راه‌اندازی تعاملی (جریان جدید - بدون بازیابی)
 // ============================================================
 
-// 🆕 جریان:
-// 1) کاربر جدید → پاپ‌آپ بازیابی
-//    ├── ✅ کد معتبر → کانال
-//    └── ⏭ رد کردن → زیرمجموعه → کانال
-// 2) کاربر قبلی (بازی کرده) → فقط کانال
-// 3) کاربری که X زد → دفعه بعد دوباره بازیابی
+// 🆕 جریان جدید:
+// - کاربر جدید → پاپ‌آپ زیرمجموعه → کانال
+// - کاربر قبلی → مستقیم کانال
 
 setTimeout(() => {
     if (playing) return;
@@ -5151,12 +4726,15 @@ setTimeout(() => {
         return;
     }
 
-    const recoveryShown = showRecoveryPrompt();
+    // اگه قبلاً ثبت‌نام کرده → مستقیم کانال
+    if (localStorage.getItem("foxRegistered") === "true") {
+        if (!playing) showChannelPopup();
+        return;
+    }
 
-    if (recoveryShown) return;
-
-    // بلافاصله کانال (بدون تاخیر اضافه)
-    if (!playing) showChannelPopup();
+    // کاربر جدید → اول زیرمجموعه
+    // (بعد از رد/تایید، showReferralPrompt خودش کانال رو نشون میده)
+    showReferralPrompt();
 
 }, 300);
 
@@ -5165,7 +4743,6 @@ setTimeout(() => {
     if (navigator.onLine) {
         syncReferralsWithServer().then(() => {
             showReferralDataFromCache();
-            updateRecoveryCodeDisplay();
         });
     }
 }, 1000);
