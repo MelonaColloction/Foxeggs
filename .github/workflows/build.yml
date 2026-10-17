@@ -81,68 +81,59 @@ jobs:
 
 
       # ==========================================
-      # INJECT REAL WEBSOCKET BRIDGE (OFFLINE FIX)
+      # INJECT WEBSOCKET BRIDGE (OFFLINE FIX)
       # ==========================================
-      # این بخش به جای شبیه‌ساز، پلاگین بومی واقعی را 
-      # به کدهای بازی متصل می‌کند تا اتصال آفلاین کار کند
-      - name: Inject Real WebSocket Bridge
+      # این بخش به جای شبیه‌ساز، پل ارتباطی بین 
+      # جاوااسکریپت و سرور بومی جاوا را ایجاد می‌کند
+      - name: Inject WebSocket Bridge
         run: |
           python3 - <<'PY'
           path = "www/index.html"
           with open(path, "r", encoding="utf-8") as f:
               content = f.read()
 
-          # کد پل ارتباطی برای استفاده از پلاگین بومی
           ws_script = """
           <script>
-          // پل ارتباطی برای سرور وب‌سوکت بومی Capacitor
+          // پل ارتباطی با سرور بومی جاوا (LocalWebSocketServer.java)
           window.WebSocketServer = function() {
-              this.server = null;
-
               this.start = function(port, onSuccess, onError) {
-                  if (!window.cordova || !window.cordova.plugins || !window.cordova.plugins.wsserver) {
-                      if (onError) onError("Native WebSocket plugin not found.");
-                      return;
-                  }
-
-                  window.cordova.plugins.wsserver.start(port, {}).subscribe(
-                      function(serverInfo) {
-                          console.log('WebSocket Server started on: ' + serverInfo.addr + ':' + serverInfo.port);
+                  if (window.AndroidWebSocketServer) {
+                      try {
+                          window.AndroidWebSocketServer.startServer(port);
                           if (onSuccess) onSuccess();
-                      },
-                      function(error) {
-                          console.error('WebSocket Server error: ', error);
-                          if (onError) onError(error);
+                      } catch(e) {
+                          if (onError) onError(e.toString());
                       }
-                  );
-
-                  // گوش دادن به پیام‌های دریافتی از حریف
-                  window.cordova.plugins.wsserver.watchMessage().subscribe(function(result) {
-                      if (window.handleNetworkData) {
-                          try {
-                              const data = JSON.parse(result.msg);
-                              window.handleNetworkData(data);
-                          } catch(e) { console.warn('Invalid message', e); }
-                      }
-                  });
+                  } else {
+                      if (onError) onError("Native WebSocket Server not available");
+                  }
               };
 
               this.send = function(data) {
-                  if (!window.cordova || !window.cordova.plugins || !window.cordova.plugins.wsserver) return;
-                  window.cordova.plugins.wsserver.watchOpen().subscribe(function(conn) {
-                       window.cordova.plugins.wsserver.send({ uuid: conn.uuid }, data);
-                  });
+                  if (window.AndroidWebSocketServer) {
+                      window.AndroidWebSocketServer.broadcastMessage(data);
+                  }
               };
+          };
+
+          // این تابع توسط کد جاوا فراخوانی می‌شود
+          window.onNativeMessage = function(msg) {
+              if (window.handleNetworkData) {
+                  try {
+                      const data = JSON.parse(msg);
+                      window.handleNetworkData(data);
+                  } catch(e) { console.warn('Invalid JSON', e); }
+              }
           };
           </script>
           """
 
-          if "<script>\n// پل ارتباطی برای سرور وب‌سوکت بومی" not in content:
+          if "<script>\n// پل ارتباطی با سرور بومی جاوا" not in content:
               content = content.replace("</body>", ws_script + "\n</body>")
+              print("WebSocket bridge injected.")
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(content)
-          print("Real WebSocket bridge injected.")
           PY
 
 
@@ -158,16 +149,10 @@ jobs:
             "private": true,
             "dependencies": {
               "@capacitor/core": "^7.4.0",
-              "@capacitor/android": "^7.4.0",
-              "cordova-plugin-websocket-server": "^1.0.0"
+              "@capacitor/android": "^7.4.0"
             },
             "devDependencies": {
               "@capacitor/cli": "^7.4.0"
-            },
-            "cordova": {
-              "plugins": {
-                "cordova-plugin-websocket-server": {}
-              }
             }
           }
           EOF
@@ -190,12 +175,7 @@ jobs:
           {
             "appId": "com.foxeggs.game",
             "appName": "Fox Eggs",
-            "webDir": "www",
-            "plugins": {
-              "WebSocketServer": {
-                "enabled": true
-              }
-            }
+            "webDir": "www"
           }
           EOF
 
@@ -280,9 +260,127 @@ jobs:
 
 
       # ==========================================
-      # ENABLE IMMERSIVE FULLSCREEN
+      # ADD JAVA-WEBSOCKET LIBRARY
       # ==========================================
-      - name: Enable Fullscreen
+      # این کتابخانه سرور وب‌سوکت واقعی را در اندروید فراهم می‌کند
+      - name: Add Java-WebSocket Dependency
+        run: |
+          python3 - <<'PY'
+          path = "android/app/build.gradle"
+          with open(path, "r", encoding="utf-8") as f:
+              text = f.read()
+
+          if "org.java-websocket:Java-WebSocket" not in text:
+              # اضافه کردن به بخش dependencies
+              text = re.sub(
+                  r'(dependencies\s*\{)',
+                  r'\1\n    implementation "org.java-websocket:Java-WebSocket:1.5.6"',
+                  text,
+                  count=1
+              )
+              with open(path, "w", encoding="utf-8") as f:
+                  f.write(text)
+              print("Java-WebSocket added to build.gradle.")
+          else:
+              print("Java-WebSocket already exists.")
+          PY
+
+
+      # ==========================================
+      # CREATE LOCAL WEBSOCKET SERVER (JAVA)
+      # ==========================================
+      - name: Create LocalWebSocketServer.java
+        run: |
+          python3 - <<'PY'
+          import os, re
+          # پیدا کردن مسیر پکیج اصلی
+          base = "android/app/src/main/java"
+          pkg_dir = None
+          for root, dirs, files in os.walk(base):
+              if "MainActivity.java" in files:
+                  pkg_dir = root
+                  break
+          if not pkg_dir:
+              raise SystemExit("MainActivity not found")
+
+          # استخراج نام پکیج از فایل MainActivity
+          with open(os.path.join(pkg_dir, "MainActivity.java"), "r", encoding="utf-8") as f:
+              main_content = f.read()
+          package_match = re.search(r'^\s*package\s+([^;]+);', main_content, re.MULTILINE)
+          package_name = package_match.group(1)
+
+          java_code = f'''package {package_name};
+
+          import android.webkit.JavascriptInterface;
+          import org.java_websocket.WebSocket;
+          import org.java_websocket.handshake.ClientHandshake;
+          import org.java_websocket.server.WebSocketServer;
+          import java.net.InetSocketAddress;
+          import java.util.Set;
+          import java.util.HashSet;
+
+          public class LocalWebSocketServer {{
+              private WebSocketServer server = null;
+              private Set<WebSocket> clients = new HashSet<>();
+              private android.webkit.WebView webView;
+
+              public LocalWebSocketServer(android.webkit.WebView webView) {{
+                  this.webView = webView;
+              }}
+
+              @JavascriptInterface
+              public void startServer(int port) {{
+                  if (server != null) return;
+                  try {{
+                      server = new WebSocketServer(new InetSocketAddress(port)) {{
+                          @Override
+                          public void onOpen(WebSocket conn, ClientHandshake handshake) {{
+                              clients.add(conn);
+                          }}
+                          @Override
+                          public void onClose(WebSocket conn, int code, String reason, boolean remote) {{
+                              clients.remove(conn);
+                          }}
+                          @Override
+                          public void onMessage(WebSocket conn, String message) {{
+                              if (webView != null) {{
+                                  final String msg = message.replace("\\\\", "\\\\\\\\").replace("'", "\\\\'");
+                                  webView.post(() -> webView.evaluateJavascript("window.onNativeMessage('" + msg + "');", null));
+                              }}
+                          }}
+                          @Override
+                          public void onError(WebSocket conn, Exception ex) {{ ex.printStackTrace(); }}
+                          @Override
+                          public void onStart() {{ }}
+                      }};
+                      server.start();
+                  }} catch (Exception e) {{
+                      e.printStackTrace();
+                  }}
+              }}
+
+              @JavascriptInterface
+              public void broadcastMessage(String message) {{
+                  for (WebSocket client : clients) {{
+                      if (client.isOpen()) {{
+                          client.send(message);
+                      }}
+                  }}
+              }}
+          }}
+          '''
+
+          target = os.path.join(pkg_dir, "LocalWebSocketServer.java")
+          with open(target, "w", encoding="utf-8") as f:
+              f.write(java_code)
+          print(f"Created: {target}")
+          PY
+
+
+      # ==========================================
+      # ENABLE IMMERSIVE FULLSCREEN & ATTACH BRIDGE
+      # ==========================================
+      - name: Enable Fullscreen & WebSocket Bridge
         run: |
           python3 - <<'PY'
           import os
@@ -324,17 +422,21 @@ jobs:
           print("Package:", package_name)
 
           # ------------------------------------------
-          # CREATE FULLSCREEN MAIN ACTIVITY
+          # CREATE FULLSCREEN MAIN ACTIVITY WITH WEBSOCKET
           # ------------------------------------------
           fullscreen_activity = f'''package {package_name};
 
           import android.os.Bundle;
           import android.view.View;
           import android.view.WindowManager;
+          import android.webkit.WebView;
 
           import com.getcapacitor.BridgeActivity;
+          import com.getcapacitor.Bridge;
 
           public class MainActivity extends BridgeActivity {{
+
+              private LocalWebSocketServer wsServer;
 
               @Override
               public void onCreate(Bundle savedInstanceState) {{
@@ -353,6 +455,13 @@ jobs:
                       | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                       | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                   );
+
+                  Bridge bridge = getBridge();
+                  if (bridge != null && bridge.getWebView() != null) {{
+                      WebView webView = bridge.getWebView();
+                      wsServer = new LocalWebSocketServer(webView);
+                      webView.addJavascriptInterface(wsServer, "AndroidWebSocketServer");
+                  }}
               }}
           }}
           '''
@@ -360,7 +469,7 @@ jobs:
           with open(main_activity, "w", encoding="utf-8") as f:
               f.write(fullscreen_activity)
 
-          print("Fullscreen MainActivity created successfully.")
+          print("Fullscreen MainActivity with WebSocket created successfully.")
 
           print("==========================================")
           print("FINAL MAIN ACTIVITY")
