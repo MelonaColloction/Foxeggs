@@ -166,11 +166,7 @@ button:active {
 #record {display:none;color:#ffe45e;font-weight:bold;margin-bottom:15px;}
 #stats {margin-top:15px;margin-bottom:20px;font-size:15px;line-height:2;}
 
-/* ============================================
-   استایل‌های اختصاصی بازی دو نفره
-   ============================================ */
 #multiplayerBtn {
-    /* دقیقاً مشابه دکمه تغییر تم (رنگ خاکستری شیشه‌ای) */
     background: rgba(255, 255, 255, 0.12) !important;
     box-shadow: none !important;
     color: white;
@@ -219,6 +215,7 @@ button:active {
     font-size:13px;
     font-weight:bold;
 }
+
 #noInternetOverlay {
     position:fixed; inset:0; z-index:100000;
     display:none; justify-content:center; align-items:center;
@@ -843,6 +840,11 @@ button:active {
             <span id="finalEggs">0</span>
         </div>
     </div>
+    <div id="mpFinalScores" style="display:none;margin-top:15px;padding:12px 20px;background:rgba(255,255,255,0.1);border-radius:12px;font-size:14px;line-height:1.8;">
+        <div style="font-weight:bold;margin-bottom:6px;color:#ffd700;">🌐 نتیجه دو نفره</div>
+        <div>🦊 <span id="mpFinalLabelYou">شما</span>: <span id="mpFinalScoreYou" style="color:#4ade80;font-weight:bold;">0</span></div>
+        <div>🦊 <span id="mpFinalLabelEnemy">حریف</span>: <span id="mpFinalScoreEnemy" style="color:#fbbf24;font-weight:bold;">0</span></div>
+    </div>
     <button id="restart">Play Again</button>
     <button id="changeThemeBtn">🎨 <span id="changeThemeLabel">Change Theme</span></button>
 </div>
@@ -850,7 +852,7 @@ button:active {
 </div>
 
 <!-- ============================================ -->
-<!-- المان‌های اختصاصی بازی دو نفره -->
+<!-- المان‌های بازی دو نفره (فقط آنلاین) -->
 <!-- ============================================ -->
 
 <div id="vsScores" style="display:none; position:fixed; top:65px; left:50%; transform:translateX(-50%); z-index:6; display:flex; gap:14px; background:rgba(0,0,0,0.55); padding:7px 16px; border-radius:24px; color:white; font-size:13px; font-weight:bold;">
@@ -862,23 +864,13 @@ button:active {
     <div style="background:linear-gradient(135deg,#1a1a2e,#2a1a3e); padding:25px 20px; border-radius:24px; width:100%; max-width:360px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 20px 60px rgba(0,0,0,0.6); text-align:center; position:relative;">
         <button id="closeMpModal" style="position:absolute; top:12px; right:16px; background:none; border:none; color:rgba(255,255,255,0.4); font-size:24px; cursor:pointer;">✕</button>
         <h2 style="color:white; font-size:20px; margin-bottom:20px;">بازی دو نفره 🦊🦊</h2>
-        <div style="display:flex; flex-direction:column; gap:12px;">
-            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-                <div style="color:#4ade80; font-size:13px; font-weight:bold; margin-bottom:8px;">🌐 آنلاین (نیاز به اینترنت)</div>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="hostOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#10b981; box-shadow:0 3px #047857; border-radius:8px;">ساخت اتاق</button>
-                    <button onclick="joinOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#3b82f6; box-shadow:0 3px #1d4ed8; border-radius:8px;">اتصال</button>
-                </div>
-            </div>
-            <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-                <div style="color:#fbbf24; font-size:13px; font-weight:bold; margin-bottom:8px;">📶 آفلاین (هات‌اسپات)</div>
-                <div style="display:flex; gap:8px;">
-                    <button onclick="hostOffline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#f59e0b; box-shadow:0 3px #b45309; border-radius:8px;">میزبان</button>
-                    <button onclick="joinOffline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#8b5cf6; box-shadow:0 3px #5b21b6; border-radius:8px;">مهمان</button>
-                </div>
+        <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
+            <div style="color:#4ade80; font-size:13px; font-weight:bold; margin-bottom:8px;">🌐 آنلاین (نیاز به اینترنت)</div>
+            <div style="display:flex; gap:8px;">
+                <button onclick="hostOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#10b981; box-shadow:0 3px #047857; border-radius:8px;">ساخت اتاق</button>
+                <button onclick="joinOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#3b82f6; box-shadow:0 3px #1d4ed8; border-radius:8px;">اتصال</button>
             </div>
         </div>
-        <p style="font-size:11px; color:#666; margin-top:15px; line-height:1.6;">برای بازی آفلاین، گوشی میزبان هات‌اسپات را روشن کند و گوشی دوم به آن متصل شود.</p>
     </div>
 </div>
 
@@ -936,7 +928,7 @@ button:active {
 
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
-  // ============================================================
+// ============================================================
 // بخش ۱: راه‌اندازی Canvas
 // ============================================================
 
@@ -1035,7 +1027,7 @@ function getChannelUrl() {
 }
 
 // ============================================================
-// بخش ۳: سیستم فصل‌ها و Event ها
+// بخش ۳: سیستم فصل‌ها
 // ============================================================
 
 const SEASONS = {
@@ -1102,20 +1094,13 @@ const SEASONS = {
 };
 
 const EID_DATES = {
-    eidFitr: [
-        '2027-03-09', '2028-02-27', '2029-02-15',
-        '2030-02-04', '2031-01-24', '2032-01-13'
-    ],
-    eidAdha: [
-        '2027-05-16', '2028-05-05', '2029-04-24',
-        '2030-04-13', '2031-04-02', '2032-03-22'
-    ]
+    eidFitr: ['2027-03-09','2028-02-27','2029-02-15','2030-02-04','2031-01-24','2032-01-13'],
+    eidAdha: ['2027-05-16','2028-05-05','2029-04-24','2030-04-13','2031-04-02','2032-03-22']
 };
 
 function checkEidEvent() {
     const now = new Date();
     now.setHours(12, 0, 0, 0);
-
     const checkRange = (datesArray, eventName) => {
         for (const dateStr of datesArray) {
             const eidDate = new Date(dateStr + 'T12:00:00');
@@ -1124,14 +1109,7 @@ function checkEidEvent() {
         }
         return null;
     };
-
-    const fitr = checkRange(EID_DATES.eidFitr, 'eidFitr');
-    if (fitr) return fitr;
-
-    const adha = checkRange(EID_DATES.eidAdha, 'eidAdha');
-    if (adha) return adha;
-
-    return null;
+    return checkRange(EID_DATES.eidFitr, 'eidFitr') || checkRange(EID_DATES.eidAdha, 'eidAdha');
 }
 
 let _cachedSeason = null;
@@ -1141,11 +1119,9 @@ function getCurrentSeason() {
     const now = new Date();
     const dateKey = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
     if (_cachedSeasonDate === dateKey && _cachedSeason) return _cachedSeason;
-
     const month = now.getMonth() + 1;
     const day = now.getDate();
     let result;
-
     const eid = checkEidEvent();
     if (eid) result = eid;
     else if (month === 12 && day === 21) result = 'yalda';
@@ -1158,383 +1134,223 @@ function getCurrentSeason() {
     else if ((month === 6 && day >= 21) || month === 7 || month === 8 || (month === 9 && day <= 22)) result = 'summer';
     else if ((month === 9 && day >= 23) || month === 10 || month === 11 || (month === 12 && day <= 20)) result = 'autumn';
     else result = 'winter';
-
     _cachedSeason = result;
     _cachedSeasonDate = dateKey;
     return result;
 }
 
 let currentSeason = getCurrentSeason();
-
-function getSeasonConfig() {
-    return SEASONS[currentSeason];
-}
-
+function getSeasonConfig() { return SEASONS[currentSeason]; }
 function isEventActive() {
-    return ['christmas', 'nowruz', 'birthday', 'anniversary', 'eidFitr', 'eidAdha', 'yalda', 'valentine'].includes(currentSeason);
+    return ['christmas','nowruz','birthday','anniversary','eidFitr','eidAdha','yalda','valentine'].includes(currentSeason);
 }
 
 // ============================================================
-// بخش ۴: آرایه نام تم‌ها
+// بخش ۴: تم‌ها
 // ============================================================
 
-const THEME_IDS = [
-    'classic', 'city', 'beach', 'forest',
-    'space', 'night', 'volcano', 'ocean',
-    'desert', 'magic', 'toon', 'cyberpunk'
-];
-
-// ============================================================
-// بخش ۵: نام‌ها و آیکون‌های تم‌ها
-// ============================================================
+const THEME_IDS = ['classic','city','beach','forest','space','night','volcano','ocean','desert','magic','toon','cyberpunk'];
 
 const THEME_NAMES = {
     classic: {
-        spring:{fa:'بهار',en:'Spring',icon:'🌸'},
-        summer:{fa:'تابستان',en:'Summer',icon:'☀️'},
-        autumn:{fa:'پاییز',en:'Autumn',icon:'🍂'},
-        winter:{fa:'زمستان',en:'Winter',icon:'❄️'},
-        christmas:{fa:'کریسمس',en:'Christmas',icon:'🎄'},
-        nowruz:{fa:'نوروز',en:'Nowruz',icon:'🌷'},
-        birthday:{fa:'تولد سازنده',en:"Developer's Birthday",icon:'🎂'},
-        anniversary:{fa:'سالگرد',en:'Anniversary',icon:'🎉'},
-        eidFitr:{fa:'عید فطر',en:'Eid al-Fitr',icon:'🌙'},
-        eidAdha:{fa:'عید قربان',en:'Eid al-Adha',icon:'🐑'},
-        yalda:{fa:'یلدای کلاسیک',en:'Classic Yalda',icon:'🍉'},
-        valentine:{fa:'ولنتاین کلاسیک',en:'Classic Valentine',icon:'💕'}
+        spring:{fa:'بهار',en:'Spring',icon:'🌸'}, summer:{fa:'تابستان',en:'Summer',icon:'☀️'},
+        autumn:{fa:'پاییز',en:'Autumn',icon:'🍂'}, winter:{fa:'زمستان',en:'Winter',icon:'❄️'},
+        christmas:{fa:'کریسمس',en:'Christmas',icon:'🎄'}, nowruz:{fa:'نوروز',en:'Nowruz',icon:'🌷'},
+        birthday:{fa:'تولد سازنده',en:"Developer's Birthday",icon:'🎂'}, anniversary:{fa:'سالگرد',en:'Anniversary',icon:'🎉'},
+        eidFitr:{fa:'عید فطر',en:'Eid al-Fitr',icon:'🌙'}, eidAdha:{fa:'عید قربان',en:'Eid al-Adha',icon:'🐑'},
+        yalda:{fa:'یلدای کلاسیک',en:'Classic Yalda',icon:'🍉'}, valentine:{fa:'ولنتاین کلاسیک',en:'Classic Valentine',icon:'💕'}
     },
     city: {
-        spring:{fa:'شهر بهاری',en:'Urban Spring',icon:'🏡'},
-        summer:{fa:'شهر تابستانی',en:'Urban Summer',icon:'🏙️'},
-        autumn:{fa:'پاییز شهری',en:'Urban Autumn',icon:'🏢'},
-        winter:{fa:'شهر زمستانی',en:'Urban Winter',icon:'🌃'},
-        christmas:{fa:'شهر کریسمس',en:'Christmas City',icon:'🏘️'},
-        nowruz:{fa:'شهر نوروز',en:'Nowruz City',icon:'🏛️'},
-        birthday:{fa:'تولد سازنده شهری',en:"Developer's City Birthday",icon:'🎁'},
-        anniversary:{fa:'شهر سالگرد',en:'Anniversary City',icon:'🎊'},
-        eidFitr:{fa:'شهر عید فطر',en:'Eid City',icon:'🕌'},
-        eidAdha:{fa:'شهر عید قربان',en:'Adha City',icon:'🏗️'},
-        yalda:{fa:'یلدای شهری',en:'Urban Yalda',icon:'🌉'},
-        valentine:{fa:'ولنتاین شهری',en:'Urban Valentine',icon:'🏩'}
+        spring:{fa:'شهر بهاری',en:'Urban Spring',icon:'🏡'}, summer:{fa:'شهر تابستانی',en:'Urban Summer',icon:'🏙️'},
+        autumn:{fa:'پاییز شهری',en:'Urban Autumn',icon:'🏢'}, winter:{fa:'شهر زمستانی',en:'Urban Winter',icon:'🌃'},
+        christmas:{fa:'شهر کریسمس',en:'Christmas City',icon:'🏘️'}, nowruz:{fa:'شهر نوروز',en:'Nowruz City',icon:'🏛️'},
+        birthday:{fa:'تولد سازنده شهری',en:"Developer's City Birthday",icon:'🎁'}, anniversary:{fa:'شهر سالگرد',en:'Anniversary City',icon:'🎊'},
+        eidFitr:{fa:'شهر عید فطر',en:'Eid City',icon:'🕌'}, eidAdha:{fa:'شهر عید قربان',en:'Adha City',icon:'🏗️'},
+        yalda:{fa:'یلدای شهری',en:'Urban Yalda',icon:'🌉'}, valentine:{fa:'ولنتاین شهری',en:'Urban Valentine',icon:'🏩'}
     },
     beach: {
-        spring:{fa:'ساحل بهاری',en:'Spring Shore',icon:'⛵'},
-        summer:{fa:'ساحل تابستانی',en:'Summer Shore',icon:'🏖️'},
-        autumn:{fa:'ساحل پاییزی',en:'Autumn Shore',icon:'🌅'},
-        winter:{fa:'ساحل زمستانی',en:'Winter Shore',icon:'🏝️'},
-        christmas:{fa:'ساحل کریسمس',en:'Christmas Shore',icon:'🎅'},
-        nowruz:{fa:'ساحل نوروز',en:'Nowruz Shore',icon:'🌊'},
-        birthday:{fa:'تولد ساحلی سازنده',en:"Developer's Shore Birthday",icon:'🎈'},
-        anniversary:{fa:'ساحل سالگرد',en:'Anniversary Shore',icon:'🥂'},
-        eidFitr:{fa:'ساحل عید فطر',en:'Eid Shore',icon:'🌒'},
-        eidAdha:{fa:'ساحل عید قربان',en:'Adha Shore',icon:'🐚'},
-        yalda:{fa:'یلدای ساحلی',en:'Shore Yalda',icon:'🍇'},
-        valentine:{fa:'ولنتاین ساحلی',en:'Shore Valentine',icon:'💘'}
+        spring:{fa:'ساحل بهاری',en:'Spring Shore',icon:'⛵'}, summer:{fa:'ساحل تابستانی',en:'Summer Shore',icon:'🏖️'},
+        autumn:{fa:'ساحل پاییزی',en:'Autumn Shore',icon:'🌅'}, winter:{fa:'ساحل زمستانی',en:'Winter Shore',icon:'🏝️'},
+        christmas:{fa:'ساحل کریسمس',en:'Christmas Shore',icon:'🎅'}, nowruz:{fa:'ساحل نوروز',en:'Nowruz Shore',icon:'🌊'},
+        birthday:{fa:'تولد ساحلی سازنده',en:"Developer's Shore Birthday",icon:'🎈'}, anniversary:{fa:'ساحل سالگرد',en:'Anniversary Shore',icon:'🥂'},
+        eidFitr:{fa:'ساحل عید فطر',en:'Eid Shore',icon:'🌒'}, eidAdha:{fa:'ساحل عید قربان',en:'Adha Shore',icon:'🐚'},
+        yalda:{fa:'یلدای ساحلی',en:'Shore Yalda',icon:'🍇'}, valentine:{fa:'ولنتاین ساحلی',en:'Shore Valentine',icon:'💘'}
     },
     forest: {
-        spring:{fa:'جنگل شکوفا',en:'Blooming Forest',icon:'🌱'},
-        summer:{fa:'جنگل سبز',en:'Green Forest',icon:'🌳'},
-        autumn:{fa:'جنگل خزان',en:'Falling Forest',icon:'🍁'},
-        winter:{fa:'جنگل برفی',en:'Snowy Forest',icon:'🌲'},
-        christmas:{fa:'جنگل کریسمس',en:'Christmas Forest',icon:'🦌'},
-        nowruz:{fa:'جنگل نوروز',en:'Nowruz Forest',icon:'🌿'},
-        birthday:{fa:'تولد جنگلی سازنده',en:"Developer's Forest Birthday",icon:'🍄'},
-        anniversary:{fa:'جنگل سالگرد',en:'Anniversary Forest',icon:'🌺'},
-        eidFitr:{fa:'جنگل عید فطر',en:'Eid Forest',icon:'🌘'},
-        eidAdha:{fa:'جنگل عید قربان',en:'Adha Forest',icon:'🍃'},
-        yalda:{fa:'یلدای جنگلی',en:'Forest Yalda',icon:'🫐'},
-        valentine:{fa:'ولنتاین جنگلی',en:'Forest Valentine',icon:'🌹'}
+        spring:{fa:'جنگل شکوفا',en:'Blooming Forest',icon:'🌱'}, summer:{fa:'جنگل سبز',en:'Green Forest',icon:'🌳'},
+        autumn:{fa:'جنگل خزان',en:'Falling Forest',icon:'🍁'}, winter:{fa:'جنگل برفی',en:'Snowy Forest',icon:'🌲'},
+        christmas:{fa:'جنگل کریسمس',en:'Christmas Forest',icon:'🦌'}, nowruz:{fa:'جنگل نوروز',en:'Nowruz Forest',icon:'🌿'},
+        birthday:{fa:'تولد جنگلی سازنده',en:"Developer's Forest Birthday",icon:'🍄'}, anniversary:{fa:'جنگل سالگرد',en:'Anniversary Forest',icon:'🌺'},
+        eidFitr:{fa:'جنگل عید فطر',en:'Eid Forest',icon:'🌘'}, eidAdha:{fa:'جنگل عید قربان',en:'Adha Forest',icon:'🍃'},
+        yalda:{fa:'یلدای جنگلی',en:'Forest Yalda',icon:'🫐'}, valentine:{fa:'ولنتاین جنگلی',en:'Forest Valentine',icon:'🌹'}
     },
     space: {
-        spring:{fa:'بهار کیهانی',en:'Cosmic Spring',icon:'🪐'},
-        summer:{fa:'تابستان کیهانی',en:'Cosmic Summer',icon:'🌌'},
-        autumn:{fa:'پاییز کیهانی',en:'Cosmic Fall',icon:'☄️'},
-        winter:{fa:'زمستان کیهانی',en:'Cosmic Winter',icon:'🌠'},
-        christmas:{fa:'کریسمس کیهانی',en:'Cosmic Christmas',icon:'🛷'},
-        nowruz:{fa:'نوروز کیهانی',en:'Cosmic Nowruz',icon:'🚀'},
-        birthday:{fa:'تولد کیهانی سازنده',en:"Developer's Cosmic Birthday",icon:'🛸'},
-        anniversary:{fa:'سالگرد کیهانی',en:'Cosmic Anniversary',icon:'🌍'},
-        eidFitr:{fa:'کهکشان عید فطر',en:'Eid Galaxy',icon:'🌗'},
-        eidAdha:{fa:'کهکشان عید قربان',en:'Adha Galaxy',icon:'⭐'},
-        yalda:{fa:'یلدای کیهانی',en:'Cosmic Yalda',icon:'🔭'},
-        valentine:{fa:'ولنتاین کیهانی',en:'Cosmic Valentine',icon:'💫'}
+        spring:{fa:'بهار کیهانی',en:'Cosmic Spring',icon:'🪐'}, summer:{fa:'تابستان کیهانی',en:'Cosmic Summer',icon:'🌌'},
+        autumn:{fa:'پاییز کیهانی',en:'Cosmic Fall',icon:'☄️'}, winter:{fa:'زمستان کیهانی',en:'Cosmic Winter',icon:'🌠'},
+        christmas:{fa:'کریسمس کیهانی',en:'Cosmic Christmas',icon:'🛷'}, nowruz:{fa:'نوروز کیهانی',en:'Cosmic Nowruz',icon:'🚀'},
+        birthday:{fa:'تولد کیهانی سازنده',en:"Developer's Cosmic Birthday",icon:'🛸'}, anniversary:{fa:'سالگرد کیهانی',en:'Cosmic Anniversary',icon:'🌍'},
+        eidFitr:{fa:'کهکشان عید فطر',en:'Eid Galaxy',icon:'🌗'}, eidAdha:{fa:'کهکشان عید قربان',en:'Adha Galaxy',icon:'⭐'},
+        yalda:{fa:'یلدای کیهانی',en:'Cosmic Yalda',icon:'🔭'}, valentine:{fa:'ولنتاین کیهانی',en:'Cosmic Valentine',icon:'💫'}
     },
     night: {
-        spring:{fa:'شب بهاری',en:'Spring Night',icon:'🌙'},
-        summer:{fa:'شب تابستانی',en:'Summer Night',icon:'🌆'},
-        autumn:{fa:'شب پاییزی',en:'Autumn Night',icon:'🌉'},
-        winter:{fa:'شب زمستانی',en:'Winter Night',icon:'🌨️'},
-        christmas:{fa:'شب کریسمس',en:'Christmas Night',icon:'🕯️'},
-        nowruz:{fa:'شب نوروز',en:'Nowruz Night',icon:'🌛'},
-        birthday:{fa:'شب تولد سازنده',en:"Developer's Birthday Night",icon:'🎆'},
-        anniversary:{fa:'شب سالگرد',en:'Anniversary Night',icon:'🍾'},
-        eidFitr:{fa:'شب عید فطر',en:'Eid Night',icon:'🌜'},
-        eidAdha:{fa:'شب عید قربان',en:'Adha Night',icon:'🌙'},
-        yalda:{fa:'شب یلدا',en:'Yalda Night',icon:'🕯️'},
-        valentine:{fa:'شب ولنتاین',en:"Valentine's Night",icon:'🕊️'}
+        spring:{fa:'شب بهاری',en:'Spring Night',icon:'🌙'}, summer:{fa:'شب تابستانی',en:'Summer Night',icon:'🌆'},
+        autumn:{fa:'شب پاییزی',en:'Autumn Night',icon:'🌉'}, winter:{fa:'شب زمستانی',en:'Winter Night',icon:'🌨️'},
+        christmas:{fa:'شب کریسمس',en:'Christmas Night',icon:'🕯️'}, nowruz:{fa:'شب نوروز',en:'Nowruz Night',icon:'🌛'},
+        birthday:{fa:'شب تولد سازنده',en:"Developer's Birthday Night",icon:'🎆'}, anniversary:{fa:'شب سالگرد',en:'Anniversary Night',icon:'🍾'},
+        eidFitr:{fa:'شب عید فطر',en:'Eid Night',icon:'🌜'}, eidAdha:{fa:'شب عید قربان',en:'Adha Night',icon:'🌙'},
+        yalda:{fa:'شب یلدا',en:'Yalda Night',icon:'🕯️'}, valentine:{fa:'شب ولنتاین',en:"Valentine's Night",icon:'🕊️'}
     },
     volcano: {
-        spring:{fa:'بهار آتشفشانی',en:'Ember Spring',icon:'♨️'},
-        summer:{fa:'تابستان آتشفشانی',en:'Ember Summer',icon:'🌋'},
-        autumn:{fa:'پاییز آتشفشانی',en:'Ember Fall',icon:'🔥'},
-        winter:{fa:'زمستان آتشفشانی',en:'Ember Winter',icon:'🗻'},
-        christmas:{fa:'کریسمس آتشفشانی',en:'Ember Christmas',icon:'🧦'},
-        nowruz:{fa:'نوروز آتشفشانی',en:'Ember Nowruz',icon:'🪔'},
-        birthday:{fa:'تولد آتشین سازنده',en:"Developer's Ember Birthday",icon:'💥'},
-        anniversary:{fa:'سالگرد آتشفشانی',en:'Ember Anniversary',icon:'🎇'},
-        eidFitr:{fa:'آتشفشان عید فطر',en:'Eid Volcano',icon:'🌚'},
-        eidAdha:{fa:'آتشفشان عید قربان',en:'Adha Volcano',icon:'🐏'},
-        yalda:{fa:'یلدای آتشین',en:'Ember Yalda',icon:'🍎'},
-        valentine:{fa:'ولنتاین آتشین',en:'Ember Valentine',icon:'❤️‍🔥'}
+        spring:{fa:'بهار آتشفشانی',en:'Ember Spring',icon:'♨️'}, summer:{fa:'تابستان آتشفشانی',en:'Ember Summer',icon:'🌋'},
+        autumn:{fa:'پاییز آتشفشانی',en:'Ember Fall',icon:'🔥'}, winter:{fa:'زمستان آتشفشانی',en:'Ember Winter',icon:'🗻'},
+        christmas:{fa:'کریسمس آتشفشانی',en:'Ember Christmas',icon:'🧦'}, nowruz:{fa:'نوروز آتشفشانی',en:'Ember Nowruz',icon:'🪔'},
+        birthday:{fa:'تولد آتشین سازنده',en:"Developer's Ember Birthday",icon:'💥'}, anniversary:{fa:'سالگرد آتشفشانی',en:'Ember Anniversary',icon:'🎇'},
+        eidFitr:{fa:'آتشفشان عید فطر',en:'Eid Volcano',icon:'🌚'}, eidAdha:{fa:'آتشفشان عید قربان',en:'Adha Volcano',icon:'🐏'},
+        yalda:{fa:'یلدای آتشین',en:'Ember Yalda',icon:'🍎'}, valentine:{fa:'ولنتاین آتشین',en:'Ember Valentine',icon:'❤️‍🔥'}
     },
     ocean: {
-        spring:{fa:'موج بهاری',en:'Spring Tide',icon:'🐚'},
-        summer:{fa:'موج تابستانی',en:'Summer Tide',icon:'🌊'},
-        autumn:{fa:'موج پاییزی',en:'Autumn Tide',icon:'⚓'},
-        winter:{fa:'موج زمستانی',en:'Winter Tide',icon:'🧊'},
-        christmas:{fa:'موج کریسمس',en:'Christmas Tide',icon:'🐧'},
-        nowruz:{fa:'موج نوروز',en:'Nowruz Tide',icon:'🐠'},
-        birthday:{fa:'تولد اقیانوسی سازنده',en:"Developer's Ocean Birthday",icon:'🐬'},
-        anniversary:{fa:'موج سالگرد',en:'Anniversary Tide',icon:'🦞'},
-        eidFitr:{fa:'موج عید فطر',en:'Eid Tide',icon:'🌖'},
-        eidAdha:{fa:'موج عید قربان',en:'Adha Tide',icon:'🦭'},
-        yalda:{fa:'یلدای اقیانوسی',en:'Ocean Yalda',icon:'🍒'},
-        valentine:{fa:'ولنتاین اقیانوسی',en:'Ocean Valentine',icon:'🐙'}
+        spring:{fa:'موج بهاری',en:'Spring Tide',icon:'🐚'}, summer:{fa:'موج تابستانی',en:'Summer Tide',icon:'🌊'},
+        autumn:{fa:'موج پاییزی',en:'Autumn Tide',icon:'⚓'}, winter:{fa:'موج زمستانی',en:'Winter Tide',icon:'🧊'},
+        christmas:{fa:'موج کریسمس',en:'Christmas Tide',icon:'🐧'}, nowruz:{fa:'موج نوروز',en:'Nowruz Tide',icon:'🐠'},
+        birthday:{fa:'تولد اقیانوسی سازنده',en:"Developer's Ocean Birthday",icon:'🐬'}, anniversary:{fa:'موج سالگرد',en:'Anniversary Tide',icon:'🦞'},
+        eidFitr:{fa:'موج عید فطر',en:'Eid Tide',icon:'🌖'}, eidAdha:{fa:'موج عید قربان',en:'Adha Tide',icon:'🦭'},
+        yalda:{fa:'یلدای اقیانوسی',en:'Ocean Yalda',icon:'🍒'}, valentine:{fa:'ولنتاین اقیانوسی',en:'Ocean Valentine',icon:'🐙'}
     },
     desert: {
-        spring:{fa:'صحرای شکوفا',en:'Blooming Desert',icon:'🌵'},
-        summer:{fa:'صحرای طلایی',en:'Golden Desert',icon:'🏜️'},
-        autumn:{fa:'خزان صحرا',en:'Golden Fall',icon:'🐪'},
-        winter:{fa:'صحرای یخی',en:'Frozen Desert',icon:'🏔️'},
-        christmas:{fa:'صحرای کریسمس',en:'Christmas Desert',icon:'🦃'},
-        nowruz:{fa:'صحرای نوروز',en:'Nowruz Desert',icon:'🪻'},
-        birthday:{fa:'تولد کویری سازنده',en:"Developer's Desert Birthday",icon:'🦂'},
-        anniversary:{fa:'صحرای سالگرد',en:'Anniversary Desert',icon:'🏺'},
-        eidFitr:{fa:'صحرای عید فطر',en:'Eid Desert',icon:'🌕'},
-        eidAdha:{fa:'صحرای عید قربان',en:'Adha Desert',icon:'🐫'},
-        yalda:{fa:'یلدای کویری',en:'Desert Yalda',icon:'🍊'},
-        valentine:{fa:'ولنتاین کویری',en:'Desert Valentine',icon:'🌵'}
+        spring:{fa:'صحرای شکوفا',en:'Blooming Desert',icon:'🌵'}, summer:{fa:'صحرای طلایی',en:'Golden Desert',icon:'🏜️'},
+        autumn:{fa:'خزان صحرا',en:'Golden Fall',icon:'🐪'}, winter:{fa:'صحرای یخی',en:'Frozen Desert',icon:'🏔️'},
+        christmas:{fa:'صحرای کریسمس',en:'Christmas Desert',icon:'🦃'}, nowruz:{fa:'صحرای نوروز',en:'Nowruz Desert',icon:'🪻'},
+        birthday:{fa:'تولد کویری سازنده',en:"Developer's Desert Birthday",icon:'🦂'}, anniversary:{fa:'صحرای سالگرد',en:'Anniversary Desert',icon:'🏺'},
+        eidFitr:{fa:'صحرای عید فطر',en:'Eid Desert',icon:'🌕'}, eidAdha:{fa:'صحرای عید قربان',en:'Adha Desert',icon:'🐫'},
+        yalda:{fa:'یلدای کویری',en:'Desert Yalda',icon:'🍊'}, valentine:{fa:'ولنتاین کویری',en:'Desert Valentine',icon:'🌵'}
     },
     magic: {
-        spring:{fa:'بهار جادویی',en:'Enchanted Spring',icon:'🦋'},
-        summer:{fa:'تابستان جادویی',en:'Enchanted Summer',icon:'🪄'},
-        autumn:{fa:'خزان جادویی',en:'Enchanted Fall',icon:'🔮'},
-        winter:{fa:'زمستان جادویی',en:'Enchanted Winter',icon:'🧙'},
-        christmas:{fa:'کریسمس جادویی',en:'Enchanted Christmas',icon:'🧝'},
-        nowruz:{fa:'نوروز جادویی',en:'Enchanted Nowruz',icon:'🧚'},
-        birthday:{fa:'تولد جادویی سازنده',en:"Developer's Magic Birthday",icon:'🌟'},
-        anniversary:{fa:'سالگرد جادویی',en:'Enchanted Anniversary',icon:'🪅'},
-        eidFitr:{fa:'جادوی عید فطر',en:'Eid Magic',icon:'✨'},
-        eidAdha:{fa:'جادوی عید قربان',en:'Adha Magic',icon:'✨'},
-        yalda:{fa:'یلدای جادویی',en:'Enchanted Yalda',icon:'✨'},
-        valentine:{fa:'ولنتاین جادویی',en:'Enchanted Valentine',icon:'💕'}
+        spring:{fa:'بهار جادویی',en:'Enchanted Spring',icon:'🦋'}, summer:{fa:'تابستان جادویی',en:'Enchanted Summer',icon:'🪄'},
+        autumn:{fa:'خزان جادویی',en:'Enchanted Fall',icon:'🔮'}, winter:{fa:'زمستان جادویی',en:'Enchanted Winter',icon:'🧙'},
+        christmas:{fa:'کریسمس جادویی',en:'Enchanted Christmas',icon:'🧝'}, nowruz:{fa:'نوروز جادویی',en:'Enchanted Nowruz',icon:'🧚'},
+        birthday:{fa:'تولد جادویی سازنده',en:"Developer's Magic Birthday",icon:'🌟'}, anniversary:{fa:'سالگرد جادویی',en:'Enchanted Anniversary',icon:'🪅'},
+        eidFitr:{fa:'جادوی عید فطر',en:'Eid Magic',icon:'✨'}, eidAdha:{fa:'جادوی عید قربان',en:'Adha Magic',icon:'✨'},
+        yalda:{fa:'یلدای جادویی',en:'Enchanted Yalda',icon:'✨'}, valentine:{fa:'ولنتاین جادویی',en:'Enchanted Valentine',icon:'💕'}
     },
     toon: {
-        spring:{fa:'بهار کارتونی',en:'Toon Spring',icon:'🎈'},
-        summer:{fa:'تابستان کارتونی',en:'Toon Summer',icon:'🎨'},
-        autumn:{fa:'خزان کارتونی',en:'Toon Fall',icon:'🎭'},
-        winter:{fa:'زمستان کارتونی',en:'Toon Winter',icon:'🎪'},
-        christmas:{fa:'کریسمس کارتونی',en:'Toon Christmas',icon:'🤡'},
-        nowruz:{fa:'نوروز کارتونی',en:'Toon Nowruz',icon:'🎠'},
-        birthday:{fa:'تولد کارتونی سازنده',en:"Developer's Toon Birthday",icon:'🧁'},
-        anniversary:{fa:'سالگرد کارتونی',en:'Toon Anniversary',icon:'🎁'},
-        eidFitr:{fa:'کارتونی عید فطر',en:'Eid Toon',icon:'🎊'},
-        eidAdha:{fa:'کارتونی عید قربان',en:'Adha Toon',icon:'🎉'},
-        yalda:{fa:'یلدای کارتونی',en:'Toon Yalda',icon:'🍭'},
-        valentine:{fa:'ولنتاین کارتونی',en:'Toon Valentine',icon:'🍫'}
+        spring:{fa:'بهار کارتونی',en:'Toon Spring',icon:'🎈'}, summer:{fa:'تابستان کارتونی',en:'Toon Summer',icon:'🎨'},
+        autumn:{fa:'خزان کارتونی',en:'Toon Fall',icon:'🎭'}, winter:{fa:'زمستان کارتونی',en:'Toon Winter',icon:'🎪'},
+        christmas:{fa:'کریسمس کارتونی',en:'Toon Christmas',icon:'🤡'}, nowruz:{fa:'نوروز کارتونی',en:'Toon Nowruz',icon:'🎠'},
+        birthday:{fa:'تولد کارتونی سازنده',en:"Developer's Toon Birthday",icon:'🧁'}, anniversary:{fa:'سالگرد کارتونی',en:'Toon Anniversary',icon:'🎁'},
+        eidFitr:{fa:'کارتونی عید فطر',en:'Eid Toon',icon:'🎊'}, eidAdha:{fa:'کارتونی عید قربان',en:'Adha Toon',icon:'🎉'},
+        yalda:{fa:'یلدای کارتونی',en:'Toon Yalda',icon:'🍭'}, valentine:{fa:'ولنتاین کارتونی',en:'Toon Valentine',icon:'🍫'}
     },
     cyberpunk: {
-        spring:{fa:'بهار نئونی',en:'Neon Spring',icon:'💚'},
-        summer:{fa:'تابستان نئونی',en:'Neon Summer',icon:'💜'},
-        autumn:{fa:'خزان سایبری',en:'Neon Fall',icon:'🟣'},
-        winter:{fa:'زمستان نئونی',en:'Neon Winter',icon:'💙'},
-        christmas:{fa:'کریسمس نئونی',en:'Neon Christmas',icon:'🤖'},
-        nowruz:{fa:'نوروز نئونی',en:'Neon Nowruz',icon:'👾'},
-        birthday:{fa:'تولد نئونی سازنده',en:"Developer's Neon Birthday",icon:'⚡'},
-        anniversary:{fa:'سالگرد نئونی',en:'Neon Anniversary',icon:'🔌'},
-        eidFitr:{fa:'نئون عید فطر',en:'Eid Neon',icon:'🛰️'},
-        eidAdha:{fa:'نئون عید قربان',en:'Adha Neon',icon:'💛'},
-        yalda:{fa:'یلدای نئونی',en:'Neon Yalda',icon:'🧬'},
-        valentine:{fa:'ولنتاین نئونی',en:'Neon Valentine',icon:'💔'}
+        spring:{fa:'بهار نئونی',en:'Neon Spring',icon:'💚'}, summer:{fa:'تابستان نئونی',en:'Neon Summer',icon:'💜'},
+        autumn:{fa:'خزان سایبری',en:'Neon Fall',icon:'🟣'}, winter:{fa:'زمستان نئونی',en:'Neon Winter',icon:'💙'},
+        christmas:{fa:'کریسمس نئونی',en:'Neon Christmas',icon:'🤖'}, nowruz:{fa:'نوروز نئونی',en:'Neon Nowruz',icon:'👾'},
+        birthday:{fa:'تولد نئونی سازنده',en:"Developer's Neon Birthday",icon:'⚡'}, anniversary:{fa:'سالگرد نئونی',en:'Neon Anniversary',icon:'🔌'},
+        eidFitr:{fa:'نئون عید فطر',en:'Eid Neon',icon:'🛰️'}, eidAdha:{fa:'نئون عید قربان',en:'Adha Neon',icon:'💛'},
+        yalda:{fa:'یلدای نئونی',en:'Neon Yalda',icon:'🧬'}, valentine:{fa:'ولنتاین نئونی',en:'Neon Valentine',icon:'💔'}
     }
 };
-// ============================================================
-// بخش ۶: توضیحات تم‌ها
-// ============================================================
 
 const THEME_DESCS = {
     classic: {
-        spring:{fa:'شکوفه‌های بهاری',en:'Spring blossoms'},
-        summer:{fa:'آفتاب گرم',en:'Warm sunshine'},
-        autumn:{fa:'برگ‌های خزانی',en:'Falling leaves'},
-        winter:{fa:'دانه‌های برف',en:'Snowflakes'},
-        christmas:{fa:'روح کریسمس',en:'Christmas spirit'},
-        nowruz:{fa:'بهار نوروزی',en:'Nowruz spring'},
-        birthday:{fa:'جشن سازنده',en:"Developer's party"},
-        anniversary:{fa:'جشن سالگرد',en:'Anniversary joy'},
-        eidFitr:{fa:'عیدانه سبز',en:'Eid green'},
-        eidAdha:{fa:'عیدانه طلایی',en:'Eid gold'},
-        yalda:{fa:'انار و هندوانه',en:'Pomegranate & melon'},
-        valentine:{fa:'قلب‌های عاشق',en:'Loving hearts'}
+        spring:{fa:'شکوفه‌های بهاری',en:'Spring blossoms'}, summer:{fa:'آفتاب گرم',en:'Warm sunshine'},
+        autumn:{fa:'برگ‌های خزانی',en:'Falling leaves'}, winter:{fa:'دانه‌های برف',en:'Snowflakes'},
+        christmas:{fa:'روح کریسمس',en:'Christmas spirit'}, nowruz:{fa:'بهار نوروزی',en:'Nowruz spring'},
+        birthday:{fa:'جشن سازنده',en:"Developer's party"}, anniversary:{fa:'جشن سالگرد',en:'Anniversary joy'},
+        eidFitr:{fa:'عیدانه سبز',en:'Eid green'}, eidAdha:{fa:'عیدانه طلایی',en:'Eid gold'},
+        yalda:{fa:'انار و هندوانه',en:'Pomegranate & melon'}, valentine:{fa:'قلب‌های عاشق',en:'Loving hearts'}
     },
     city: {
-        spring:{fa:'خیابان‌های شکوفا',en:'Blooming streets'},
-        summer:{fa:'شهر آفتابی',en:'Sunny city'},
-        autumn:{fa:'پاییز شهری',en:'Urban autumn'},
-        winter:{fa:'شهر برفی',en:'Snowy city'},
-        christmas:{fa:'شهر کریسمس',en:'Christmas city'},
-        nowruz:{fa:'شهر عیدانه',en:'Nowruz city'},
-        birthday:{fa:'جشن شهری سازنده',en:"Developer's city party"},
-        anniversary:{fa:'شهر سالگرد',en:'Anniversary city'},
-        eidFitr:{fa:'شهر عیدانه',en:'Festive city'},
-        eidAdha:{fa:'شهر قربان',en:'Adha city'},
-        yalda:{fa:'شهر اناری',en:'Pomegranate city'},
-        valentine:{fa:'شهر عاشقان',en:'City of love'}
+        spring:{fa:'خیابان‌های شکوفا',en:'Blooming streets'}, summer:{fa:'شهر آفتابی',en:'Sunny city'},
+        autumn:{fa:'پاییز شهری',en:'Urban autumn'}, winter:{fa:'شهر برفی',en:'Snowy city'},
+        christmas:{fa:'شهر کریسمس',en:'Christmas city'}, nowruz:{fa:'شهر عیدانه',en:'Nowruz city'},
+        birthday:{fa:'جشن شهری سازنده',en:"Developer's city party"}, anniversary:{fa:'شهر سالگرد',en:'Anniversary city'},
+        eidFitr:{fa:'شهر عیدانه',en:'Festive city'}, eidAdha:{fa:'شهر قربان',en:'Adha city'},
+        yalda:{fa:'شهر اناری',en:'Pomegranate city'}, valentine:{fa:'شهر عاشقان',en:'City of love'}
     },
     beach: {
-        spring:{fa:'ساحل آرام',en:'Calm shore'},
-        summer:{fa:'ساحل آفتابی',en:'Sunny beach'},
-        autumn:{fa:'ساحل غروب',en:'Sunset shore'},
-        winter:{fa:'ساحل یخی',en:'Icy shore'},
-        christmas:{fa:'ساحل کریسمس',en:'Christmas shore'},
-        nowruz:{fa:'ساحل بهاری',en:'Spring shore'},
-        birthday:{fa:'جشن ساحلی سازنده',en:"Developer's shore party"},
-        anniversary:{fa:'ساحل سالگرد',en:'Anniversary shore'},
-        eidFitr:{fa:'ساحل عیدانه',en:'Festive shore'},
-        eidAdha:{fa:'ساحل قربان',en:'Adha shore'},
-        yalda:{fa:'ساحل اناری',en:'Pomegranate shore'},
-        valentine:{fa:'ساحل عاشقان',en:'Lovers shore'}
+        spring:{fa:'ساحل آرام',en:'Calm shore'}, summer:{fa:'ساحل آفتابی',en:'Sunny beach'},
+        autumn:{fa:'ساحل غروب',en:'Sunset shore'}, winter:{fa:'ساحل یخی',en:'Icy shore'},
+        christmas:{fa:'ساحل کریسمس',en:'Christmas shore'}, nowruz:{fa:'ساحل بهاری',en:'Spring shore'},
+        birthday:{fa:'جشن ساحلی سازنده',en:"Developer's shore party"}, anniversary:{fa:'ساحل سالگرد',en:'Anniversary shore'},
+        eidFitr:{fa:'ساحل عیدانه',en:'Festive shore'}, eidAdha:{fa:'ساحل قربان',en:'Adha shore'},
+        yalda:{fa:'ساحل اناری',en:'Pomegranate shore'}, valentine:{fa:'ساحل عاشقان',en:'Lovers shore'}
     },
     forest: {
-        spring:{fa:'جنگل شکوفا',en:'Blooming forest'},
-        summer:{fa:'جنگل سبز',en:'Green forest'},
-        autumn:{fa:'جنگل خزانی',en:'Autumn forest'},
-        winter:{fa:'جنگل برفی',en:'Snowy forest'},
-        christmas:{fa:'جنگل کریسمس',en:'Christmas forest'},
-        nowruz:{fa:'جنگل بهاری',en:'Spring forest'},
-        birthday:{fa:'جشن جنگلی سازنده',en:"Developer's forest party"},
-        anniversary:{fa:'جنگل سالگرد',en:'Anniversary forest'},
-        eidFitr:{fa:'جنگل عیدانه',en:'Festive forest'},
-        eidAdha:{fa:'جنگل قربان',en:'Adha forest'},
-        yalda:{fa:'جنگل اناری',en:'Pomegranate forest'},
-        valentine:{fa:'جنگل عاشقان',en:'Lovers forest'}
+        spring:{fa:'جنگل شکوفا',en:'Blooming forest'}, summer:{fa:'جنگل سبز',en:'Green forest'},
+        autumn:{fa:'جنگل خزانی',en:'Autumn forest'}, winter:{fa:'جنگل برفی',en:'Snowy forest'},
+        christmas:{fa:'جنگل کریسمس',en:'Christmas forest'}, nowruz:{fa:'جنگل بهاری',en:'Spring forest'},
+        birthday:{fa:'جشن جنگلی سازنده',en:"Developer's forest party"}, anniversary:{fa:'جنگل سالگرد',en:'Anniversary forest'},
+        eidFitr:{fa:'جنگل عیدانه',en:'Festive forest'}, eidAdha:{fa:'جنگل قربان',en:'Adha forest'},
+        yalda:{fa:'جنگل اناری',en:'Pomegranate forest'}, valentine:{fa:'جنگل عاشقان',en:'Lovers forest'}
     },
     space: {
-        spring:{fa:'کهکشان شکوفا',en:'Blooming galaxy'},
-        summer:{fa:'کهکشان درخشان',en:'Bright galaxy'},
-        autumn:{fa:'کهکشان خزانی',en:'Autumn galaxy'},
-        winter:{fa:'کهکشان یخی',en:'Frozen galaxy'},
-        christmas:{fa:'کهکشان کریسمس',en:'Christmas galaxy'},
-        nowruz:{fa:'کهکشان نوروزی',en:'Nowruz galaxy'},
-        birthday:{fa:'جشن کیهانی سازنده',en:"Developer's cosmic party"},
-        anniversary:{fa:'کهکشان سالگرد',en:'Anniversary galaxy'},
-        eidFitr:{fa:'کهکشان عیدانه',en:'Festive galaxy'},
-        eidAdha:{fa:'کهکشان قربان',en:'Adha galaxy'},
-        yalda:{fa:'کهکشان اناری',en:'Pomegranate galaxy'},
-        valentine:{fa:'کهکشان عاشقان',en:'Lovers galaxy'}
+        spring:{fa:'کهکشان شکوفا',en:'Blooming galaxy'}, summer:{fa:'کهکشان درخشان',en:'Bright galaxy'},
+        autumn:{fa:'کهکشان خزانی',en:'Autumn galaxy'}, winter:{fa:'کهکشان یخی',en:'Frozen galaxy'},
+        christmas:{fa:'کهکشان کریسمس',en:'Christmas galaxy'}, nowruz:{fa:'کهکشان نوروزی',en:'Nowruz galaxy'},
+        birthday:{fa:'جشن کیهانی سازنده',en:"Developer's cosmic party"}, anniversary:{fa:'کهکشان سالگرد',en:'Anniversary galaxy'},
+        eidFitr:{fa:'کهکشان عیدانه',en:'Festive galaxy'}, eidAdha:{fa:'کهکشان قربان',en:'Adha galaxy'},
+        yalda:{fa:'کهکشان اناری',en:'Pomegranate galaxy'}, valentine:{fa:'کهکشان عاشقان',en:'Lovers galaxy'}
     },
     night: {
-        spring:{fa:'شب شکوفا',en:'Blooming night'},
-        summer:{fa:'شب گرم',en:'Warm night'},
-        autumn:{fa:'شب خزانی',en:'Autumn night'},
-        winter:{fa:'شب برفی',en:'Snowy night'},
-        christmas:{fa:'شب کریسمس',en:'Christmas night'},
-        nowruz:{fa:'شب نوروزی',en:'Nowruz night'},
-        birthday:{fa:'شب جشن سازنده',en:"Developer's party night"},
-        anniversary:{fa:'شب سالگرد',en:'Anniversary night'},
-        eidFitr:{fa:'شب عیدانه',en:'Festive night'},
-        eidAdha:{fa:'شب قربان',en:'Adha night'},
-        yalda:{fa:'شب انار',en:'Pomegranate night'},
-        valentine:{fa:'شب عاشقان',en:'Lovers night'}
+        spring:{fa:'شب شکوفا',en:'Blooming night'}, summer:{fa:'شب گرم',en:'Warm night'},
+        autumn:{fa:'شب خزانی',en:'Autumn night'}, winter:{fa:'شب برفی',en:'Snowy night'},
+        christmas:{fa:'شب کریسمس',en:'Christmas night'}, nowruz:{fa:'شب نوروزی',en:'Nowruz night'},
+        birthday:{fa:'شب جشن سازنده',en:"Developer's party night"}, anniversary:{fa:'شب سالگرد',en:'Anniversary night'},
+        eidFitr:{fa:'شب عیدانه',en:'Festive night'}, eidAdha:{fa:'شب قربان',en:'Adha night'},
+        yalda:{fa:'شب انار',en:'Pomegranate night'}, valentine:{fa:'شب عاشقان',en:'Lovers night'}
     },
     volcano: {
-        spring:{fa:'آتشفشان شکوفا',en:'Blooming volcano'},
-        summer:{fa:'آتشفشان سوزان',en:'Burning volcano'},
-        autumn:{fa:'آتشفشان خزانی',en:'Autumn volcano'},
-        winter:{fa:'آتشفشان یخی',en:'Frozen volcano'},
-        christmas:{fa:'آتشفشان کریسمس',en:'Christmas volcano'},
-        nowruz:{fa:'آتشفشان نوروزی',en:'Nowruz volcano'},
-        birthday:{fa:'جشن آتشین سازنده',en:"Developer's ember party"},
-        anniversary:{fa:'آتشفشان سالگرد',en:'Anniversary volcano'},
-        eidFitr:{fa:'آتشفشان عیدانه',en:'Festive volcano'},
-        eidAdha:{fa:'آتشفشان قربان',en:'Adha volcano'},
-        yalda:{fa:'آتشفشان اناری',en:'Pomegranate volcano'},
-        valentine:{fa:'آتشفشان عاشقان',en:'Lovers volcano'}
+        spring:{fa:'آتشفشان شکوفا',en:'Blooming volcano'}, summer:{fa:'آتشفشان سوزان',en:'Burning volcano'},
+        autumn:{fa:'آتشفشان خزانی',en:'Autumn volcano'}, winter:{fa:'آتشفشان یخی',en:'Frozen volcano'},
+        christmas:{fa:'آتشفشان کریسمس',en:'Christmas volcano'}, nowruz:{fa:'آتشفشان نوروزی',en:'Nowruz volcano'},
+        birthday:{fa:'جشن آتشین سازنده',en:"Developer's ember party"}, anniversary:{fa:'آتشفشان سالگرد',en:'Anniversary volcano'},
+        eidFitr:{fa:'آتشفشان عیدانه',en:'Festive volcano'}, eidAdha:{fa:'آتشفشان قربان',en:'Adha volcano'},
+        yalda:{fa:'آتشفشان اناری',en:'Pomegranate volcano'}, valentine:{fa:'آتشفشان عاشقان',en:'Lovers volcano'}
     },
     ocean: {
-        spring:{fa:'موج بهاری',en:'Spring waves'},
-        summer:{fa:'موج تابستانی',en:'Summer waves'},
-        autumn:{fa:'موج خزانی',en:'Autumn waves'},
-        winter:{fa:'موج یخی',en:'Icy waves'},
-        christmas:{fa:'موج کریسمس',en:'Christmas waves'},
-        nowruz:{fa:'موج نوروزی',en:'Nowruz waves'},
-        birthday:{fa:'جشن اقیانوسی سازنده',en:"Developer's ocean party"},
-        anniversary:{fa:'موج سالگرد',en:'Anniversary waves'},
-        eidFitr:{fa:'موج عیدانه',en:'Festive waves'},
-        eidAdha:{fa:'موج قربان',en:'Adha waves'},
-        yalda:{fa:'موج اناری',en:'Pomegranate waves'},
-        valentine:{fa:'موج عاشقان',en:'Lovers waves'}
+        spring:{fa:'موج بهاری',en:'Spring waves'}, summer:{fa:'موج تابستانی',en:'Summer waves'},
+        autumn:{fa:'موج خزانی',en:'Autumn waves'}, winter:{fa:'موج یخی',en:'Icy waves'},
+        christmas:{fa:'موج کریسمس',en:'Christmas waves'}, nowruz:{fa:'موج نوروزی',en:'Nowruz waves'},
+        birthday:{fa:'جشن اقیانوسی سازنده',en:"Developer's ocean party"}, anniversary:{fa:'موج سالگرد',en:'Anniversary waves'},
+        eidFitr:{fa:'موج عیدانه',en:'Festive waves'}, eidAdha:{fa:'موج قربان',en:'Adha waves'},
+        yalda:{fa:'موج اناری',en:'Pomegranate waves'}, valentine:{fa:'موج عاشقان',en:'Lovers waves'}
     },
     desert: {
-        spring:{fa:'صحرای شکوفا',en:'Blooming desert'},
-        summer:{fa:'صحرای سوزان',en:'Burning desert'},
-        autumn:{fa:'صحرای خزانی',en:'Autumn desert'},
-        winter:{fa:'صحرای یخی',en:'Frozen desert'},
-        christmas:{fa:'صحرای کریسمس',en:'Christmas desert'},
-        nowruz:{fa:'صحرای نوروزی',en:'Nowruz desert'},
-        birthday:{fa:'جشن کویری سازنده',en:"Developer's desert party"},
-        anniversary:{fa:'صحرای سالگرد',en:'Anniversary desert'},
-        eidFitr:{fa:'صحرای عیدانه',en:'Festive desert'},
-        eidAdha:{fa:'صحرای قربان',en:'Adha desert'},
-        yalda:{fa:'صحرای اناری',en:'Pomegranate desert'},
-        valentine:{fa:'صحرای عاشقان',en:'Lovers desert'}
+        spring:{fa:'صحرای شکوفا',en:'Blooming desert'}, summer:{fa:'صحرای سوزان',en:'Burning desert'},
+        autumn:{fa:'صحرای خزانی',en:'Autumn desert'}, winter:{fa:'صحرای یخی',en:'Frozen desert'},
+        christmas:{fa:'صحرای کریسمس',en:'Christmas desert'}, nowruz:{fa:'صحرای نوروزی',en:'Nowruz desert'},
+        birthday:{fa:'جشن کویری سازنده',en:"Developer's desert party"}, anniversary:{fa:'صحرای سالگرد',en:'Anniversary desert'},
+        eidFitr:{fa:'صحرای عیدانه',en:'Festive desert'}, eidAdha:{fa:'صحرای قربان',en:'Adha desert'},
+        yalda:{fa:'صحرای اناری',en:'Pomegranate desert'}, valentine:{fa:'صحرای عاشقان',en:'Lovers desert'}
     },
     magic: {
-        spring:{fa:'جادوی شکوفا',en:'Blooming magic'},
-        summer:{fa:'جادوی درخشان',en:'Bright magic'},
-        autumn:{fa:'جادوی خزانی',en:'Autumn magic'},
-        winter:{fa:'جادوی یخی',en:'Frozen magic'},
-        christmas:{fa:'جادوی کریسمس',en:'Christmas magic'},
-        nowruz:{fa:'جادوی نوروزی',en:'Nowruz magic'},
-        birthday:{fa:'جشن جادویی سازنده',en:"Developer's magic party"},
-        anniversary:{fa:'جادوی سالگرد',en:'Anniversary magic'},
-        eidFitr:{fa:'جادوی عیدانه',en:'Festive magic'},
-        eidAdha:{fa:'جادوی قربان',en:'Adha magic'},
-        yalda:{fa:'جادوی انار',en:'Pomegranate magic'},
-        valentine:{fa:'جادوی عشق',en:'Love magic'}
+        spring:{fa:'جادوی شکوفا',en:'Blooming magic'}, summer:{fa:'جادوی درخشان',en:'Bright magic'},
+        autumn:{fa:'جادوی خزانی',en:'Autumn magic'}, winter:{fa:'جادوی یخی',en:'Frozen magic'},
+        christmas:{fa:'جادوی کریسمس',en:'Christmas magic'}, nowruz:{fa:'جادوی نوروزی',en:'Nowruz magic'},
+        birthday:{fa:'جشن جادویی سازنده',en:"Developer's magic party"}, anniversary:{fa:'جادوی سالگرد',en:'Anniversary magic'},
+        eidFitr:{fa:'جادوی عیدانه',en:'Festive magic'}, eidAdha:{fa:'جادوی قربان',en:'Adha magic'},
+        yalda:{fa:'جادوی انار',en:'Pomegranate magic'}, valentine:{fa:'جادوی عشق',en:'Love magic'}
     },
     toon: {
-        spring:{fa:'بهار کارتونی',en:'Toon spring'},
-        summer:{fa:'تابستان کارتونی',en:'Toon summer'},
-        autumn:{fa:'پاییز کارتونی',en:'Toon autumn'},
-        winter:{fa:'زمستان کارتونی',en:'Toon winter'},
-        christmas:{fa:'کریسمس کارتونی',en:'Toon Christmas'},
-        nowruz:{fa:'نوروز کارتونی',en:'Toon Nowruz'},
-        birthday:{fa:'جشن کارتونی سازنده',en:"Developer's toon party"},
-        anniversary:{fa:'سالگرد کارتونی',en:'Toon anniversary'},
-        eidFitr:{fa:'کارتونی عیدانه',en:'Festive toon'},
-        eidAdha:{fa:'کارتونی قربان',en:'Adha toon'},
-        yalda:{fa:'انار کارتونی',en:'Toon pomegranate'},
-        valentine:{fa:'عشق کارتونی',en:'Toon love'}
+        spring:{fa:'بهار کارتونی',en:'Toon spring'}, summer:{fa:'تابستان کارتونی',en:'Toon summer'},
+        autumn:{fa:'پاییز کارتونی',en:'Toon autumn'}, winter:{fa:'زمستان کارتونی',en:'Toon winter'},
+        christmas:{fa:'کریسمس کارتونی',en:'Toon Christmas'}, nowruz:{fa:'نوروز کارتونی',en:'Toon Nowruz'},
+        birthday:{fa:'جشن کارتونی سازنده',en:"Developer's toon party"}, anniversary:{fa:'سالگرد کارتونی',en:'Toon anniversary'},
+        eidFitr:{fa:'کارتونی عیدانه',en:'Festive toon'}, eidAdha:{fa:'کارتونی قربان',en:'Adha toon'},
+        yalda:{fa:'انار کارتونی',en:'Toon pomegranate'}, valentine:{fa:'عشق کارتونی',en:'Toon love'}
     },
     cyberpunk: {
-        spring:{fa:'نئون بهاری',en:'Neon spring'},
-        summer:{fa:'نئون تابستانی',en:'Neon summer'},
-        autumn:{fa:'نئون خزانی',en:'Neon autumn'},
-        winter:{fa:'نئون یخی',en:'Neon winter'},
-        christmas:{fa:'نئون کریسمس',en:'Neon Christmas'},
-        nowruz:{fa:'نئون نوروزی',en:'Neon Nowruz'},
-        birthday:{fa:'جشن نئونی سازنده',en:"Developer's neon party"},
-        anniversary:{fa:'نئون سالگرد',en:'Neon anniversary'},
-        eidFitr:{fa:'نئون عیدانه',en:'Festive neon'},
-        eidAdha:{fa:'نئون قربان',en:'Adha neon'},
-        yalda:{fa:'انار نئونی',en:'Neon pomegranate'},
-        valentine:{fa:'عشق نئونی',en:'Neon love'}
+        spring:{fa:'نئون بهاری',en:'Neon spring'}, summer:{fa:'نئون تابستانی',en:'Neon summer'},
+        autumn:{fa:'نئون خزانی',en:'Neon autumn'}, winter:{fa:'نئون یخی',en:'Neon winter'},
+        christmas:{fa:'نئون کریسمس',en:'Neon Christmas'}, nowruz:{fa:'نئون نوروزی',en:'Neon Nowruz'},
+        birthday:{fa:'جشن نئونی سازنده',en:"Developer's neon party"}, anniversary:{fa:'نئون سالگرد',en:'Neon anniversary'},
+        eidFitr:{fa:'نئون عیدانه',en:'Festive neon'}, eidAdha:{fa:'نئون قربان',en:'Adha neon'},
+        yalda:{fa:'انار نئونی',en:'Neon pomegranate'}, valentine:{fa:'عشق نئونی',en:'Neon love'}
     }
 };
 
 // ============================================================
-// بخش ۷: اسکین‌های روباه (۲۰ اسکین)
+// بخش ۷: اسکین‌ها
 // ============================================================
 
 const FOX_SKINS = [
@@ -1561,7 +1377,7 @@ const FOX_SKINS = [
 ];
 
 // ============================================================
-// بخش ۸: افکت‌های فصلی (ذرات شناور)
+// بخش ۸: افکت‌های فصلی
 // ============================================================
 
 let seasonalParticles = [];
@@ -1619,7 +1435,6 @@ const SEASONAL_EFFECTS = {
 };
 
 let _cachedEffect = null;
-
 function getSeasonalEffect() {
     if (_cachedEffect) return _cachedEffect;
     _cachedEffect = SEASONAL_EFFECTS[currentSeason] || [{ enabled:false, maxCount:0 }];
@@ -1630,25 +1445,17 @@ function spawnSeasonalParticle(isInitial, groupIndex) {
     const effects = getSeasonalEffect();
     const fx = effects[groupIndex];
     if (!fx || !fx.enabled) return;
-
     const speedX = (Math.random() - 0.5) * 20;
     let startX, startY;
-
     if (isInitial) {
         startX = Math.random() * W;
         startY = Math.random() * H;
     } else {
         startX = Math.random() * W;
-        if (fx.rise) {
-            startY = H + 20 + Math.random() * 50;
-        } else {
-            startY = -20 - Math.random() * 50;
-        }
+        startY = fx.rise ? (H + 20 + Math.random() * 50) : (-20 - Math.random() * 50);
     }
-
     seasonalParticles.push({
-        x: startX, y: startY,
-        vx: speedX,
+        x: startX, y: startY, vx: speedX,
         vy: fx.speedY * (0.8 + Math.random() * 0.4),
         size: fx.size * (0.7 + Math.random() * 0.6),
         rotation: Math.random() * Math.PI * 2,
@@ -1656,8 +1463,7 @@ function spawnSeasonalParticle(isInitial, groupIndex) {
         swayOffset: Math.random() * Math.PI * 2,
         swaySpeed: 1 + Math.random() * 1.5,
         color: Math.random() > 0.5 ? fx.color : fx.colorDark,
-        shape: fx.shape,
-        group: groupIndex,
+        shape: fx.shape, group: groupIndex,
         sparkle: fx.sparkle || false,
         rise: fx.rise || false,
         flyHorizontal: fx.flyHorizontal || false,
@@ -1671,73 +1477,51 @@ function updateSeasonalParticles(dt) {
         if (seasonalParticles.length > 0) seasonalParticles.length = 0;
         return;
     }
-
     const t = _nowSeconds;
-
     for (let i = seasonalParticles.length - 1; i >= 0; i--) {
         const p = seasonalParticles[i];
         const fx = effects[p.group] || effects[0];
         if (!fx || !fx.enabled) { seasonalParticles.splice(i, 1); continue; }
-
         p.y += p.vy * dt;
         p.x += p.vx * dt;
-        
         if (fx.swayAmount > 0) {
             const sway = Math.sin(t * p.swaySpeed + p.swayOffset) * fx.swayAmount * dt * 15;
             p.x += sway;
         }
-        
         if (fx.rotation) p.rotation += p.rotationSpeed * dt;
-        
         if (fx.flyHorizontal) {
             p.vx += Math.sin(t * 2 + p.swayOffset) * 10 * dt;
             if (p.vx < -30) p.vx = -30;
             if (p.vx > 30) p.vx = 30;
         }
-
         const margin = 50;
         let out = false;
-        
-        if (fx.rise) {
-            if (p.y < -margin) out = true;
-        } else {
-            if (p.y > H + margin) out = true;
-        }
+        if (fx.rise) { if (p.y < -margin) out = true; }
+        else { if (p.y > H + margin) out = true; }
         if (p.x < -200 || p.x > W + 200) out = true;
-
         if (out) {
             seasonalParticles.splice(i, 1);
             spawnSeasonalParticle(false, p.group);
             continue;
         }
-
         let edgeOpacity = 1;
         const fadeDist = 80;
-        
-        if (fx.rise) {
-            if (p.y < fadeDist) edgeOpacity = Math.min(edgeOpacity, p.y / fadeDist);
-        } else {
-            if (p.y > H - fadeDist) edgeOpacity = Math.min(edgeOpacity, (H - p.y) / fadeDist);
-        }
-        
+        if (fx.rise) { if (p.y < fadeDist) edgeOpacity = Math.min(edgeOpacity, p.y / fadeDist); }
+        else { if (p.y > H - fadeDist) edgeOpacity = Math.min(edgeOpacity, (H - p.y) / fadeDist); }
         p.edgeOpacity = Math.max(0, Math.min(1, edgeOpacity));
     }
-
     for (let g = 0; g < effects.length; g++) {
         const fx = effects[g];
         if (!fx.enabled) continue;
-        
         let count = 0;
         for (let i = 0; i < seasonalParticles.length; i++) {
             if (seasonalParticles[i].group === g) count++;
         }
-        
         const needed = fx.maxCount - count;
-        for (let i = 0; i < needed; i++) {
-            spawnSeasonalParticle(false, g);
-        }
+        for (let i = 0; i < needed; i++) spawnSeasonalParticle(false, g);
     }
 }
+
 // ============================================================
 // بخش ۹: توابع رسم ذرات فصلی
 // ============================================================
@@ -1762,7 +1546,6 @@ function drawButterfly(x, y, size, color, rotation, t) {
     ctx.translate(x, y);
     ctx.rotate(rotation);
     const flap = Math.sin(t * 8) * 0.5 + 0.5;
-    
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.ellipse(-size * 0.7, 0, size * 0.7, size * flap, 0, 0, Math.PI * 2);
@@ -1770,7 +1553,6 @@ function drawButterfly(x, y, size, color, rotation, t) {
     ctx.beginPath();
     ctx.ellipse(size * 0.7, 0, size * 0.7, size * flap, 0, 0, Math.PI * 2);
     ctx.fill();
-    
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.beginPath();
     ctx.ellipse(0, 0, size * 0.15, size * 0.4, 0, 0, Math.PI * 2);
@@ -1783,21 +1565,18 @@ function drawBalloon(x, y, size, color) {
     ctx.beginPath();
     ctx.ellipse(x, y, size, size * 1.2, 0, 0, Math.PI * 2);
     ctx.fill();
-    
     ctx.beginPath();
     ctx.moveTo(x - 2, y + size * 1.2);
     ctx.lineTo(x, y + size * 1.5);
     ctx.lineTo(x + 2, y + size * 1.2);
     ctx.closePath();
     ctx.fill();
-    
     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     ctx.moveTo(x, y + size * 1.5);
     ctx.lineTo(x, y + size * 2.5);
     ctx.stroke();
-    
     ctx.fillStyle = 'rgba(255,255,255,0.5)';
     ctx.beginPath();
     ctx.ellipse(x - size * 0.3, y - size * 0.3, size * 0.25, size * 0.35, -0.5, 0, Math.PI * 2);
@@ -1810,7 +1589,6 @@ function drawSparkle(x, y, size, color, rotation, t) {
     ctx.translate(x, y);
     ctx.rotate(rotation);
     ctx.fillStyle = color;
-    
     for (let i = 0; i < 4; i++) {
         ctx.rotate(Math.PI / 2);
         ctx.beginPath();
@@ -1821,7 +1599,6 @@ function drawSparkle(x, y, size, color, rotation, t) {
         ctx.closePath();
         ctx.fill();
     }
-    
     ctx.fillStyle = 'rgba(255,255,255,0.9)';
     ctx.beginPath();
     ctx.arc(0, 0, size * 0.3 * pulse, 0, Math.PI * 2);
@@ -1833,18 +1610,15 @@ function drawCrescent(x, y, size, color, rotation) {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(rotation);
-    
     const outerR = size;
     const innerR = size * 0.85;
     const offset = size * 0.4;
-    
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(0, 0, outerR, Math.PI * 0.5, Math.PI * 1.5, false);
     ctx.arc(offset, 0, innerR, Math.PI * 1.5, Math.PI * 0.5, true);
     ctx.closePath();
     ctx.fill();
-    
     ctx.restore();
 }
 
@@ -1853,9 +1627,7 @@ function drawSprout(x, y, size, color, rotation) {
     ctx.translate(x, y);
     ctx.rotate(rotation);
     ctx.fillStyle = color;
-    
     ctx.fillRect(-1, 0, 2, size * 1.2);
-    
     ctx.beginPath();
     ctx.ellipse(-size * 0.6, size * 0.2, size * 0.7, size * 0.4, -0.5, 0, Math.PI * 2);
     ctx.fill();
@@ -1870,7 +1642,6 @@ function drawPomegranate(x, y, size, color) {
     ctx.beginPath();
     ctx.arc(x, y, size, 0, Math.PI * 2);
     ctx.fill();
-    
     ctx.beginPath();
     ctx.moveTo(x - size * 0.3, y - size * 0.9);
     ctx.lineTo(x - size * 0.15, y - size * 1.3);
@@ -1879,7 +1650,6 @@ function drawPomegranate(x, y, size, color) {
     ctx.lineTo(x + size * 0.3, y - size * 0.9);
     ctx.closePath();
     ctx.fill();
-    
     ctx.fillStyle = 'rgba(255,255,255,0.4)';
     ctx.beginPath();
     ctx.ellipse(x - size * 0.3, y - size * 0.3, size * 0.3, size * 0.4, -0.5, 0, Math.PI * 2);
@@ -1889,28 +1659,22 @@ function drawPomegranate(x, y, size, color) {
 function drawSeasonalParticles() {
     const effects = getSeasonalEffect();
     if (!effects.some(e => e.enabled) || seasonalParticles.length === 0) return;
-
     const t = _nowSeconds;
-
     for (let i = 0; i < seasonalParticles.length; i++) {
         const p = seasonalParticles[i];
-
         if (p.sparkle) {
             const pulse = 0.5 + Math.sin(t * 6 + p.swayOffset) * 0.5;
             ctx.globalAlpha = 0.5 + pulse * 0.4;
         } else {
             ctx.globalAlpha = p.edgeOpacity !== undefined ? p.edgeOpacity : 1.0;
         }
-
         ctx.fillStyle = p.color;
-
         switch (p.shape) {
             case 'snow':
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
                 ctx.fill();
                 break;
-
             case 'confetti':
                 ctx.save();
                 ctx.translate(p.x, p.y);
@@ -1918,7 +1682,6 @@ function drawSeasonalParticles() {
                 ctx.fillRect(-p.size, -p.size * 0.4, p.size * 2, p.size * 0.8);
                 ctx.restore();
                 break;
-
             case 'star':
                 ctx.save();
                 ctx.translate(p.x, p.y);
@@ -1927,7 +1690,6 @@ function drawSeasonalParticles() {
                 ctx.fill();
                 ctx.restore();
                 break;
-
             case 'heart':
                 ctx.save();
                 ctx.translate(p.x, p.y);
@@ -1940,31 +1702,24 @@ function drawSeasonalParticles() {
                 ctx.fill();
                 ctx.restore();
                 break;
-
             case 'butterfly':
                 drawButterfly(p.x, p.y, p.size, p.color, p.rotation, t + p.swayOffset);
                 break;
-
             case 'balloon':
                 drawBalloon(p.x, p.y, p.size, p.color);
                 break;
-
             case 'sparkle':
                 drawSparkle(p.x, p.y, p.size, p.color, p.rotation, t + p.swayOffset);
                 break;
-
             case 'crescent':
                 drawCrescent(p.x, p.y, p.size, p.color, p.rotation);
                 break;
-
             case 'sprout':
                 drawSprout(p.x, p.y, p.size, p.color, p.rotation);
                 break;
-
             case 'pomegranate':
                 drawPomegranate(p.x, p.y, p.size, p.color);
                 break;
-
             default:
                 ctx.beginPath();
                 ctx.ellipse(p.x, p.y, p.size * 1.2, p.size * 0.5, p.rotation, 0, Math.PI * 2);
@@ -1975,7 +1730,7 @@ function drawSeasonalParticles() {
 }
 
 // ============================================================
-// بخش ۱۰: متغیرهای اصلی بازی و شبکه
+// بخش ۱۰: متغیرهای اصلی
 // ============================================================
 
 let isOnline = true;
@@ -2028,27 +1783,22 @@ let isNight = false;
 let lastDayCycle = -1;
 let MAX_PARTICLES = 40;
 
-// متغیرهای اتصال دو نفره
 let peer = null;
 let conn = null;
 let isHost = false;
-let localServer = null;
 let remoteData = { active: false, score: 0, y: 0, vy: 0, grounded: true, animation: 0 };
 let lastNetworkSend = 0;
 
 let isReady = false;
 let isOpponentReady = false;
 let isStartingCountdown = false;
+let gameStarted = false;
+let wasMultiplayer = false;
+let lastEnemyScore = 0;
 
 const POWERUP_CONFIG = {
-    shield: {
-        duration:15, color:'#4fc3f7', icon:'🛡️',
-        startTime:10, maxHits:1
-    },
-    speed: {
-        duration:15, color:'#ffd54f', icon:'⚡',
-        startTime:10, speedMultiplier:1.2
-    }
+    shield: { duration:15, color:'#4fc3f7', icon:'🛡️', startTime:10, maxHits:1 },
+    speed: { duration:15, color:'#ffd54f', icon:'⚡', startTime:10, speedMultiplier:1.2 }
 };
 
 const fox = {
@@ -2058,7 +1808,7 @@ const fox = {
 };
 
 // ============================================================
-// بخش ۱۱: توابع کمکی عمومی
+// بخش ۱۱: توابع کمکی
 // ============================================================
 
 function loadNumber(key, defaultValue = 0) {
@@ -2114,18 +1864,14 @@ function isSkinActive(id) { return currentSkinId === id; }
 
 function getRarityLabel(rarity) {
     const labels = {
-        common:{fa:'معمولی',en:'Common'},
-        uncommon:{fa:'نادر',en:'Uncommon'},
-        rare:{fa:'کمیاب',en:'Rare'},
-        epic:{fa:'حماسی',en:'Epic'},
-        legendary:{fa:'افسانه‌ای',en:'Legendary'},
-        mythic:{fa:'اسطوره‌ای',en:'Mythic'}
+        common:{fa:'معمولی',en:'Common'}, uncommon:{fa:'نادر',en:'Uncommon'},
+        rare:{fa:'کمیاب',en:'Rare'}, epic:{fa:'حماسی',en:'Epic'},
+        legendary:{fa:'افسانه‌ای',en:'Legendary'}, mythic:{fa:'اسطوره‌ای',en:'Mythic'}
     };
     return labels[rarity] ? (language === 'fa' ? labels[rarity].fa : labels[rarity].en) : rarity;
 }
 
 const NEON_EGG_COLORS = [["#ffffff", 1], ["#00ff88", 2], ["#00aaff", 5], ["#ff00ff", 10], ["#ffff00", 25]];
-
 function getEggColors() { return NEON_EGG_COLORS; }
 
 function updateSpeed() {
@@ -2157,7 +1903,6 @@ function resetFox() {
 function collision(a, b, padA, padB) {
     if (padA === undefined) padA = 8;
     if (padB === undefined) padB = padA;
-
     return a.x + padA < b.x + b.w - padB &&
            a.x + a.w - padA > b.x + padB &&
            a.y + padA < b.y + b.h - padB &&
@@ -2166,20 +1911,9 @@ function collision(a, b, padA, padB) {
 
 function jump() {
     if (!playing) return;
-    
-    if (isHost) {
-        if (fox.grounded) {
-            fox.vy = fox.jump;
-            fox.grounded = false;
-        }
-    } else {
-        if (conn && conn.open) {
-            conn.send({ type: 'jumpRequest' });
-        }
-        if (fox.grounded) {
-            fox.vy = fox.jump;
-            fox.grounded = false;
-        }
+    if (fox.grounded) {
+        fox.vy = fox.jump;
+        fox.grounded = false;
     }
 }
 
@@ -2339,8 +2073,9 @@ function updateSoundButtons() {
         offB.textContent = !soundEnabled ? "🔇 Off ✓" : "🔇 Off";
     }
 }
+
 // ============================================================
-// بخش ۱۳: پالت تم‌ها - THEME_PALETTES (فصل‌های عادی)
+// بخش ۱۳: پالت تم‌ها
 // ============================================================
 
 const THEME_PALETTES = {
@@ -2353,8 +2088,7 @@ const THEME_PALETTES = {
         nowruz: { skyDay:['#a8d8f0','#c0e0f5','#d8e8fa'], skyNight:['#1a2a3a','#2a3a4a','#3a4a5a'], groundDay:['#8ad870','#7ac860','#6ab850'], groundNight:['#2a3a2a','#1a2a1a','#0a1a0a'], sun:'rgba(255,240,180,0.85)', tree:{trunk:'#6a4a2a',main:'#22c55e',light:'#4ade80',dark:'#15803d'}, rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,255,255,0.3)' },
         birthday: { skyDay:['#ffd6e8','#ffc0d8','#ffa8c8'], skyNight:['#3a1a3a','#4a2a4a','#5a3a5a'], groundDay:['#ffb8d8','#ffa8c8','#ff98b8'], groundNight:['#3a1a2a','#2a0a1a','#1a000a'], sun:'rgba(255,180,220,0.8)', tree:{trunk:'#a855f7',main:'#ff69b4',light:'#ffd700',dark:'#ec4899'}, rock:'#a855f7', cactus:'#ff69b4', skyStars:'rgba(255,200,220,0.5)' },
         anniversary: { skyDay:['#ffed4e','#fff59d','#fff9c4'], skyNight:['#3a2a0a','#4a3a1a','#5a4a2a'], groundDay:['#ffd700','#ffed4e','#fff59d'], groundNight:['#3a2a0a','#2a1a00','#1a0a00'], sun:'rgba(255,215,0,0.9)', tree:{trunk:'#a855f7',main:'#ffd700',light:'#fff59d',dark:'#f59e0b'}, rock:'#ffd700', cactus:'#ff69b4', skyStars:'rgba(255,215,0,0.5)' }
-    }
-    ,
+    },
     city: {
         spring: { skyDay:['#d8d0d8','#e0d8e0','#e8e0e8'], skyNight:['#1a1a2e','#2a2a3e','#3a3a4e'], groundDay:['#a8a898','#989888','#888878'], groundNight:['#3a3a4a','#2a2a3a','#1a1a2a'], sun:'rgba(255,220,235,0.7)', tree:{trunk:'#5a4a3a',main:'#ff9ec7',light:'#ffc4dd',dark:'#e87aa8'}, rock:'#22c55e', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)' },
         summer: { skyDay:['#b8c8d8','#d0dce8','#e0e8f0'], skyNight:['#0a1520','#15202a','#1a2a3a'], groundDay:['#8a9aa8','#7a8a98','#6a7a88'], groundNight:['#3a4a5a','#2a3a4a','#1a2a3a'], sun:'rgba(255,240,150,0.7)', tree:{trunk:'#5a4a3a',main:'#22c55e',light:'#4ade80',dark:'#15803d'}, rock:'#ff5722', cactus:'#00e5ff', skyStars:'rgba(255,255,255,0.15)' },
@@ -2467,10 +2201,6 @@ const THEME_PALETTES = {
     }
 };
 
-// ============================================================
-// بخش ۱۴: EID_PALETTES (عید فطر، عید قربان، یلدا، ولنتاین)
-// ============================================================
-
 const EID_PALETTES = {
     eidFitr: {
         classic: { skyDay:['#a8e8c0','#c8f0d8','#e0f8e8'], skyNight:['#0a2a1a','#0a3a20','#0a4a28'], groundDay:['#5ad878','#4ac868','#3ab858'], groundNight:['#0a3a20','#052a15','#021a0a'], sun:'rgba(255,240,180,0.85)', tree:{trunk:'#4a6a2a',main:'#00d96a',light:'#4aff8a',dark:'#00a050'}, rock:'#00d96a', cactus:'#ffd700', skyStars:'rgba(180,255,200,0.5)' },
@@ -2530,10 +2260,6 @@ const EID_PALETTES = {
     }
 };
 
-// ============================================================
-// بخش ۱۵: توابع کمکی پالت (با چک EID)
-// ============================================================
-
 function getThemePalette(themeId, season) {
     if (EID_PALETTES[season]) {
         const eidTheme = EID_PALETTES[season];
@@ -2552,6 +2278,7 @@ function getRockColor() { return getTheme().rock; }
 function getCactusColor() { return getTheme().cactus; }
 function getSunColor() { return getTheme().sun; }
 function getSkyStarsColor() { return getTheme().skyStars || 'rgba(255,255,255,0.2)'; }
+
 // ============================================================
 // بخش ۱۶: رسم پس‌زمینه
 // ============================================================
@@ -2563,7 +2290,6 @@ function drawBackground() {
     const gy = ground();
     const skyColors = getSkyColors(isNight);
     const isSpace = currentTheme === 'space';
-
     const key = skyColors[0] + skyColors[2] + gy + currentTheme + currentSeason + isNight;
     if (bgCacheKey !== key || !bgGradientCache) {
         const gradient = ctx.createLinearGradient(0, 0, 0, gy);
@@ -2575,18 +2301,15 @@ function drawBackground() {
     }
     ctx.fillStyle = bgGradientCache;
     ctx.fillRect(0, 0, W, gy);
-
     if (isSpace) {
         ctx.fillStyle = "rgba(150,100,200,0.05)";
         ctx.beginPath();
         ctx.ellipse(W * 0.2, gy * 0.3, 150, 80, 0.5, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = "rgba(100,150,255,0.04)";
         ctx.beginPath();
         ctx.ellipse(W * 0.7, gy * 0.2, 180, 60, -0.3, 0, Math.PI * 2);
         ctx.fill();
-
         for (let i = 0; i < 15; i++) {
             const x = (i * 137 + 53) % W;
             const y = (i * 97 + 31) % (gy * 0.7);
@@ -2597,15 +2320,12 @@ function drawBackground() {
             ctx.fill();
         }
     }
-
     const sunColor = getSunColor();
-
     if (isNight) {
         ctx.fillStyle = isSpace ? "rgba(255,240,220,0.1)" : "rgba(255,240,220,0.15)";
         ctx.beginPath();
         ctx.arc(W - 90, 90, 28, 0, Math.PI * 2);
         ctx.fill();
-
         const starColor = getSkyStarsColor();
         ctx.fillStyle = starColor;
         const starCount = isSpace ? 20 : 10;
@@ -2617,7 +2337,6 @@ function drawBackground() {
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
         }
-
         if (isSpace) {
             const t = _nowSeconds;
             for (let i = 0; i < 5; i++) {
@@ -2635,7 +2354,6 @@ function drawBackground() {
         ctx.beginPath();
         ctx.arc(W - 90, 90, isSpace ? 30 : 35, 0, Math.PI * 2);
         ctx.fill();
-
         if (!isSpace) {
             ctx.fillStyle = "rgba(255,255,255,0.25)";
             drawCloud(120, 100, 1);
@@ -2643,7 +2361,6 @@ function drawBackground() {
             drawCloud(W * 0.85, 80, 0.8);
         }
     }
-
     const groundColors = getGroundColors(isNight);
     const groundGrad = ctx.createLinearGradient(0, gy, 0, H);
     groundGrad.addColorStop(0, groundColors[0]);
@@ -2651,7 +2368,6 @@ function drawBackground() {
     groundGrad.addColorStop(1, groundColors[2]);
     ctx.fillStyle = groundGrad;
     ctx.fillRect(0, gy, W, H - gy);
-
     ctx.fillStyle = isNight ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)";
     ctx.fillRect(0, gy, W, 3);
 }
@@ -2671,20 +2387,16 @@ function drawCloud(x, y, s) {
 function drawPowerup(p) {
     const cx = p.x + p.w / 2;
     const cy = p.y + p.h / 2;
-
     p.pulse += 0.05;
     const scaleVal = 1 + Math.sin(p.pulse) * 0.08;
-
     ctx.beginPath();
     ctx.arc(cx, cy, 18 * scaleVal, 0, Math.PI * 2);
     ctx.fillStyle = p.color + '30';
     ctx.fill();
-
     ctx.beginPath();
     ctx.arc(cx, cy, 14 * scaleVal, 0, Math.PI * 2);
     ctx.fillStyle = p.color;
     ctx.fill();
-
     ctx.font = '18px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -2693,7 +2405,7 @@ function drawPowerup(p) {
 }
 
 // ============================================================
-// بخش ۱۸: رسم روباه (پارامتری شده برای چند روباه)
+// بخش ۱۸: رسم روباه
 // ============================================================
 
 function drawFox(x, y, w, h, vy, grounded, animation, skinId, isRemote) {
@@ -2708,14 +2420,12 @@ function drawFox(x, y, w, h, vy, grounded, animation, skinId, isRemote) {
 
     let foxColor = skin.color;
     let trailColor = skin.trailColor || 'rgba(249,115,22,0.25)';
-
     if (skin.id === 'rainbow') {
         const hue = (_nowSeconds * 20) % 360;
         foxColor = `hsl(${hue}, 80%, 60%)`;
         trailColor = `hsla(${hue}, 80%, 60%, 0.2)`;
     }
 
-    // ذرات فقط برای روباه خودم (نه روباه حریف)
     if (!isRemote && playing && grounded && particles.length < MAX_PARTICLES) {
         createTrailParticle(x - 2, y + 22, trailColor);
         createTrailParticle(x - 6, y + 28, trailColor);
@@ -2766,7 +2476,6 @@ function drawFox(x, y, w, h, vy, grounded, animation, skinId, isRemote) {
     ctx.lineTo(x + 50, y - 6);
     ctx.closePath();
     ctx.fill();
-
     ctx.beginPath();
     ctx.moveTo(x + 53, y - 4);
     ctx.lineTo(x + 62, y - 19);
@@ -2808,19 +2517,16 @@ function drawFox(x, y, w, h, vy, grounded, animation, skinId, isRemote) {
 function drawEgg(e) {
     const cx = e.x + e.w / 2;
     const isSpace = currentTheme === 'space';
-
     ctx.fillStyle = e.color;
     ctx.beginPath();
     ctx.moveTo(cx, e.y);
     ctx.bezierCurveTo(e.x + e.w, e.y + 5, e.x + e.w, e.y + 23, cx, e.y + e.h);
     ctx.bezierCurveTo(e.x, e.y + 23, e.x, e.y + 5, cx, e.y);
     ctx.fill();
-
     ctx.fillStyle = 'rgba(255,255,255,0.55)';
     ctx.beginPath();
     ctx.ellipse(cx - e.w * 0.15, e.y + e.h * 0.28, e.w * 0.16, e.h * 0.18, -0.3, 0, Math.PI * 2);
     ctx.fill();
-
     ctx.strokeStyle = isSpace ? "rgba(200,180,255,0.25)" : "rgba(255,255,255,0.35)";
     ctx.lineWidth = 1;
     ctx.beginPath();
@@ -2830,7 +2536,7 @@ function drawEgg(e) {
 }
 
 // ============================================================
-// بخش ۲۰: رسم موانع (۶ نوع)
+// بخش ۲۰: رسم موانع
 // ============================================================
 
 function drawObstacle(o) {
@@ -2842,7 +2548,6 @@ function drawObstacle(o) {
     if (o.type === "tree") {
         ctx.fillStyle = treeColors.trunk;
         ctx.fillRect(o.x + 16, o.y + 27, 14, o.h - 27);
-
         ctx.fillStyle = treeColors.dark;
         ctx.beginPath();
         ctx.arc(o.x + 7, o.y + 32, 16, 0, Math.PI * 2);
@@ -2850,22 +2555,18 @@ function drawObstacle(o) {
         ctx.beginPath();
         ctx.arc(o.x + 40, o.y + 32, 16, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = treeColors.main;
         ctx.beginPath();
         ctx.arc(o.x + 23, o.y + 20, 25, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = treeColors.light;
         ctx.beginPath();
         ctx.arc(o.x + 18, o.y + 14, 10, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = 'rgba(255,255,255,0.35)';
         ctx.beginPath();
         ctx.arc(o.x + 20, o.y + 12, 5, 0, Math.PI * 2);
         ctx.fill();
-
         if (currentSeason === 'winter' || currentSeason === 'christmas') {
             ctx.fillStyle = isNight ? 'rgba(200,220,240,0.85)' : 'rgba(255,255,255,0.95)';
             ctx.beginPath();
@@ -2877,13 +2578,11 @@ function drawObstacle(o) {
             ctx.beginPath();
             ctx.arc(o.x + 40, o.y + 22, 14, Math.PI, 0);
             ctx.fill();
-
             ctx.fillStyle = isNight ? 'rgba(200,220,240,0.7)' : 'rgba(255,255,255,0.8)';
             ctx.beginPath();
             ctx.ellipse(o.x + 23, o.y + 28, 12, 4, 0, 0, Math.PI * 2);
             ctx.fill();
         }
-
         if (currentSeason === 'spring' || currentSeason === 'nowruz') {
             ctx.fillStyle = '#ffeb3b';
             ctx.beginPath();
@@ -2907,7 +2606,6 @@ function drawObstacle(o) {
         ctx.lineTo(o.x + o.w - 8, o.y + o.h);
         ctx.closePath();
         ctx.fill();
-
         ctx.fillStyle = 'rgba(255,255,255,0.4)';
         ctx.beginPath();
         ctx.moveTo(o.x + 12, o.y + 12);
@@ -2915,7 +2613,6 @@ function drawObstacle(o) {
         ctx.lineTo(o.x + 22, o.y + 20);
         ctx.closePath();
         ctx.fill();
-
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.beginPath();
         ctx.moveTo(o.x + o.w - 8, o.y + o.h);
@@ -2929,17 +2626,14 @@ function drawObstacle(o) {
         ctx.fillRect(o.x + 9, o.y, 14, o.h);
         ctx.fillRect(o.x, o.y + 20, 13, 11);
         ctx.fillRect(o.x + 20, o.y + 38, 13, 11);
-
         ctx.fillStyle = 'rgba(255,255,255,0.5)';
         ctx.fillRect(o.x + 10, o.y + 2, 4, o.h - 4);
         ctx.fillRect(o.x + 2, o.y + 22, 3, 7);
         ctx.fillRect(o.x + 22, o.y + 40, 3, 7);
-
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.fillRect(o.x + 19, o.y, 4, o.h);
         ctx.fillRect(o.x + 10, o.y + 20, 3, 11);
         ctx.fillRect(o.x + 30, o.y + 38, 3, 11);
-
         if (currentSeason === 'spring' || currentSeason === 'nowruz') {
             ctx.fillStyle = '#ff6fa8';
             ctx.beginPath();
@@ -2955,24 +2649,19 @@ function drawObstacle(o) {
         const leftH = o.h;
         const rightH = o.h * 0.88;
         const rightY = o.y + (o.h - rightH);
-
         ctx.fillStyle = 'rgba(0,0,0,0.15)';
         ctx.beginPath();
         ctx.ellipse(o.x + o.w / 2, o.y + o.h + 2, o.w * 0.5, 4, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = cactusColor;
         ctx.fillRect(o.x + 8, o.y, 14, leftH);
         ctx.fillRect(o.x, o.y + 18, 12, 11);
         ctx.fillRect(o.x + 18, o.y + 32, 12, 10);
-
         ctx.fillRect(o.x + 38, rightY, 14, rightH);
         ctx.fillRect(o.x + 30, rightY + 22, 12, 11);
         ctx.fillRect(o.x + 48, rightY + 36, 12, 10);
-
         ctx.fillStyle = 'rgba(0,0,0,0.25)';
         ctx.fillRect(o.x + 22, o.y + 5, 2, leftH - 10);
-
         ctx.fillStyle = 'rgba(255,255,255,0.5)';
         ctx.fillRect(o.x + 9, o.y + 2, 4, leftH - 4);
         ctx.fillRect(o.x + 2, o.y + 20, 3, 7);
@@ -2980,13 +2669,11 @@ function drawObstacle(o) {
         ctx.fillRect(o.x + 39, rightY + 2, 4, rightH - 4);
         ctx.fillRect(o.x + 32, rightY + 24, 3, 7);
         ctx.fillRect(o.x + 50, rightY + 38, 3, 6);
-
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.fillRect(o.x + 18, o.y, 4, leftH);
         ctx.fillRect(o.x + 48, rightY, 4, rightH);
         ctx.fillRect(o.x + 9, o.y + 18, 3, 11);
         ctx.fillRect(o.x + 39, rightY + 22, 3, 11);
-
         if (currentSeason === 'spring' || currentSeason === 'nowruz') {
             ctx.fillStyle = '#ff6fa8';
             ctx.beginPath();
@@ -2996,7 +2683,6 @@ function drawObstacle(o) {
             ctx.beginPath();
             ctx.arc(o.x + 15, o.y - 2, 2, 0, Math.PI * 2);
             ctx.fill();
-
             ctx.fillStyle = '#ff6fa8';
             ctx.beginPath();
             ctx.arc(o.x + 45, rightY - 2, 4.5, 0, Math.PI * 2);
@@ -3011,19 +2697,16 @@ function drawObstacle(o) {
         const cx = o.x + o.w / 2;
         const topY = o.y;
         const bottomY = o.y + o.h;
-
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.beginPath();
         ctx.ellipse(cx, bottomY + 2, o.w * 0.55, 5, 0, 0, Math.PI * 2);
         ctx.fill();
-
         const stumpGrad = ctx.createLinearGradient(o.x, 0, o.x + o.w, 0);
         stumpGrad.addColorStop(0, '#5a3a1a');
         stumpGrad.addColorStop(0.5, '#7a5230');
         stumpGrad.addColorStop(1, '#4a2e14');
         ctx.fillStyle = stumpGrad;
         ctx.fillRect(o.x + 4, topY + 4, o.w - 8, o.h - 4);
-
         ctx.strokeStyle = 'rgba(0,0,0,0.25)';
         ctx.lineWidth = 1;
         for (let i = 0; i < 4; i++) {
@@ -3033,12 +2716,10 @@ function drawObstacle(o) {
             ctx.lineTo(lx + (Math.random() - 0.5) * 2, bottomY - 2);
             ctx.stroke();
         }
-
         ctx.fillStyle = '#8a6040';
         ctx.beginPath();
         ctx.ellipse(cx, topY + 4, (o.w - 8) / 2, 5, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.strokeStyle = 'rgba(60,35,15,0.7)';
         ctx.lineWidth = 1.2;
         for (let r = 3; r < (o.w - 8) / 2 - 2; r += 3) {
@@ -3046,13 +2727,11 @@ function drawObstacle(o) {
             ctx.ellipse(cx, topY + 4, r, r * 0.4, 0, 0, Math.PI * 2);
             ctx.stroke();
         }
-
         ctx.strokeStyle = 'rgba(255,220,180,0.35)';
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.ellipse(cx, topY + 4, (o.w - 8) / 2, 5, 0, Math.PI * 1.2, Math.PI * 1.9);
         ctx.stroke();
-
         if (o.h > 42) {
             ctx.strokeStyle = 'rgba(30,15,5,0.6)';
             ctx.lineWidth = 1.5;
@@ -3062,7 +2741,6 @@ function drawObstacle(o) {
             ctx.lineTo(cx - 4, topY + 24);
             ctx.stroke();
         }
-
         ctx.fillStyle = currentSeason === 'winter' || currentSeason === 'christmas'
             ? 'rgba(240,248,255,0.7)'
             : 'rgba(60,130,50,0.7)';
@@ -3078,12 +2756,10 @@ function drawObstacle(o) {
         const cy = o.y + o.h / 2 + 2;
         const rx = o.w / 2 - 2;
         const ry = o.h / 2 - 2;
-
         ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.beginPath();
         ctx.ellipse(cx, o.y + o.h + 2, o.w * 0.45, 5, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = '#4a6a2a';
         ctx.beginPath();
         ctx.moveTo(cx - 4, o.y + 2);
@@ -3092,17 +2768,14 @@ function drawObstacle(o) {
         ctx.lineTo(cx + 5, o.y + 2);
         ctx.closePath();
         ctx.fill();
-
         ctx.fillStyle = '#5a8a3a';
         ctx.beginPath();
         ctx.ellipse(cx + 8, o.y - 4, 6, 3, -0.5, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = '#f97316';
         ctx.beginPath();
         ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.strokeStyle = 'rgba(180,60,10,0.6)';
         ctx.lineWidth = 1.5;
         for (let i = -2; i <= 2; i++) {
@@ -3112,21 +2785,17 @@ function drawObstacle(o) {
             ctx.quadraticCurveTo(cx + offsetX * 1.1, cy, cx + offsetX, o.y + o.h - 2);
             ctx.stroke();
         }
-
         ctx.fillStyle = 'rgba(194,65,12,0.5)';
         ctx.beginPath();
         ctx.ellipse(cx - rx * 0.55, cy, rx * 0.28, ry * 0.85, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.beginPath();
         ctx.ellipse(cx + rx * 0.55, cy, rx * 0.28, ry * 0.85, 0, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = 'rgba(255,220,180,0.35)';
         ctx.beginPath();
         ctx.ellipse(cx - rx * 0.4, cy - ry * 0.45, rx * 0.25, ry * 0.18, -0.4, 0, Math.PI * 2);
         ctx.fill();
-
         ctx.fillStyle = '#1a0a00';
         ctx.beginPath();
         ctx.moveTo(cx - 12, cy - 4);
@@ -3134,14 +2803,12 @@ function drawObstacle(o) {
         ctx.lineTo(cx - 9, cy + 3);
         ctx.closePath();
         ctx.fill();
-
         ctx.beginPath();
         ctx.moveTo(cx + 6, cy - 4);
         ctx.lineTo(cx + 12, cy - 4);
         ctx.lineTo(cx + 9, cy + 3);
         ctx.closePath();
         ctx.fill();
-
         ctx.fillStyle = '#1a0a00';
         ctx.beginPath();
         ctx.moveTo(cx - 10, cy + 8);
@@ -3153,7 +2820,6 @@ function drawObstacle(o) {
         ctx.lineTo(cx - 8, cy + 14);
         ctx.closePath();
         ctx.fill();
-
         if (isNight) {
             ctx.fillStyle = 'rgba(255,200,50,0.7)';
             ctx.beginPath();
@@ -3167,7 +2833,7 @@ function drawObstacle(o) {
 }
 
 // ============================================================
-// بخش ۲۱: پارتیکل‌های روباه
+// بخش ۲۱: پارتیکل‌ها
 // ============================================================
 
 function createTrailParticle(x, y, color) {
@@ -3240,6 +2906,9 @@ function draw() {
 
     drawFox(fox.x, fox.y, fox.w, fox.h, fox.vy, fox.grounded, fox.animation, currentSkinId, false);
 
+    if (remoteData.active) {
+        drawFox(W * 0.75, remoteData.y, fox.w, fox.h, remoteData.vy, remoteData.grounded, remoteData.animation, 'classic', true);
+    }
 }
 
 // ============================================================
@@ -3255,7 +2924,6 @@ function createEgg() {
     if (r > .91) type = 3;
     if (r > .98) type = 4;
     const data = eggColors[type];
-
     eggs.push({
         x: W + 30,
         y: ground() - 50 - Math.random() * 130,
@@ -3269,22 +2937,18 @@ function createEgg() {
 function createObstacle() {
     const r = Math.random();
     let type;
-
     if (r < 0.28) type = "tree";
     else if (r < 0.48) type = "rock";
     else if (r < 0.65) type = "cactus";
     else if (r < 0.78) type = "doubleCactus";
     else if (r < 0.89) type = "stump";
     else type = "pumpkin";
-
     let w = 45, h = 65;
-
     if (type === "rock") { w = 55; h = 40; }
     else if (type === "cactus") { w = 32; h = 62; }
     else if (type === "doubleCactus") { w = 58; h = 60 + Math.random() * 12; }
     else if (type === "stump") { w = 46; h = 38 + Math.random() * 8; }
     else if (type === "pumpkin") { w = 50; h = 44 + Math.random() * 6; }
-
     obstacles.push({
         x: W + 40,
         y: ground() - h,
@@ -3298,7 +2962,6 @@ function createObstacle() {
 function createPowerup(type) {
     const config = POWERUP_CONFIG[type];
     if (!config) return;
-
     powerups.push({
         x: W + 30,
         y: ground() - 80 - Math.random() * 100,
@@ -3313,15 +2976,12 @@ function createPowerup(type) {
 
 function trySpawnPowerup() {
     if (gameTime < 10) return;
-
     const activeTypes = [];
     if (shieldActive) activeTypes.push('shield');
     if (speedBoostActive) activeTypes.push('speed');
     if (activeTypes.length >= 2) return;
-
     const available = ['shield', 'speed'].filter(t => !activeTypes.includes(t));
     if (available.length === 0) return;
-
     const chance = Math.random() * 100;
     if (chance < 90) {
         const type = available[Math.floor(Math.random() * available.length)];
@@ -3332,51 +2992,27 @@ function trySpawnPowerup() {
 function collectEgg(e) {
     combo++;
     comboTimer = 2;
-
     let multiplier = 1;
     if (combo >= 10) multiplier = 3;
     else if (combo >= 5) multiplier = 2;
-
     let earned = e.value * multiplier;
     score += earned;
     totalEggs += 1;
     totalScore += earned;
-
     saveWallet();
     updateSpeed();
     updateDayNight();
     updateUI();
-
     if (combo >= 2) {
         comboBox.classList.add("show");
         comboValue.textContent = combo;
     }
-
     const skin = getSkin(currentSkinId);
     let burstColor = skin.color;
     if (skin.id === 'rainbow') {
         const hue = (_nowSeconds * 12) % 360;
         burstColor = `hsl(${hue}, 80%, 60%)`;
     }
-    if (skin.id === 'galaxy') burstColor = '#818cf8';
-    if (skin.id === 'shadow') burstColor = '#4ade80';
-    if (skin.id === 'phoenix') burstColor = '#f97316';
-    if (skin.id === 'neon') burstColor = '#f472b6';
-    if (skin.id === 'crystal') burstColor = '#a78bfa';
-    if (skin.id === 'golden') burstColor = '#fcd34d';
-    if (skin.id === 'frost') burstColor = '#93c5fd';
-    if (skin.id === 'ember') burstColor = '#ff6b35';
-    if (skin.id === 'lava') burstColor = '#dc2626';
-    if (skin.id === 'mint') burstColor = '#5eead4';
-    if (skin.id === 'vampire') burstColor = '#dc2626';
-    if (skin.id === 'eid') burstColor = '#4ade80';
-    if (skin.id === 'ice') burstColor = '#22d3ee';
-    if (skin.id === 'sakura') burstColor = '#fbcfe8';
-    if (skin.id === 'dragon') burstColor = '#10b981';
-    if (skin.id === 'phantom') burstColor = '#a78bfa';
-    if (skin.id === 'inferno') burstColor = '#ef4444';
-    if (skin.id === 'celestial') burstColor = '#fef3c7';
-
     createBurstParticles(e.x + e.w / 2, e.y + e.h / 2, burstColor, 6);
 }
 
@@ -3400,9 +3036,7 @@ function applyPowerup(type) {
 function updatePowerupTimers() {
     shieldTimerItem.classList.add('hidden-timer');
     speedTimerItem.classList.add('hidden-timer');
-
     let anyActive = false;
-
     if (shieldActive) {
         shieldTimerItem.classList.remove('hidden-timer');
         shieldTimeDisplay.textContent = Math.ceil(shieldTimer);
@@ -3413,28 +3047,20 @@ function updatePowerupTimers() {
         speedTimeDisplay.textContent = Math.ceil(speedBoostTimer);
         anyActive = true;
     }
-
     if (anyActive) powerupTimer.classList.remove('hidden');
     else powerupTimer.classList.add('hidden');
 }
 
 // ============================================================
-// بخش ۲۴: توابع اتصال دو نفره (PeerJS)
+// بخش ۲۴: اتصال دو نفره (PeerJS)
 // ============================================================
 
-// ============================================================
-// بخش ۲۴: توابع اتصال دو نفره (PeerJS و WebSocket محلی)
-// ============================================================
-
-// تابع کمکی برای نمایش مودال ورودی (جایگزین prompt)
 function showInputModal(title, placeholder, callback) {
     const modal = document.createElement('div');
     modal.style.cssText = 'position:fixed;inset:0;z-index:100005;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.85);padding:20px;backdrop-filter:blur(4px);';
-    
     const fa = language === 'fa';
     const cancelText = fa ? 'لغو' : 'Cancel';
     const submitText = fa ? 'اتصال' : 'Connect';
-
     modal.innerHTML = `
         <div style="background:linear-gradient(135deg,#1a1a2e,#2a1a3e);padding:25px 20px;border-radius:20px;width:100%;max-width:320px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.6);text-align:center;">
             <h3 style="color:white;margin-bottom:15px;font-size:16px;">${title}</h3>
@@ -3446,19 +3072,15 @@ function showInputModal(title, placeholder, callback) {
         </div>
     `;
     document.body.appendChild(modal);
-
     const input = document.getElementById('customInputModal');
     setTimeout(() => input.focus(), 100);
-
     const close = () => modal.remove();
-
     document.getElementById('modalCancelBtn').onclick = close;
     document.getElementById('modalSubmitBtn').onclick = () => {
         const value = input.value.trim();
         close();
         if (value) callback(value);
     };
-    
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -3467,9 +3089,6 @@ function showInputModal(title, placeholder, callback) {
     });
 }
 
-// ============================================================
-// اتصال آنلاین (PeerJS)
-// ============================================================
 function hostOnline() {
     if (peer) return;
     peer = new Peer();
@@ -3505,66 +3124,35 @@ function joinOnline() {
     );
 }
 
-// ============================================================
-// اتصال آفلاین (هات‌اسپات - با پلاگین بومی جدید)
-// ============================================================
-function hostOffline() {
-    isHost = true;
-    
-    // چک کردن اینکه پلاگین بومی (که در build.yml ساختیم) لود شده است
-    if (!window.WebSocketServer) {
-        showToast(language === 'fa' ? 'پلاگین سرور نصب نیست!' : 'Server plugin not found!');
-        return;
-    }
-
-    localServer = new window.WebSocketServer();
-    localServer.start(8080, 
-        () => {
-            showRoomCode('192.168.43.1:8080');
-            showToast(language === 'fa' ? 'سرور محلی روشن شد ✅' : 'Local server started ✅');
-        },
-        (err) => {
-            showToast((language === 'fa' ? 'خطا: ' : 'Error: ') + err);
-        }
-    );
-}
-
-function joinOffline() {
-    showInputModal(
-        language === 'fa' ? 'IP میزبان را وارد کنید' : 'Enter host IP',
-        '192.168.43.1',
-        (ip) => {
-            isHost = false;
-            try {
-                joinOffline._ws = new WebSocket('ws://' + ip + ':8080');
-                joinOffline._ws.onopen = () => {
-                    showToast(language === 'fa' ? 'وصل شدی! ✅' : 'Connected! ✅');
-                    conn = {
-                        open: true,
-                        send: (data) => joinOffline._ws.send(JSON.stringify(data))
-                    };
-                };
-                joinOffline._ws.onmessage = (e) => {
-                    try { handleNetworkData(JSON.parse(e.data)); } catch(e) {}
-                };
-                joinOffline._ws.onerror = () => showToast(language === 'fa' ? 'اتصال برقرار نشد ❌' : 'Connection failed ❌');
-            } catch (e) {
-                showToast(language === 'fa' ? 'خطا در اتصال ❌' : 'Connection error ❌');
-            }
-        }
-    );
-}
-
 function setupConnection() {
     if (!conn) return;
     conn.on('data', handleNetworkData);
     conn.on('close', () => {
-        remoteData.active = false;
-        isReady = false;
-        isOpponentReady = false;
-        conn = null;
-        showToast('اتصال قطع شد');
+        handleOpponentLeft();
     });
+    conn.on('error', () => {
+        handleOpponentLeft();
+    });
+}
+
+function handleOpponentLeft() {
+    if (remoteData.active) {
+        lastEnemyScore = remoteData.score;
+    }
+    remoteData.active = false;
+    isReady = false;
+    isOpponentReady = false;
+    gameStarted = false;
+    wasMultiplayer = false;
+    conn = null;
+
+    const vs = document.getElementById('vsScores');
+    if (vs) vs.style.display = 'none';
+
+    if (playing) {
+        showToast(language === 'fa' ? 'حریف بازی را ترک کرد! ادامه به‌صورت تک‌نفره 🦊' : 'Opponent left! Continuing solo 🦊');
+        updateUI();
+    }
 }
 
 function handleNetworkData(data) {
@@ -3575,6 +3163,7 @@ function handleNetworkData(data) {
         remoteData.vy = data.vy;
         remoteData.grounded = data.grounded;
         remoteData.animation = data.animation;
+        lastEnemyScore = data.score;
     }
     if (data.type === 'ready') {
         isOpponentReady = true;
@@ -3583,17 +3172,17 @@ function handleNetworkData(data) {
     if (data.type === 'countdownStart') {
         if (!playing && !isStartingCountdown) startCountdown();
     }
+    if (data.type === 'left') {
+        handleOpponentLeft();
+    }
 }
 
 function showRoomCode(text) {
     const box = document.createElement('div');
     box.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.92);color:white;padding:24px 20px;border-radius:16px;z-index:100005;text-align:center;min-width:280px;max-width:90%;';
-    
-    // ساخت دکمه کپی
     box.innerHTML = `
         <div style="font-size:13px;color:#aaa;margin-bottom:8px;">کد اتاق</div>
         <div id="roomCodeText" style="font-size:18px;font-weight:bold;color:#4ade80;word-break:break-all;margin-bottom:15px;user-select:all;font-family:monospace;">${text}</div>
-        
         <div style="display:flex;flex-direction:column;gap:8px;">
             <button id="copyRoomCodeBtn" style="padding:10px;background:#2d7a3d;border:none;border-radius:9px;color:white;font-weight:bold;cursor:pointer;font-size:14px;">📋 کپی کد اتاق</button>
             <button id="closeRoomCodeBtn" style="padding:10px;background:#f97316;border:none;border-radius:9px;color:white;font-weight:bold;cursor:pointer;font-size:14px;">باشه</button>
@@ -3601,14 +3190,12 @@ function showRoomCode(text) {
     `;
     document.body.appendChild(box);
 
-    // دکمه کپی
     document.getElementById('copyRoomCodeBtn').addEventListener('click', function() {
         if (navigator.clipboard) {
             navigator.clipboard.writeText(text).then(() => {
                 this.textContent = '✅ کپی شد!';
                 setTimeout(() => { this.textContent = '📋 کپی کد اتاق'; }, 2000);
             }).catch(() => {
-                // روش جایگزین برای دستگاه‌های قدیمی‌تر
                 const tempInput = document.createElement('input');
                 tempInput.value = text;
                 document.body.appendChild(tempInput);
@@ -3630,18 +3217,13 @@ function showRoomCode(text) {
         }
     });
 
-    // دکمه بستن
     document.getElementById('closeRoomCodeBtn').addEventListener('click', function() {
         box.remove();
     });
 }
 
-function getLocalIP() {
-    return '192.168.43.1';
-}
-
 // ============================================================
-// بخش ۲۵: شمارش معکوس و شروع بازی
+// بخش ۲۵: شمارش معکوس
 // ============================================================
 
 function startCountdown() {
@@ -3790,10 +3372,8 @@ function update(dt) {
 
     const shieldInd = document.getElementById('shieldIndicator');
     const speedInd = document.getElementById('speedIndicator');
-
     if (shieldActive) shieldInd.classList.remove('hidden-indicator');
     else shieldInd.classList.add('hidden-indicator');
-
     if (speedBoostActive) speedInd.classList.remove('hidden-indicator');
     else speedInd.classList.add('hidden-indicator');
 
@@ -3808,22 +3388,16 @@ function update(dt) {
     updateParticles(dt);
     updateSeasonalParticles(dt);
 
-    // ارسال داده‌های شبکه
     const now = performance.now();
     if (now - lastNetworkSend > 40 && conn && conn.open) {
-        const payload = {
+        conn.send({
             type: 'state',
             score: score,
             y: fox.y,
             vy: fox.vy,
             grounded: fox.grounded,
             animation: fox.animation
-        };
-        if (isHost && localServer) {
-            localServer.send(JSON.stringify(payload));
-        } else if (conn.send) {
-            conn.send(payload);
-        }
+        });
         lastNetworkSend = now;
     }
 }
@@ -3832,26 +3406,22 @@ let _rafId = null;
 
 function loop(time) {
     if (!playing) { _rafId = null; return; }
-
     let dt = (time - lastTime) / 1000;
     lastTime = time;
     if (dt > 0.033) dt = 0.033;
     if (dt < 0) dt = 0.016;
-
     update(dt);
     draw();
-
     if (playing) _rafId = requestAnimationFrame(loop);
     else _rafId = null;
 }
+
 // ============================================================
 // بخش ۲۷: شروع و پایان بازی
 // ============================================================
 
 function startGame() {
     if (playing || isStartingCountdown) return;
-
-    // اگر در حالت دو نفره هستیم (اتصال برقرار است)
     if (conn && conn.open) {
         if (!isReady) {
             isReady = true;
@@ -3864,8 +3434,6 @@ function startGame() {
             return;
         }
     }
-
-    // اگر تک‌نفره بود
     executeGameStart();
 }
 
@@ -3875,6 +3443,9 @@ function executeGameStart() {
     isReady = false;
     isOpponentReady = false;
     isStartingCountdown = false;
+    gameStarted = true;
+    wasMultiplayer = !!conn;
+    lastEnemyScore = 0;
 
     stopMusicTimer();
 
@@ -3938,6 +3509,7 @@ function executeGameStart() {
 
 function endGame() {
     playing = false;
+    gameStarted = false;
     stopMusic();
 
     if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
@@ -3973,6 +3545,20 @@ function endGame() {
     obstacles.length = 0;
     powerups.length = 0;
 
+    const mpFinal = document.getElementById('mpFinalScores');
+    if (mpFinal) {
+        if (wasMultiplayer) {
+            const fa = language === 'fa';
+            document.getElementById('mpFinalLabelYou').textContent = fa ? 'شما' : 'You';
+            document.getElementById('mpFinalLabelEnemy').textContent = fa ? 'حریف' : 'Opponent';
+            document.getElementById('mpFinalScoreYou').textContent = score;
+            document.getElementById('mpFinalScoreEnemy').textContent = lastEnemyScore;
+            mpFinal.style.display = 'block';
+        } else {
+            mpFinal.style.display = 'none';
+        }
+    }
+
     updateUI();
     menuButton.style.display = "block";
     menuButton.style.zIndex = "99999";
@@ -4007,7 +3593,7 @@ function updateUI() {
     finalEggs.textContent = totalEggs;
 
     const vs = document.getElementById('vsScores');
-    if (conn || (typeof localServer !== 'undefined' && localServer)) {
+    if (gameStarted && conn && remoteData.active) {
         vs.style.display = 'flex';
         document.getElementById('myScoreVs').textContent = score;
         document.getElementById('enemyScoreVs').textContent = remoteData.score;
@@ -4032,7 +3618,6 @@ function setTheme(themeId) {
 function updateThemeUI() {
     currentThemeDisplay.textContent = getThemeIcon(currentTheme) + ' ' + getThemeName(currentTheme);
     startThemeLabel.textContent = language === 'fa' ? 'تغییر تم' : 'Change Theme';
-
     document.querySelectorAll('.theme-option').forEach(opt => {
         const tid = opt.dataset.theme;
         if (!THEME_PALETTES[tid]) return;
@@ -4041,7 +3626,6 @@ function updateThemeUI() {
         opt.querySelector('.desc').textContent = getThemeDesc(tid);
         opt.querySelector('.icon').textContent = getThemeIcon(tid);
     });
-
     const season = getSeasonConfig();
     document.getElementById('themeSelectorTitle').textContent = language === 'fa'
         ? season.icon + ' انتخاب تم ' + season.nameFa
@@ -4056,7 +3640,6 @@ function updateThemeUI() {
 function renderSkinShop() {
     const grid = document.getElementById('skinShopGrid');
     if (!grid) return;
-
     const fa = language === 'fa';
     document.getElementById('skinCount').textContent = purchasedSkins.length + '/' + FOX_SKINS.length;
     document.getElementById('totalScoreDisplay').textContent = totalScore.toLocaleString();
@@ -4075,10 +3658,8 @@ function renderSkinShop() {
     rarityOrder.forEach(rarity => {
         const skinsInRarity = FOX_SKINS.filter(s => s.rarity === rarity);
         if (skinsInRarity.length === 0) return;
-
         const label = fa ? rarityLabels[rarity].fa : rarityLabels[rarity].en;
         const color = rarityLabels[rarity].color;
-
         html += `<div style="margin-top:12px;margin-bottom:6px;">`;
         html += `<div style="font-size:11px;font-weight:bold;color:${color};border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:4px;">${label}</div>`;
         html += `<div style="display:grid;grid-template-columns:repeat(${skinsInRarity.length === 1 ? 1 : 2},1fr);gap:6px;margin-top:6px;">`;
@@ -4088,16 +3669,13 @@ function renderSkinShop() {
             const active = isSkinActive(skin.id);
             const canBuy = totalScore >= skin.price && !owned && skin.price > 0;
             const isFree = skin.price === 0;
-
             const colorStyle = skin.id === 'rainbow'
                 ? 'linear-gradient(45deg,red,orange,yellow,green,blue,indigo,violet)'
                 : skin.color;
-
             let statusText = '', statusColor = '';
             let bgColor = 'rgba(255,255,255,0.03)';
             let borderColor = 'rgba(255,255,255,0.06)';
             let cursorStyle = 'pointer';
-
             if (active) {
                 statusText = fa ? '✓ فعال' : '✓ Active';
                 statusColor = '#4ade80';
@@ -4120,10 +3698,8 @@ function renderSkinShop() {
                 bgColor = 'rgba(239,68,68,0.05)';
                 cursorStyle = 'not-allowed';
             }
-
             const rarityLabel = getRarityLabel(skin.rarity);
             const isLocked = !owned && !canBuy && !isFree;
-
             html += `<div class="skin-option ${active ? 'active' : ''} ${owned ? 'owned' : ''} ${isLocked ? 'locked' : ''}"
                 data-skin="${skin.id}"
                 style="background:${bgColor};border:2px solid ${borderColor};border-radius:10px;padding:8px;text-align:center;cursor:${cursorStyle};position:relative;${isLocked ? 'opacity:0.5;' : ''}">
@@ -4137,10 +3713,8 @@ function renderSkinShop() {
                 ${active ? '<div style="position:absolute;top:-4px;right:-4px;font-size:12px;">⭐</div>' : ''}
             </div>`;
         });
-
         html += `</div></div>`;
     });
-
     grid.innerHTML = html;
 
     document.querySelectorAll('.skin-option').forEach(el => {
@@ -4155,7 +3729,6 @@ function renderSkinShop() {
 function handleSkinClick(skinId) {
     const skin = getSkin(skinId);
     if (!skin) return;
-
     const owned = isSkinOwned(skinId);
     const fa = language === 'fa';
 
@@ -4214,7 +3787,6 @@ function closeThemeSelectorFn() {
     themeSelectorOverlay.style.display = 'none';
     menuButton.style.display = "block";
     nftButton.style.display = "flex";
-
     if (gameOver.dataset.wasVisible === 'true') {
         gameOver.style.display = 'flex';
         gameOver.dataset.wasVisible = 'false';
@@ -4224,16 +3796,12 @@ function closeThemeSelectorFn() {
 function applySeasonToUI() {
     const season = getSeasonConfig();
     const fa = language === 'fa';
-
     const startLogo = document.getElementById('startLogo');
     if (startLogo) startLogo.textContent = season.logo;
-
     const gameOverLogo = document.getElementById('gameOverLogo');
     if (gameOverLogo) gameOverLogo.textContent = season.logo;
-
     const channelIcon = document.getElementById('channelIcon');
     if (channelIcon) channelIcon.textContent = season.logo;
-
     const editionBadge = document.getElementById('editionBadge');
     if (editionBadge) {
         editionBadge.textContent = fa ? season.editionFa : season.editionEn;
@@ -4272,9 +3840,7 @@ function refreshSeason() {
         drawBackground();
         drawFox(fox.x, fox.y, fox.w, fox.h, fox.vy, fox.grounded, fox.animation, currentSkinId, false);
     }
-
     if (playing && soundEnabled) startMusic();
-
     if (typeof showSeasonAnnouncement === 'function') {
         showSeasonAnnouncement(newSeason);
     }
@@ -4284,7 +3850,6 @@ function applyLanguage() {
     const fa = language === "fa";
     document.documentElement.lang = fa ? "fa" : "en";
     document.documentElement.dir = fa ? "rtl" : "ltr";
-
     const season = getSeasonConfig();
 
     document.getElementById("gameTitle").textContent = "Fox Eggs";
@@ -4336,15 +3901,6 @@ function setLanguage(lang) {
     applyLanguage();
     menuPanel.style.display = "none";
     nftButton.style.display = "flex";
-
-    const prompt = document.getElementById('referralPrompt');
-    if (prompt) {
-        const parent = prompt.parentNode;
-        if (parent) {
-            parent.removeChild(prompt);
-            showReferralPrompt();
-        }
-    }
 }
 
 // ============================================================
@@ -4425,13 +3981,11 @@ async function syncReferralsWithServer() {
     const userId = getUserId();
     const code = generateReferralCode(userId);
     const local = getReferralsFromLocalStorage(code);
-
     try {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 5000);
         const response = await fetch(`${WEBHOOK_URL}/api/referrals/${code}`, { signal: controller.signal });
         clearTimeout(timeoutId);
-
         if (response.ok) {
             const data = await response.json();
             if (data.success && data.referrals) {
@@ -4468,7 +4022,6 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
     }
 
     const userId = getUserId();
-
     if (!referralCodeInput || referralCodeInput.trim() === '') {
         const fa = language === 'fa';
         errorElement.textContent = fa ? '⚠️ لطفاً کد دعوت را وارد کنید.' : '⚠️ Please enter an invite code.';
@@ -4479,7 +4032,6 @@ async function registerReferralWithRetry(referralCodeInput, overlayElement, inpu
     }
 
     const code = referralCodeInput.trim().toUpperCase();
-
     if (!/^[A-Z0-9]{4,10}$/.test(code)) {
         const fa = language === 'fa';
         errorElement.textContent = fa ? '⚠️ فرمت کد نامعتبر!' : '⚠️ Invalid code format!';
@@ -4616,7 +4168,6 @@ function showReferralPrompt() {
         this.classList.remove('error');
         this.style.borderColor = '#f97316';
     });
-
     setTimeout(() => input.focus(), 200);
 }
 
@@ -4626,7 +4177,6 @@ function copyReferralCode() {
         alert(language === 'fa' ? 'کدی برای کپی وجود ندارد!' : 'No code to copy!');
         return;
     }
-
     if (navigator.clipboard) {
         navigator.clipboard.writeText(code).then(() => {
             const originalText = copyBtn.textContent;
@@ -4655,7 +4205,7 @@ function fallbackCopy(text) {
 }
 
 // ============================================================
-// بخش ۳۰: پاپ‌آپ کانال تلگرام
+// بخش ۳۰: کانال تلگرام
 // ============================================================
 
 let channelPopupShown = false;
@@ -4677,13 +4227,10 @@ function getChannelTexts() {
 
 function showChannelPopup() {
     if (playing) return;
-
     const popup = document.getElementById('channelPopup');
     if (!popup) return;
-
     const texts = getChannelTexts();
     const season = getSeasonConfig();
-
     document.getElementById('channelTitle').textContent = texts.title;
     document.getElementById('channelSub').textContent = texts.subtitle;
     document.getElementById('feature1').textContent = texts.feature1;
@@ -4692,14 +4239,11 @@ function showChannelPopup() {
     document.getElementById('channelBtnText').textContent = texts.btnText;
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
     document.getElementById('channelIcon').textContent = season.logo;
-
     const channelLink = document.getElementById('channelLink');
     if (channelLink) channelLink.href = getChannelUrl();
-
     const box = document.querySelector('#channelPopup .box');
     box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
     box.style.textAlign = 'center';
-
     popup.style.display = 'flex';
     channelPopupShown = true;
 }
@@ -4712,10 +4256,8 @@ function closeChannelPopup() {
 function updateChannelPopup() {
     const popup = document.getElementById('channelPopup');
     if (!popup || popup.style.display !== 'flex') return;
-
     const texts = getChannelTexts();
     const season = getSeasonConfig();
-
     document.getElementById('channelTitle').textContent = texts.title;
     document.getElementById('channelSub').textContent = texts.subtitle;
     document.getElementById('feature1').textContent = texts.feature1;
@@ -4724,16 +4266,14 @@ function updateChannelPopup() {
     document.getElementById('channelBtnText').textContent = texts.btnText;
     document.getElementById('closeChannelBtn').textContent = texts.closeText;
     document.getElementById('channelIcon').textContent = season.logo;
-
     const channelLink = document.getElementById('channelLink');
     if (channelLink) channelLink.href = getChannelUrl();
-
     const box = document.querySelector('#channelPopup .box');
     box.style.direction = language === 'fa' ? 'rtl' : 'ltr';
 }
 
 // ============================================================
-// بخش ۳۱: NFT Modal + آکاردئون اسکین‌ها
+// بخش ۳۱: NFT
 // ============================================================
 
 const NFT_CONTENT = {
@@ -4772,15 +4312,12 @@ const NFT_CONTENT = {
 function updateNftUI() {
     const fa = language === 'fa';
     const data = fa ? NFT_CONTENT.fa : NFT_CONTENT.en;
-
     if (nftTitle) nftTitle.textContent = data.title;
     if (nftContent) nftContent.innerHTML = data.content;
     if (nftChannelText) nftChannelText.textContent = data.channelText;
     if (nftButtonText) nftButtonText.textContent = 'NFT';
-
     const nftLink = document.getElementById('nftChannelLink');
     if (nftLink) nftLink.href = getChannelUrl();
-
     if (nftContent) {
         nftContent.style.direction = fa ? 'rtl' : 'ltr';
         nftContent.style.textAlign = fa ? 'right' : 'left';
@@ -4814,7 +4351,6 @@ function initNftEvents() {
             if (e.target === nftModal) closeNftModalFn();
         });
     }
-
     updateNftUI();
 }
 
@@ -4824,13 +4360,10 @@ function initSkinShopToggle() {
     const header = document.getElementById('skinShopHeader');
     const body = document.getElementById('skinShopBody');
     const arrow = document.getElementById('skinShopArrow');
-
     if (!header || !body || !arrow) return;
-
     header.addEventListener('click', function(e) {
         e.stopPropagation();
         skinShopOpen = !skinShopOpen;
-
         if (skinShopOpen) {
             body.style.display = 'block';
             arrow.classList.add('open');
@@ -4843,7 +4376,7 @@ function initSkinShopToggle() {
 }
 
 // ============================================================
-// بخش ۳۲: سیستم اعلان فصل جدید
+// بخش ۳۲: اعلان فصل
 // ============================================================
 
 const SEASON_ANNOUNCEMENTS = {
@@ -4893,33 +4426,24 @@ let seasonToastTimeout = null;
 
 function showSeasonAnnouncement(seasonId, force = false) {
     if (!force && isSeasonAnnouncedThisYear(seasonId)) return;
-
     const config = SEASON_ANNOUNCEMENTS[seasonId];
     if (!config) return;
-
     const popup = document.getElementById('seasonAnnouncement');
     if (!popup) return;
-
     const fa = language === 'fa';
     const season = SEASONS[seasonId];
     if (season) {
         document.getElementById('seasonAnnounceIcon').textContent = season.icon;
     }
-
     document.getElementById('seasonAnnounceLabel').textContent = fa ? config.labelFa : config.labelEn;
     document.getElementById('seasonAnnounceName').textContent = fa ? config.nameFa : config.nameEn;
-
     popup.style.setProperty('--season-color', config.color);
     popup.style.setProperty('--season-glow', config.glow);
-
     markSeasonAsAnnounced(seasonId);
-
     popup.classList.remove('hide');
     void popup.offsetWidth;
     popup.classList.add('show');
-
     playSeasonSound(seasonId);
-
     if (seasonToastTimeout) clearTimeout(seasonToastTimeout);
     seasonToastTimeout = setTimeout(() => {
         hideSeasonToast();
@@ -4940,7 +4464,6 @@ function playSeasonSound(seasonId) {
     if (!soundEnabled) return;
     initAudio();
     if (!audioContext) return;
-
     const notes = {
         spring: [523.25, 659.25, 783.99],
         summer: [587.33, 739.99, 880.00],
@@ -4955,7 +4478,6 @@ function playSeasonSound(seasonId) {
         yalda: [523.25, 659.25, 783.99],
         valentine: [659.25, 830.61, 987.77]
     };
-
     const melody = notes[seasonId] || notes.spring;
     melody.forEach((note, i) => {
         playTone(note, 0.22, 'triangle', 0.08, i * 0.1);
@@ -4972,7 +4494,7 @@ function checkAndAnnounceSeason() {
 }
 
 // ============================================================
-// بخش ۳۳: رویدادها (Event Listeners)
+// بخش ۳۳: رویدادها
 // ============================================================
 
 window.addEventListener("online", function() { checkInternet(); });
@@ -5024,7 +4546,6 @@ restartButton.addEventListener("click", function(e) {
     startGame();
 });
 
-// دکمه بازی دو نفره
 document.getElementById('multiplayerBtn').addEventListener('click', function(e) {
     e.stopPropagation();
     document.getElementById('mpModal').style.display = 'flex';
@@ -5159,7 +4680,7 @@ initNftEvents();
 initSkinShopToggle();
 
 // ============================================================
-// بخش ۳۵: تایمرها و راه‌اندازی تعاملی
+// بخش ۳۵: تایمرها
 // ============================================================
 
 setTimeout(() => {
@@ -5204,6 +4725,9 @@ setInterval(() => {
 }, 60000);
 
 window.addEventListener('beforeunload', function() {
+    if (conn && conn.open) {
+        try { conn.send({ type: 'left' }); } catch(e) {}
+    }
     if (_rafId) cancelAnimationFrame(_rafId);
     stopMusicTimer();
 });
