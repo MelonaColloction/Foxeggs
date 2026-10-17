@@ -81,72 +81,6 @@ jobs:
 
 
       # ==========================================
-      # INJECT REAL WEBSOCKET BRIDGE (OFFLINE FIX)
-      # ==========================================
-      # این بخش به جای شبیه‌ساز، پلاگین بومی واقعی را 
-      # به کدهای بازی متصل می‌کند تا اتصال آفلاین کار کند
-      - name: Inject Real WebSocket Bridge
-        run: |
-          python3 - <<'PY'
-          path = "www/index.html"
-          with open(path, "r", encoding="utf-8") as f:
-              content = f.read()
-
-          # کد پل ارتباطی برای استفاده از پلاگین بومی
-          ws_script = """
-          <script>
-          // پل ارتباطی برای سرور وب‌سوکت بومی Capacitor
-          window.WebSocketServer = function() {
-              this.server = null;
-
-              this.start = function(port, onSuccess, onError) {
-                  if (!window.cordova || !window.cordova.plugins || !window.cordova.plugins.wsserver) {
-                      if (onError) onError("Native WebSocket plugin not found.");
-                      return;
-                  }
-
-                  window.cordova.plugins.wsserver.start(port, {}).subscribe(
-                      function(serverInfo) {
-                          console.log('WebSocket Server started on: ' + serverInfo.addr + ':' + serverInfo.port);
-                          if (onSuccess) onSuccess();
-                      },
-                      function(error) {
-                          console.error('WebSocket Server error: ', error);
-                          if (onError) onError(error);
-                      }
-                  );
-
-                  // گوش دادن به پیام‌های دریافتی از حریف
-                  window.cordova.plugins.wsserver.watchMessage().subscribe(function(result) {
-                      if (window.handleNetworkData) {
-                          try {
-                              const data = JSON.parse(result.msg);
-                              window.handleNetworkData(data);
-                          } catch(e) { console.warn('Invalid message', e); }
-                      }
-                  });
-              };
-
-              this.send = function(data) {
-                  if (!window.cordova || !window.cordova.plugins || !window.cordova.plugins.wsserver) return;
-                  window.cordova.plugins.wsserver.watchOpen().subscribe(function(conn) {
-                       window.cordova.plugins.wsserver.send({ uuid: conn.uuid }, data);
-                  });
-              };
-          };
-          </script>
-          """
-
-          if "<script>\n// پل ارتباطی برای سرور وب‌سوکت بومی" not in content:
-              content = content.replace("</body>", ws_script + "\n</body>")
-
-          with open(path, "w", encoding="utf-8") as f:
-              f.write(content)
-          print("Real WebSocket bridge injected.")
-          PY
-
-
-      # ==========================================
       # CREATE PACKAGE.JSON
       # ==========================================
       - name: Create package.json
@@ -158,16 +92,10 @@ jobs:
             "private": true,
             "dependencies": {
               "@capacitor/core": "^7.4.0",
-              "@capacitor/android": "^7.4.0",
-              "cordova-plugin-websocket-server": "^1.0.0"
+              "@capacitor/android": "^7.4.0"
             },
             "devDependencies": {
               "@capacitor/cli": "^7.4.0"
-            },
-            "cordova": {
-              "plugins": {
-                "cordova-plugin-websocket-server": {}
-              }
             }
           }
           EOF
@@ -190,12 +118,7 @@ jobs:
           {
             "appId": "com.foxeggs.game",
             "appName": "Fox Eggs",
-            "webDir": "www",
-            "plugins": {
-              "WebSocketServer": {
-                "enabled": true
-              }
-            }
+            "webDir": "www"
           }
           EOF
 
@@ -206,77 +129,6 @@ jobs:
       - name: Add Android
         run: |
           npx cap add android
-
-
-      # ==========================================
-      # CONFIGURE LOCAL NETWORK & FIX KEYBOARD (BLACK SCREEN)
-      # ==========================================
-      # برای کار کردن اتصال آفلاین (هات‌اسپات):
-      #   1. usesCleartextTraffic="true" برای ws:// محلی
-      #   2. مجوزهای شبکه محلی (WiFi / Nearby Devices)
-      #   3. مجوز موقعیت مکانی برای کشف IP روی اندروید قدیمی
-      # برای رفع مشکل سیاه شدن صفحه هنگام باز شدن کیبورد:
-      #   4. windowSoftInputMode="adjustPan"
-      - name: Configure AndroidManifest
-        run: |
-          python3 - <<'PY'
-          import re
-
-          path = "android/app/src/main/AndroidManifest.xml"
-
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
-
-          # ------------------------------------------
-          # ENABLE CLEARTEXT TRAFFIC (برای ws:// محلی)
-          # ------------------------------------------
-          if 'android:usesCleartextTraffic' not in text:
-              text = re.sub(
-                  r'<application(\s+)',
-                  r'<application\1android:usesCleartextTraffic="true" ',
-                  text,
-                  count=1
-              )
-
-          # ------------------------------------------
-          # ADD NETWORK PERMISSIONS
-          # ------------------------------------------
-          needed_permissions = [
-              "android.permission.INTERNET",
-              "android.permission.ACCESS_NETWORK_STATE",
-              "android.permission.ACCESS_WIFI_STATE",
-              "android.permission.CHANGE_WIFI_MULTICAST_STATE",
-              "android.permission.NEARBY_WIFI_DEVICES",
-              "android.permission.ACCESS_FINE_LOCATION",
-              "android.permission.ACCESS_COARSE_LOCATION",
-          ]
-
-          for perm in needed_permissions:
-              if perm not in text:
-                  text = text.replace(
-                      "<application",
-                      f'<uses-permission android:name="{perm}" />\n    <application',
-                      1
-                  )
-
-          # ------------------------------------------
-          # FIX KEYBOARD BLACK SCREEN BUG
-          # ------------------------------------------
-          if 'android:windowSoftInputMode="adjustPan"' not in text:
-              text = re.sub(
-                  r'<activity([^>]*?android:name="\.MainActivity"[^>]*?)>',
-                  r'<activity\1 android:windowSoftInputMode="adjustPan">',
-                  text
-              )
-
-          with open(path, "w", encoding="utf-8") as f:
-              f.write(text)
-
-          print("==========================================")
-          print("MANIFEST CONFIGURED FOR LOCAL NETWORK & KEYBOARD")
-          print("==========================================")
-          print(text)
-          PY
 
 
       # ==========================================
@@ -602,8 +454,6 @@ jobs:
       # ==========================================
       # CLEAN UNNECESSARY PERMISSIONS
       # ==========================================
-      # مجوزهای مرتبط با شبکه محلی (WiFi / Nearby / Location)
-      # عمداً در این لیست نیستند تا اتصال آفلاین کار کند.
       - name: Clean unnecessary permissions
         run: |
           python3 - <<'PY'
@@ -622,6 +472,8 @@ jobs:
               "RECEIVE_SMS",
               "CALL_PHONE",
               "READ_PHONE_STATE",
+              "ACCESS_FINE_LOCATION",
+              "ACCESS_COARSE_LOCATION",
               "CAMERA",
               "RECORD_AUDIO",
               "READ_EXTERNAL_STORAGE",
@@ -648,17 +500,6 @@ jobs:
 
           print("Unnecessary permissions removed.")
           PY
-
-
-      # ==========================================
-      # VERIFY NETWORK PERMISSIONS
-      # ==========================================
-      - name: Verify network permissions
-        run: |
-          echo "=========================================="
-          echo "ANDROID MANIFEST - NETWORK PERMISSIONS"
-          echo "=========================================="
-          grep -E "uses-permission|usesCleartextTraffic" android/app/src/main/AndroidManifest.xml || true
 
 
       # ==========================================
