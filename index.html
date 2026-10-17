@@ -3422,6 +3422,52 @@ function updatePowerupTimers() {
 // بخش ۲۴: توابع اتصال دو نفره (PeerJS)
 // ============================================================
 
+// ============================================================
+// توابع جدید برای اتصال آفلاین و آنلاین با پلاگین واقعی
+// ============================================================
+
+// تابع کمکی برای نمایش مودال ورودی (جایگزین prompt)
+function showInputModal(title, placeholder, callback) {
+    const modal = document.createElement('div');
+    modal.style.cssText = 'position:fixed;inset:0;z-index:100005;display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.85);padding:20px;backdrop-filter:blur(4px);';
+    
+    const fa = language === 'fa';
+    const cancelText = fa ? 'لغو' : 'Cancel';
+    const submitText = fa ? 'اتصال' : 'Connect';
+
+    modal.innerHTML = `
+        <div style="background:linear-gradient(135deg,#1a1a2e,#2a1a3e);padding:25px 20px;border-radius:20px;width:100%;max-width:320px;border:1px solid rgba(255,255,255,0.1);box-shadow:0 20px 60px rgba(0,0,0,0.6);text-align:center;">
+            <h3 style="color:white;margin-bottom:15px;font-size:16px;">${title}</h3>
+            <input type="text" id="customInputModal" placeholder="${placeholder}" style="width:100%;padding:12px;border-radius:10px;border:2px solid #f97316;background:#2a2a3e;color:white;font-size:16px;text-align:center;margin-bottom:15px;outline:none;direction:ltr;" autofocus>
+            <div style="display:flex;gap:10px;">
+                <button id="modalCancelBtn" style="flex:1;padding:10px;background:rgba(255,255,255,0.1);border:none;border-radius:10px;color:white;font-weight:bold;cursor:pointer;">${cancelText}</button>
+                <button id="modalSubmitBtn" style="flex:1;padding:10px;background:#f97316;border:none;border-radius:10px;color:white;font-weight:bold;cursor:pointer;box-shadow:0 3px #c2410c;">${submitText}</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    const input = document.getElementById('customInputModal');
+    setTimeout(() => input.focus(), 100);
+
+    const close = () => modal.remove();
+
+    document.getElementById('modalCancelBtn').onclick = close;
+    document.getElementById('modalSubmitBtn').onclick = () => {
+        const value = input.value.trim();
+        close();
+        if (value) callback(value);
+    };
+    
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            document.getElementById('modalSubmitBtn').click();
+        }
+    });
+}
+
+// ---------- آنلاین ----------
 function hostOnline() {
     if (peer) return;
     peer = new Peer();
@@ -3432,63 +3478,77 @@ function hostOnline() {
     peer.on('connection', c => {
         conn = c;
         setupConnection();
-        showToast('حریف وصل شد!');
+        showToast(language === 'fa' ? 'حریف وصل شد!' : 'Opponent connected!');
     });
-    peer.on('error', () => showToast('خطا در ساخت اتاق'));
+    peer.on('error', () => showToast(language === 'fa' ? 'خطا در ساخت اتاق' : 'Room creation error'));
 }
 
 function joinOnline() {
     if (peer) return;
-    const id = prompt('کد اتاق حریف:');
-    if (!id) return;
-    peer = new Peer();
-    peer.on('open', () => {
-        conn = peer.connect(id);
-        conn.on('open', () => {
-            isHost = false;
-            setupConnection();
-            showToast('وصل شدی!');
-        });
-    });
-    peer.on('error', () => showToast('خطا در اتصال'));
+    showInputModal(
+        language === 'fa' ? 'کد اتاق حریف را وارد کنید' : 'Enter opponent room code',
+        'ABC123',
+        (id) => {
+            peer = new Peer();
+            peer.on('open', () => {
+                conn = peer.connect(id);
+                conn.on('open', () => {
+                    isHost = false;
+                    setupConnection();
+                    showToast(language === 'fa' ? 'وصل شدی!' : 'Connected!');
+                });
+            });
+            peer.on('error', () => showToast(language === 'fa' ? 'خطا در اتصال' : 'Connection error'));
+        }
+    );
 }
 
+// ---------- آفلاین (هات‌اسپات با پلاگین بومی) ----------
 function hostOffline() {
-    if (typeof WebSocketServer === 'undefined') {
-        showToast('پلاگین سرور محلی نصب نیست');
+    isHost = true;
+    
+    // چک کردن وجود پلاگین
+    if (!window.WebSocketServer) {
+        showToast(language === 'fa' ? 'پلاگین سرور نصب نیست!' : 'Server plugin not found!');
         return;
     }
-    isHost = true;
-    localServer = new WebSocketServer();
-    localServer.start(8080, () => {
-        showRoomCode(getLocalIP() + ':8080');
-        showToast('سرور محلی روشن شد');
-    }, () => showToast('خطا در سرور محلی'));
 
-    localServer.onMessage = (msg) => {
-        try {
-            const data = JSON.parse(msg);
-            handleNetworkData(data);
-        } catch(e) {}
-    };
+    localServer = new window.WebSocketServer();
+    localServer.start(8080, 
+        () => {
+            showRoomCode('192.168.43.1:8080');
+            showToast(language === 'fa' ? 'سرور محلی روشن شد' : 'Local server started');
+        },
+        (err) => {
+            showToast((language === 'fa' ? 'خطا در سرور: ' : 'Server error: ') + err);
+        }
+    );
 }
 
 function joinOffline() {
-    const ip = prompt('IP میزبان (مثلاً 192.168.43.1):');
-    if (!ip) return;
-    isHost = false;
-    joinOffline._ws = new WebSocket('ws://' + ip + ':8080');
-    joinOffline._ws.onopen = () => {
-        showToast('وصل شدی!');
-        conn = {
-            open: true,
-            send: (data) => joinOffline._ws.send(JSON.stringify(data))
-        };
-    };
-    joinOffline._ws.onmessage = (e) => {
-        try { handleNetworkData(JSON.parse(e.data)); } catch(e) {}
-    };
-    joinOffline._ws.onerror = () => showToast('اتصال برقرار نشد');
+    showInputModal(
+        language === 'fa' ? 'IP میزبان را وارد کنید' : 'Enter host IP',
+        '192.168.43.1',
+        (ip) => {
+            isHost = false;
+            try {
+                joinOffline._ws = new WebSocket('ws://' + ip + ':8080');
+                joinOffline._ws.onopen = () => {
+                    showToast(language === 'fa' ? 'وصل شدی!' : 'Connected!');
+                    conn = {
+                        open: true,
+                        send: (data) => joinOffline._ws.send(JSON.stringify(data))
+                    };
+                };
+                joinOffline._ws.onmessage = (e) => {
+                    try { handleNetworkData(JSON.parse(e.data)); } catch(e) {}
+                };
+                joinOffline._ws.onerror = () => showToast(language === 'fa' ? 'اتصال برقرار نشد' : 'Connection failed');
+            } catch (e) {
+                showToast(language === 'fa' ? 'خطا در اتصال' : 'Connection error');
+            }
+        }
+    );
 }
 
 function setupConnection() {
