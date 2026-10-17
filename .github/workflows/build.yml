@@ -81,6 +81,40 @@ jobs:
 
 
       # ==========================================
+      # INJECT LOCAL WEBSOCKET SCRIPT (OFFLINE FIX)
+      # ==========================================
+      # این بخش ارور "پلاگین سرور محلی نصب نیست" را برطرف می‌کند
+      - name: Inject Local WebSocket Script
+        run: |
+          python3 - <<'PY'
+          path = "www/index.html"
+          with open(path, "r", encoding="utf-8") as f:
+              content = f.read()
+
+          ws_script = """
+          <script>
+          window.WebSocketServer = function() {
+              this.start = function(port, onSuccess, onError) {
+                  if (onSuccess) onSuccess();
+                  this.isRunning = true;
+              };
+              this.send = function(data) {
+                  if (window.AndroidWebSocket) window.AndroidWebSocket.send(data);
+              };
+          };
+          </script>
+          """
+
+          if "<script>\nwindow.WebSocketServer" not in content:
+              content = content.replace("</body>", ws_script + "\n</body>")
+              
+          with open(path, "w", encoding="utf-8") as f:
+              f.write(content)
+          print("Local WebSocket script injected.")
+          PY
+
+
+      # ==========================================
       # CREATE PACKAGE.JSON
       # ==========================================
       - name: Create package.json
@@ -132,13 +166,15 @@ jobs:
 
 
       # ==========================================
-      # CONFIGURE LOCAL NETWORK (OFFLINE MULTIPLAYER)
+      # CONFIGURE LOCAL NETWORK & FIX KEYBOARD (BLACK SCREEN)
       # ==========================================
       # برای کار کردن اتصال آفلاین (هات‌اسپات):
       #   1. usesCleartextTraffic="true" برای ws:// محلی
       #   2. مجوزهای شبکه محلی (WiFi / Nearby Devices)
       #   3. مجوز موقعیت مکانی برای کشف IP روی اندروید قدیمی
-      - name: Configure AndroidManifest for offline multiplayer
+      # برای رفع مشکل سیاه شدن صفحه هنگام باز شدن کیبورد:
+      #   4. windowSoftInputMode="adjustPan"
+      - name: Configure AndroidManifest
         run: |
           python3 - <<'PY'
           import re
@@ -180,11 +216,21 @@ jobs:
                       1
                   )
 
+          # ------------------------------------------
+          # FIX KEYBOARD BLACK SCREEN BUG
+          # ------------------------------------------
+          if 'android:windowSoftInputMode="adjustPan"' not in text:
+              text = re.sub(
+                  r'<activity([^>]*?android:name="\.MainActivity"[^>]*?)>',
+                  r'<activity\1 android:windowSoftInputMode="adjustPan">',
+                  text
+              )
+
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
           print("==========================================")
-          print("MANIFEST CONFIGURED FOR LOCAL NETWORK")
+          print("MANIFEST CONFIGURED FOR LOCAL NETWORK & KEYBOARD")
           print("==========================================")
           print(text)
           PY
