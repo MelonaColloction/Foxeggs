@@ -3240,10 +3240,6 @@ function draw() {
 
     drawFox(fox.x, fox.y, fox.w, fox.h, fox.vy, fox.grounded, fox.animation, currentSkinId, false);
 
-    if (remoteData.active) {
-        const remoteX = W * 0.12;
-        drawFox(remoteX, remoteData.y, fox.w, fox.h, remoteData.vy, remoteData.grounded, remoteData.animation, 'classic', true);
-    }
 }
 
 // ============================================================
