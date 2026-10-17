@@ -3423,7 +3423,7 @@ function updatePowerupTimers() {
 // ============================================================
 
 // ============================================================
-// توابع جدید برای اتصال آفلاین و آنلاین با پلاگین واقعی
+// بخش ۲۴: توابع اتصال دو نفره (PeerJS و WebSocket محلی)
 // ============================================================
 
 // تابع کمکی برای نمایش مودال ورودی (جایگزین prompt)
@@ -3467,7 +3467,9 @@ function showInputModal(title, placeholder, callback) {
     });
 }
 
-// ---------- آنلاین ----------
+// ============================================================
+// اتصال آنلاین (PeerJS)
+// ============================================================
 function hostOnline() {
     if (peer) return;
     peer = new Peer();
@@ -3503,11 +3505,13 @@ function joinOnline() {
     );
 }
 
-// ---------- آفلاین (هات‌اسپات با پلاگین بومی) ----------
+// ============================================================
+// اتصال آفلاین (هات‌اسپات - با پلاگین بومی جدید)
+// ============================================================
 function hostOffline() {
     isHost = true;
     
-    // چک کردن وجود پلاگین
+    // چک کردن اینکه پلاگین بومی (که در build.yml ساختیم) لود شده است
     if (!window.WebSocketServer) {
         showToast(language === 'fa' ? 'پلاگین سرور نصب نیست!' : 'Server plugin not found!');
         return;
@@ -3517,10 +3521,10 @@ function hostOffline() {
     localServer.start(8080, 
         () => {
             showRoomCode('192.168.43.1:8080');
-            showToast(language === 'fa' ? 'سرور محلی روشن شد' : 'Local server started');
+            showToast(language === 'fa' ? 'سرور محلی روشن شد ✅' : 'Local server started ✅');
         },
         (err) => {
-            showToast((language === 'fa' ? 'خطا در سرور: ' : 'Server error: ') + err);
+            showToast((language === 'fa' ? 'خطا: ' : 'Error: ') + err);
         }
     );
 }
@@ -3534,7 +3538,7 @@ function joinOffline() {
             try {
                 joinOffline._ws = new WebSocket('ws://' + ip + ':8080');
                 joinOffline._ws.onopen = () => {
-                    showToast(language === 'fa' ? 'وصل شدی!' : 'Connected!');
+                    showToast(language === 'fa' ? 'وصل شدی! ✅' : 'Connected! ✅');
                     conn = {
                         open: true,
                         send: (data) => joinOffline._ws.send(JSON.stringify(data))
@@ -3543,9 +3547,9 @@ function joinOffline() {
                 joinOffline._ws.onmessage = (e) => {
                     try { handleNetworkData(JSON.parse(e.data)); } catch(e) {}
                 };
-                joinOffline._ws.onerror = () => showToast(language === 'fa' ? 'اتصال برقرار نشد' : 'Connection failed');
+                joinOffline._ws.onerror = () => showToast(language === 'fa' ? 'اتصال برقرار نشد ❌' : 'Connection failed ❌');
             } catch (e) {
-                showToast(language === 'fa' ? 'خطا در اتصال' : 'Connection error');
+                showToast(language === 'fa' ? 'خطا در اتصال ❌' : 'Connection error ❌');
             }
         }
     );
@@ -5206,4 +5210,4 @@ window.addEventListener('beforeunload', function() {
 
 </script>
 </body>
-    </html>
+        </html>
