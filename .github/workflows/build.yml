@@ -41,6 +41,9 @@ jobs:
       # ==========================================
       # ANDROID SDK
       # ==========================================
+      # مهم:
+      # packages خالی است تا setup-android سعی نکند
+      # پکیج قدیمی "tools" را نصب کند.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
@@ -53,10 +56,12 @@ jobs:
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses || true
+
           sdkmanager \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
+
           echo "Android SDK packages installed successfully."
 
 
@@ -66,67 +71,78 @@ jobs:
       - name: Prepare game
         run: |
           test -f index.html
+
           rm -rf www
           mkdir -p www
+
           cp index.html www/index.html
+
           echo "Game prepared successfully."
 
 
       # ==========================================
-      # INJECT CUSTOM WEBSOCKET BRIDGE
+      # INJECT REAL WEBSOCKET BRIDGE (OFFLINE FIX)
       # ==========================================
-      # این اسکریپت با پلاگین بومی که در MainActivity ساخته می‌شود صحبت می‌کند
-      - name: Inject Custom WebSocket Bridge
+      # این بخش به جای شبیه‌ساز، پلاگین بومی واقعی را 
+      # به کدهای بازی متصل می‌کند تا اتصال آفلاین کار کند
+      - name: Inject Real WebSocket Bridge
         run: |
           python3 - <<'PY'
           path = "www/index.html"
           with open(path, "r", encoding="utf-8") as f:
               content = f.read()
 
+          # کد پل ارتباطی برای استفاده از پلاگین بومی
           ws_script = """
           <script>
-          // پل ارتباطی با سرور بومی اندروید (LocalWebSocketServer.java)
+          // پل ارتباطی برای سرور وب‌سوکت بومی Capacitor
           window.WebSocketServer = function() {
+              this.server = null;
+
               this.start = function(port, onSuccess, onError) {
-                  if (window.AndroidWebSocketServer) {
-                      try {
-                          window.AndroidWebSocketServer.startServer(port);
-                          if (onSuccess) onSuccess();
-                      } catch(e) {
-                          if (onError) onError(e.toString());
-                      }
-                  } else {
-                      if (onError) onError("Native WebSocket Server not available");
+                  if (!window.cordova || !window.cordova.plugins || !window.cordova.plugins.wsserver) {
+                      if (onError) onError("Native WebSocket plugin not found.");
+                      return;
                   }
+
+                  window.cordova.plugins.wsserver.start(port, {}).subscribe(
+                      function(serverInfo) {
+                          console.log('WebSocket Server started on: ' + serverInfo.addr + ':' + serverInfo.port);
+                          if (onSuccess) onSuccess();
+                      },
+                      function(error) {
+                          console.error('WebSocket Server error: ', error);
+                          if (onError) onError(error);
+                      }
+                  );
+
+                  // گوش دادن به پیام‌های دریافتی از حریف
+                  window.cordova.plugins.wsserver.watchMessage().subscribe(function(result) {
+                      if (window.handleNetworkData) {
+                          try {
+                              const data = JSON.parse(result.msg);
+                              window.handleNetworkData(data);
+                          } catch(e) { console.warn('Invalid message', e); }
+                      }
+                  });
               };
 
               this.send = function(data) {
-                  if (window.AndroidWebSocketServer) {
-                      window.AndroidWebSocketServer.broadcastMessage(data);
-                  }
+                  if (!window.cordova || !window.cordova.plugins || !window.cordova.plugins.wsserver) return;
+                  window.cordova.plugins.wsserver.watchOpen().subscribe(function(conn) {
+                       window.cordova.plugins.wsserver.send({ uuid: conn.uuid }, data);
+                  });
               };
-          };
-
-          // این تابع توسط کد جاوا فراخوانی می‌شود
-          window.onNativeMessage = function(msg) {
-              if (window.handleNetworkData) {
-                  try {
-                      const data = JSON.parse(msg);
-                      window.handleNetworkData(data);
-                  } catch(e) { console.warn('Invalid JSON', e); }
-              }
           };
           </script>
           """
 
-          if "<script>\n// پل ارتباطی با سرور بومی اندروید" not in content:
+          if "<script>\n// پل ارتباطی برای سرور وب‌سوکت بومی" not in content:
               content = content.replace("</body>", ws_script + "\n</body>")
-              print("Custom WebSocket bridge injected.")
-          else:
-              print("Bridge already exists.")
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(content)
+          print("Real WebSocket bridge injected.")
           PY
 
 
@@ -142,10 +158,16 @@ jobs:
             "private": true,
             "dependencies": {
               "@capacitor/core": "^7.4.0",
-              "@capacitor/android": "^7.4.0"
+              "@capacitor/android": "^7.4.0",
+              "cordova-plugin-websocket-server": "^1.0.0"
             },
             "devDependencies": {
               "@capacitor/cli": "^7.4.0"
+            },
+            "cordova": {
+              "plugins": {
+                "cordova-plugin-websocket-server": {}
+              }
             }
           }
           EOF
@@ -168,7 +190,12 @@ jobs:
           {
             "appId": "com.foxeggs.game",
             "appName": "Fox Eggs",
-            "webDir": "www"
+            "webDir": "www",
+            "plugins": {
+              "WebSocketServer": {
+                "enabled": true
+              }
+            }
           }
           EOF
 
@@ -182,21 +209,38 @@ jobs:
 
 
       # ==========================================
-      # CONFIGURE ANDROID MANIFEST
+      # CONFIGURE LOCAL NETWORK & FIX KEYBOARD (BLACK SCREEN)
       # ==========================================
+      # برای کار کردن اتصال آفلاین (هات‌اسپات):
+      #   1. usesCleartextTraffic="true" برای ws:// محلی
+      #   2. مجوزهای شبکه محلی (WiFi / Nearby Devices)
+      #   3. مجوز موقعیت مکانی برای کشف IP روی اندروید قدیمی
+      # برای رفع مشکل سیاه شدن صفحه هنگام باز شدن کیبورد:
+      #   4. windowSoftInputMode="adjustPan"
       - name: Configure AndroidManifest
         run: |
           python3 - <<'PY'
           import re
+
           path = "android/app/src/main/AndroidManifest.xml"
+
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          # 1. Cleartext Traffic
+          # ------------------------------------------
+          # ENABLE CLEARTEXT TRAFFIC (برای ws:// محلی)
+          # ------------------------------------------
           if 'android:usesCleartextTraffic' not in text:
-              text = re.sub(r'<application(\s+)', r'<application\1android:usesCleartextTraffic="true" ', text, count=1)
+              text = re.sub(
+                  r'<application(\s+)',
+                  r'<application\1android:usesCleartextTraffic="true" ',
+                  text,
+                  count=1
+              )
 
-          # 2. Add Network Permissions
+          # ------------------------------------------
+          # ADD NETWORK PERMISSIONS
+          # ------------------------------------------
           needed_permissions = [
               "android.permission.INTERNET",
               "android.permission.ACCESS_NETWORK_STATE",
@@ -206,11 +250,18 @@ jobs:
               "android.permission.ACCESS_FINE_LOCATION",
               "android.permission.ACCESS_COARSE_LOCATION",
           ]
+
           for perm in needed_permissions:
               if perm not in text:
-                  text = text.replace("<application", f'<uses-permission android:name="{perm}" />\n    <application', 1)
+                  text = text.replace(
+                      "<application",
+                      f'<uses-permission android:name="{perm}" />\n    <application',
+                      1
+                  )
 
-          # 3. Fix Keyboard Black Screen
+          # ------------------------------------------
+          # FIX KEYBOARD BLACK SCREEN BUG
+          # ------------------------------------------
           if 'android:windowSoftInputMode="adjustPan"' not in text:
               text = re.sub(
                   r'<activity([^>]*?android:name="\.MainActivity"[^>]*?)>',
@@ -220,171 +271,80 @@ jobs:
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
-          print("Manifest configured.")
+
+          print("==========================================")
+          print("MANIFEST CONFIGURED FOR LOCAL NETWORK & KEYBOARD")
+          print("==========================================")
+          print(text)
           PY
 
 
       # ==========================================
-      # ADD JAVA-WEBSOCKET LIBRARY
+      # ENABLE IMMERSIVE FULLSCREEN
       # ==========================================
-      # این کتابخانه سرور وب‌سوکت واقعی را در اندروید فراهم می‌کند
-      - name: Add Java-WebSocket Dependency
+      - name: Enable Fullscreen
         run: |
           python3 - <<'PY'
-          path = "android/app/build.gradle"
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
+          import os
+          import re
 
-          if "org.java-websocket:Java-WebSocket" not in text:
-              # اضافه کردن به بخش dependencies
-              text = re.sub(
-                  r'(dependencies\s*\{)',
-                  r'\1\n    implementation "org.java-websocket:Java-WebSocket:1.5.6"',
-                  text,
-                  count=1
-              )
-              with open(path, "w", encoding="utf-8") as f:
-                  f.write(text)
-              print("Java-WebSocket added to build.gradle.")
-          else:
-              print("Java-WebSocket already exists.")
-          PY
-
-
-      # ==========================================
-      # CREATE LOCAL WEBSOCKET SERVER (JAVA)
-      # ==========================================
-      - name: Create LocalWebSocketServer.java
-        run: |
-          python3 - <<'PY'
-          import os, re
-          # پیدا کردن مسیر پکیج اصلی
           base = "android/app/src/main/java"
-          pkg_dir = None
-          for root, dirs, files in os.walk(base):
-              if "MainActivity.java" in files:
-                  pkg_dir = root
-                  break
-          if not pkg_dir:
-              raise SystemExit("MainActivity not found")
 
-          # استخراج نام پکیج از فایل MainActivity
-          with open(os.path.join(pkg_dir, "MainActivity.java"), "r", encoding="utf-8") as f:
-              main_content = f.read()
-          package_match = re.search(r'^\s*package\s+([^;]+);', main_content, re.MULTILINE)
-          package_name = package_match.group(1)
-
-          java_code = f'''package {package_name};
-
-          import android.webkit.JavascriptInterface;
-          import org.java_websocket.WebSocket;
-          import org.java_websocket.handshake.ClientHandshake;
-          import org.java_websocket.server.WebSocketServer;
-          import java.net.InetSocketAddress;
-          import java.util.Set;
-          import java.util.HashSet;
-
-          public class LocalWebSocketServer {{
-              private WebSocketServer server = null;
-              private Set<WebSocket> clients = new HashSet<>();
-              private android.webkit.WebView webView;
-
-              public LocalWebSocketServer(android.webkit.WebView webView) {{
-                  this.webView = webView;
-              }}
-
-              @JavascriptInterface
-              public void startServer(int port) {{
-                  if (server != null) return;
-                  try {{
-                      server = new WebSocketServer(new InetSocketAddress(port)) {{
-                          @Override
-                          public void onOpen(WebSocket conn, ClientHandshake handshake) {{
-                              clients.add(conn);
-                          }}
-                          @Override
-                          public void onClose(WebSocket conn, int code, String reason, boolean remote) {{
-                              clients.remove(conn);
-                          }}
-                          @Override
-                          public void onMessage(WebSocket conn, String message) {{
-                              if (webView != null) {{
-                                  final String msg = message.replace("\\\\", "\\\\\\\\").replace("'", "\\\\'");
-                                  webView.post(() -> webView.evaluateJavascript("window.onNativeMessage('" + msg + "');", null));
-                              }}
-                          }}
-                          @Override
-                          public void onError(WebSocket conn, Exception ex) {{ ex.printStackTrace(); }}
-                          @Override
-                          public void onStart() {{ }}
-                      }};
-                      server.start();
-                  }} catch (Exception e) {{
-                      e.printStackTrace();
-                  }}
-              }}
-
-              @JavascriptInterface
-              public void broadcastMessage(String message) {{
-                  for (WebSocket client : clients) {{
-                      if (client.isOpen()) {{
-                          client.send(message);
-                      }}
-                  }}
-              }}
-          }}
-          '''
-
-          target = os.path.join(pkg_dir, "LocalWebSocketServer.java")
-          with open(target, "w", encoding="utf-8") as f:
-              f.write(java_code)
-          print(f"Created: {target}")
-          PY
-
-
-      # ==========================================
-      # MODIFY MAINACTIVITY (FULLSCREEN + WEBSOCKET)
-      # ==========================================
-      - name: Modify MainActivity
-        run: |
-          python3 - <<'PY'
-          import os, re
-          base = "android/app/src/main/java"
           main_activity = None
+
           for root, dirs, files in os.walk(base):
               if "MainActivity.java" in files:
                   main_activity = os.path.join(root, "MainActivity.java")
                   break
+
           if not main_activity:
               raise SystemExit("MainActivity.java not found.")
+
+          print("Found MainActivity:", main_activity)
 
           with open(main_activity, "r", encoding="utf-8") as f:
               original = f.read()
 
-          package_match = re.search(r'^\s*package\s+([^;]+);', original, re.MULTILINE)
+          # ------------------------------------------
+          # GET PACKAGE NAME FROM EXISTING FILE
+          # ------------------------------------------
+          package_match = re.search(
+              r'^\s*package\s+([^;]+);',
+              original,
+              re.MULTILINE
+          )
+
+          if not package_match:
+              raise SystemExit(
+                  "Package name not found in MainActivity.java"
+              )
+
           package_name = package_match.group(1)
 
-          new_activity = f'''package {package_name};
+          print("Package:", package_name)
+
+          # ------------------------------------------
+          # CREATE FULLSCREEN MAIN ACTIVITY
+          # ------------------------------------------
+          fullscreen_activity = f'''package {package_name};
 
           import android.os.Bundle;
           import android.view.View;
           import android.view.WindowManager;
-          import android.webkit.WebView;
+
           import com.getcapacitor.BridgeActivity;
-          import com.getcapacitor.Bridge;
 
           public class MainActivity extends BridgeActivity {{
-              private LocalWebSocketServer wsServer;
 
               @Override
               public void onCreate(Bundle savedInstanceState) {{
                   super.onCreate(savedInstanceState);
 
-                  // Fullscreen
                   getWindow().setFlags(
                       WindowManager.LayoutParams.FLAG_FULLSCREEN,
                       WindowManager.LayoutParams.FLAG_FULLSCREEN
                   );
+
                   getWindow().getDecorView().setSystemUiVisibility(
                       View.SYSTEM_UI_FLAG_FULLSCREEN
                       | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
@@ -393,20 +353,20 @@ jobs:
                       | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                       | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                   );
-
-                  // Setup WebSocket Bridge
-                  Bridge bridge = getBridge();
-                  if (bridge != null && bridge.getWebView() != null) {{
-                      WebView webView = bridge.getWebView();
-                      wsServer = new LocalWebSocketServer(webView);
-                      webView.addJavascriptInterface(wsServer, "AndroidWebSocketServer");
-                  }}
               }}
           }}
           '''
+
           with open(main_activity, "w", encoding="utf-8") as f:
-              f.write(new_activity)
-          print("MainActivity modified with WebSocket bridge.")
+              f.write(fullscreen_activity)
+
+          print("Fullscreen MainActivity created successfully.")
+
+          print("==========================================")
+          print("FINAL MAIN ACTIVITY")
+          print("==========================================")
+
+          print(fullscreen_activity)
           PY
 
 
@@ -427,34 +387,57 @@ jobs:
         run: |
           VERSION_CODE=$((RUN_NUMBER + 100))
           VERSION_NAME="1.0.${RUN_NUMBER}"
+
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
 
+          echo "=========================================="
+          echo "VERSION"
+          echo "=========================================="
+          echo "Version Code: $VERSION_CODE"
+          echo "Version Name: $VERSION_NAME"
+
 
       # ==========================================
-      # KEYSTORE & SIGNING
+      # LOAD EXISTING KEYSTORE
       # ==========================================
+      # همان keystore قبلی را استفاده می‌کنیم.
+      # این برای آپدیت بدون حذف نسخه قبلی بسیار مهم است.
       - name: Load existing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           test -n "$KEYSTORE_BASE64"
+
           echo "$KEYSTORE_BASE64" | base64 --decode > FoxEggs.keystore
+
           test -s FoxEggs.keystore
+
           mkdir -p android/app
+
           cp FoxEggs.keystore android/app/FoxEggs.keystore
 
+          echo "Keystore loaded successfully."
+
+
+      # ==========================================
+      # CONFIGURE SIGNING PROPERTIES
+      # ==========================================
       - name: Configure signing properties
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
           test -n "$KEYSTORE_PASSWORD"
+
           cat >> android/gradle.properties <<EOF
+
           FOXEGGS_KEYSTORE_FILE=FoxEggs.keystore
           FOXEGGS_KEYSTORE_PASSWORD=${KEYSTORE_PASSWORD}
           FOXEGGS_KEY_ALIAS=foxeggs
           FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
           EOF
+
+          echo "Signing properties configured."
 
 
       # ==========================================
@@ -463,18 +446,68 @@ jobs:
       - name: Configure Android Gradle
         run: |
           python3 - <<'PY'
-          import re, os
+          import re
+          import os
+
           path = "android/app/build.gradle"
+
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          text = re.sub(r'applicationId\s+"[^"]+"', 'applicationId "com.foxeggs.game"', text, count=1)
-          text = re.sub(r'compileSdk\s+\d+', 'compileSdk 35', text, count=1)
-          text = re.sub(r'versionCode\s+\d+', 'versionCode ' + os.environ["VERSION_CODE"], text, count=1)
-          text = re.sub(r'versionName\s+"[^"]+"', 'versionName "' + os.environ["VERSION_NAME"] + '"', text, count=1)
+          # ------------------------------------------
+          # APPLICATION ID
+          # ------------------------------------------
+          text = re.sub(
+              r'applicationId\s+"[^"]+"',
+              'applicationId "com.foxeggs.game"',
+              text,
+              count=1
+          )
 
-          text = re.sub(r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)', '', text, count=1, flags=re.S)
+          # ------------------------------------------
+          # COMPILE SDK
+          # ------------------------------------------
+          text = re.sub(
+              r'compileSdk\s+\d+',
+              'compileSdk 35',
+              text,
+              count=1
+          )
 
+          # ------------------------------------------
+          # VERSION CODE
+          # ------------------------------------------
+          text = re.sub(
+              r'versionCode\s+\d+',
+              'versionCode ' + os.environ["VERSION_CODE"],
+              text,
+              count=1
+          )
+
+          # ------------------------------------------
+          # VERSION NAME
+          # ------------------------------------------
+          text = re.sub(
+              r'versionName\s+"[^"]+"',
+              'versionName "' + os.environ["VERSION_NAME"] + '"',
+              text,
+              count=1
+          )
+
+          # ------------------------------------------
+          # REMOVE EXISTING SIGNING CONFIG
+          # ------------------------------------------
+          text = re.sub(
+              r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)',
+              '',
+              text,
+              count=1,
+              flags=re.S
+          )
+
+          # ------------------------------------------
+          # SIGNING CONFIG
+          # ------------------------------------------
           signing_block = '''
               signingConfigs {
                   release {
@@ -486,89 +519,257 @@ jobs:
                       v2SigningEnabled true
                   }
               }
+
           '''
+
           if "signingConfigs {" not in text:
-              text = text.replace("    buildTypes {", signing_block + "    buildTypes {", 1)
+              text = text.replace(
+                  "    buildTypes {",
+                  signing_block + "    buildTypes {",
+                  1
+              )
+
+          # ------------------------------------------
+          # RELEASE BUILD TYPE
+          # ------------------------------------------
+          release_pattern = (
+              r'(buildTypes\s*\{\s*'
+              r'release\s*\{)'
+          )
 
           if "signingConfig signingConfigs.release" not in text:
-              text = re.sub(r'(buildTypes\s*\{\s*release\s*\{)', r'\1\n            signingConfig signingConfigs.release', text, count=1, flags=re.S)
+              text = re.sub(
+                  release_pattern,
+                  r'\1\n            signingConfig signingConfigs.release',
+                  text,
+                  count=1,
+                  flags=re.S
+              )
 
-          release_match = re.search(r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})', text, re.S)
-          if release_match:
-              release_body = release_match.group(2)
-              if "minifyEnabled" in release_body:
-                  release_body = re.sub(r'minifyEnabled\s+\w+', 'minifyEnabled false', release_body, count=1)
-              else:
-                  release_body = "\n            minifyEnabled false" + release_body
-              text = text[:release_match.start(2)] + release_body + text[release_match.end(2):]
+          # ------------------------------------------
+          # MINIFY
+          # ------------------------------------------
+          if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
+
+              release_match = re.search(
+                  r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})',
+                  text,
+                  re.S
+              )
+
+              if release_match:
+
+                  release_body = release_match.group(2)
+
+                  if "minifyEnabled" in release_body:
+                      release_body = re.sub(
+                          r'minifyEnabled\s+\w+',
+                          'minifyEnabled false',
+                          release_body,
+                          count=1
+                      )
+                  else:
+                      release_body = (
+                          "\n            minifyEnabled false"
+                          + release_body
+                      )
+
+                  text = (
+                      text[:release_match.start(2)]
+                      + release_body
+                      + text[release_match.end(2):]
+                  )
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
-          print("Gradle configured.")
+
+          print("Android Gradle configured successfully.")
           PY
+
+
+      # ==========================================
+      # SHOW GRADLE CONFIG
+      # ==========================================
+      - name: Show Gradle configuration
+        run: |
+          echo "=========================================="
+          echo "FINAL ANDROID BUILD.GRADLE"
+          echo "=========================================="
+
+          cat android/app/build.gradle
 
 
       # ==========================================
       # CLEAN UNNECESSARY PERMISSIONS
       # ==========================================
+      # مجوزهای مرتبط با شبکه محلی (WiFi / Nearby / Location)
+      # عمداً در این لیست نیستند تا اتصال آفلاین کار کند.
       - name: Clean unnecessary permissions
         run: |
           python3 - <<'PY'
           import re
+
           path = "android/app/src/main/AndroidManifest.xml"
+
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
+
           permissions = [
-              "READ_CONTACTS", "WRITE_CONTACTS", "READ_SMS", "SEND_SMS", "RECEIVE_SMS",
-              "CALL_PHONE", "READ_PHONE_STATE", "CAMERA", "RECORD_AUDIO",
-              "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "MANAGE_EXTERNAL_STORAGE",
-              "REQUEST_INSTALL_PACKAGES", "SYSTEM_ALERT_WINDOW", "BIND_ACCESSIBILITY_SERVICE"
+              "READ_CONTACTS",
+              "WRITE_CONTACTS",
+              "READ_SMS",
+              "SEND_SMS",
+              "RECEIVE_SMS",
+              "CALL_PHONE",
+              "READ_PHONE_STATE",
+              "CAMERA",
+              "RECORD_AUDIO",
+              "READ_EXTERNAL_STORAGE",
+              "WRITE_EXTERNAL_STORAGE",
+              "MANAGE_EXTERNAL_STORAGE",
+              "REQUEST_INSTALL_PACKAGES",
+              "SYSTEM_ALERT_WINDOW",
+              "BIND_ACCESSIBILITY_SERVICE"
           ]
+
           for permission in permissions:
-              pattern = r'\s*<uses-permission\s+android:name="android\.permission\.' + permission + r'"\s*/>'
+
+              pattern = (
+                  r'\s*<uses-permission\s+'
+                  r'android:name="android\.permission\.'
+                  + permission +
+                  r'"\s*/>'
+              )
+
               text = re.sub(pattern, '', text)
+
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
-          print("Permissions cleaned.")
+
+          print("Unnecessary permissions removed.")
           PY
 
 
       # ==========================================
-      # INSTALL PILLOW & ICONS
+      # VERIFY NETWORK PERMISSIONS
+      # ==========================================
+      - name: Verify network permissions
+        run: |
+          echo "=========================================="
+          echo "ANDROID MANIFEST - NETWORK PERMISSIONS"
+          echo "=========================================="
+          grep -E "uses-permission|usesCleartextTraffic" android/app/src/main/AndroidManifest.xml || true
+
+
+      # ==========================================
+      # INSTALL PILLOW
       # ==========================================
       - name: Install Pillow
-        run: python3 -m pip install pillow
+        run: |
+          python3 -m pip install pillow
 
+
+      # ==========================================
+      # FIND CUSTOM GAME ICON
+      # ==========================================
       - name: Find custom game icon
         run: |
           python3 - <<'PY'
           import os
-          extensions = (".png", ".jpg", ".jpeg", ".webp")
-          files = [f for f in os.listdir(".") if os.path.isfile(f) and f.lower().endswith(extensions)]
-          ignored = {"fox-eggs-icon.png", "game-logo.png"}
-          files = [f for f in files if f.lower() not in ignored]
-          if not files: raise SystemExit("No image found.")
-          with open("CUSTOM_ICON", "w") as f: f.write(files[0])
-          print(f"Using image: {files[0]}")
+
+          extensions = (
+              ".png",
+              ".jpg",
+              ".jpeg",
+              ".webp"
+          )
+
+          files = [
+              f for f in os.listdir(".")
+              if os.path.isfile(f)
+              and f.lower().endswith(extensions)
+          ]
+
+          ignored = {
+              "fox-eggs-icon.png",
+              "game-logo.png"
+          }
+
+          files = [
+              f for f in files
+              if f.lower() not in ignored
+          ]
+
+          if not files:
+              raise SystemExit(
+                  "No image file found in project root."
+              )
+
+          logo = files[0]
+
+          print("==========================================")
+          print("CUSTOM GAME ICON")
+          print("==========================================")
+          print("Using image:", logo)
+
+          with open("CUSTOM_ICON", "w") as f:
+              f.write(logo)
           PY
 
+
+      # ==========================================
+      # GENERATE ANDROID ICONS
+      # ==========================================
       - name: Generate Android icons
         run: |
           python3 - <<'PY'
           from PIL import Image
           import os
-          with open("CUSTOM_ICON", "r") as f: filename = f.read().strip()
+
+          with open("CUSTOM_ICON", "r") as f:
+              filename = f.read().strip()
+
+          print("Loading custom icon:", filename)
+
           source = Image.open(filename).convert("RGBA")
-          sizes = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
+
+          sizes = {
+              "mdpi": 48,
+              "hdpi": 72,
+              "xhdpi": 96,
+              "xxhdpi": 144,
+              "xxxhdpi": 192
+          }
+
           for density, size in sizes.items():
-              folder = f"android/app/src/main/res/mipmap-{density}"
+
+              folder = (
+                  "android/app/src/main/res/mipmap-"
+                  + density
+              )
+
               os.makedirs(folder, exist_ok=True)
-              icon = source.resize((size, size), Image.Resampling.LANCZOS)
-              icon.save(folder + "/ic_launcher.png")
-              icon.save(folder + "/ic_launcher_round.png")
-          print("Icons generated.")
+
+              icon = source.resize(
+                  (size, size),
+                  Image.Resampling.LANCZOS
+              )
+
+              icon.save(
+                  folder + "/ic_launcher.png"
+              )
+
+              icon.save(
+                  folder + "/ic_launcher_round.png"
+              )
+
+          print("Android icons generated successfully.")
           PY
 
+
+      # ==========================================
+      # REMOVE ADAPTIVE ICON DEFAULTS
+      # ==========================================
       - name: Remove adaptive icon defaults
         run: |
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
@@ -576,26 +777,123 @@ jobs:
 
 
       # ==========================================
-      # BUILD & RELEASE
+      # VERIFY CONFIGURATION
+      # ==========================================
+      - name: Verify configuration
+        run: |
+          echo "=========================================="
+          echo "FOX EGGS CONFIGURATION"
+          echo "=========================================="
+
+          echo ""
+          echo "APPLICATION ID:"
+          grep "applicationId" android/app/build.gradle
+
+          echo ""
+          echo "VERSION:"
+          grep "versionCode" android/app/build.gradle
+          grep "versionName" android/app/build.gradle
+
+          echo ""
+          echo "COMPILE SDK:"
+          grep "compileSdk" android/app/build.gradle
+
+          echo ""
+          echo "SIGNING:"
+          grep -A10 "signingConfigs" android/app/build.gradle
+
+
+      # ==========================================
+      # BUILD RELEASE APK
       # ==========================================
       - name: Build Release APK
         working-directory: android
         run: |
           chmod +x gradlew
+
           ./gradlew clean
+
           ./gradlew assembleRelease --no-daemon
 
+
+      # ==========================================
+      # INSPECT APK
+      # ==========================================
+      - name: Inspect APK
+        run: |
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+
+          test -f "$APK"
+
+          BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
+
+          AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
+
+          echo "=========================================="
+          echo "FOX EGGS APK"
+          echo "=========================================="
+
+          echo ""
+          echo "APK FILE:"
+          ls -lh "$APK"
+
+          echo ""
+          echo "SHA256:"
+          sha256sum "$APK"
+
+          echo ""
+          echo "PACKAGE / VERSION:"
+          "$AAPT" dump badging "$APK" | head -n 20
+
+          echo ""
+          echo "PERMISSIONS:"
+          "$AAPT" dump permissions "$APK"
+
+          echo ""
+          echo "SIGNATURE:"
+          "$APKSIGNER" verify \
+            --verbose \
+            --print-certs \
+            "$APK"
+
+
+      # ==========================================
+      # BUILD RELEASE AAB
+      # ==========================================
       - name: Build Release AAB
         working-directory: android
-        run: ./gradlew bundleRelease --no-daemon
+        run: |
+          ./gradlew bundleRelease --no-daemon
 
+
+      # ==========================================
+      # PREPARE RELEASE
+      # ==========================================
       - name: Prepare release
         run: |
           mkdir -p release
-          cp android/app/build/outputs/apk/release/app-release.apk release/FoxEggs.apk
-          cp android/app/build/outputs/bundle/release/app-release.aab release/FoxEggs.aab
-          cp $(cat CUSTOM_ICON) release/FoxEggs-Icon.png
 
+          cp \
+            android/app/build/outputs/apk/release/app-release.apk \
+            release/FoxEggs.apk
+
+          cp \
+            android/app/build/outputs/bundle/release/app-release.aab \
+            release/FoxEggs.aab
+
+          CUSTOM_ICON=$(cat CUSTOM_ICON)
+
+          cp \
+            "$CUSTOM_ICON" \
+            release/FoxEggs-Icon.png
+
+          echo "Release files prepared."
+
+
+      # ==========================================
+      # UPLOAD ARTIFACT
+      # ==========================================
       - name: Upload Fox Eggs Release
         uses: actions/upload-artifact@v6
         with:
@@ -603,6 +901,10 @@ jobs:
           path: release/
           if-no-files-found: error
 
+
+      # ==========================================
+      # CLEANUP
+      # ==========================================
       - name: Cleanup
         if: always()
         run: |
