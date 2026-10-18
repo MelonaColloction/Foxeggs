@@ -202,7 +202,7 @@ button:active {
 #vsScores {
     display:none;
     position:fixed;
-    top:40px;
+    top:65px;
     left:50%;
     transform:translateX(-50%);
     z-index:6;
@@ -1786,7 +1786,7 @@ let MAX_PARTICLES = 40;
 let peer = null;
 let conn = null;
 let isHost = false;
-let remoteData = { active: false, score: 0, y: 0, vy: 0, grounded: true, animation: 0 };
+let remoteData = { active: false, score: 0 };
 let lastNetworkSend = 0;
 
 let isReady = false;
@@ -2904,11 +2904,8 @@ function draw() {
     for (const p of powerups) drawPowerup(p);
     drawParticles();
 
+    // فقط روباه خود بازیکن رسم می‌شود (روباه حریف حذف شد)
     drawFox(fox.x, fox.y, fox.w, fox.h, fox.vy, fox.grounded, fox.animation, currentSkinId, false);
-
-    if (remoteData.active) {
-        drawFox(W * 0.75, remoteData.y, fox.w, fox.h, remoteData.vy, remoteData.grounded, remoteData.animation, 'classic', true);
-    }
 }
 
 // ============================================================
@@ -3159,10 +3156,6 @@ function handleNetworkData(data) {
     if (data.type === 'state') {
         remoteData.active = true;
         remoteData.score = data.score;
-        remoteData.y = data.y;
-        remoteData.vy = data.vy;
-        remoteData.grounded = data.grounded;
-        remoteData.animation = data.animation;
         lastEnemyScore = data.score;
     }
     if (data.type === 'ready') {
@@ -3283,17 +3276,6 @@ function update(dt) {
     }
     fox.animation += dt * 15;
 
-    if (remoteData.active) {
-        remoteData.vy += fox.gravity * dt;
-        remoteData.y += remoteData.vy * dt;
-        if (remoteData.y + fox.h >= ground()) {
-            remoteData.y = ground() - fox.h;
-            remoteData.vy = 0;
-            remoteData.grounded = true;
-        }
-        remoteData.animation += dt * 15;
-    }
-
     updateDayNight();
 
     eggTimer -= dt;
@@ -3392,11 +3374,7 @@ function update(dt) {
     if (now - lastNetworkSend > 40 && conn && conn.open) {
         conn.send({
             type: 'state',
-            score: score,
-            y: fox.y,
-            vy: fox.vy,
-            grounded: fox.grounded,
-            animation: fox.animation
+            score: score
         });
         lastNetworkSend = now;
     }
@@ -4734,4 +4712,4 @@ window.addEventListener('beforeunload', function() {
 
 </script>
 </body>
-        </html>
+                </html>
