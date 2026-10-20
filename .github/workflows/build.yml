@@ -41,9 +41,6 @@ jobs:
       # ==========================================
       # ANDROID SDK
       # ==========================================
-      # مهم:
-      # packages خالی است تا setup-android سعی نکند
-      # پکیج قدیمی "tools" را نصب کند.
       - name: Setup Android SDK
         uses: android-actions/setup-android@v4
         with:
@@ -78,6 +75,52 @@ jobs:
           cp index.html www/index.html
 
           echo "Game prepared successfully."
+
+
+      # ==========================================
+      # OBFUSCATE & MINIFY CODE (امنیت کد بازی)
+      # ==========================================
+      - name: Obfuscate and Minify
+        run: |
+          echo "🔒 Installing obfuscator..."
+          npm install -g javascript-obfuscator
+          npm install -g html-minifier-terser
+          
+          # ۱. فشرده‌سازی HTML
+          html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js false www/index.html -o www/index.html.min
+          mv www/index.html.min www/index.html
+          
+          # ۲. مبهم‌سازی JS داخل HTML
+          python3 - <<'PY'
+          import re
+          import os
+          import subprocess
+          
+          with open("www/index.html", "r", encoding="utf-8") as f:
+              html = f.read()
+          scripts = re.findall(r'<script>(.*?)</script>', html, re.DOTALL)
+          
+          for i, script in enumerate(scripts):
+              if len(script.strip()) < 100: continue
+              with open(f"temp_{i}.js", "w", encoding="utf-8") as f: f.write(script)
+              
+              subprocess.run([
+                  "javascript-obfuscator", f"temp_{i}.js", "--output", f"temp_{i}_obs.js",
+                  "--compact", "true", "--control-flow-flattening", "true",
+                  "--identifier-names-generator", "hexadecimal", "--string-array", "true",
+                  "--self-defending", "true"
+              ], capture_output=True)
+              
+              if os.path.exists(f"temp_{i}_obs.js"):
+                  with open(f"temp_{i}_obs.js", "r", encoding="utf-8") as f: obs = f.read()
+                  html = html.replace(script, obs, 1)
+              os.remove(f"temp_{i}.js")
+              if os.path.exists(f"temp_{i}_obs.js"): os.remove(f"temp_{i}_obs.js")
+              
+          with open("www/index.html", "w", encoding="utf-8") as f: f.write(html)
+          PY
+          
+          echo "✅ Code successfully obfuscated."
 
 
       # ==========================================
@@ -157,9 +200,6 @@ jobs:
           with open(main_activity, "r", encoding="utf-8") as f:
               original = f.read()
 
-          # ------------------------------------------
-          # GET PACKAGE NAME FROM EXISTING FILE
-          # ------------------------------------------
           package_match = re.search(
               r'^\s*package\s+([^;]+);',
               original,
@@ -175,9 +215,6 @@ jobs:
 
           print("Package:", package_name)
 
-          # ------------------------------------------
-          # CREATE FULLSCREEN MAIN ACTIVITY
-          # ------------------------------------------
           fullscreen_activity = f'''package {package_name};
 
           import android.os.Bundle;
@@ -253,8 +290,6 @@ jobs:
       # ==========================================
       # LOAD EXISTING KEYSTORE
       # ==========================================
-      # همان keystore قبلی را استفاده می‌کنیم.
-      # این برای آپدیت بدون حذف نسخه قبلی بسیار مهم است.
       - name: Load existing keystore
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
@@ -306,9 +341,6 @@ jobs:
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          # ------------------------------------------
-          # APPLICATION ID
-          # ------------------------------------------
           text = re.sub(
               r'applicationId\s+"[^"]+"',
               'applicationId "com.foxeggs.game"',
@@ -316,9 +348,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # COMPILE SDK
-          # ------------------------------------------
           text = re.sub(
               r'compileSdk\s+\d+',
               'compileSdk 35',
@@ -326,9 +355,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # VERSION CODE
-          # ------------------------------------------
           text = re.sub(
               r'versionCode\s+\d+',
               'versionCode ' + os.environ["VERSION_CODE"],
@@ -336,9 +362,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # VERSION NAME
-          # ------------------------------------------
           text = re.sub(
               r'versionName\s+"[^"]+"',
               'versionName "' + os.environ["VERSION_NAME"] + '"',
@@ -346,9 +369,6 @@ jobs:
               count=1
           )
 
-          # ------------------------------------------
-          # REMOVE EXISTING SIGNING CONFIG
-          # ------------------------------------------
           text = re.sub(
               r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)',
               '',
@@ -357,9 +377,6 @@ jobs:
               flags=re.S
           )
 
-          # ------------------------------------------
-          # SIGNING CONFIG
-          # ------------------------------------------
           signing_block = '''
               signingConfigs {
                   release {
@@ -381,9 +398,6 @@ jobs:
                   1
               )
 
-          # ------------------------------------------
-          # RELEASE BUILD TYPE
-          # ------------------------------------------
           release_pattern = (
               r'(buildTypes\s*\{\s*'
               r'release\s*\{)'
@@ -398,9 +412,6 @@ jobs:
                   flags=re.S
               )
 
-          # ------------------------------------------
-          # MINIFY
-          # ------------------------------------------
           if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
 
               release_match = re.search(
