@@ -39,12 +39,12 @@ canvas {
 #combo.show {opacity:1;}
 
 #powerupTimer {
-    position:absolute; top:110px; left:50%;
+    position:absolute; top:65px; left:50%;
     transform:translateX(-50%); z-index:6;
     pointer-events:none; display:flex; gap:20px;
     justify-content:center; align-items:center;
-    background:rgba(0,0,0,0.5);
-    padding:6px 18px; border-radius:30px;
+    background:rgba(0,0,0,0.6);
+    padding:4px 16px; border-radius:20px;
     transition:opacity 0.2s ease, transform 0.2s ease;
 }
 
@@ -56,14 +56,25 @@ canvas {
 
 .timer-item {
     display:flex; align-items:center; gap:6px;
-    color:white; font-size:13px; font-weight:bold;
+    color:white; font-size:12px; font-weight:bold;
 }
 
-.timer-item .icon {font-size:16px;}
-.timer-item .time {min-width:28px;text-align:center;font-variant-numeric:tabular-nums;}
+.timer-item .icon {font-size:14px;}
+.timer-item .time {min-width:24px;text-align:center;font-variant-numeric:tabular-nums;}
 #shieldTimer .time {color:#4fc3f7;}
 #speedTimer .time {color:#ffd54f;}
 .timer-item.hidden-timer {display:none !important;}
+
+body.multiplayer-active #powerupTimer {
+    left: auto;
+    right: 15px;
+    transform: translateX(0) translateY(0);
+    top: 115px;
+}
+
+body.multiplayer-active #powerupTimer.hidden {
+    transform: translateX(0) translateY(-10px);
+}
 
 #menuButton {
     position:fixed; top:12px; left:12px; z-index:99999;
@@ -205,15 +216,15 @@ button:active {
     top:65px;
     left:50%;
     transform:translateX(-50%);
-    z-index:6;
-    display:flex;
-    gap:14px;
-    background:rgba(0,0,0,0.55);
-    padding:7px 16px;
-    border-radius:24px;
+    z-index:5;
+    gap:12px;
+    background:rgba(0,0,0,0.65);
+    padding:4px 14px;
+    border-radius:20px;
     color:white;
-    font-size:13px;
+    font-size:12px;
     font-weight:bold;
+    white-space:nowrap;
 }
 
 #noInternetOverlay {
@@ -3145,6 +3156,7 @@ function handleOpponentLeft() {
 
     const vs = document.getElementById('vsScores');
     if (vs) vs.style.display = 'none';
+    document.body.classList.remove('multiplayer-active');
 
     if (playing) {
         showToast(language === 'fa' ? 'حریف بازی را ترک کرد! ادامه به‌صورت تک‌نفره 🦊' : 'Opponent left! Continuing solo 🦊');
@@ -3523,6 +3535,8 @@ function endGame() {
     obstacles.length = 0;
     powerups.length = 0;
 
+    document.body.classList.remove('multiplayer-active');
+
     const mpFinal = document.getElementById('mpFinalScores');
     if (mpFinal) {
         if (wasMultiplayer) {
@@ -3575,8 +3589,10 @@ function updateUI() {
         vs.style.display = 'flex';
         document.getElementById('myScoreVs').textContent = score;
         document.getElementById('enemyScoreVs').textContent = remoteData.score;
+        document.body.classList.add('multiplayer-active');
     } else {
         vs.style.display = 'none';
+        document.body.classList.remove('multiplayer-active');
     }
 }
 
@@ -4712,4 +4728,4 @@ window.addEventListener('beforeunload', function() {
 
 </script>
 </body>
-                </html>
+    </html>
