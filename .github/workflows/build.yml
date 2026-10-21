@@ -56,7 +56,7 @@ jobs:
           echo "Android SDK packages installed successfully."
 
       # ==========================================
-      # PREPARE GAME + REMOVE INTERNET CHECK + INJECT ANTI-CHEAT
+      # PREPARE GAME (Offline Mode & Anti-Cheat)
       # ==========================================
       - name: Prepare game (Offline Mode & Anti-Cheat)
         run: |
@@ -130,16 +130,16 @@ jobs:
           // ANTI-CHEAT SYSTEM (Max 250 score per second)
           // ============================================================
           (function() {
-              let _lastScore = 0;
-              let _lastCheckTime = Date.now();
-              const MAX_SCORE_PER_SEC = 250;
+              var _lastScore = 0;
+              var _lastCheckTime = Date.now();
+              var MAX_SCORE_PER_SEC = 250;
 
               setInterval(function() {
-                  const now = Date.now();
-                  const timeDiff = (now - _lastCheckTime) / 1000; 
+                  var now = Date.now();
+                  var timeDiff = (now - _lastCheckTime) / 1000; 
                   
                   if (typeof score !== 'undefined' && score > _lastScore) {
-                      const allowedScore = _lastScore + (MAX_SCORE_PER_SEC * timeDiff);
+                      var allowedScore = _lastScore + (MAX_SCORE_PER_SEC * timeDiff);
 
                       if (score > allowedScore) {
                           score = Math.floor(allowedScore);
@@ -161,6 +161,100 @@ jobs:
           with open(html_path, "w", encoding="utf-8") as f:
               f.write(html)
           print("✅ Offline patch applied. Game can now run without internet.")
+          PY
+
+      # ==========================================
+      # OBFUSCATE (SAFE FOR GAME & ANTI-CHEAT & PEERJS)
+      # ==========================================
+      - name: Obfuscate Game Code
+        run: |
+          echo "🔒 Installing obfuscator..."
+          npm install -g javascript-obfuscator
+          npm install -g html-minifier-terser
+
+          # ۱. فشرده‌سازی HTML
+          html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js false www/index.html -o www/index.html.min
+          mv www/index.html.min www/index.html
+
+          # ۲. مبهم‌سازی امن (مخصوص بازی)
+          python3 - <<'PY'
+          import re, os, subprocess, tempfile, shutil
+
+          # ⚠️ لیست حیاتی: این کلمات هرگز نباید توسط مبهم‌ساز تغییر کنند
+          RESERVED_NAMES = [
+              # --- ضد تقلب (Anti-Cheat) ---
+              "score", "updateUI", "updateScore", "_lastScore", "_lastCheckTime", "MAX_SCORE_PER_SEC", "allowedScore", "timeDiff", "now",
+              
+              # --- هسته بازی ---
+              "playing", "fox", "eggs", "obstacles", "particles", "canvas", "ctx", "W", "H", "scale",
+              "requestAnimationFrame", "cancelAnimationFrame", "setInterval", "clearInterval", "setTimeout",
+              "getContext", "fillRect", "clearRect", "drawImage", "beginPath", "closePath", "fill", "stroke", "arc",
+              "Math", "JSON", "Date", "Promise", "Object", "Array", "String", "Number", "Boolean", "Function", "Symbol", "Map", "Set",
+              "window", "document", "navigator", "localStorage", "sessionStorage", "console",
+              
+              # --- PeerJS (بازی آنلاین) ---
+              "peer", "conn", "on", "emit", "send", "connect", "open", "data", "close", "error", "Peer", "peerjs",
+              
+              # --- داده‌های کاربر (LocalStorage) ---
+              "foxBest", "foxGames", "foxEggs", "foxTotalScore", "foxTheme", "foxLanguage", "foxSkin", "purchasedSkins",
+              "getItem", "setItem", "removeItem",
+              
+              # --- سایر موارد ---
+              "undefined", "null", "true", "false", "this", "isOnline"
+          ]
+
+          def obfuscate(js_code):
+              tmpdir = tempfile.mkdtemp()
+              src = os.path.join(tmpdir, "in.js")
+              dst = os.path.join(tmpdir, "out.js")
+              try:
+                  with open(src, "w", encoding="utf-8") as f: f.write(js_code)
+                  opts = [
+                      "--compact", "true",
+                      "--identifier-names-generator", "hexadecimal",
+                      "--rename-globals", "false",
+                      "--rename-properties", "false",
+                      "--string-array", "true",
+                      "--string-array-encoding", "base64",
+                      "--string-array-threshold", "0.75",
+                      "--disable-console-output", "false"
+                  ]
+                  for s in RESERVED_NAMES:
+                      opts += ["--reserved-names", s]
+                  
+                  res = subprocess.run(["javascript-obfuscator", src, "--output", dst, *opts], capture_output=True, text=True)
+                  if res.returncode != 0:
+                      print(f"⚠️ Obfuscation failed: {res.stderr[:200]}")
+                      return js_code
+                  with open(dst, "r", encoding="utf-8") as f: return f.read()
+              finally:
+                  shutil.rmtree(tmpdir, ignore_errors=True)
+
+          with open("www/index.html", "r", encoding="utf-8") as f:
+              html = f.read()
+
+          # پیدا کردن تمام تگ‌های <script>
+          script_re = re.compile(r'<script(?:\s[^>]*)?>(.*?)</script>', re.DOTALL)
+          
+          def repl(m):
+              body = m.group(1)
+              # اسکریپت‌های کوچک (مثل patch آفلاین) و اسکریپت‌های خالی را رد کن
+              if not body.strip() or len(body.strip()) < 100:
+                  return m.group(0)
+              
+              # 🔥 استثنا کردن بخش آنلاین (PeerJS) از مبهم‌سازی
+              if "new Peer(" in body or "peerjs" in body or "PeerJS" in body:
+                  print("⏭️ Skipping obfuscation for PeerJS (Online Multiplayer) block.")
+                  return m.group(0)
+              
+              obs = obfuscate(body)
+              return f'<script>{obs}</script>'
+
+          html = script_re.sub(repl, html)
+          
+          with open("www/index.html", "w", encoding="utf-8") as f:
+              f.write(html)
+          print("✅ Game obfuscated safely.")
           PY
 
       # ==========================================
@@ -214,72 +308,36 @@ jobs:
       - name: Enable Fullscreen
         run: |
           python3 - <<'PY'
-          import os
-          import re
-
+          import os, re
           base = "android/app/src/main/java"
           main_activity = None
-
           for root, dirs, files in os.walk(base):
               if "MainActivity.java" in files:
                   main_activity = os.path.join(root, "MainActivity.java")
                   break
-
-          if not main_activity:
-              raise SystemExit("MainActivity.java not found.")
-
-          print("Found MainActivity:", main_activity)
-
-          with open(main_activity, "r", encoding="utf-8") as f:
-              original = f.read()
-
-          package_match = re.search(
-              r'^\s*package\s+([^;]+);',
-              original,
-              re.MULTILINE
-          )
-
-          if not package_match:
-              raise SystemExit("Package name not found in MainActivity.java")
-
+          if not main_activity: raise SystemExit("MainActivity.java not found.")
+          with open(main_activity, "r", encoding="utf-8") as f: original = f.read()
+          package_match = re.search(r'^\s*package\s+([^;]+);', original, re.MULTILINE)
           package_name = package_match.group(1)
-          print("Package:", package_name)
-
           fullscreen_activity = f'''package {package_name};
 
           import android.os.Bundle;
           import android.view.View;
           import android.view.WindowManager;
-
           import com.getcapacitor.BridgeActivity;
 
           public class MainActivity extends BridgeActivity {{
-
               @Override
               public void onCreate(Bundle savedInstanceState) {{
                   super.onCreate(savedInstanceState);
-
-                  getWindow().setFlags(
-                      WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                      WindowManager.LayoutParams.FLAG_FULLSCREEN
-                  );
-
+                  getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
                   getWindow().getDecorView().setSystemUiVisibility(
-                      View.SYSTEM_UI_FLAG_FULLSCREEN
-                      | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                      | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                      | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                      | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                      | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                      View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                   );
               }}
           }}
           '''
-
-          with open(main_activity, "w", encoding="utf-8") as f:
-              f.write(fullscreen_activity)
-
-          print("Fullscreen MainActivity created successfully.")
+          with open(main_activity, "w", encoding="utf-8") as f: f.write(fullscreen_activity)
           PY
 
       # ==========================================
@@ -342,20 +400,14 @@ jobs:
       - name: Configure Android Gradle
         run: |
           python3 - <<'PY'
-          import re
-          import os
-
+          import re, os
           path = "android/app/build.gradle"
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
-
+          with open(path, "r", encoding="utf-8") as f: text = f.read()
           text = re.sub(r'applicationId\s+"[^"]+"', 'applicationId "com.foxeggs.game"', text, count=1)
           text = re.sub(r'compileSdk\s+\d+', 'compileSdk 35', text, count=1)
           text = re.sub(r'versionCode\s+\d+', 'versionCode ' + os.environ["VERSION_CODE"], text, count=1)
           text = re.sub(r'versionName\s+"[^"]+"', 'versionName "' + os.environ["VERSION_NAME"] + '"', text, count=1)
-
           text = re.sub(r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)', '', text, count=1, flags=re.S)
-
           signing_block = '''
               signingConfigs {
                   release {
@@ -367,30 +419,21 @@ jobs:
                       v2SigningEnabled true
                   }
               }
-
           '''
-
           if "signingConfigs {" not in text:
               text = text.replace("    buildTypes {", signing_block + "    buildTypes {", 1)
-
           if "signingConfig signingConfigs.release" not in text:
               text = re.sub(r'(buildTypes\s*\{\s*release\s*\{)', r'\1\n            signingConfig signingConfigs.release', text, count=1, flags=re.S)
-
           if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
               release_match = re.search(r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})', text, re.S)
               if release_match:
                   release_body = release_match.group(2)
-
                   if "minifyEnabled" in release_body:
                       release_body = re.sub(r'minifyEnabled\s+\w+', 'minifyEnabled false', release_body, count=1)
                   else:
                       release_body = "\n            minifyEnabled false" + release_body
-
                   text = text[:release_match.start(2)] + release_body + text[release_match.end(2):]
-
-          with open(path, "w", encoding="utf-8") as f:
-              f.write(text)
-
+          with open(path, "w", encoding="utf-8") as f: f.write(text)
           print("Android Gradle configured (minify disabled).")
           PY
 
@@ -402,56 +445,29 @@ jobs:
           python3 - <<'PY'
           import re
           path = "android/app/src/main/AndroidManifest.xml"
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
-
-          permissions = [
-              "READ_CONTACTS", "WRITE_CONTACTS", "READ_SMS", "SEND_SMS",
-              "RECEIVE_SMS", "CALL_PHONE", "READ_PHONE_STATE",
-              "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION",
-              "RECORD_AUDIO",
-              "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE",
-              "MANAGE_EXTERNAL_STORAGE", "REQUEST_INSTALL_PACKAGES",
-              "SYSTEM_ALERT_WINDOW", "BIND_ACCESSIBILITY_SERVICE"
-          ]
-
+          with open(path, "r", encoding="utf-8") as f: text = f.read()
+          permissions = ["READ_CONTACTS", "WRITE_CONTACTS", "READ_SMS", "SEND_SMS", "RECEIVE_SMS", "CALL_PHONE", "READ_PHONE_STATE", "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "RECORD_AUDIO", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE", "MANAGE_EXTERNAL_STORAGE", "REQUEST_INSTALL_PACKAGES", "SYSTEM_ALERT_WINDOW", "BIND_ACCESSIBILITY_SERVICE"]
           for permission in permissions:
-              pattern = r'\s*<uses-permission\s+android:name="android\.permission\.' + permission + r'"\s*/>'
-              text = re.sub(pattern, '', text)
-
+              text = re.sub(r'\s*<uses-permission\s+android:name="android\.permission\.' + permission + r'"\s*/>', '', text)
           text = re.sub(r'android:debuggable="true"', 'android:debuggable="false"', text)
-
-          with open(path, "w", encoding="utf-8") as f:
-              f.write(text)
+          with open(path, "w", encoding="utf-8") as f: f.write(text)
           print("Unnecessary permissions removed.")
           PY
 
       # ==========================================
-      # ADD PERMISSIONS (INTERNET برای بازی آنلاین)
+      # ADD PERMISSIONS
       # ==========================================
       - name: Add permissions
         run: |
           python3 - <<'PY'
           import re
           path = "android/app/src/main/AndroidManifest.xml"
-          with open(path, "r", encoding="utf-8") as f:
-              text = f.read()
-
+          with open(path, "r", encoding="utf-8") as f: text = f.read()
           extras = ""
-          for perm in [
-              "android.permission.INTERNET",
-              "android.permission.ACCESS_NETWORK_STATE",
-              "android.permission.VIBRATE"
-          ]:
-              if perm not in text:
-                  extras += f'    <uses-permission android:name="{perm}" />\n'
-
-          if extras:
-              text = text.replace('<application', extras + '    <application', 1)
-
-          with open(path, "w", encoding="utf-8") as f:
-              f.write(text)
-
+          for perm in ["android.permission.INTERNET", "android.permission.ACCESS_NETWORK_STATE", "android.permission.VIBRATE"]:
+              if perm not in text: extras += f'    <uses-permission android:name="{perm}" />\n'
+          if extras: text = text.replace('<application', extras + '    <application', 1)
+          with open(path, "w", encoding="utf-8") as f: f.write(text)
           print("Permissions added.")
           PY
 
@@ -470,19 +486,12 @@ jobs:
           import os
           extensions = (".png", ".jpg", ".jpeg", ".webp")
           files = [f for f in os.listdir(".") if os.path.isfile(f) and f.lower().endswith(extensions)]
-          ignored = {"fox-eggs-icon.png", "game-logo.png"}
-          files = [f for f in files if f.lower() not in ignored]
-
-          if not files:
-              raise SystemExit("No image file found in project root.")
-
-          logo = files[0]
-          print("==========================================")
-          print("CUSTOM GAME ICON")
-          print("==========================================")
-          print("Using image:", logo)
-          with open("CUSTOM_ICON", "w") as f:
-              f.write(logo)
+          files = [f for f in files if f.lower() not in {"fox-eggs-icon.png", "game-logo.png"}]
+          if not files: raise SystemExit("No image file found.")
+          with open("CUSTOM_ICON", "w") as f: f.write(files[0])
+          print("=" * 50)
+          print("CUSTOM GAME ICON:", files[0])
+          print("=" * 50)
           PY
 
       # ==========================================
@@ -493,28 +502,17 @@ jobs:
           python3 - <<'PY'
           from PIL import Image
           import os
-          with open("CUSTOM_ICON", "r") as f:
-              filename = f.read().strip()
-
-          print("Loading custom icon:", filename)
+          with open("CUSTOM_ICON", "r") as f: filename = f.read().strip()
           source = Image.open(filename).convert("RGBA")
           sizes = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
-
           for density, size in sizes.items():
               folder = "android/app/src/main/res/mipmap-" + density
               os.makedirs(folder, exist_ok=True)
               icon = source.resize((size, size), Image.Resampling.LANCZOS)
               icon.save(folder + "/ic_launcher.png")
               icon.save(folder + "/ic_launcher_round.png")
-
           print("Android icons generated successfully.")
           PY
-
-      # ==========================================
-      # REMOVE ADAPTIVE ICON DEFAULTS
-      # ==========================================
-      - name: Remove adaptive icon defaults
-        run: |
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
@@ -526,17 +524,13 @@ jobs:
           echo "=========================================="
           echo "FOX EGGS CONFIGURATION"
           echo "=========================================="
-          echo ""
           echo "APPLICATION ID:"
           grep "applicationId" android/app/build.gradle
-          echo ""
           echo "VERSION:"
           grep "versionCode" android/app/build.gradle
           grep "versionName" android/app/build.gradle
-          echo ""
           echo "COMPILE SDK:"
           grep "compileSdk" android/app/build.gradle
-          echo ""
           echo "MINIFY:"
           grep "minifyEnabled" android/app/build.gradle
 
@@ -557,27 +551,20 @@ jobs:
         run: |
           APK="android/app/build/outputs/apk/release/app-release.apk"
           test -f "$APK"
-
           BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
           AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
           APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
-
           echo "=========================================="
           echo "FOX EGGS APK"
           echo "=========================================="
-          echo ""
           echo "APK FILE:"
           ls -lh "$APK"
-          echo ""
           echo "SHA256:"
           sha256sum "$APK"
-          echo ""
           echo "PACKAGE / VERSION:"
           "$AAPT" dump badging "$APK" | head -n 20
-          echo ""
           echo "PERMISSIONS:"
           "$AAPT" dump permissions "$APK"
-          echo ""
           echo "SIGNATURE:"
           "$APKSIGNER" verify --verbose --print-certs "$APK"
 
@@ -594,13 +581,10 @@ jobs:
       - name: Prepare release
         run: |
           mkdir -p release
-
           cp android/app/build/outputs/apk/release/app-release.apk release/FoxEggs.apk
           cp android/app/build/outputs/bundle/release/app-release.aab release/FoxEggs.aab
-
           CUSTOM_ICON=$(cat CUSTOM_ICON)
           cp "$CUSTOM_ICON" release/FoxEggs-Icon.png
-
           echo "Release files prepared."
 
       # ==========================================
