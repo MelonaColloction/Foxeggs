@@ -82,265 +82,6 @@ jobs:
           find www -type f | head -n 50
 
       # ==========================================
-      # INJECT ANTI-CHEAT (حرفه‌ای - داخل scope بازی)
-      # ==========================================
-      - name: Inject Anti-Cheat
-        run: |
-          python3 - <<'PY'
-          import re
-
-          with open("www/index.html", "r", encoding="utf-8") as f:
-              html = f.read()
-
-          # پیدا کردن محل تعریف score
-          marker = "let score = 0;"
-          if marker not in html:
-              m = re.search(r'let\s+score\s*=\s*0\s*;', html)
-              if m:
-                  marker = m.group(0)
-              else:
-                  raise SystemExit("Could not find 'let score = 0;' in game!")
-
-          anti_cheat = marker + '''
-
-          // ============================================================
-          // ANTI-CHEAT (Inline - same scope as score)
-          // ============================================================
-          (function() {
-              "use strict";
-
-              var _lastValidScore = 0;
-              var _cheatCount = 0;
-              var THRESHOLD = 250;
-              var _guardOn = true;
-
-              // ---------- نظارت روی score هر 500ms ----------
-              var _checkId = setInterval(function() {
-                  if (!_guardOn) return;
-                  try {
-                      if (typeof score !== 'number' || isNaN(score) || !isFinite(score)) {
-                          score = _lastValidScore;
-                          _cheatCount++;
-                          return;
-                      }
-
-                      var diff = score - _lastValidScore;
-
-                      if (diff < 0) {
-                          _lastValidScore = score;
-                          return;
-                      }
-
-                      if (diff > THRESHOLD) {
-                          _cheatCount++;
-                          score = _lastValidScore;
-                          try {
-                              if (typeof updateUI === 'function') updateUI();
-                          } catch(e) {}
-                          try {
-                              console.warn('[AntiCheat] Blocked jump: +' + diff);
-                          } catch(e) {}
-                          return;
-                      }
-
-                      _lastValidScore = score;
-                  } catch(e) {}
-              }, 500);
-
-              // ---------- محافظت در برابر حذف setInterval ----------
-              var _origClearInterval = window.clearInterval;
-              window.clearInterval = function(id) {
-                  if (id === _checkId) {
-                      // کاربر می‌خواهد Anti-Cheat را پاک کند → نادیده بگیر
-                      return;
-                  }
-                  return _origClearInterval(id);
-              };
-
-              // ---------- محافظت در برابر override شدن console.warn ----------
-              var _origWarn = console.warn;
-              try {
-                  Object.defineProperty(console, 'warn', {
-                      get: function() { return _origWarn; },
-                      set: function() {},
-                      configurable: false
-                  });
-              } catch(e) {}
-
-              // ---------- API برای دیباگ (اختیاری) ----------
-              window.__antiCheatStatus = function() {
-                  return {
-                      lastValid: _lastValidScore,
-                      current: typeof score !== 'undefined' ? score : null,
-                      cheats: _cheatCount,
-                      threshold: THRESHOLD,
-                      active: _guardOn
-                  };
-              };
-          })();
-          '''
-
-          html = html.replace(marker, anti_cheat, 1)
-
-          with open("www/index.html", "w", encoding="utf-8") as f:
-              f.write(html)
-
-          print("Anti-Cheat injected successfully.")
-          print("Threshold: 250 (fixed)")
-          print("Check interval: 500ms")
-          print("Self-protection: enabled")
-          PY
-
-      # ==========================================
-      # FULL OBFUSCATION (مبهم‌سازی کامل)
-      # ==========================================
-      - name: Obfuscate and Minify EVERYTHING
-        run: |
-          echo "Installing obfuscator and minifiers..."
-          npm install -g javascript-obfuscator
-          npm install -g html-minifier-terser
-
-          python3 - <<'PY'
-          import os
-          import re
-          import subprocess
-          import glob
-
-          OBFUSCATOR = "javascript-obfuscator"
-
-          OBFUSCATOR_FLAGS = [
-              "--compact", "true",
-              "--control-flow-flattening", "true",
-              "--control-flow-flattening-threshold", "0.75",
-              "--identifier-names-generator", "hexadecimal",
-              "--string-array", "true",
-              "--string-array-encoding", "base64",
-              "--string-array-threshold", "0.75",
-              "--split-strings", "true",
-              "--split-strings-chunk-length", "10",
-              "--self-defending", "true",
-              "--dead-code-injection", "true",
-              "--dead-code-injection-threshold", "0.4",
-              "--numbers-to-expressions", "true",
-          ]
-
-          def obfuscate_js_content(content, label):
-              if len(content.strip()) < 50:
-                  return content
-
-              with open("__tmp_in.js", "w", encoding="utf-8") as f:
-                  f.write(content)
-
-              result = subprocess.run(
-                  [OBFUSCATOR, "__tmp_in.js", "--output", "__tmp_out.js"] + OBFUSCATOR_FLAGS,
-                  capture_output=True, text=True
-              )
-
-              out_content = None
-              if result.returncode == 0 and os.path.exists("__tmp_out.js"):
-                  with open("__tmp_out.js", "r", encoding="utf-8") as f:
-                      out_content = f.read()
-
-              for p in ("__tmp_in.js", "__tmp_out.js"):
-                  if os.path.exists(p):
-                      os.remove(p)
-
-              if out_content is None:
-                  print(f"[WARN] Obfuscation FAILED for {label}: {result.stderr[:300]}")
-                  return content
-
-              print(f"[OK] Obfuscated {label} ({len(content)} -> {len(out_content)} bytes)")
-              return out_content
-
-          # ---------- ۱. فایل‌های .js خارجی ----------
-          js_files = glob.glob("www/**/*.js", recursive=True)
-          for js_file in js_files:
-              with open(js_file, "r", encoding="utf-8") as f:
-                  original = f.read()
-              obfuscated = obfuscate_js_content(original, js_file)
-              with open(js_file, "w", encoding="utf-8") as f:
-                  f.write(obfuscated)
-
-          print(f"Total external JS files obfuscated: {len(js_files)}")
-
-          # ---------- ۲. HTML ----------
-          html_files = glob.glob("www/**/*.html", recursive=True)
-
-          for html_file in html_files:
-              with open(html_file, "r", encoding="utf-8") as f:
-                  html = f.read()
-
-              # inline کردن اسکریپت‌های خارجی
-              def inline_and_obfuscate_script_src(match):
-                  src = match.group(1)
-                  base_dir = os.path.dirname(html_file)
-                  src_path = os.path.normpath(os.path.join(base_dir, src))
-
-                  if os.path.exists(src_path):
-                      with open(src_path, "r", encoding="utf-8") as sf:
-                          js_content = sf.read()
-                      obs = obfuscate_js_content(js_content, src_path)
-                      try:
-                          os.remove(src_path)
-                      except Exception:
-                          pass
-                      return f"<script>\n{obs}\n</script>"
-                  else:
-                      print(f"[WARN] External script not found: {src}")
-                      return match.group(0)
-
-              html = re.sub(
-                  r'<script[^>]+src=["\']([^"\']+)["\'][^>]*>\s*</script>',
-                  inline_and_obfuscate_script_src,
-                  html
-              )
-
-              # مبهم‌سازی اسکریپت‌های inline
-              def obfuscate_inline_script(match):
-                  js = match.group(1)
-                  return "<script>\n" + obfuscate_js_content(js, f"{html_file}:inline") + "\n</script>"
-
-              html = re.sub(
-                  r'<script(?:\s+[^>]*)?>(.*?)</script>',
-                  obfuscate_inline_script,
-                  html,
-                  flags=re.DOTALL
-              )
-
-              with open(html_file, "w", encoding="utf-8") as f:
-                  f.write(html)
-
-          print(f"Total HTML files processed: {len(html_files)}")
-
-          # ---------- ۳. فشرده‌سازی HTML ----------
-          for html_file in html_files:
-              tmp_out = html_file + ".min"
-              result = subprocess.run([
-                  "html-minifier-terser",
-                  "--collapse-whitespace",
-                  "--remove-comments",
-                  "--remove-redundant-attributes",
-                  "--remove-script-type-attributes",
-                  "--remove-style-link-type-attributes",
-                  "--minify-css", "true",
-                  "--minify-js", "false",
-                  "--remove-attribute-quotes",
-                  html_file,
-                  "-o", tmp_out
-              ], capture_output=True, text=True)
-
-              if result.returncode == 0 and os.path.exists(tmp_out):
-                  os.replace(tmp_out, html_file)
-                  print(f"[OK] Minified HTML: {html_file}")
-              else:
-                  print(f"[WARN] HTML minify failed for {html_file}: {result.stderr[:200]}")
-
-          print("All JS and HTML obfuscated/minified.")
-          PY
-
-          echo "Code successfully obfuscated."
-
-      # ==========================================
       # CREATE PACKAGE.JSON
       # ==========================================
       - name: Create package.json
@@ -514,7 +255,7 @@ jobs:
           echo "Signing properties configured."
 
       # ==========================================
-      # CONFIGURE ANDROID GRADLE (minify + proguard)
+      # CONFIGURE ANDROID GRADLE (بدون Minify و بدون ProGuard)
       # ==========================================
       - name: Configure Android Gradle
         run: |
@@ -553,58 +294,31 @@ jobs:
           if "signingConfig signingConfigs.release" not in text:
               text = re.sub(r'(buildTypes\s*\{\s*release\s*\{)', r'\1\n            signingConfig signingConfigs.release', text, count=1, flags=re.S)
 
-          # minify + shrinkResources + proguard
+          # غیرفعال کردن Minify و حذف ProGuard
           if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
               release_match = re.search(r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})', text, re.S)
               if release_match:
                   release_body = release_match.group(2)
 
                   if "minifyEnabled" in release_body:
-                      release_body = re.sub(r'minifyEnabled\s+\w+', 'minifyEnabled true', release_body, count=1)
+                      release_body = re.sub(r'minifyEnabled\s+\w+', 'minifyEnabled false', release_body, count=1)
                   else:
-                      release_body = "\n            minifyEnabled true" + release_body
+                      release_body = "\n            minifyEnabled false" + release_body
 
                   if "shrinkResources" in release_body:
-                      release_body = re.sub(r'shrinkResources\s+\w+', 'shrinkResources true', release_body, count=1)
+                      release_body = re.sub(r'shrinkResources\s+\w+', 'shrinkResources false', release_body, count=1)
                   else:
-                      release_body = "\n            shrinkResources true" + release_body
+                      release_body = "\n            shrinkResources false" + release_body
 
-                  if "proguardFiles" not in release_body:
-                      release_body += "\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'"
+                  # حذف proguardFiles برای جلوگیری از خطای تداخل
+                  release_body = re.sub(r'\n\s*proguardFiles.*', '', release_body)
 
                   text = text[:release_match.start(2)] + release_body + text[release_match.end(2):]
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
-          print("Android Gradle configured (minify+proguard enabled).")
-
-          # proguard-rules.pro
-          proguard_path = "android/app/proguard-rules.pro"
-          with open(proguard_path, "w", encoding="utf-8") as f:
-              f.write("""
-          # Fox Eggs ProGuard Rules
-          -dontwarn com.getcapacitor.**
-          -keep class com.getcapacitor.** { *; }
-          -keep class com.foxeggs.** { *; }
-          -keep class * extends com.getcapacitor.BridgeActivity { *; }
-          -keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
-
-          # حذف لاگ‌ها
-          -assumenosideeffects class android.util.Log {
-              public static *** d(...);
-              public static *** v(...);
-              public static *** i(...);
-          }
-
-          # مبهم‌سازی کامل
-          -repackageclasses ''
-          -allowaccessmodification
-          -optimizationpasses 5
-          -overloadaggressively
-          -useuniqueclassmembernames
-          """)
-          print("proguard-rules.pro created.")
+          print("Android Gradle configured (minify disabled).")
           PY
 
       # ==========================================
