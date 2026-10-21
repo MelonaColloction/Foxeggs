@@ -56,9 +56,9 @@ jobs:
           echo "Android SDK packages installed successfully."
 
       # ==========================================
-      # PREPARE GAME (کپی همه فایل‌های بازی)
+      # PREPARE GAME + REMOVE INTERNET CHECK + INJECT ANTI-CHEAT
       # ==========================================
-      - name: Prepare game
+      - name: Prepare game (Offline Mode & Anti-Cheat)
         run: |
           test -f index.html
           rm -rf www
@@ -77,175 +77,91 @@ jobs:
             --exclude='capacitor.config.json' \
             ./ www/
 
-          echo "Game prepared successfully."
-          find www -type f | head -n 50
+          echo "Game files copied. Now patching index.html..."
 
-      # ==========================================
-      # OBFUSCATE & MINIFY (SAFE FOR GAME & ONLINE)
-      # ==========================================
-      - name: Obfuscate and Minify Game
-        run: |
-          echo "🔒 Installing obfuscator..."
-          npm install -g javascript-obfuscator
-          npm install -g html-minifier-terser
-
-          # ۱. فشرده‌سازی HTML
-          html-minifier-terser \
-            --collapse-whitespace \
-            --remove-comments \
-            --minify-css true \
-            --minify-js false \
-            www/index.html -o www/index.html.min
-          mv www/index.html.min www/index.html
-
-          # ۲. مبهم‌سازی امن بازی
           python3 - <<'PY'
-          import re, os, subprocess, tempfile, shutil, glob
+          import re
+          import os
 
-          # =========================================================
-          # کلمات کلیدی که برای اجرای بازی و بخش آنلاین حیاتی هستند
-          # و نباید هرگز مبهم شوند
-          # =========================================================
-          PROTECTED_LITERALS = [
-              # --- کانواس و گرافیک بازی ---
-              "canvas", "Canvas", "context", "ctx", "getContext", "2d", "webgl",
-              "requestAnimationFrame", "cancelAnimationFrame", "setInterval", "clearInterval",
-              "setTimeout", "clearTimeout", "performance", "now", "Date",
-              "fillRect", "clearRect", "drawImage", "beginPath", "closePath",
-              "fill", "stroke", "arc", "moveTo", "lineTo", "save", "restore",
-              "translate", "rotate", "scale", "width", "height", "style", "display",
-              # --- بخش آنلاین / Multiplayer (PeerJS / WebSocket) ---
-              "peer", "Peer", "PeerJS", "peerjs", "io", "socket", "Socket",
-              "WebSocket", "onopen", "onmessage", "onerror", "onclose",
-              "connect", "disconnect", "send", "emit", "on", "off", "once",
-              "broadcast", "room", "join", "leave", "host", "client", "guest",
-              "player", "players", "opponent", "id", "peerId", "connection",
-              "open", "data", "close", "error", "call", "answer",
-              "serialization", "binaryType", "arraybuffer", "blob",
-              # --- ذخیره‌سازی و داده کاربر ---
-              "localStorage", "sessionStorage", "indexedDB",
-              "getItem", "setItem", "removeItem", "clear",
-              # --- فیزیک و منطق بازی ---
-              "score", "level", "time", "timer", "life", "lives", "hp",
-              "x", "y", "vx", "vy", "dx", "dy", "speed", "gravity",
-              "physics", "update", "render", "loop", "tick", "frame",
-              "game", "Game", "state", "scene", "start", "stop", "pause", "resume",
-              # --- ورودی‌های کاربر ---
-              "click", "touch", "touchstart", "touchmove", "touchend",
-              "mousedown", "mouseup", "mousemove", "keydown", "keyup",
-              "addEventListener", "removeEventListener", "dispatchEvent",
-              # --- Capacitor / اندروید ---
-              "Capacitor", "Plugins", "Android", "webkit", "JavascriptInterface",
-              # --- رشته‌های عمومی که نباید در string-array بروند ---
-              "FoxEggs", "Fox Eggs", "foxeggs", "com.foxeggs.game"
-          ]
-
-          RESERVED_IDENTIFIERS = [
-              "window", "document", "navigator", "location", "history",
-              "console", "Math", "JSON", "Date", "Promise", "Object",
-              "Array", "String", "Number", "Boolean", "Function",
-              "Symbol", "Map", "Set", "WeakMap", "WeakSet",
-              "Error", "TypeError", "SyntaxError", "RegExp",
-              "undefined", "null", "true", "false", "this",
-              "localStorage", "sessionStorage", "indexedDB",
-              "fetch", "XMLHttpRequest", "WebSocket", "Worker",
-              "requestAnimationFrame", "setTimeout", "setInterval",
-              "clearTimeout", "clearInterval",
-              "alert", "confirm", "prompt",
-              "parseInt", "parseFloat", "isNaN", "isFinite",
-              "encodeURIComponent", "decodeURIComponent",
-              "atob", "btoa", "crypto", "subtle"
-          ]
-
-          def build_obf_options(extra_strings=None):
-              # ⚠️ تنظیمات سبک و مخصوص بازی: منطق و گرافیک سالم می‌مانند
-              opts = [
-                  "--compact", "true",
-                  "--identifier-names-generator", "hexadecimal",
-                  "--rename-globals", "false",
-                  "--rename-properties", "false",   # حیاتی برای بازی و peerjs
-                  "--string-array", "true",
-                  "--string-array-encoding", "base64",
-                  "--string-array-threshold", "0.75",
-                  "--string-array-rotate", "true",
-                  "--string-array-shuffle", "true",
-                  "--string-array-wrappers-count", "1",
-                  "--disable-console-output", "false"
-                  # ❌ control-flow-flattening و dead-code-injection حذف شدند
-                  # تا بازی فریز نشود و اتصال آنلاین (peerjs) قطع نشود
-              ]
-
-              for s in RESERVED_IDENTIFIERS + PROTECTED_LITERALS:
-                  if re.fullmatch(r'[A-Za-z_$][A-Za-z0-9_$]*', s):
-                      opts += ["--reserved-names", s]
-
-              protected_strings = [s for s in PROTECTED_LITERALS if len(s) >= 2]
-              if extra_strings:
-                  for s in extra_strings:
-                      if s and 2 <= len(s) <= 100 and s not in protected_strings:
-                          protected_strings.append(s)
-              opts += ["--reserved-strings", ",".join(protected_strings)]
-              return opts
-
-          def obfuscate(js_code, tag, extra_strings=None):
-              tmpdir = tempfile.mkdtemp()
-              src = os.path.join(tmpdir, "in.js")
-              dst = os.path.join(tmpdir, "out.js")
-              try:
-                  with open(src, "w", encoding="utf-8") as f: f.write(js_code)
-                  res = subprocess.run(["javascript-obfuscator", src, "--output", dst, *build_obf_options(extra_strings)], capture_output=True, text=True)
-                  if res.returncode != 0:
-                      print(f"⚠️ Obfuscation FAILED for {tag}:\n{res.stderr[:1000]}")
-                      return None
-                  if not os.path.exists(dst): return None
-                  with open(dst, "r", encoding="utf-8") as f: return f.read()
-              finally:
-                  shutil.rmtree(tmpdir, ignore_errors=True)
-
-          # ------------------------------------------------------------
-          # مبهم‌سازی فایل‌های JS جداگانه
-          # ------------------------------------------------------------
-          js_files = sorted(glob.glob("www/**/*.js", recursive=True))
-          for js_path in js_files:
-              with open(js_path, "r", encoding="utf-8") as f:
-                  js = f.read()
-              if not js.strip(): continue
-              obs = obfuscate(js, js_path)
-              if obs is None:
-                  print(f"⚠️  Skipping (failed): {js_path}")
-                  continue
-              with open(js_path, "w", encoding="utf-8") as f:
-                  f.write(obs)
-              print(f"✅ obfuscated: {js_path}")
-
-          # ------------------------------------------------------------
-          # مبهم‌سازی اسکریپت‌های داخل HTML
-          # ------------------------------------------------------------
-          with open("www/index.html", "r", encoding="utf-8") as f:
+          html_path = "www/index.html"
+          with open(html_path, "r", encoding="utf-8") as f:
               html = f.read()
 
-          script_re = re.compile(r'<script(\s[^>]*)?>(.*?)</script>', re.DOTALL)
-          stats = {"total": 0, "obfuscated": 0, "skipped": 0, "failed": 0}
+          # ---------------------------------------------------------
+          # ۱. حذف اجبار اینترنت (دور زدن checkInternet و navigator.onLine)
+          # ---------------------------------------------------------
+          offline_patch = """
+          <script>
+          // === PATCH: Force Offline Mode ===
+          Object.defineProperty(navigator, 'onLine', {
+              get: function() { return true; }
+          });
+          </script>
+          """
 
-          def repl(m):
-              attrs = m.group(1) or ""
-              body = m.group(2)
-              stats["total"] += 1
-              if 'src=' in attrs or not body.strip() or re.search(r'type\s*=\s*[\'"](?:application/ld\+json|importmap|application/json)[\'"]', attrs):
-                  stats["skipped"] += 1
-                  return m.group(0)
-              obs = obfuscate(body, f"<script#{stats['total']}>")
-              if obs is None:
-                  stats["failed"] += 1
-                  return m.group(0)
-              stats["obfuscated"] += 1
-              return f'<script{attrs}>{obs}</script>'
+          if "<head>" in html:
+              html = html.replace("<head>", "<head>\n" + offline_patch, 1)
+          else:
+              html = offline_patch + html
 
-          html = script_re.sub(repl, html)
-          with open("www/index.html", "w", encoding="utf-8") as f: f.write(html)
-          print(f"📊 HTML scripts: total={stats['total']} obf={stats['obfuscated']} skip={stats['skipped']} fail={stats['failed']}")
+          # تابع checkInternet را دستکاری می‌کنیم تا همیشه true برگرداند
+          html = html.replace(
+              "function checkInternet() {",
+              "function checkInternet() { return true; } // PATCHED: always online\nfunction _originalCheckInternet() {"
+          )
+
+          # دکمه Retry را از کار می‌اندازیم
+          html = html.replace(
+              "retryBtn.addEventListener(\"click\", function() {",
+              "retryBtn.addEventListener(\"click\", function() { noInternetOverlay.style.display='none'; return; } // PATCHED\nfunction _origRetry() {"
+          )
+
+          # ---------------------------------------------------------
+          # ۲. تزریق سیستم ضد تقلب (محدودیت ۲۵۰ امتیاز در ۱ ثانیه)
+          # ---------------------------------------------------------
+          marker = "let score = 0;"
+          
+          if marker not in html:
+              print("⚠️ Warning: Could not find 'let score = 0;'. Anti-Cheat not injected.")
+          else:
+              anti_cheat_code = marker + """
+
+          // ============================================================
+          // ANTI-CHEAT SYSTEM (Max 250 score per second)
+          // ============================================================
+          (function() {
+              let _lastScore = 0;
+              let _lastCheckTime = Date.now();
+              const MAX_SCORE_PER_SEC = 250;
+
+              setInterval(function() {
+                  const now = Date.now();
+                  const timeDiff = (now - _lastCheckTime) / 1000; 
+                  
+                  if (typeof score !== 'undefined' && score > _lastScore) {
+                      const allowedScore = _lastScore + (MAX_SCORE_PER_SEC * timeDiff);
+
+                      if (score > allowedScore) {
+                          score = Math.floor(allowedScore);
+                          try {
+                              if (typeof updateUI === 'function') updateUI();
+                              if (typeof updateScore === 'function') updateScore();
+                          } catch(e) {}
+                          console.warn('[AntiCheat] Score hack blocked! Reset to ' + score);
+                      }
+                  }
+                  _lastScore = score;
+                  _lastCheckTime = now;
+              }, 1000); 
+          })();
+          """
+              html = html.replace(marker, anti_cheat_code, 1)
+              print("✅ Anti-Cheat injected (Max 250 per second).")
+
+          with open(html_path, "w", encoding="utf-8") as f:
+              f.write(html)
+          print("✅ Offline patch applied. Game can now run without internet.")
           PY
-          echo "✅ Game obfuscated safely (multiplayer preserved)."
 
       # ==========================================
       # CREATE PACKAGE.JSON
