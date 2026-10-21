@@ -18,7 +18,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-
       # ==========================================
       # NODE.JS
       # ==========================================
@@ -26,7 +25,6 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 24
-
 
       # ==========================================
       # JAVA
@@ -37,7 +35,6 @@ jobs:
           distribution: temurin
           java-version: 21
 
-
       # ==========================================
       # ANDROID SDK
       # ==========================================
@@ -46,82 +43,302 @@ jobs:
         with:
           packages: ''
 
-
       # ==========================================
       # INSTALL REQUIRED ANDROID PACKAGES
       # ==========================================
       - name: Install Android SDK packages
         run: |
           yes | sdkmanager --licenses || true
-
           sdkmanager \
             "platform-tools" \
             "platforms;android-35" \
             "build-tools;35.0.0"
-
           echo "Android SDK packages installed successfully."
 
-
       # ==========================================
-      # PREPARE GAME
+      # PREPARE GAME (کپی همه فایل‌های بازی)
       # ==========================================
       - name: Prepare game
         run: |
           test -f index.html
-
           rm -rf www
           mkdir -p www
 
-          cp index.html www/index.html
+          rsync -av \
+            --exclude='www' \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='android' \
+            --exclude='release' \
+            --exclude='*.keystore' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='capacitor.config.json' \
+            ./ www/
 
           echo "Game prepared successfully."
-
+          echo "Files in www:"
+          find www -type f | head -n 50
 
       # ==========================================
-      # OBFUSCATE & MINIFY CODE (امنیت کد بازی)
+      # INJECT ANTI-CHEAT (حرفه‌ای - داخل scope بازی)
       # ==========================================
-      - name: Obfuscate and Minify
+      - name: Inject Anti-Cheat
         run: |
-          echo "🔒 Installing obfuscator..."
-          npm install -g javascript-obfuscator
-          npm install -g html-minifier-terser
-          
-          # ۱. فشرده‌سازی HTML
-          html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js false www/index.html -o www/index.html.min
-          mv www/index.html.min www/index.html
-          
-          # ۲. مبهم‌سازی JS داخل HTML
           python3 - <<'PY'
           import re
-          import os
-          import subprocess
-          
+
           with open("www/index.html", "r", encoding="utf-8") as f:
               html = f.read()
-          scripts = re.findall(r'<script>(.*?)</script>', html, re.DOTALL)
-          
-          for i, script in enumerate(scripts):
-              if len(script.strip()) < 100: continue
-              with open(f"temp_{i}.js", "w", encoding="utf-8") as f: f.write(script)
-              
-              subprocess.run([
-                  "javascript-obfuscator", f"temp_{i}.js", "--output", f"temp_{i}_obs.js",
-                  "--compact", "true", "--control-flow-flattening", "true",
-                  "--identifier-names-generator", "hexadecimal", "--string-array", "true",
-                  "--self-defending", "true"
-              ], capture_output=True)
-              
-              if os.path.exists(f"temp_{i}_obs.js"):
-                  with open(f"temp_{i}_obs.js", "r", encoding="utf-8") as f: obs = f.read()
-                  html = html.replace(script, obs, 1)
-              os.remove(f"temp_{i}.js")
-              if os.path.exists(f"temp_{i}_obs.js"): os.remove(f"temp_{i}_obs.js")
-              
-          with open("www/index.html", "w", encoding="utf-8") as f: f.write(html)
-          PY
-          
-          echo "✅ Code successfully obfuscated."
 
+          # پیدا کردن محل تعریف score
+          marker = "let score = 0;"
+          if marker not in html:
+              m = re.search(r'let\s+score\s*=\s*0\s*;', html)
+              if m:
+                  marker = m.group(0)
+              else:
+                  raise SystemExit("Could not find 'let score = 0;' in game!")
+
+          anti_cheat = marker + '''
+
+          // ============================================================
+          // ANTI-CHEAT (Inline - same scope as score)
+          // ============================================================
+          (function() {
+              "use strict";
+
+              var _lastValidScore = 0;
+              var _cheatCount = 0;
+              var THRESHOLD = 250;
+              var _guardOn = true;
+
+              // ---------- نظارت روی score هر 500ms ----------
+              var _checkId = setInterval(function() {
+                  if (!_guardOn) return;
+                  try {
+                      if (typeof score !== 'number' || isNaN(score) || !isFinite(score)) {
+                          score = _lastValidScore;
+                          _cheatCount++;
+                          return;
+                      }
+
+                      var diff = score - _lastValidScore;
+
+                      if (diff < 0) {
+                          _lastValidScore = score;
+                          return;
+                      }
+
+                      if (diff > THRESHOLD) {
+                          _cheatCount++;
+                          score = _lastValidScore;
+                          try {
+                              if (typeof updateUI === 'function') updateUI();
+                          } catch(e) {}
+                          try {
+                              console.warn('[AntiCheat] Blocked jump: +' + diff);
+                          } catch(e) {}
+                          return;
+                      }
+
+                      _lastValidScore = score;
+                  } catch(e) {}
+              }, 500);
+
+              // ---------- محافظت در برابر حذف setInterval ----------
+              var _origClearInterval = window.clearInterval;
+              window.clearInterval = function(id) {
+                  if (id === _checkId) {
+                      // کاربر می‌خواهد Anti-Cheat را پاک کند → نادیده بگیر
+                      return;
+                  }
+                  return _origClearInterval(id);
+              };
+
+              // ---------- محافظت در برابر override شدن console.warn ----------
+              var _origWarn = console.warn;
+              try {
+                  Object.defineProperty(console, 'warn', {
+                      get: function() { return _origWarn; },
+                      set: function() {},
+                      configurable: false
+                  });
+              } catch(e) {}
+
+              // ---------- API برای دیباگ (اختیاری) ----------
+              window.__antiCheatStatus = function() {
+                  return {
+                      lastValid: _lastValidScore,
+                      current: typeof score !== 'undefined' ? score : null,
+                      cheats: _cheatCount,
+                      threshold: THRESHOLD,
+                      active: _guardOn
+                  };
+              };
+          })();
+          '''
+
+          html = html.replace(marker, anti_cheat, 1)
+
+          with open("www/index.html", "w", encoding="utf-8") as f:
+              f.write(html)
+
+          print("Anti-Cheat injected successfully.")
+          print("Threshold: 250 (fixed)")
+          print("Check interval: 500ms")
+          print("Self-protection: enabled")
+          PY
+
+      # ==========================================
+      # FULL OBFUSCATION (مبهم‌سازی کامل)
+      # ==========================================
+      - name: Obfuscate and Minify EVERYTHING
+        run: |
+          echo "Installing obfuscator and minifiers..."
+          npm install -g javascript-obfuscator
+          npm install -g html-minifier-terser
+
+          python3 - <<'PY'
+          import os
+          import re
+          import subprocess
+          import glob
+
+          OBFUSCATOR = "javascript-obfuscator"
+
+          OBFUSCATOR_FLAGS = [
+              "--compact", "true",
+              "--control-flow-flattening", "true",
+              "--control-flow-flattening-threshold", "0.75",
+              "--identifier-names-generator", "hexadecimal",
+              "--string-array", "true",
+              "--string-array-encoding", "base64",
+              "--string-array-threshold", "0.75",
+              "--split-strings", "true",
+              "--split-strings-chunk-length", "10",
+              "--self-defending", "true",
+              "--dead-code-injection", "true",
+              "--dead-code-injection-threshold", "0.4",
+              "--numbers-to-expressions", "true",
+          ]
+
+          def obfuscate_js_content(content, label):
+              if len(content.strip()) < 50:
+                  return content
+
+              with open("__tmp_in.js", "w", encoding="utf-8") as f:
+                  f.write(content)
+
+              result = subprocess.run(
+                  [OBFUSCATOR, "__tmp_in.js", "--output", "__tmp_out.js"] + OBFUSCATOR_FLAGS,
+                  capture_output=True, text=True
+              )
+
+              out_content = None
+              if result.returncode == 0 and os.path.exists("__tmp_out.js"):
+                  with open("__tmp_out.js", "r", encoding="utf-8") as f:
+                      out_content = f.read()
+
+              for p in ("__tmp_in.js", "__tmp_out.js"):
+                  if os.path.exists(p):
+                      os.remove(p)
+
+              if out_content is None:
+                  print(f"[WARN] Obfuscation FAILED for {label}: {result.stderr[:300]}")
+                  return content
+
+              print(f"[OK] Obfuscated {label} ({len(content)} -> {len(out_content)} bytes)")
+              return out_content
+
+          # ---------- ۱. فایل‌های .js خارجی ----------
+          js_files = glob.glob("www/**/*.js", recursive=True)
+          for js_file in js_files:
+              with open(js_file, "r", encoding="utf-8") as f:
+                  original = f.read()
+              obfuscated = obfuscate_js_content(original, js_file)
+              with open(js_file, "w", encoding="utf-8") as f:
+                  f.write(obfuscated)
+
+          print(f"Total external JS files obfuscated: {len(js_files)}")
+
+          # ---------- ۲. HTML ----------
+          html_files = glob.glob("www/**/*.html", recursive=True)
+
+          for html_file in html_files:
+              with open(html_file, "r", encoding="utf-8") as f:
+                  html = f.read()
+
+              # inline کردن اسکریپت‌های خارجی
+              def inline_and_obfuscate_script_src(match):
+                  src = match.group(1)
+                  base_dir = os.path.dirname(html_file)
+                  src_path = os.path.normpath(os.path.join(base_dir, src))
+
+                  if os.path.exists(src_path):
+                      with open(src_path, "r", encoding="utf-8") as sf:
+                          js_content = sf.read()
+                      obs = obfuscate_js_content(js_content, src_path)
+                      try:
+                          os.remove(src_path)
+                      except Exception:
+                          pass
+                      return f"<script>\n{obs}\n</script>"
+                  else:
+                      print(f"[WARN] External script not found: {src}")
+                      return match.group(0)
+
+              html = re.sub(
+                  r'<script[^>]+src=["\']([^"\']+)["\'][^>]*>\s*</script>',
+                  inline_and_obfuscate_script_src,
+                  html
+              )
+
+              # مبهم‌سازی اسکریپت‌های inline
+              def obfuscate_inline_script(match):
+                  js = match.group(1)
+                  return "<script>\n" + obfuscate_js_content(js, f"{html_file}:inline") + "\n</script>"
+
+              html = re.sub(
+                  r'<script(?:\s+[^>]*)?>(.*?)</script>',
+                  obfuscate_inline_script,
+                  html,
+                  flags=re.DOTALL
+              )
+
+              with open(html_file, "w", encoding="utf-8") as f:
+                  f.write(html)
+
+          print(f"Total HTML files processed: {len(html_files)}")
+
+          # ---------- ۳. فشرده‌سازی HTML ----------
+          for html_file in html_files:
+              tmp_out = html_file + ".min"
+              result = subprocess.run([
+                  "html-minifier-terser",
+                  "--collapse-whitespace",
+                  "--remove-comments",
+                  "--remove-redundant-attributes",
+                  "--remove-script-type-attributes",
+                  "--remove-style-link-type-attributes",
+                  "--minify-css", "true",
+                  "--minify-js", "false",
+                  "--remove-attribute-quotes",
+                  html_file,
+                  "-o", tmp_out
+              ], capture_output=True, text=True)
+
+              if result.returncode == 0 and os.path.exists(tmp_out):
+                  os.replace(tmp_out, html_file)
+                  print(f"[OK] Minified HTML: {html_file}")
+              else:
+                  print(f"[WARN] HTML minify failed for {html_file}: {result.stderr[:200]}")
+
+          print("All JS and HTML obfuscated/minified.")
+          PY
+
+          echo "Code successfully obfuscated."
 
       # ==========================================
       # CREATE PACKAGE.JSON
@@ -143,14 +360,11 @@ jobs:
           }
           EOF
 
-
       # ==========================================
       # INSTALL DEPENDENCIES
       # ==========================================
       - name: Install dependencies
-        run: |
-          npm install
-
+        run: npm install
 
       # ==========================================
       # CREATE CAPACITOR CONFIG
@@ -165,14 +379,11 @@ jobs:
           }
           EOF
 
-
       # ==========================================
       # ADD ANDROID
       # ==========================================
       - name: Add Android
-        run: |
-          npx cap add android
-
+        run: npx cap add android
 
       # ==========================================
       # ENABLE IMMERSIVE FULLSCREEN
@@ -184,7 +395,6 @@ jobs:
           import re
 
           base = "android/app/src/main/java"
-
           main_activity = None
 
           for root, dirs, files in os.walk(base):
@@ -207,12 +417,9 @@ jobs:
           )
 
           if not package_match:
-              raise SystemExit(
-                  "Package name not found in MainActivity.java"
-              )
+              raise SystemExit("Package name not found in MainActivity.java")
 
           package_name = package_match.group(1)
-
           print("Package:", package_name)
 
           fullscreen_activity = f'''package {package_name};
@@ -250,22 +457,13 @@ jobs:
               f.write(fullscreen_activity)
 
           print("Fullscreen MainActivity created successfully.")
-
-          print("==========================================")
-          print("FINAL MAIN ACTIVITY")
-          print("==========================================")
-
-          print(fullscreen_activity)
           PY
-
 
       # ==========================================
       # SYNC ANDROID
       # ==========================================
       - name: Sync Android
-        run: |
-          npx cap sync android
-
+        run: npx cap sync android
 
       # ==========================================
       # VERSION
@@ -276,16 +474,13 @@ jobs:
         run: |
           VERSION_CODE=$((RUN_NUMBER + 100))
           VERSION_NAME="1.0.${RUN_NUMBER}"
-
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
-
           echo "=========================================="
           echo "VERSION"
           echo "=========================================="
           echo "Version Code: $VERSION_CODE"
           echo "Version Name: $VERSION_NAME"
-
 
       # ==========================================
       # LOAD EXISTING KEYSTORE
@@ -295,17 +490,11 @@ jobs:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
         run: |
           test -n "$KEYSTORE_BASE64"
-
           echo "$KEYSTORE_BASE64" | base64 --decode > FoxEggs.keystore
-
           test -s FoxEggs.keystore
-
           mkdir -p android/app
-
           cp FoxEggs.keystore android/app/FoxEggs.keystore
-
           echo "Keystore loaded successfully."
-
 
       # ==========================================
       # CONFIGURE SIGNING PROPERTIES
@@ -315,7 +504,6 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: |
           test -n "$KEYSTORE_PASSWORD"
-
           cat >> android/gradle.properties <<EOF
 
           FOXEGGS_KEYSTORE_FILE=FoxEggs.keystore
@@ -323,12 +511,10 @@ jobs:
           FOXEGGS_KEY_ALIAS=foxeggs
           FOXEGGS_KEY_PASSWORD=${KEYSTORE_PASSWORD}
           EOF
-
           echo "Signing properties configured."
 
-
       # ==========================================
-      # CONFIGURE ANDROID GRADLE
+      # CONFIGURE ANDROID GRADLE (minify + proguard)
       # ==========================================
       - name: Configure Android Gradle
         run: |
@@ -337,45 +523,15 @@ jobs:
           import os
 
           path = "android/app/build.gradle"
-
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
-          text = re.sub(
-              r'applicationId\s+"[^"]+"',
-              'applicationId "com.foxeggs.game"',
-              text,
-              count=1
-          )
+          text = re.sub(r'applicationId\s+"[^"]+"', 'applicationId "com.foxeggs.game"', text, count=1)
+          text = re.sub(r'compileSdk\s+\d+', 'compileSdk 35', text, count=1)
+          text = re.sub(r'versionCode\s+\d+', 'versionCode ' + os.environ["VERSION_CODE"], text, count=1)
+          text = re.sub(r'versionName\s+"[^"]+"', 'versionName "' + os.environ["VERSION_NAME"] + '"', text, count=1)
 
-          text = re.sub(
-              r'compileSdk\s+\d+',
-              'compileSdk 35',
-              text,
-              count=1
-          )
-
-          text = re.sub(
-              r'versionCode\s+\d+',
-              'versionCode ' + os.environ["VERSION_CODE"],
-              text,
-              count=1
-          )
-
-          text = re.sub(
-              r'versionName\s+"[^"]+"',
-              'versionName "' + os.environ["VERSION_NAME"] + '"',
-              text,
-              count=1
-          )
-
-          text = re.sub(
-              r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)',
-              '',
-              text,
-              count=1,
-              flags=re.S
-          )
+          text = re.sub(r'\n\s*signingConfigs\s*\{.*?\n\s*\}\s*(?=\n\s*buildTypes)', '', text, count=1, flags=re.S)
 
           signing_block = '''
               signingConfigs {
@@ -392,63 +548,64 @@ jobs:
           '''
 
           if "signingConfigs {" not in text:
-              text = text.replace(
-                  "    buildTypes {",
-                  signing_block + "    buildTypes {",
-                  1
-              )
-
-          release_pattern = (
-              r'(buildTypes\s*\{\s*'
-              r'release\s*\{)'
-          )
+              text = text.replace("    buildTypes {", signing_block + "    buildTypes {", 1)
 
           if "signingConfig signingConfigs.release" not in text:
-              text = re.sub(
-                  release_pattern,
-                  r'\1\n            signingConfig signingConfigs.release',
-                  text,
-                  count=1,
-                  flags=re.S
-              )
+              text = re.sub(r'(buildTypes\s*\{\s*release\s*\{)', r'\1\n            signingConfig signingConfigs.release', text, count=1, flags=re.S)
 
+          # minify + shrinkResources + proguard
           if re.search(r'buildTypes\s*\{.*?release\s*\{', text, re.S):
-
-              release_match = re.search(
-                  r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})',
-                  text,
-                  re.S
-              )
-
+              release_match = re.search(r'(buildTypes\s*\{\s*release\s*\{)(.*?)(\n\s*\})', text, re.S)
               if release_match:
-
                   release_body = release_match.group(2)
 
                   if "minifyEnabled" in release_body:
-                      release_body = re.sub(
-                          r'minifyEnabled\s+\w+',
-                          'minifyEnabled false',
-                          release_body,
-                          count=1
-                      )
+                      release_body = re.sub(r'minifyEnabled\s+\w+', 'minifyEnabled true', release_body, count=1)
                   else:
-                      release_body = (
-                          "\n            minifyEnabled false"
-                          + release_body
-                      )
+                      release_body = "\n            minifyEnabled true" + release_body
 
-                  text = (
-                      text[:release_match.start(2)]
-                      + release_body
-                      + text[release_match.end(2):]
-                  )
+                  if "shrinkResources" in release_body:
+                      release_body = re.sub(r'shrinkResources\s+\w+', 'shrinkResources true', release_body, count=1)
+                  else:
+                      release_body = "\n            shrinkResources true" + release_body
+
+                  if "proguardFiles" not in release_body:
+                      release_body += "\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'"
+
+                  text = text[:release_match.start(2)] + release_body + text[release_match.end(2):]
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
 
-          print("Android Gradle configured successfully.")
-          PY
+          print("Android Gradle configured (minify+proguard enabled).")
 
+          # proguard-rules.pro
+          proguard_path = "android/app/proguard-rules.pro"
+          with open(proguard_path, "w", encoding="utf-8") as f:
+              f.write("""
+          # Fox Eggs ProGuard Rules
+          -dontwarn com.getcapacitor.**
+          -keep class com.getcapacitor.** { *; }
+          -keep class com.foxeggs.** { *; }
+          -keep class * extends com.getcapacitor.BridgeActivity { *; }
+          -keepclassmembers class * { @android.webkit.JavascriptInterface <methods>; }
+
+          # حذف لاگ‌ها
+          -assumenosideeffects class android.util.Log {
+              public static *** d(...);
+              public static *** v(...);
+              public static *** i(...);
+          }
+
+          # مبهم‌سازی کامل
+          -repackageclasses ''
+          -allowaccessmodification
+          -optimizationpasses 5
+          -overloadaggressively
+          -useuniqueclassmembernames
+          """)
+          print("proguard-rules.pro created.")
+          PY
 
       # ==========================================
       # SHOW GRADLE CONFIG
@@ -458,9 +615,7 @@ jobs:
           echo "=========================================="
           echo "FINAL ANDROID BUILD.GRADLE"
           echo "=========================================="
-
           cat android/app/build.gradle
-
 
       # ==========================================
       # CLEAN UNNECESSARY PERMISSIONS
@@ -469,57 +624,35 @@ jobs:
         run: |
           python3 - <<'PY'
           import re
-
           path = "android/app/src/main/AndroidManifest.xml"
-
           with open(path, "r", encoding="utf-8") as f:
               text = f.read()
 
           permissions = [
-              "READ_CONTACTS",
-              "WRITE_CONTACTS",
-              "READ_SMS",
-              "SEND_SMS",
-              "RECEIVE_SMS",
-              "CALL_PHONE",
-              "READ_PHONE_STATE",
-              "ACCESS_FINE_LOCATION",
-              "ACCESS_COARSE_LOCATION",
-              "CAMERA",
-              "RECORD_AUDIO",
-              "READ_EXTERNAL_STORAGE",
-              "WRITE_EXTERNAL_STORAGE",
-              "MANAGE_EXTERNAL_STORAGE",
-              "REQUEST_INSTALL_PACKAGES",
-              "SYSTEM_ALERT_WINDOW",
-              "BIND_ACCESSIBILITY_SERVICE"
+              "READ_CONTACTS", "WRITE_CONTACTS", "READ_SMS", "SEND_SMS",
+              "RECEIVE_SMS", "CALL_PHONE", "READ_PHONE_STATE",
+              "ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION", "CAMERA",
+              "RECORD_AUDIO", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE",
+              "MANAGE_EXTERNAL_STORAGE", "REQUEST_INSTALL_PACKAGES",
+              "SYSTEM_ALERT_WINDOW", "BIND_ACCESSIBILITY_SERVICE"
           ]
 
           for permission in permissions:
-
-              pattern = (
-                  r'\s*<uses-permission\s+'
-                  r'android:name="android\.permission\.'
-                  + permission +
-                  r'"\s*/>'
-              )
-
+              pattern = r'\s*<uses-permission\s+android:name="android\.permission\.' + permission + r'"\s*/>'
               text = re.sub(pattern, '', text)
+
+          text = re.sub(r'android:debuggable="true"', 'android:debuggable="false"', text)
 
           with open(path, "w", encoding="utf-8") as f:
               f.write(text)
-
           print("Unnecessary permissions removed.")
           PY
-
 
       # ==========================================
       # INSTALL PILLOW
       # ==========================================
       - name: Install Pillow
-        run: |
-          python3 -m pip install pillow
-
+        run: python3 -m pip install pillow
 
       # ==========================================
       # FIND CUSTOM GAME ICON
@@ -528,46 +661,22 @@ jobs:
         run: |
           python3 - <<'PY'
           import os
-
-          extensions = (
-              ".png",
-              ".jpg",
-              ".jpeg",
-              ".webp"
-          )
-
-          files = [
-              f for f in os.listdir(".")
-              if os.path.isfile(f)
-              and f.lower().endswith(extensions)
-          ]
-
-          ignored = {
-              "fox-eggs-icon.png",
-              "game-logo.png"
-          }
-
-          files = [
-              f for f in files
-              if f.lower() not in ignored
-          ]
+          extensions = (".png", ".jpg", ".jpeg", ".webp")
+          files = [f for f in os.listdir(".") if os.path.isfile(f) and f.lower().endswith(extensions)]
+          ignored = {"fox-eggs-icon.png", "game-logo.png"}
+          files = [f for f in files if f.lower() not in ignored]
 
           if not files:
-              raise SystemExit(
-                  "No image file found in project root."
-              )
+              raise SystemExit("No image file found in project root.")
 
           logo = files[0]
-
           print("==========================================")
           print("CUSTOM GAME ICON")
           print("==========================================")
           print("Using image:", logo)
-
           with open("CUSTOM_ICON", "w") as f:
               f.write(logo)
           PY
-
 
       # ==========================================
       # GENERATE ANDROID ICONS
@@ -577,47 +686,22 @@ jobs:
           python3 - <<'PY'
           from PIL import Image
           import os
-
           with open("CUSTOM_ICON", "r") as f:
               filename = f.read().strip()
 
           print("Loading custom icon:", filename)
-
           source = Image.open(filename).convert("RGBA")
-
-          sizes = {
-              "mdpi": 48,
-              "hdpi": 72,
-              "xhdpi": 96,
-              "xxhdpi": 144,
-              "xxxhdpi": 192
-          }
+          sizes = {"mdpi": 48, "hdpi": 72, "xhdpi": 96, "xxhdpi": 144, "xxxhdpi": 192}
 
           for density, size in sizes.items():
-
-              folder = (
-                  "android/app/src/main/res/mipmap-"
-                  + density
-              )
-
+              folder = "android/app/src/main/res/mipmap-" + density
               os.makedirs(folder, exist_ok=True)
-
-              icon = source.resize(
-                  (size, size),
-                  Image.Resampling.LANCZOS
-              )
-
-              icon.save(
-                  folder + "/ic_launcher.png"
-              )
-
-              icon.save(
-                  folder + "/ic_launcher_round.png"
-              )
+              icon = source.resize((size, size), Image.Resampling.LANCZOS)
+              icon.save(folder + "/ic_launcher.png")
+              icon.save(folder + "/ic_launcher_round.png")
 
           print("Android icons generated successfully.")
           PY
-
 
       # ==========================================
       # REMOVE ADAPTIVE ICON DEFAULTS
@@ -627,7 +711,6 @@ jobs:
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml
           rm -f android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml
 
-
       # ==========================================
       # VERIFY CONFIGURATION
       # ==========================================
@@ -636,24 +719,22 @@ jobs:
           echo "=========================================="
           echo "FOX EGGS CONFIGURATION"
           echo "=========================================="
-
           echo ""
           echo "APPLICATION ID:"
           grep "applicationId" android/app/build.gradle
-
           echo ""
           echo "VERSION:"
           grep "versionCode" android/app/build.gradle
           grep "versionName" android/app/build.gradle
-
           echo ""
           echo "COMPILE SDK:"
           grep "compileSdk" android/app/build.gradle
-
+          echo ""
+          echo "MINIFY:"
+          grep "minifyEnabled" android/app/build.gradle
           echo ""
           echo "SIGNING:"
           grep -A10 "signingConfigs" android/app/build.gradle
-
 
       # ==========================================
       # BUILD RELEASE APK
@@ -662,11 +743,8 @@ jobs:
         working-directory: android
         run: |
           chmod +x gradlew
-
           ./gradlew clean
-
           ./gradlew assembleRelease --no-daemon
-
 
       # ==========================================
       # INSPECT APK
@@ -674,50 +752,37 @@ jobs:
       - name: Inspect APK
         run: |
           APK="android/app/build/outputs/apk/release/app-release.apk"
-
           test -f "$APK"
 
           BUILD_TOOLS=$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n 1)
-
           AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
           APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
 
           echo "=========================================="
           echo "FOX EGGS APK"
           echo "=========================================="
-
           echo ""
           echo "APK FILE:"
           ls -lh "$APK"
-
           echo ""
           echo "SHA256:"
           sha256sum "$APK"
-
           echo ""
           echo "PACKAGE / VERSION:"
           "$AAPT" dump badging "$APK" | head -n 20
-
           echo ""
           echo "PERMISSIONS:"
           "$AAPT" dump permissions "$APK"
-
           echo ""
           echo "SIGNATURE:"
-          "$APKSIGNER" verify \
-            --verbose \
-            --print-certs \
-            "$APK"
-
+          "$APKSIGNER" verify --verbose --print-certs "$APK"
 
       # ==========================================
       # BUILD RELEASE AAB
       # ==========================================
       - name: Build Release AAB
         working-directory: android
-        run: |
-          ./gradlew bundleRelease --no-daemon
-
+        run: ./gradlew bundleRelease --no-daemon
 
       # ==========================================
       # PREPARE RELEASE
@@ -726,22 +791,13 @@ jobs:
         run: |
           mkdir -p release
 
-          cp \
-            android/app/build/outputs/apk/release/app-release.apk \
-            release/FoxEggs.apk
-
-          cp \
-            android/app/build/outputs/bundle/release/app-release.aab \
-            release/FoxEggs.aab
+          cp android/app/build/outputs/apk/release/app-release.apk release/FoxEggs.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab release/FoxEggs.aab
 
           CUSTOM_ICON=$(cat CUSTOM_ICON)
-
-          cp \
-            "$CUSTOM_ICON" \
-            release/FoxEggs-Icon.png
+          cp "$CUSTOM_ICON" release/FoxEggs-Icon.png
 
           echo "Release files prepared."
-
 
       # ==========================================
       # UPLOAD ARTIFACT
@@ -752,7 +808,6 @@ jobs:
           name: FoxEggs-Release
           path: release/
           if-no-files-found: error
-
 
       # ==========================================
       # CLEANUP
