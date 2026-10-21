@@ -56,7 +56,7 @@ jobs:
           echo "Android SDK packages installed successfully."
 
       # ==========================================
-      # PREPARE GAME (INJECT ANTI-CHEAT & OFFLINE PATCH)
+      # PREPARE GAME (INJECT ANTI-CHEAT ONLY)
       # ==========================================
       - name: Prepare game
         run: |
@@ -77,7 +77,7 @@ jobs:
             --exclude='capacitor.config.json' \
             ./ www/
 
-          echo "Patching HTML..."
+          echo "Injecting Anti-Cheat..."
           python3 - <<'PY'
           import re
 
@@ -85,44 +85,7 @@ jobs:
           with open(html_path, "r", encoding="utf-8") as f:
               html = f.read()
 
-          # ۱. مخفی کردن کامل ارور اینترنت
-          css_patch = """
-          <style>
-          #noInternetOverlay { display: none !important; }
-          </style>
-          """
-          if "</head>" in html:
-              html = html.replace("</head>", css_patch + "\n</head>", 1)
-
-          # ۲. دستکاری درخواست‌های شبکه (فقط برای رفرال و کانال)
-          # باعث می‌شود اگر نت نبود، بازی برای باز کردن کانال و رفرال گیر نکند
-          offline_patch = """
-          <script id="offlinePatch">
-          const originalFetch = window.fetch;
-          window.fetch = function(url, options) {
-              // اگر آدرس مربوط به بازی دو نفره یا PeerJS نبود، و اینترنت قطع بود، پاسخ ساختگی بده
-              if (!navigator.onLine && url.indexOf('railway.app') !== -1) {
-                  console.warn('Offline Mode: Mocking network response for', url);
-                  return Promise.resolve(new Response(JSON.stringify({ success: true, offline: true }), {
-                      status: 200,
-                      headers: { 'Content-Type': 'application/json' }
-                  }));
-              }
-              return originalFetch.apply(this, arguments).catch(err => {
-                  // اگر خطای شبکه رخ داد، به جای کرش کردن، پاسخ خالی بده
-                  console.warn('Network request failed. Proceeding offline.');
-                  return new Response(JSON.stringify({ success: false, offline: true }), {
-                      status: 200,
-                      headers: { 'Content-Type': 'application/json' }
-                  });
-              });
-          };
-          </script>
-          """
-          if "</body>" in html:
-              html = html.replace("</body>", offline_patch + "\n</body>", 1)
-
-          # ۳. تزریق پیام هشدار تقلب
+          # ۱. تزریق پیام هشدار تقلب (دو زبانه)
           alert_html = """
           <div id="cheatAlert" style="display:none; position:fixed; top:20%; left:50%; transform:translateX(-50%); background:red; color:white; padding:15px 25px; border-radius:10px; font-weight:bold; z-index:999999; text-align:center; box-shadow:0 0 20px rgba(255,0,0,0.5);">
               ⚠️ تقلب شناسایی شد!<br>امتیاز شما به حد مجاز برگشت.
@@ -131,7 +94,7 @@ jobs:
           if "</body>" in html:
               html = html.replace("</body>", alert_html + "\n</body>", 1)
 
-          # ۴. تزریق منطق ضد تقلب
+          # ۲. تزریق منطق ضد تقلب
           anti_cheat_script = """
           <script id="antiCheatLogic">
           (function() {
@@ -172,7 +135,7 @@ jobs:
 
           with open(html_path, "w", encoding="utf-8") as f:
               f.write(html)
-          print("✅ Offline patch & Anti-Cheat Injected.")
+          print("✅ Anti-Cheat Injected.")
           PY
 
       # ==========================================
@@ -248,9 +211,6 @@ jobs:
               if "ANTI-CHEAT SYSTEM" in body or "antiCheatLogic" in attrs:
                   print("⏭️ Skipping obfuscation for Anti-Cheat.")
                   return m.group(0)
-              if "originalFetch" in body or "offlinePatch" in attrs:
-                  print("⏭️ Skipping obfuscation for Offline Patch.")
-                  return m.group(0)
               
               obs = obfuscate(body)
               return f'{attrs}{obs}</script>'
@@ -265,7 +225,7 @@ jobs:
       # ==========================================
       # VERIFY
       # ==========================================
-      - name: Verify Anti-Cheat, i18n & UI in final HTML
+      - name: Verify Anti-Cheat & i18n
         run: |
           echo "=========================================="
           echo "CHECKING FINAL HTML"
@@ -281,13 +241,6 @@ jobs:
               echo "✅ i18n (Language keys) FOUND!"
           else
               echo "❌ ERROR: i18n keys NOT FOUND!"
-              exit 1
-          fi
-
-          if grep -q "noInternetOverlay { display: none" www/index.html || grep -q "noInternetOverlay{display:none" www/index.html; then
-              echo "✅ Internet Overlay is hidden!"
-          else
-              echo "❌ ERROR: Internet Overlay is NOT hidden!"
               exit 1
           fi
           echo "=========================================="
