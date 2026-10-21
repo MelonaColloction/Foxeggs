@@ -85,19 +85,26 @@ jobs:
           with open(html_path, "r", encoding="utf-8") as f:
               html = f.read()
 
-          # ۱. دستکاری مستقیم تابع checkInternet در کد اصلی بازی
-          # این کار باعث می‌شود بازی همیشه فکر کند آنلاین است و آن صفحه سیاه باز نشود
+          # ۱. دستکاری مستقیم توابع اصلی بازی
+          # خنثی کردن تابع بررسی اینترنت
           html = html.replace(
               "function checkInternet() {",
-              "function checkInternet() { return true; } // PATCHED: always online\nfunction _originalCheckInternet() {"
+              "function checkInternet() { return true; } // PATCHED\nfunction _originalCheckInternet() {"
           )
-          # غیرفعال کردن دکمه Retry در صفحه سیاه
+          # خنثی کردن تابع نمایش ارور اینترنت (با استفاده از Regex برای پیدا کردن دقیق تابع)
+          html = re.sub(
+              r'function showNoInternet\(\)\s*\{[^}]*\}',
+              'function showNoInternet() { return; } // PATCHED: do nothing',
+              html,
+              count=1
+          )
+          # غیرفعال کردن دکمه Retry
           html = html.replace(
               "retryBtn.addEventListener(\"click\", function() {",
               "retryBtn.addEventListener(\"click\", function() { noInternetOverlay.style.display='none'; return; } // PATCHED\nfunction _origRetry() {"
           )
 
-          # ۲. مخفی کردن صفحه سیاه به عنوان یک لایه اطمینان اضافی
+          # ۲. مخفی کردن لایه سیاه به عنوان یک لایه اطمینان اضافی (CSS)
           css_patch = """
           <style>
           #noInternetOverlay { display: none !important; }
@@ -156,7 +163,7 @@ jobs:
 
           with open(html_path, "w", encoding="utf-8") as f:
               f.write(html)
-          print("✅ Internet check disabled & Anti-Cheat Injected.")
+          print("✅ Internet error functions completely disabled & Anti-Cheat Injected.")
           PY
 
       # ==========================================
@@ -185,7 +192,7 @@ jobs:
               "peer", "conn", "on", "emit", "send", "connect", "open", "data", "close", "error", "Peer", "peerjs",
               "foxBest", "foxGames", "foxEggs", "foxTotalScore", "foxTheme", "foxSkin", "purchasedSkins",
               "getItem", "setItem", "removeItem",
-              "undefined", "null", "true", "false", "this"
+              "undefined", "null", "true", "false", "this", "showNoInternet", "checkInternet"
           ]
 
           def obfuscate(js_code):
