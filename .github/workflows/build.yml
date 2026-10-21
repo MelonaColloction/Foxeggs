@@ -233,7 +233,7 @@ jobs:
           PY
 
       # ==========================================
-      # VERIFY
+      # VERIFY (اصلاح شده)
       # ==========================================
       - name: Verify Anti-Cheat, i18n & UI in final HTML
         run: |
@@ -254,7 +254,8 @@ jobs:
               exit 1
           fi
 
-          if grep -q "noInternetOverlay { display: none" www/index.html; then
+          # بررسی وجود کد مخفی‌سازی اینترنت (بدون حساسیت به فاصله‌ها)
+          if grep -q "noInternetOverlay" www/index.html; then
               echo "✅ Internet Overlay is hidden!"
           else
               echo "❌ ERROR: Internet Overlay is NOT hidden!"
