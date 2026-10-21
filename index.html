@@ -65,15 +65,22 @@ canvas {
 #speedTimer .time {color:#ffd54f;}
 .timer-item.hidden-timer {display:none !important;}
 
-body.multiplayer-active #powerupTimer {
-    left: auto;
-    right: 15px;
-    transform: translateX(0) translateY(0);
-    top: 115px;
-}
-
-body.multiplayer-active #powerupTimer.hidden {
-    transform: translateX(0) translateY(-10px);
+#vsScores {
+    display:none;
+    position:fixed;
+    top:65px;
+    left:50%;
+    transform:translateX(-50%);
+    z-index:5;
+    display:flex;
+    gap:12px;
+    background:rgba(0,0,0,0.65);
+    padding:4px 14px;
+    border-radius:20px;
+    color:white;
+    font-size:12px;
+    font-weight:bold;
+    white-space:nowrap;
 }
 
 #menuButton {
@@ -208,23 +215,6 @@ button:active {
     text-shadow: 0 0 30px #f97316;
     pointer-events: none;
     font-family: Arial, sans-serif;
-}
-
-#vsScores {
-    display:none;
-    position:fixed;
-    top:65px;
-    left:50%;
-    transform:translateX(-50%);
-    z-index:5;
-    gap:12px;
-    background:rgba(0,0,0,0.65);
-    padding:4px 14px;
-    border-radius:20px;
-    color:white;
-    font-size:12px;
-    font-weight:bold;
-    white-space:nowrap;
 }
 
 #noInternetOverlay {
@@ -825,7 +815,7 @@ button:active {
     <p id="editionBadge" style="font-size:16px;color:#ffd700;margin-top:-8px;letter-spacing:3px;font-weight:bold;">🌸 SPRING EDITION 🌸</p>
     <p id="startText" style="margin-top:15px;">Collect eggs and beat your record!</p>
     <button id="start">Start Game</button>
-    <button id="multiplayerBtn">🌐 بازی دو نفره</button>
+    <button id="multiplayerBtn">🌐 Two Player</button>
     <button id="openThemeStartBtn" style="background:rgba(255,255,255,0.12);box-shadow:none;font-size:14px;padding:10px 25px;margin-top:10px;">
         🎨 <span id="startThemeLabel">Change Theme</span>
     </button>
@@ -867,19 +857,19 @@ button:active {
 <!-- ============================================ -->
 
 <div id="vsScores" style="display:none; position:fixed; top:65px; left:50%; transform:translateX(-50%); z-index:6; display:flex; gap:14px; background:rgba(0,0,0,0.55); padding:7px 16px; border-radius:24px; color:white; font-size:13px; font-weight:bold;">
-    <div>🦊 من: <span id="myScoreVs" style="color:#4ade80;">0</span></div>
-    <div>🦊 حریف: <span id="enemyScoreVs" style="color:#fbbf24;">0</span></div>
+    <div>🦊 <span id="vsYouLabel">You</span>: <span id="myScoreVs" style="color:#4ade80;">0</span></div>
+    <div>🦊 <span id="vsEnemyLabel">Opponent</span>: <span id="enemyScoreVs" style="color:#fbbf24;">0</span></div>
 </div>
 
 <div id="mpModal" style="position:fixed; inset:0; z-index:100000; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); padding:20px;">
     <div style="background:linear-gradient(135deg,#1a1a2e,#2a1a3e); padding:25px 20px; border-radius:24px; width:100%; max-width:360px; border:1px solid rgba(255,255,255,0.1); box-shadow:0 20px 60px rgba(0,0,0,0.6); text-align:center; position:relative;">
         <button id="closeMpModal" style="position:absolute; top:12px; right:16px; background:none; border:none; color:rgba(255,255,255,0.4); font-size:24px; cursor:pointer;">✕</button>
-        <h2 style="color:white; font-size:20px; margin-bottom:20px;">بازی دو نفره 🦊🦊</h2>
+        <h2 id="mpModalTitle" style="color:white; font-size:20px; margin-bottom:20px;">Two Player 🦊🦊</h2>
         <div style="background:rgba(255,255,255,0.05); padding:12px; border-radius:14px; border:1px solid rgba(255,255,255,0.1);">
-            <div style="color:#4ade80; font-size:13px; font-weight:bold; margin-bottom:8px;">🌐 آنلاین (نیاز به اینترنت)</div>
+            <div id="mpOnlineLabel" style="color:#4ade80; font-size:13px; font-weight:bold; margin-bottom:8px;">🌐 Online (Internet required)</div>
             <div style="display:flex; gap:8px;">
-                <button onclick="hostOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#10b981; box-shadow:0 3px #047857; border-radius:8px;">ساخت اتاق</button>
-                <button onclick="joinOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#3b82f6; box-shadow:0 3px #1d4ed8; border-radius:8px;">اتصال</button>
+                <button id="mpHostBtn" onclick="hostOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#10b981; box-shadow:0 3px #047857; border-radius:8px;">Create Room</button>
+                <button id="mpJoinBtn" onclick="joinOnline(); closeMpModalFn();" style="flex:1; padding:10px; font-size:13px; background:#3b82f6; box-shadow:0 3px #1d4ed8; border-radius:8px;">Join</button>
             </div>
         </div>
     </div>
@@ -2914,8 +2904,6 @@ function draw() {
     for (const o of obstacles) drawObstacle(o);
     for (const p of powerups) drawPowerup(p);
     drawParticles();
-
-    // فقط روباه خود بازیکن رسم می‌شود (روباه حریف حذف شد)
     drawFox(fox.x, fox.y, fox.w, fox.h, fox.vy, fox.grounded, fox.animation, currentSkinId, false);
 }
 
@@ -3060,8 +3048,20 @@ function updatePowerupTimers() {
 }
 
 // ============================================================
-// بخش ۲۴: اتصال دو نفره (PeerJS)
+// بخش ۲۴: اتصال دو نفره (PeerJS) — دو زبانه
 // ============================================================
+
+function updateMpModalLanguage() {
+    const fa = language === 'fa';
+    const title = document.getElementById('mpModalTitle');
+    const onlineLabel = document.getElementById('mpOnlineLabel');
+    const hostBtn = document.getElementById('mpHostBtn');
+    const joinBtn = document.getElementById('mpJoinBtn');
+    if (title) title.textContent = fa ? 'بازی دو نفره 🦊🦊' : 'Two Player 🦊🦊';
+    if (onlineLabel) onlineLabel.textContent = fa ? '🌐 آنلاین (نیاز به اینترنت)' : '🌐 Online (Internet required)';
+    if (hostBtn) hostBtn.textContent = fa ? 'ساخت اتاق' : 'Create Room';
+    if (joinBtn) joinBtn.textContent = fa ? 'اتصال' : 'Join';
+}
 
 function showInputModal(title, placeholder, callback) {
     const modal = document.createElement('div');
@@ -3099,17 +3099,25 @@ function showInputModal(title, placeholder, callback) {
 
 function hostOnline() {
     if (peer) return;
-    peer = new Peer();
-    peer.on('open', id => {
-        isHost = true;
-        showRoomCode(id);
-    });
-    peer.on('connection', c => {
-        conn = c;
-        setupConnection();
-        showToast(language === 'fa' ? 'حریف وصل شد!' : 'Opponent connected!');
-    });
-    peer.on('error', () => showToast(language === 'fa' ? 'خطا در ساخت اتاق' : 'Room creation error'));
+    try {
+        peer = new Peer();
+        peer.on('open', id => {
+            isHost = true;
+            showRoomCode(id);
+        });
+        peer.on('connection', c => {
+            conn = c;
+            setupConnection();
+            showToast(language === 'fa' ? 'حریف وصل شد!' : 'Opponent connected!');
+        });
+        peer.on('error', (err) => {
+            console.error("PeerJS Error:", err);
+            showToast(language === 'fa' ? 'خطا: ' + err.type : 'Error: ' + err.type);
+        });
+    } catch(e) {
+        console.error("Catch Error:", e);
+        showToast(language === 'fa' ? 'خطای جاوااسکریپت' : 'JS Error');
+    }
 }
 
 function joinOnline() {
@@ -3118,16 +3126,23 @@ function joinOnline() {
         language === 'fa' ? 'کد اتاق حریف را وارد کنید' : 'Enter opponent room code',
         'ABC123',
         (id) => {
-            peer = new Peer();
-            peer.on('open', () => {
-                conn = peer.connect(id);
-                conn.on('open', () => {
-                    isHost = false;
-                    setupConnection();
-                    showToast(language === 'fa' ? 'وصل شدی!' : 'Connected!');
+            try {
+                peer = new Peer();
+                peer.on('open', () => {
+                    conn = peer.connect(id);
+                    conn.on('open', () => {
+                        isHost = false;
+                        setupConnection();
+                        showToast(language === 'fa' ? 'وصل شدی!' : 'Connected!');
+                    });
                 });
-            });
-            peer.on('error', () => showToast(language === 'fa' ? 'خطا در اتصال' : 'Connection error'));
+                peer.on('error', (err) => {
+                    console.error("PeerJS Error:", err);
+                    showToast(language === 'fa' ? 'خطا در اتصال: ' + err.type : 'Connection error: ' + err.type);
+                });
+            } catch(e) {
+                showToast(language === 'fa' ? 'خطای جاوااسکریپت' : 'JS Error');
+            }
         }
     );
 }
@@ -3156,7 +3171,6 @@ function handleOpponentLeft() {
 
     const vs = document.getElementById('vsScores');
     if (vs) vs.style.display = 'none';
-    document.body.classList.remove('multiplayer-active');
 
     if (playing) {
         showToast(language === 'fa' ? 'حریف بازی را ترک کرد! ادامه به‌صورت تک‌نفره 🦊' : 'Opponent left! Continuing solo 🦊');
@@ -3169,6 +3183,7 @@ function handleNetworkData(data) {
         remoteData.active = true;
         remoteData.score = data.score;
         lastEnemyScore = data.score;
+        updateUI();
     }
     if (data.type === 'ready') {
         isOpponentReady = true;
@@ -3183,32 +3198,37 @@ function handleNetworkData(data) {
 }
 
 function showRoomCode(text) {
+    const fa = language === 'fa';
     const box = document.createElement('div');
     box.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.92);color:white;padding:24px 20px;border-radius:16px;z-index:100005;text-align:center;min-width:280px;max-width:90%;';
     box.innerHTML = `
-        <div style="font-size:13px;color:#aaa;margin-bottom:8px;">کد اتاق</div>
+        <div style="font-size:13px;color:#aaa;margin-bottom:8px;">${fa ? 'کد اتاق' : 'Room Code'}</div>
         <div id="roomCodeText" style="font-size:18px;font-weight:bold;color:#4ade80;word-break:break-all;margin-bottom:15px;user-select:all;font-family:monospace;">${text}</div>
         <div style="display:flex;flex-direction:column;gap:8px;">
-            <button id="copyRoomCodeBtn" style="padding:10px;background:#2d7a3d;border:none;border-radius:9px;color:white;font-weight:bold;cursor:pointer;font-size:14px;">📋 کپی کد اتاق</button>
-            <button id="closeRoomCodeBtn" style="padding:10px;background:#f97316;border:none;border-radius:9px;color:white;font-weight:bold;cursor:pointer;font-size:14px;">باشه</button>
+            <button id="copyRoomCodeBtn" style="padding:10px;background:#2d7a3d;border:none;border-radius:9px;color:white;font-weight:bold;cursor:pointer;font-size:14px;">${fa ? '📋 کپی کد اتاق' : '📋 Copy Room Code'}</button>
+            <button id="closeRoomCodeBtn" style="padding:10px;background:#f97316;border:none;border-radius:9px;color:white;font-weight:bold;cursor:pointer;font-size:14px;">${fa ? 'باشه' : 'OK'}</button>
         </div>
     `;
     document.body.appendChild(box);
 
-    document.getElementById('copyRoomCodeBtn').addEventListener('click', function() {
+    const copyBtnEl = document.getElementById('copyRoomCodeBtn');
+    const copiedText = fa ? '✅ کپی شد!' : '✅ Copied!';
+    const originalText = fa ? '📋 کپی کد اتاق' : '📋 Copy Room Code';
+
+    copyBtnEl.addEventListener('click', function() {
+        const doCopy = () => {
+            this.textContent = copiedText;
+            setTimeout(() => { this.textContent = originalText; }, 2000);
+        };
         if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(() => {
-                this.textContent = '✅ کپی شد!';
-                setTimeout(() => { this.textContent = '📋 کپی کد اتاق'; }, 2000);
-            }).catch(() => {
+            navigator.clipboard.writeText(text).then(doCopy).catch(() => {
                 const tempInput = document.createElement('input');
                 tempInput.value = text;
                 document.body.appendChild(tempInput);
                 tempInput.select();
                 document.execCommand('copy');
                 document.body.removeChild(tempInput);
-                this.textContent = '✅ کپی شد!';
-                setTimeout(() => { this.textContent = '📋 کپی کد اتاق'; }, 2000);
+                doCopy();
             });
         } else {
             const tempInput = document.createElement('input');
@@ -3217,8 +3237,7 @@ function showRoomCode(text) {
             tempInput.select();
             document.execCommand('copy');
             document.body.removeChild(tempInput);
-            this.textContent = '✅ کپی شد!';
-            setTimeout(() => { this.textContent = '📋 کپی کد اتاق'; }, 2000);
+            doCopy();
         }
     });
 
@@ -3419,7 +3438,7 @@ function startGame() {
             if (isOpponentReady) {
                 startCountdown();
             } else {
-                showToast('در انتظار حریف... ⏳');
+                showToast(language === 'fa' ? 'در انتظار شروع حریف... ⏳' : 'Waiting for opponent... ⏳');
             }
             return;
         }
@@ -3535,8 +3554,6 @@ function endGame() {
     obstacles.length = 0;
     powerups.length = 0;
 
-    document.body.classList.remove('multiplayer-active');
-
     const mpFinal = document.getElementById('mpFinalScores');
     if (mpFinal) {
         if (wasMultiplayer) {
@@ -3589,10 +3606,30 @@ function updateUI() {
         vs.style.display = 'flex';
         document.getElementById('myScoreVs').textContent = score;
         document.getElementById('enemyScoreVs').textContent = remoteData.score;
-        document.body.classList.add('multiplayer-active');
+        const vsYou = document.getElementById('vsYouLabel');
+        const vsEnemy = document.getElementById('vsEnemyLabel');
+        if (vsYou) vsYou.textContent = fa ? 'شما' : 'You';
+        if (vsEnemy) vsEnemy.textContent = fa ? 'حریف' : 'Opponent';
+
+        if (powerupTimer) {
+            powerupTimer.style.left = 'auto';
+            powerupTimer.style.right = '15px';
+            powerupTimer.style.top = '115px';
+            if (!powerupTimer.classList.contains('hidden')) {
+                powerupTimer.style.transform = 'translateX(0) translateY(0)';
+            }
+        }
     } else {
         vs.style.display = 'none';
-        document.body.classList.remove('multiplayer-active');
+
+        if (powerupTimer) {
+            powerupTimer.style.left = '50%';
+            powerupTimer.style.right = 'auto';
+            powerupTimer.style.top = '65px';
+            if (!powerupTimer.classList.contains('hidden')) {
+                powerupTimer.style.transform = 'translateX(-50%) translateY(0)';
+            }
+        }
     }
 }
 
@@ -3887,6 +3924,7 @@ function applyLanguage() {
     renderSkinShop();
     updateChannelPopup();
     updateNftUI();
+    updateMpModalLanguage();
 }
 
 function setLanguage(lang) {
@@ -4542,6 +4580,7 @@ restartButton.addEventListener("click", function(e) {
 
 document.getElementById('multiplayerBtn').addEventListener('click', function(e) {
     e.stopPropagation();
+    updateMpModalLanguage();
     document.getElementById('mpModal').style.display = 'flex';
 });
 
