@@ -96,7 +96,7 @@ jobs:
           else:
               html += alert_html
 
-          # ۲. تزریق منطق ضد تقلب در یک اسکریپت جداگانه (تا مبهم‌ساز به آن دست نزند)
+          # ۲. تزریق منطق ضد تقلب در یک اسکریپت جداگانه
           anti_cheat_script = """
           <script id="antiCheatLogic">
           // ============================================================
@@ -109,9 +109,7 @@ jobs:
               var alertTimeout = null;
 
               setInterval(function() {
-                  // بررسی اینکه آیا متغیر score تعریف شده است یا خیر
                   if (typeof score === 'undefined') return;
-
                   var now = Date.now();
                   var timeDiff = (now - _lastCheckTime) / 1000; 
                   
@@ -119,18 +117,14 @@ jobs:
                       var allowedScore = _lastScore + (MAX_SCORE_PER_SEC * timeDiff);
                       if (score > allowedScore) {
                           score = Math.floor(allowedScore);
-                          
-                          // بروزرسانی رابط کاربری
                           try { if (typeof updateUI === 'function') updateUI(); } catch(e) {}
                           
-                          // نمایش هشدار به کاربر
                           var alertBox = document.getElementById('cheatAlert');
                           if (alertBox) {
                               alertBox.style.display = 'block';
                               if (alertTimeout) clearTimeout(alertTimeout);
                               alertTimeout = setTimeout(function() { alertBox.style.display = 'none'; }, 3000);
                           }
-                          console.warn('[AntiCheat] Blocked jump: +' + (score - _lastScore));
                       }
                   }
                   _lastScore = score;
@@ -214,11 +208,9 @@ jobs:
               attrs = m.group(0).split('>')[0] + '>'
               body = m.group(1)
               
-              # اسکریپت‌های خالی یا کوچک را رد کن
               if not body.strip() or len(body.strip()) < 100:
                   return m.group(0)
               
-              # 🔥 اسکیپ کردن PeerJS و AntiCheat
               if "new Peer(" in body or "peerjs" in body or "PeerJS" in body:
                   print("⏭️ Skipping obfuscation for PeerJS.")
                   return m.group(0)
@@ -235,6 +227,36 @@ jobs:
               f.write(html)
           print("✅ Game obfuscated safely.")
           PY
+
+      # ==========================================
+      # VERIFY ANTI-CHEAT (NEW STEP)
+      # ==========================================
+      - name: Verify Anti-Cheat in final HTML
+        run: |
+          echo "=========================================="
+          echo "CHECKING IF ANTI-CHEAT EXISTS IN FINAL HTML"
+          echo "=========================================="
+          if grep -q "antiCheatLogic" www/index.html; then
+              echo "✅ Anti-Cheat Script tag FOUND!"
+          else
+              echo "❌ ERROR: Anti-Cheat Script tag NOT FOUND!"
+              exit 1
+          fi
+
+          if grep -q "MAX_SCORE_PER_SEC" www/index.html; then
+              echo "✅ Anti-Cheat Variables FOUND!"
+          else
+              echo "❌ ERROR: Anti-Cheat Variables NOT FOUND!"
+              exit 1
+          fi
+
+          if grep -q "cheatAlert" www/index.html; then
+              echo "✅ Cheat Alert HTML FOUND!"
+          else
+              echo "❌ ERROR: Cheat Alert HTML NOT FOUND!"
+              exit 1
+          fi
+          echo "=========================================="
 
       # ==========================================
       # CREATE PACKAGE.JSON
