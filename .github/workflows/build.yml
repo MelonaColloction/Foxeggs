@@ -56,9 +56,9 @@ jobs:
           echo "Android SDK packages installed successfully."
 
       # ==========================================
-      # PREPARE GAME (Offline Mode & Anti-Cheat)
+      # PREPARE GAME (ONLY ANTI-CHEAT)
       # ==========================================
-      - name: Prepare game (Offline Mode & Anti-Cheat)
+      - name: Prepare game
         run: |
           test -f index.html
           rm -rf www
@@ -77,77 +77,30 @@ jobs:
             --exclude='capacitor.config.json' \
             ./ www/
 
-          echo "Game files copied. Now patching index.html..."
-
+          echo "Injecting Anti-Cheat only..."
           python3 - <<'PY'
           import re
-          import os
 
           html_path = "www/index.html"
           with open(html_path, "r", encoding="utf-8") as f:
               html = f.read()
 
-          # ---------------------------------------------------------
-          # ۱. حذف اجبار اینترنت (دور زدن checkInternet و navigator.onLine)
-          # ---------------------------------------------------------
-          offline_patch = """
-          <script>
-          // === PATCH: Force Offline Mode ===
-          Object.defineProperty(navigator, 'onLine', {
-              get: function() { return true; }
-          });
-          </script>
-          """
-
-          if "<head>" in html:
-              html = html.replace("<head>", "<head>\n" + offline_patch, 1)
-          else:
-              html = offline_patch + html
-
-          # تابع checkInternet را دستکاری می‌کنیم تا همیشه true برگرداند
-          html = html.replace(
-              "function checkInternet() {",
-              "function checkInternet() { return true; } // PATCHED: always online\nfunction _originalCheckInternet() {"
-          )
-
-          # دکمه Retry را از کار می‌اندازیم
-          html = html.replace(
-              "retryBtn.addEventListener(\"click\", function() {",
-              "retryBtn.addEventListener(\"click\", function() { noInternetOverlay.style.display='none'; return; } // PATCHED\nfunction _origRetry() {"
-          )
-
-          # ---------------------------------------------------------
-          # ۲. تزریق سیستم ضد تقلب (محدودیت ۲۵۰ امتیاز در ۱ ثانیه)
-          # ---------------------------------------------------------
+          # تزریق ضد تقلب ۲۵۰ امتیاز
           marker = "let score = 0;"
-          
-          if marker not in html:
-              print("⚠️ Warning: Could not find 'let score = 0;'. Anti-Cheat not injected.")
-          else:
+          if marker in html:
               anti_cheat_code = marker + """
-
-          // ============================================================
-          // ANTI-CHEAT SYSTEM (Max 250 score per second)
-          // ============================================================
           (function() {
               var _lastScore = 0;
               var _lastCheckTime = Date.now();
               var MAX_SCORE_PER_SEC = 250;
-
               setInterval(function() {
                   var now = Date.now();
                   var timeDiff = (now - _lastCheckTime) / 1000; 
-                  
                   if (typeof score !== 'undefined' && score > _lastScore) {
                       var allowedScore = _lastScore + (MAX_SCORE_PER_SEC * timeDiff);
-
                       if (score > allowedScore) {
                           score = Math.floor(allowedScore);
-                          try {
-                              if (typeof updateUI === 'function') updateUI();
-                              if (typeof updateScore === 'function') updateScore();
-                          } catch(e) {}
-                          console.warn('[AntiCheat] Score hack blocked! Reset to ' + score);
+                          try { if (typeof updateUI === 'function') updateUI(); } catch(e) {}
                       }
                   }
                   _lastScore = score;
@@ -156,11 +109,104 @@ jobs:
           })();
           """
               html = html.replace(marker, anti_cheat_code, 1)
-              print("✅ Anti-Cheat injected (Max 250 per second).")
+              print("✅ Anti-Cheat injected.")
+          else:
+              print("⚠️ Warning: Could not find 'let score = 0;'.")
 
           with open(html_path, "w", encoding="utf-8") as f:
               f.write(html)
-          print("✅ Offline patch applied. Game can now run without internet.")
+          PY
+
+      # ==========================================
+      # OBFUSCATE (SAFE FOR GAME & ANTI-CHEAT & PEERJS)
+      # ==========================================
+      - name: Obfuscate Game Code
+        run: |
+          echo "🔒 Installing obfuscator..."
+          npm install -g javascript-obfuscator
+          npm install -g html-minifier-terser
+
+          # ۱. فشرده‌سازی HTML
+          html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js false www/index.html -o www/index.html.min
+          mv www/index.html.min www/index.html
+
+          # ۲. مبهم‌سازی امن
+          python3 - <<'PY'
+          import re, os, subprocess, tempfile, shutil
+
+          # ⚠️ لیست حیاتی: این کلمات هرگز نباید توسط مبهم‌ساز تغییر کنند
+          RESERVED_NAMES = [
+              # --- ضد تقلب (Anti-Cheat) ---
+              "score", "updateUI", "_lastScore", "_lastCheckTime", "MAX_SCORE_PER_SEC", "allowedScore", "timeDiff", "now",
+              
+              # --- هسته بازی ---
+              "playing", "fox", "eggs", "obstacles", "particles", "canvas", "ctx", "W", "H", "scale",
+              "requestAnimationFrame", "cancelAnimationFrame", "setInterval", "clearInterval", "setTimeout",
+              "getContext", "fillRect", "clearRect", "drawImage", "beginPath", "closePath", "fill", "stroke", "arc",
+              "Math", "JSON", "Date", "Promise", "Object", "Array", "String", "Number", "Boolean", "Function", "Symbol", "Map", "Set",
+              "window", "document", "navigator", "localStorage", "sessionStorage", "console",
+              
+              # --- PeerJS (بازی آنلاین) ---
+              "peer", "conn", "on", "emit", "send", "connect", "open", "data", "close", "error", "Peer", "peerjs",
+              
+              # --- داده‌های کاربر (LocalStorage) ---
+              "foxBest", "foxGames", "foxEggs", "foxTotalScore", "foxTheme", "foxLanguage", "foxSkin", "purchasedSkins",
+              "getItem", "setItem", "removeItem",
+              
+              # --- سایر موارد ---
+              "undefined", "null", "true", "false", "this"
+          ]
+
+          def obfuscate(js_code):
+              tmpdir = tempfile.mkdtemp()
+              src = os.path.join(tmpdir, "in.js")
+              dst = os.path.join(tmpdir, "out.js")
+              try:
+                  with open(src, "w", encoding="utf-8") as f: f.write(js_code)
+                  opts = [
+                      "--compact", "true",
+                      "--identifier-names-generator", "hexadecimal",
+                      "--rename-globals", "false",
+                      "--rename-properties", "false",
+                      "--string-array", "true",
+                      "--string-array-encoding", "base64",
+                      "--string-array-threshold", "0.75",
+                      "--disable-console-output", "false"
+                  ]
+                  for s in RESERVED_NAMES:
+                      opts += ["--reserved-names", s]
+                  
+                  res = subprocess.run(["javascript-obfuscator", src, "--output", dst, *opts], capture_output=True, text=True)
+                  if res.returncode != 0:
+                      print(f"⚠️ Obfuscation failed: {res.stderr[:200]}")
+                      return js_code
+                  with open(dst, "r", encoding="utf-8") as f: return f.read()
+              finally:
+                  shutil.rmtree(tmpdir, ignore_errors=True)
+
+          with open("www/index.html", "r", encoding="utf-8") as f:
+              html = f.read()
+
+          script_re = re.compile(r'<script(?:\s[^>]*)?>(.*?)</script>', re.DOTALL)
+          
+          def repl(m):
+              body = m.group(1)
+              if not body.strip() or len(body.strip()) < 100:
+                  return m.group(0)
+              
+              # استثنا کردن بخش آنلاین (PeerJS) از مبهم‌سازی
+              if "new Peer(" in body or "peerjs" in body or "PeerJS" in body:
+                  print("⏭️ Skipping obfuscation for PeerJS (Online Multiplayer) block.")
+                  return m.group(0)
+              
+              obs = obfuscate(body)
+              return f'<script>{obs}</script>'
+
+          html = script_re.sub(repl, html)
+          
+          with open("www/index.html", "w", encoding="utf-8") as f:
+              f.write(html)
+          print("✅ Game obfuscated safely.")
           PY
 
       # ==========================================
@@ -263,9 +309,6 @@ jobs:
           VERSION_NAME="1.0.${RUN_NUMBER}"
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
-          echo "=========================================="
-          echo "VERSION"
-          echo "=========================================="
           echo "Version Code: $VERSION_CODE"
           echo "Version Name: $VERSION_NAME"
 
@@ -281,7 +324,7 @@ jobs:
           test -s FoxEggs.keystore
           mkdir -p android/app
           cp FoxEggs.keystore android/app/FoxEggs.keystore
-          echo "Keystore loaded successfully."
+          echo "Keystore loaded."
 
       # ==========================================
       # CONFIGURE SIGNING PROPERTIES
@@ -395,9 +438,7 @@ jobs:
           files = [f for f in files if f.lower() not in {"fox-eggs-icon.png", "game-logo.png"}]
           if not files: raise SystemExit("No image file found.")
           with open("CUSTOM_ICON", "w") as f: f.write(files[0])
-          print("=" * 50)
           print("CUSTOM GAME ICON:", files[0])
-          print("=" * 50)
           PY
 
       # ==========================================
