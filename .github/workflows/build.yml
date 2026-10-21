@@ -87,44 +87,67 @@ jobs:
           with open(html_path, "r", encoding="utf-8") as f:
               html = f.read()
 
-          # ۱. حذف اجبار اینترنت
+          # ---------------------------------------------------------
+          # ۱. حذف اجبار اینترنت (دور زدن checkInternet و navigator.onLine)
+          # ---------------------------------------------------------
           offline_patch = """
           <script>
+          // === PATCH: Force Offline Mode ===
           Object.defineProperty(navigator, 'onLine', {
               get: function() { return true; }
           });
           </script>
           """
+
           if "<head>" in html:
               html = html.replace("<head>", "<head>\n" + offline_patch, 1)
           else:
               html = offline_patch + html
 
+          # تابع checkInternet را دستکاری می‌کنیم تا همیشه true برگرداند
           html = html.replace(
               "function checkInternet() {",
-              "function checkInternet() { return true; }\nfunction _originalCheckInternet() {"
-          )
-          html = html.replace(
-              "retryBtn.addEventListener(\"click\", function() {",
-              "retryBtn.addEventListener(\"click\", function() { noInternetOverlay.style.display='none'; return; }\nfunction _origRetry() {"
+              "function checkInternet() { return true; } // PATCHED: always online\nfunction _originalCheckInternet() {"
           )
 
-          # ۲. تزریق سیستم ضد تقلب
+          # دکمه Retry را از کار می‌اندازیم
+          html = html.replace(
+              "retryBtn.addEventListener(\"click\", function() {",
+              "retryBtn.addEventListener(\"click\", function() { noInternetOverlay.style.display='none'; return; } // PATCHED\nfunction _origRetry() {"
+          )
+
+          # ---------------------------------------------------------
+          # ۲. تزریق سیستم ضد تقلب (محدودیت ۲۵۰ امتیاز در ۱ ثانیه)
+          # ---------------------------------------------------------
           marker = "let score = 0;"
-          if marker in html:
+          
+          if marker not in html:
+              print("⚠️ Warning: Could not find 'let score = 0;'. Anti-Cheat not injected.")
+          else:
               anti_cheat_code = marker + """
+
+          // ============================================================
+          // ANTI-CHEAT SYSTEM (Max 250 score per second)
+          // ============================================================
           (function() {
               var _lastScore = 0;
               var _lastCheckTime = Date.now();
               var MAX_SCORE_PER_SEC = 250;
+
               setInterval(function() {
                   var now = Date.now();
                   var timeDiff = (now - _lastCheckTime) / 1000; 
+                  
                   if (typeof score !== 'undefined' && score > _lastScore) {
                       var allowedScore = _lastScore + (MAX_SCORE_PER_SEC * timeDiff);
+
                       if (score > allowedScore) {
                           score = Math.floor(allowedScore);
-                          try { if (typeof updateUI === 'function') updateUI(); } catch(e) {}
+                          try {
+                              if (typeof updateUI === 'function') updateUI();
+                              if (typeof updateScore === 'function') updateScore();
+                          } catch(e) {}
+                          console.warn('[AntiCheat] Score hack blocked! Reset to ' + score);
                       }
                   }
                   _lastScore = score;
@@ -133,83 +156,11 @@ jobs:
           })();
           """
               html = html.replace(marker, anti_cheat_code, 1)
-              print("✅ Anti-Cheat injected.")
+              print("✅ Anti-Cheat injected (Max 250 per second).")
 
           with open(html_path, "w", encoding="utf-8") as f:
               f.write(html)
-          print("✅ Offline patch applied.")
-          PY
-
-      # ==========================================
-      # OBFUSCATE (STRINGS ONLY - 100% SAFE FOR LOGIC)
-      # ==========================================
-      - name: Obfuscate Game Code (Strings Only)
-        run: |
-          echo "🔒 Installing obfuscator..."
-          npm install -g javascript-obfuscator
-          npm install -g html-minifier-terser
-
-          # ۱. فشرده‌سازی HTML
-          html-minifier-terser --collapse-whitespace --remove-comments --minify-css true --minify-js false www/index.html -o www/index.html.min
-          mv www/index.html.min www/index.html
-
-          # ۲. مبهم‌سازی فقط رشته‌ها (بدون دست زدن به متغیرها و منطق)
-          python3 - <<'PY'
-          import re, os, subprocess, tempfile, shutil
-
-          def obfuscate_strings_only(js_code):
-              """فقط رشته‌ها را با base64 مخفی می‌کند، به منطق و متغیرها دست نمی‌زند."""
-              tmpdir = tempfile.mkdtemp()
-              src = os.path.join(tmpdir, "in.js")
-              dst = os.path.join(tmpdir, "out.js")
-              try:
-                  with open(src, "w", encoding="utf-8") as f: f.write(js_code)
-                  # ⚠️ تنظیمات بسیار سبک: فقط رشته‌ها مخفی می‌شوند، متغیرها هرگز تغییر نمی‌کنند
-                  opts = [
-                      "--compact", "true",
-                      "--rename-globals", "false",
-                      "--rename-properties", "false",
-                      "--identifier-names-generator", "hexadecimal",
-                      "--string-array", "true",
-                      "--string-array-encoding", "base64",
-                      "--string-array-threshold", "0.75",
-                      "--string-array-wrappers-count", "1",
-                      "--disable-console-output", "false"
-                      # ❌ control-flow-flattening و dead-code-injection حذف شدند تا منطق بازی خراب نشود
-                  ]
-                  
-                  res = subprocess.run(["javascript-obfuscator", src, "--output", dst, *opts], capture_output=True, text=True)
-                  if res.returncode != 0:
-                      print(f"⚠️ Obfuscation failed: {res.stderr[:300]}")
-                      return js_code
-                  with open(dst, "r", encoding="utf-8") as f: return f.read()
-              finally:
-                  shutil.rmtree(tmpdir, ignore_errors=True)
-
-          with open("www/index.html", "r", encoding="utf-8") as f:
-              html = f.read()
-
-          script_re = re.compile(r'<script(?:\s[^>]*)?>(.*?)</script>', re.DOTALL)
-
-          def repl(m):
-              body = m.group(1)
-              # اسکریپت‌های کوچک (مثل patch آفلاین) و اسکریپت‌های خالی را رد کن
-              if not body.strip() or len(body.strip()) < 100:
-                  return m.group(0)
-              
-              # 🔥 استثنا کردن بخش آنلاین (PeerJS) و ضد تقلب و LocalStorage
-              if any(kw in body for kw in ["new Peer(", "peerjs", "PeerJS"]):
-                  print("⏭️ Skipping obfuscation for PeerJS (Online Multiplayer) block.")
-                  return m.group(0)
-              
-              obs = obfuscate_strings_only(body)
-              return f'<script>{obs}</script>'
-
-          html = script_re.sub(repl, html)
-
-          with open("www/index.html", "w", encoding="utf-8") as f:
-              f.write(html)
-          print("✅ Game obfuscated (strings only, logic preserved).")
+          print("✅ Offline patch applied. Game can now run without internet.")
           PY
 
       # ==========================================
@@ -312,6 +263,9 @@ jobs:
           VERSION_NAME="1.0.${RUN_NUMBER}"
           echo "VERSION_CODE=$VERSION_CODE" >> "$GITHUB_ENV"
           echo "VERSION_NAME=$VERSION_NAME" >> "$GITHUB_ENV"
+          echo "=========================================="
+          echo "VERSION"
+          echo "=========================================="
           echo "Version Code: $VERSION_CODE"
           echo "Version Name: $VERSION_NAME"
 
@@ -327,7 +281,7 @@ jobs:
           test -s FoxEggs.keystore
           mkdir -p android/app
           cp FoxEggs.keystore android/app/FoxEggs.keystore
-          echo "Keystore loaded."
+          echo "Keystore loaded successfully."
 
       # ==========================================
       # CONFIGURE SIGNING PROPERTIES
