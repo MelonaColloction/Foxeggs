@@ -71,17 +71,18 @@ canvas {
     top:65px;
     left:50%;
     transform:translateX(-50%);
-    z-index:6;
+    z-index:999999;
     display:flex;
     gap:12px;
-    background:rgba(0,0,0,0.65);
-    padding:4px 14px;
+    background:rgba(0,0,0,0.75);
+    padding:6px 14px;
     border-radius:20px;
     color:white;
     font-size:12px;
     font-weight:bold;
     white-space:nowrap;
     align-items:center;
+    box-shadow:0 4px 16px rgba(0,0,0,0.4);
 }
 
 #menuButton {
@@ -591,6 +592,21 @@ button:active {
     text-overflow:ellipsis;
 }
 
+#leaveMpBtn {
+    background:rgba(239,68,68,0.9) !important;
+    border:none !important;
+    color:white !important;
+    font-size:11px !important;
+    font-weight:bold !important;
+    padding:5px 12px !important;
+    border-radius:14px !important;
+    cursor:pointer !important;
+    box-shadow:none !important;
+    margin-inline-start:6px !important;
+    transition:transform 0.1s !important;
+}
+#leaveMpBtn:active { transform:scale(0.95) !important; }
+
 @media (max-width:360px) {
     #seasonAnnouncement { padding:10px 14px 10px 12px; gap:10px; }
     #seasonAnnouncement .season-icon { font-size:26px; }
@@ -853,11 +869,7 @@ button:active {
 
 </div>
 
-<!-- ============================================ -->
-<!-- المان‌های بازی دو نفره (فقط آنلاین) -->
-<!-- ============================================ -->
-
-<div id="vsScores" style="display:none;">
+<div id="vsScores">
     <div id="vsYouBox" style="display:flex;align-items:center;gap:4px;">
         🦊 <span id="vsYouLabel">You</span>:
         <span id="myScoreVs" style="color:#4ade80;">0</span>
@@ -869,7 +881,7 @@ button:active {
         <span id="enemyScoreVs" style="color:#fbbf24;">0</span>
         <span id="enemyStatusVs" style="font-size:14px;">💚</span>
     </div>
-    <button id="leaveMpBtn" style="display:none; margin-inline-start:4px; background:rgba(239,68,68,0.85); border:none; color:white; font-size:11px; font-weight:bold; padding:4px 10px; border-radius:14px; cursor:pointer;">🚪 <span id="leaveMpText">Exit</span></button>
+    <button id="leaveMpBtn" style="display:none;">🚪 <span id="leaveMpText">Exit</span></button>
 </div>
 
 <div id="mpModal" style="position:fixed; inset:0; z-index:100000; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); padding:20px;">
@@ -3187,7 +3199,7 @@ function handleOpponentLeft() {
     conn = null;
 
     const vs = document.getElementById('vsScores');
-    if (vs) vs.style.display = 'none';
+    if (vs) { vs.style.display = 'none'; vs.style.top = '65px'; }
     const leaveBtnHide = document.getElementById('leaveMpBtn');
     if (leaveBtnHide) leaveBtnHide.style.display = 'none';
 
@@ -3304,7 +3316,8 @@ function leaveMultiplayer() {
     enemyDead = false;
     enemyAlive = false;
 
-    document.getElementById('vsScores').style.display = 'none';
+    const vs = document.getElementById('vsScores');
+    if (vs) { vs.style.display = 'none'; vs.style.top = '65px'; }
     const leaveBtnReset = document.getElementById('leaveMpBtn');
     if (leaveBtnReset) leaveBtnReset.style.display = 'none';
 
@@ -3610,6 +3623,17 @@ function executeGameStart() {
     themeSelectorOverlay.style.display = "none";
     closeChannelPopup();
 
+    const vs = document.getElementById('vsScores');
+    if (vs) {
+        if (wasMultiplayer && conn && remoteData.active) {
+            vs.style.display = 'flex';
+            vs.style.top = '65px';
+        } else {
+            vs.style.display = 'none';
+            vs.style.top = '65px';
+        }
+    }
+
     startMusic();
     lastTime = performance.now();
     _rafId = requestAnimationFrame(loop);
@@ -3681,6 +3705,16 @@ function endGame() {
     nftButton.style.display = "flex";
     gameOver.style.display = "flex";
 
+    if (wasMultiplayer && conn && conn.open && remoteData.active) {
+        const vs = document.getElementById('vsScores');
+        if (vs) {
+            vs.style.display = 'flex';
+            vs.style.top = '15px';
+        }
+        const leaveBtn = document.getElementById('leaveMpBtn');
+        if (leaveBtn) leaveBtn.style.display = 'inline-block';
+    }
+
     drawBackground();
 }
 
@@ -3708,7 +3742,7 @@ function updateUI() {
     finalEggs.textContent = totalEggs;
 
     const vs = document.getElementById('vsScores');
-    const showVs = gameStarted && conn && remoteData.active;
+    const showVs = (gameStarted || wasMultiplayer) && conn && remoteData.active;
 
     if (showVs) {
         vs.style.display = 'flex';
@@ -4903,4 +4937,4 @@ window.addEventListener('beforeunload', function() {
 
 </script>
 </body>
-    </html>
+            </html>
