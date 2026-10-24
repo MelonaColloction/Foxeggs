@@ -71,7 +71,7 @@ canvas {
     top:65px;
     left:50%;
     transform:translateX(-50%);
-    z-index:5;
+    z-index:6;
     display:flex;
     gap:12px;
     background:rgba(0,0,0,0.65);
@@ -81,6 +81,7 @@ canvas {
     font-size:12px;
     font-weight:bold;
     white-space:nowrap;
+    align-items:center;
 }
 
 #menuButton {
@@ -856,9 +857,19 @@ button:active {
 <!-- المان‌های بازی دو نفره (فقط آنلاین) -->
 <!-- ============================================ -->
 
-<div id="vsScores" style="display:none; position:fixed; top:65px; left:50%; transform:translateX(-50%); z-index:6; display:flex; gap:14px; background:rgba(0,0,0,0.55); padding:7px 16px; border-radius:24px; color:white; font-size:13px; font-weight:bold;">
-    <div>🦊 <span id="vsYouLabel">You</span>: <span id="myScoreVs" style="color:#4ade80;">0</span></div>
-    <div>🦊 <span id="vsEnemyLabel">Opponent</span>: <span id="enemyScoreVs" style="color:#fbbf24;">0</span></div>
+<div id="vsScores" style="display:none;">
+    <div id="vsYouBox" style="display:flex;align-items:center;gap:4px;">
+        🦊 <span id="vsYouLabel">You</span>:
+        <span id="myScoreVs" style="color:#4ade80;">0</span>
+        <span id="myStatusVs" style="font-size:14px;">💚</span>
+    </div>
+    <div style="width:1px;height:16px;background:rgba(255,255,255,0.2);"></div>
+    <div id="vsEnemyBox" style="display:flex;align-items:center;gap:4px;">
+        🦊 <span id="vsEnemyLabel">Opponent</span>:
+        <span id="enemyScoreVs" style="color:#fbbf24;">0</span>
+        <span id="enemyStatusVs" style="font-size:14px;">💚</span>
+    </div>
+    <button id="leaveMpBtn" style="display:none; margin-inline-start:4px; background:rgba(239,68,68,0.85); border:none; color:white; font-size:11px; font-weight:bold; padding:4px 10px; border-radius:14px; cursor:pointer;">🚪 <span id="leaveMpText">Exit</span></button>
 </div>
 
 <div id="mpModal" style="position:fixed; inset:0; z-index:100000; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.85); backdrop-filter:blur(4px); padding:20px;">
@@ -1787,7 +1798,7 @@ let MAX_PARTICLES = 40;
 let peer = null;
 let conn = null;
 let isHost = false;
-let remoteData = { active: false, score: 0 };
+let remoteData = { active: false, score: 0, dead: false, alive: false };
 let lastNetworkSend = 0;
 
 let isReady = false;
@@ -1796,6 +1807,10 @@ let isStartingCountdown = false;
 let gameStarted = false;
 let wasMultiplayer = false;
 let lastEnemyScore = 0;
+
+let myDead = false;
+let enemyDead = false;
+let enemyAlive = false;
 
 const POWERUP_CONFIG = {
     shield: { duration:15, color:'#4fc3f7', icon:'🛡️', startTime:10, maxHits:1 },
@@ -3048,7 +3063,7 @@ function updatePowerupTimers() {
 }
 
 // ============================================================
-// بخش ۲۴: اتصال دو نفره (PeerJS) — دو زبانه
+// بخش ۲۴: اتصال دو نفره (PeerJS)
 // ============================================================
 
 function updateMpModalLanguage() {
@@ -3167,10 +3182,14 @@ function handleOpponentLeft() {
     isOpponentReady = false;
     gameStarted = false;
     wasMultiplayer = false;
+    enemyDead = false;
+    enemyAlive = false;
     conn = null;
 
     const vs = document.getElementById('vsScores');
     if (vs) vs.style.display = 'none';
+    const leaveBtnHide = document.getElementById('leaveMpBtn');
+    if (leaveBtnHide) leaveBtnHide.style.display = 'none';
 
     if (playing) {
         showToast(language === 'fa' ? 'حریف بازی را ترک کرد! ادامه به‌صورت تک‌نفره 🦊' : 'Opponent left! Continuing solo 🦊');
@@ -3182,16 +3201,27 @@ function handleNetworkData(data) {
     if (data.type === 'state') {
         remoteData.active = true;
         remoteData.score = data.score;
-        lastEnemyScore = data.score;
+        remoteData.dead = !!data.dead;
+        remoteData.alive = !!data.alive;
+
+        if (data.score > lastEnemyScore) lastEnemyScore = data.score;
+
+        enemyDead = remoteData.dead;
+        enemyAlive = remoteData.alive;
+
         updateUI();
     }
+
     if (data.type === 'ready') {
         isOpponentReady = true;
+        showToast(language === 'fa' ? 'حریف آماده‌ست! ✅' : 'Opponent ready! ✅');
         if (isReady && !playing && !isStartingCountdown) startCountdown();
     }
+
     if (data.type === 'countdownStart') {
         if (!playing && !isStartingCountdown) startCountdown();
     }
+
     if (data.type === 'left') {
         handleOpponentLeft();
     }
@@ -3244,6 +3274,59 @@ function showRoomCode(text) {
     document.getElementById('closeRoomCodeBtn').addEventListener('click', function() {
         box.remove();
     });
+}
+
+function leaveMultiplayer() {
+    const fa = language === 'fa';
+    const msg = fa
+        ? 'آیا از بازی دو نفره خارج می‌شوی؟'
+        : 'Leave two-player game?';
+    if (!confirm(msg)) return;
+
+    if (conn && conn.open) {
+        try { conn.send({ type: 'left' }); } catch(e) {}
+        try { conn.close(); } catch(e) {}
+    }
+    if (peer) {
+        try { peer.destroy(); } catch(e) {}
+        peer = null;
+    }
+    conn = null;
+
+    remoteData = { active: false, score: 0, dead: false, alive: false };
+    isHost = false;
+    isReady = false;
+    isOpponentReady = false;
+    isStartingCountdown = false;
+    gameStarted = false;
+    wasMultiplayer = false;
+    myDead = false;
+    enemyDead = false;
+    enemyAlive = false;
+
+    document.getElementById('vsScores').style.display = 'none';
+    const leaveBtnReset = document.getElementById('leaveMpBtn');
+    if (leaveBtnReset) leaveBtnReset.style.display = 'none';
+
+    if (playing) {
+        playing = false;
+        if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+        stopMusic();
+        eggs.length = 0;
+        obstacles.length = 0;
+        powerups.length = 0;
+        particles.length = 0;
+        startScreen.style.display = 'flex';
+        gameOver.style.display = 'none';
+        menuButton.style.display = 'block';
+        nftButton.style.display = 'flex';
+        resetFox();
+        drawBackground();
+        drawFox(fox.x, fox.y, fox.w, fox.h, fox.vy, fox.grounded, fox.animation, currentSkinId, false);
+    }
+
+    showToast(fa ? '🚪 از بازی دو نفره خارج شدی' : '🚪 Left two-player game');
+    updateUI();
 }
 
 // ============================================================
@@ -3405,7 +3488,9 @@ function update(dt) {
     if (now - lastNetworkSend > 40 && conn && conn.open) {
         conn.send({
             type: 'state',
-            score: score
+            score: score,
+            dead: myDead,
+            alive: playing && !myDead
         });
         lastNetworkSend = now;
     }
@@ -3431,18 +3516,26 @@ function loop(time) {
 
 function startGame() {
     if (playing || isStartingCountdown) return;
+
     if (conn && conn.open) {
         if (!isReady) {
             isReady = true;
+            myDead = false;
+            enemyDead = false;
+
             conn.send({ type: 'ready' });
+            showToast(language === 'fa'
+                ? '✅ آماده شدی! در انتظار حریف... ⏳'
+                : '✅ You are ready! Waiting for opponent... ⏳');
+
             if (isOpponentReady) {
                 startCountdown();
-            } else {
-                showToast(language === 'fa' ? 'در انتظار شروع حریف... ⏳' : 'Waiting for opponent... ⏳');
             }
             return;
         }
+        return;
     }
+
     executeGameStart();
 }
 
@@ -3489,6 +3582,12 @@ function executeGameStart() {
     speedBoostTimer = 0;
     powerupTimerValue = 2;
 
+    myDead = false;
+    enemyDead = false;
+    enemyAlive = false;
+    remoteData.dead = false;
+    remoteData.alive = false;
+
     gamesPlayed++;
     saveWallet();
     updateUI();
@@ -3522,6 +3621,13 @@ function endGame() {
     stopMusic();
 
     if (_rafId) { cancelAnimationFrame(_rafId); _rafId = null; }
+
+    myDead = true;
+    if (conn && conn.open) {
+        try {
+            conn.send({ type: 'state', score: score, dead: true, alive: false });
+        } catch(e) {}
+    }
 
     finalScore.textContent = score;
 
@@ -3602,14 +3708,36 @@ function updateUI() {
     finalEggs.textContent = totalEggs;
 
     const vs = document.getElementById('vsScores');
-    if (gameStarted && conn && remoteData.active) {
+    const showVs = gameStarted && conn && remoteData.active;
+
+    if (showVs) {
         vs.style.display = 'flex';
+
         document.getElementById('myScoreVs').textContent = score;
         document.getElementById('enemyScoreVs').textContent = remoteData.score;
+
+        const myStatus = document.getElementById('myStatusVs');
+        if (myStatus) myStatus.textContent = myDead ? '💀' : '💚';
+
+        const enemyStatus = document.getElementById('enemyStatusVs');
+        if (enemyStatus) enemyStatus.textContent = enemyDead ? '💀' : '💚';
+
+        const myBox = document.getElementById('vsYouBox');
+        const enemyBox = document.getElementById('vsEnemyBox');
+        if (myBox) myBox.style.opacity = myDead ? '0.45' : '1';
+        if (enemyBox) enemyBox.style.opacity = enemyDead ? '0.45' : '1';
+
         const vsYou = document.getElementById('vsYouLabel');
         const vsEnemy = document.getElementById('vsEnemyLabel');
         if (vsYou) vsYou.textContent = fa ? 'شما' : 'You';
         if (vsEnemy) vsEnemy.textContent = fa ? 'حریف' : 'Opponent';
+
+        const leaveBtn = document.getElementById('leaveMpBtn');
+        const leaveText = document.getElementById('leaveMpText');
+        if (leaveBtn) {
+            leaveBtn.style.display = myDead ? 'inline-block' : 'none';
+        }
+        if (leaveText) leaveText.textContent = fa ? 'خروج' : 'Exit';
 
         if (powerupTimer) {
             powerupTimer.style.left = 'auto';
@@ -3917,6 +4045,9 @@ function applyLanguage() {
     recordText.textContent = fa ? "🏆 رکورد جدید!" : "🏆 New Record!";
     document.getElementById("startThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
     document.getElementById("changeThemeLabel").textContent = fa ? "تغییر تم" : "Change Theme";
+
+    const leaveText = document.getElementById('leaveMpText');
+    if (leaveText) leaveText.textContent = fa ? 'خروج' : 'Exit';
 
     updateSoundButtons();
     updateUI();
@@ -4675,6 +4806,11 @@ document.getElementById('closeChannelBtn').addEventListener('click', function(e)
 
 document.getElementById('channelPopup').addEventListener('click', function(e) {
     if (e.target === this) closeChannelPopup();
+});
+
+document.getElementById('leaveMpBtn').addEventListener('click', function(e) {
+    e.stopPropagation();
+    leaveMultiplayer();
 });
 
 document.addEventListener('visibilitychange', function() {
